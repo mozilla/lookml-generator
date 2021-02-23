@@ -22,3 +22,33 @@ Once we know which tables are associated with which namespaces, we can generate 
 
 Lookml-generator generates LookML based on both the BigQuery schema and manual changes. For example, we would want to add `city` drill-downs for all `country` fields.
 ![alt text](https://github.com/mozilla/lookml-generator/blob/main/architecture/lookml.jpg?raw=true)
+
+## Setup
+
+Ensure Python 3.8+ is available on your machine (see [this guide](https://docs.python-guide.org/starting/install3/osx/) for instructions if you're on a mac and haven't installed anything other than the default system Python.)
+
+Install requirements in a Python venv
+```bash
+python3.8 -m venv venv/
+venv/bin/pip install -r requirements.txt
+```
+
+Update requirements when they change with `pip-sync`
+```bash
+venv/bin/pip-sync
+```
+
+Setup pre-commit hooks
+```bash
+venv/bin/pre-commit install
+```
+
+Run unit tests and linters
+```bash
+venv/bin/pytest
+```
+
+Run integration tests
+```bash
+venv/bin/pytest -m integration
+```
