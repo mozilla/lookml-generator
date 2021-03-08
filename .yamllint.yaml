@@ -7,4 +7,3 @@ rules:
 ignore: |
   .git/
   venv/
-  bigquery_etl/events_daily/

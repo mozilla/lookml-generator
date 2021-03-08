@@ -9,5 +9,4 @@ pytest-mypy==0.8.0
 pytest-pydocstyle==2.2.0
 pytest==6.2.2
 PyYAML==5.4.1
-requests==2.25.1
 yamllint==1.26.0
