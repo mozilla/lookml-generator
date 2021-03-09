@@ -2,4 +2,8 @@
 
 cd "$(dirname "$0")/.."
 
+if [ -e venv ]; then
+  . venv/bin/activate
+fi
+
 exec python3 -c "from generator import cli; cli(prog_name='$0')" "$@"
