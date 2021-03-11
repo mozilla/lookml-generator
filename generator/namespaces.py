@@ -1,9 +1,11 @@
 """Generate namespaces.yaml."""
+import gzip
 import json
 import tarfile
 import urllib.request
 import warnings
 from collections import defaultdict
+from datetime import datetime
 from io import BytesIO
 from itertools import groupby
 from operator import itemgetter
@@ -11,6 +13,8 @@ from pathlib import Path
 
 import click
 import yaml
+
+PROBE_INFO_BASE_URI = "https://probeinfo.telemetry.mozilla.org"
 
 
 def _get_first(tuple_):
@@ -52,11 +56,14 @@ def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri):
     """Generate namespaces.yaml."""
     warnings.filterwarnings("ignore", module="google.auth._default")
 
+    if app_listings_uri.startswith(PROBE_INFO_BASE_URI):
+        # For probe-info-service requests, add query param to bypass cloudfront cache
+        app_listings_uri += f"?t={datetime.utcnow().isoformat()}"
     # define key function and reuse it for sorted and groupby
     get_app_name = itemgetter("app_name")
-    # groupby requires input be sorted by key to produce one result per key
     with urllib.request.urlopen(app_listings_uri) as f:
-        app_listings = sorted(json.load(f), key=get_app_name)
+        # groupby requires input be sorted by key to produce one result per key
+        app_listings = sorted(json.loads(gzip.decompress(f.read())), key=get_app_name)
     view_definitions = _get_views(generated_sql_uri)
     namespaces = {}
     for app_name, group in groupby(app_listings, get_app_name):

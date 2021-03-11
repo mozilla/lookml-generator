@@ -1,3 +1,4 @@
+import gzip
 import json
 import tarfile
 import traceback
@@ -45,16 +46,18 @@ def generated_sql_uri(tmp_path):
 @pytest.fixture
 def app_listings_uri(tmp_path):
     dest = tmp_path / "app-listings"
-    dest.write_text(
-        json.dumps(
-            [
-                {
-                    "app_name": "glean-app",
-                    "app_channel": "release",
-                    "canonical_app_name": "Glean App",
-                    "bq_dataset_family": "glean_app",
-                }
-            ]
+    dest.write_bytes(
+        gzip.compress(
+            json.dumps(
+                [
+                    {
+                        "app_name": "glean-app",
+                        "app_channel": "release",
+                        "canonical_app_name": "Glean App",
+                        "bq_dataset_family": "glean_app",
+                    }
+                ]
+            ).encode()
         )
     )
     return dest.absolute().as_uri()
