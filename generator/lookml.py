@@ -76,6 +76,10 @@ class Dimension:
                 else:
                     unsuffixed = re.sub("_time(stamp)?$", "", self.path[-1])
                 if unsuffixed != "parsed":
+                    # remove _{type} suffix from dimension_group names, for example
+                    # convert submission_date and submission_timestamp to submission,
+                    # but don't reduce the final part to "parsed", for example don't
+                    # convert metadata.header.parsed_date to metadata__header__parsed
                     name = "__".join((*self.path[:-1], unsuffixed))
                 attributes["timeframes"] = (
                     "[\n" + indent(",\n".join(timeframes), " " * 2) + "\n]"
