@@ -159,7 +159,7 @@ def lookml(namespaces, target_dir):
                         "\n  }"
                     )
             view_attributes.append(
-                "\n" "\n  measure: ping_count {" "\n    type: count" "\n  }"
+                "\n" "\n  measure: count {" "\n    type: count" "\n  }"
             )
             path.write_text(
                 f"view: {view} {{\n  sql_table_name: `{table}` ;;"
