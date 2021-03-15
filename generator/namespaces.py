@@ -77,9 +77,8 @@ def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri):
                 if view_id == "deletion_request":
                     continue
                 table = {"table": f"mozdata.{dataset_id}.{view_id}"}
-                for attr, column in [("app_channel", "channel"), ("app_id", "app_id")]:
-                    if attr in app:
-                        table[column] = app[attr]
+                if "app_channel" in app:
+                    table["channel"] = app["app_channel"]
                 views[view_id].append(table)
 
         namespaces[app_name] = {
