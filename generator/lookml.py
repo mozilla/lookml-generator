@@ -25,9 +25,13 @@ BIGQUERY_TYPE_TO_DIMENSION_TYPE = {
 }
 
 MEASURE_DIMENSIONS = {
-    ("document_id",): "pings",
     ("client_id",): "clients",
     ("client_info", "client_id"): "clients",
+}
+
+HIDDEN_DIMENSIONS = {
+    ("document_id",),
+    *MEASURE_DIMENSIONS.keys(),
 }
 
 MAP_LAYER_NAMES = {
@@ -49,7 +53,7 @@ class Dimension:
         key, name = "dimension", "__".join(self.path)
         attributes: Dict[str, str] = {}
         attributes["sql"] = "${TABLE}." + ".".join(self.path) + " ;;"
-        if self.mode == "REPEATED" or self.path in MEASURE_DIMENSIONS:
+        if self.mode == "REPEATED" or self.path in HIDDEN_DIMENSIONS:
             attributes["hidden"] = "yes"
         else:
             attributes["type"] = BIGQUERY_TYPE_TO_DIMENSION_TYPE[self.field_type]
@@ -151,7 +155,7 @@ def lookml(namespaces, target_dir):
                         "\n  }"
                     )
             view_attributes.append(
-                "\n" "\n  measure: count {" "\n    type: count" "\n  }"
+                "\n" "\n  measure: ping_count {" "\n    type: count" "\n  }"
             )
             path.write_text(
                 f"view: {view} {{\n  sql_table_name: `{table}` ;;"

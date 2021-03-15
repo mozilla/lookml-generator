@@ -153,13 +153,8 @@ def test_lookml(runner, namespaces):
                 type: number
               }
 
-              measure: count {
+              measure: ping_count {
                 type: count
-              }
-
-              measure: pings {
-                sql: COUNT(DISTINCT document_id) ;;
-                type: number
               }
             }
             """
@@ -293,7 +288,7 @@ def test_lookml(runner, namespaces):
                 type: number
               }
 
-              measure: count {
+              measure: ping_count {
                 type: count
               }
             }
