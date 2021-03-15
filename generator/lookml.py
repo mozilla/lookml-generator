@@ -2,9 +2,10 @@
 import json
 import re
 from dataclasses import dataclass
+from functools import cached_property
 from pathlib import Path
 from textwrap import indent
-from typing import Dict, List, Tuple
+from typing import Dict, Iterator, List, Optional, Tuple
 
 import click
 import yaml
@@ -24,14 +25,10 @@ BIGQUERY_TYPE_TO_DIMENSION_TYPE = {
     "TIMESTAMP": "time",
 }
 
-MEASURE_DIMENSIONS = {
-    ("client_id",): "clients",
-    ("client_info", "client_id"): "clients",
-}
-
 HIDDEN_DIMENSIONS = {
     ("document_id",),
-    *MEASURE_DIMENSIONS.keys(),
+    ("client_id",),
+    ("client_info", "client_id"),
 }
 
 MAP_LAYER_NAMES = {
@@ -40,7 +37,7 @@ MAP_LAYER_NAMES = {
 }
 
 
-@dataclass
+@dataclass(frozen=True)
 class Dimension:
     """LookML View Dimension."""
 
@@ -48,16 +45,41 @@ class Dimension:
     field_type: str
     mode: str
 
+    @cached_property
+    def hidden(self) -> bool:
+        """Determine whether this dimension is hidden."""
+        return self.mode == "REPEATED" or self.path in HIDDEN_DIMENSIONS
+
+    @cached_property
+    def type(self) -> str:
+        """Determine the lookml type for this dimension."""
+        return BIGQUERY_TYPE_TO_DIMENSION_TYPE[self.field_type]
+
+    @cached_property
+    def name(self) -> str:
+        """Determine the dimension or dimension_group name.
+
+        Remove _{type} suffix from the last path element for time dimension_group names.
+        For example submission_date and submission_timestamp become submission, and
+        metadata.header.parsed_date becomes metadata__header__parsed. This is because
+        the timeframe will add a {type} suffix to the individual dimension names.
+        """
+        if not self.hidden and self.type == "time":
+            path = *self.path[:-1], re.sub("_(date|time(stamp)?)$", "", self.path[-1])
+        else:
+            path = self.path
+        return "__".join(path)
+
     def to_lookml(self) -> str:
         """Serialize dimension as lookml."""
-        key, name = "dimension", "__".join(self.path)
+        key = "dimension"
         attributes: Dict[str, str] = {}
         attributes["sql"] = "${TABLE}." + ".".join(self.path) + " ;;"
-        if self.mode == "REPEATED" or self.path in HIDDEN_DIMENSIONS:
+        if self.hidden:
             attributes["hidden"] = "yes"
         else:
-            attributes["type"] = BIGQUERY_TYPE_TO_DIMENSION_TYPE[self.field_type]
-            if attributes["type"] == "time":
+            attributes["type"] = self.type
+            if self.type == "time":
                 key = "dimension_group"
                 timeframes = [
                     "raw",
@@ -72,15 +94,6 @@ class Dimension:
                     timeframes.remove("time")
                     attributes["convert_tz"] = "no"
                     attributes["datatype"] = "date"
-                    unsuffixed = re.sub("_date$", "", self.path[-1])
-                else:
-                    unsuffixed = re.sub("_time(stamp)?$", "", self.path[-1])
-                if unsuffixed != "parsed":
-                    # remove _{type} suffix from dimension_group names, for example
-                    # convert submission_date and submission_timestamp to submission,
-                    # but don't reduce the final part to "parsed", for example don't
-                    # convert metadata.header.parsed_date to metadata__header__parsed
-                    name = "__".join((*self.path[:-1], unsuffixed))
                 attributes["timeframes"] = (
                     "[\n" + indent(",\n".join(timeframes), " " * 2) + "\n]"
                 )
@@ -94,7 +107,7 @@ class Dimension:
             if self.path in MAP_LAYER_NAMES:
                 attributes["map_layer_name"] = MAP_LAYER_NAMES[self.path]
         return (
-            f"{key}: {name} {{"
+            f"{key}: {self.name} {{"
             + indent(
                 "".join(
                     f"\n{attr}: {value}" for attr, value in sorted(attributes.items())
@@ -104,13 +117,50 @@ class Dimension:
             + "\n}"
         )
 
+    @classmethod
+    def from_schema(
+        klass, schema: List[bigquery.SchemaField], *prefix: str
+    ) -> Iterator["Dimension"]:
+        """Generate dimensions from a bigquery schema."""
+        for field in schema:
+            if field.field_type == "RECORD" and not field.mode == "REPEATED":
+                yield from klass.from_schema(field.fields, *prefix, field.name)
+            else:
+                yield klass((*prefix, field.name), field.field_type, field.mode)
 
-def _get_dimensions(schema: List[bigquery.SchemaField], *prefix: str):
-    for field in schema:
-        if field.field_type == "RECORD" and not field.mode == "REPEATED":
-            yield from _get_dimensions(field.fields, *prefix, field.name)
-        else:
-            yield Dimension((*prefix, field.name), field.field_type, field.mode)
+
+@dataclass
+class Measure:
+    """LookML View Measure."""
+
+    name: str
+    type: str
+    sql: Optional[str] = None
+
+    def to_lookml(self) -> str:
+        """Serialize measure as lookml."""
+        return (
+            f"measure: {self.name} {{"
+            + f"\n  type: {self.type}"
+            + (f"\n  sql: {self.sql} ;;" if self.sql is not None else "")
+            + "\n}"
+        )
+
+    @classmethod
+    def from_dimensions(klass, dimensions: List[Dimension]) -> List["Measure"]:
+        """Generate measures from a list of dimensions."""
+        measures = []
+        for dimension in dimensions:
+            if dimension.name in {"client_id", "client_info__client_id"}:
+                measures.append(
+                    klass("clients", "count_distinct", f"${{{dimension.name}}}")
+                )
+            if dimension.name == "document_id":
+                measures.append(klass("ping_count", "count"))
+        # add a generic count measure if no default measures were generated
+        if not measures:
+            measures.append(klass("count", "count"))
+        return measures
 
 
 @click.command(help=__doc__)
@@ -144,25 +194,15 @@ def lookml(namespaces, target_dir):
             else:
                 # default to the first table
                 table = tables[0]["table"]
-            dimensions = list(_get_dimensions(client.get_table(table).schema))
-            view_attributes = [
-                indent(f"\n\n{dimension.to_lookml()}", " " * 2)
-                for dimension in dimensions
-            ]
-            for dimension in dimensions:
-                if dimension.path in MEASURE_DIMENSIONS:
-                    view_attributes.append(
-                        "\n"
-                        f"\n  measure: {MEASURE_DIMENSIONS[dimension.path]} {{"
-                        f"\n    sql: COUNT(DISTINCT {'.'.join(dimension.path)}) ;;"
-                        "\n    type: number"
-                        "\n  }"
-                    )
-            view_attributes.append(
-                "\n" "\n  measure: count {" "\n    type: count" "\n  }"
-            )
+            dimensions = list(Dimension.from_schema(client.get_table(table).schema))
+            measures = Measure.from_dimensions(dimensions)
             path.write_text(
                 f"view: {view} {{\n  sql_table_name: `{table}` ;;"
-                + "".join(sorted(view_attributes))
+                + "".join(
+                    sorted(
+                        indent(f"\n\n{field.to_lookml()}", " " * 2)
+                        for field in dimensions + measures
+                    )
+                )
                 + "\n}"
             )

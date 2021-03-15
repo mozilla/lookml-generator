@@ -149,8 +149,8 @@ def test_lookml(runner, namespaces):
               }
 
               measure: clients {
-                sql: COUNT(DISTINCT client_id) ;;
-                type: number
+                type: count_distinct
+                sql: ${client_id} ;;
               }
 
               measure: ping_count {
@@ -239,7 +239,7 @@ def test_lookml(runner, namespaces):
                 type: time
               }
 
-              dimension_group: metadata__header__parsed_date {
+              dimension_group: metadata__header__parsed {
                 group_item_label: "Parsed Date"
                 group_label: "Metadata Header"
                 sql: ${TABLE}.metadata.header.parsed_date ;;
@@ -255,7 +255,7 @@ def test_lookml(runner, namespaces):
                 type: time
               }
 
-              dimension_group: parsed_timestamp {
+              dimension_group: parsed {
                 sql: ${TABLE}.parsed_timestamp ;;
                 timeframes: [
                   raw,
@@ -284,12 +284,8 @@ def test_lookml(runner, namespaces):
               }
 
               measure: clients {
-                sql: COUNT(DISTINCT client_info.client_id) ;;
-                type: number
-              }
-
-              measure: ping_count {
-                type: count
+                type: count_distinct
+                sql: ${client_info__client_id} ;;
               }
             }
             """
