@@ -1,5 +1,4 @@
 import sys
-import traceback
 from pathlib import Path
 from textwrap import dedent
 from unittest.mock import patch
@@ -14,32 +13,6 @@ from generator.lookml import lookml
 @pytest.fixture
 def runner():
     return CliRunner()
-
-
-@pytest.fixture
-def namespaces(tmp_path):
-    dest = tmp_path / "namespaces.yaml"
-    dest.write_text(
-        dedent(
-            """
-            custom:
-              canonical_app_name: Custom
-              views:
-                baseline:
-                - channel: release
-                  table: mozdata.custom.baseline
-            glean-app:
-              canonical_app_name: Glean App
-              views:
-                baseline:
-                - channel: release
-                  table: mozdata.glean_app.baseline
-                - channel: beta
-                  table: mozdata.glean_app_beta.baseline
-            """
-        )
-    )
-    return dest.absolute()
 
 
 class MockClient:
@@ -96,6 +69,7 @@ class MockClient:
                     ),
                     bigquery.schema.SchemaField("parsed_timestamp", "TIMESTAMP"),
                     bigquery.schema.SchemaField("submission_timestamp", "TIMESTAMP"),
+                    bigquery.schema.SchemaField("submission_date", "DATE"),
                     bigquery.schema.SchemaField("test_bignumeric", "BIGNUMERIC"),
                     bigquery.schema.SchemaField("test_bool", "BOOLEAN"),
                     bigquery.schema.SchemaField("test_bytes", "BYTES"),
@@ -105,27 +79,70 @@ class MockClient:
                     bigquery.schema.SchemaField("test_string", "STRING"),
                 ],
             )
+        if table_ref == "mozdata.fail.duplicate_dimension":
+            return bigquery.Table(
+                table_ref,
+                schema=[
+                    bigquery.schema.SchemaField("parsed_timestamp", "TIMESTAMP"),
+                    bigquery.schema.SchemaField("parsed_date", "DATE"),
+                ],
+            )
+        if table_ref == "mozdata.fail.duplicate_measure":
+            return bigquery.Table(
+                table_ref,
+                schema=[
+                    bigquery.schema.SchemaField(
+                        "client_info",
+                        "RECORD",
+                        fields=[
+                            bigquery.schema.SchemaField("client_id", "STRING"),
+                        ],
+                    ),
+                    bigquery.schema.SchemaField("client_id", "STRING"),
+                ],
+            )
         raise ValueError(f"Table not found: {table_ref}")
 
 
-def test_lookml(runner, namespaces):
+def test_lookml(runner, tmp_path):
+    namespaces = tmp_path / "namespaces.yaml"
+    namespaces.write_text(
+        dedent(
+            """
+            custom:
+              canonical_app_name: Custom
+              views:
+                baseline:
+                - channel: release
+                  table: mozdata.custom.baseline
+            glean-app:
+              canonical_app_name: Glean App
+              views:
+                baseline:
+                - channel: release
+                  table: mozdata.glean_app.baseline
+                - channel: beta
+                  table: mozdata.glean_app_beta.baseline
+            """
+        )
+    )
     with runner.isolated_filesystem():
         with patch("google.cloud.bigquery.Client", MockClient):
             result = runner.invoke(
                 lookml,
                 [
                     "--namespaces",
-                    namespaces,
+                    namespaces.absolute(),
                 ],
             )
         sys.stdout.write(result.stdout)
         if result.stderr_bytes is not None:
             sys.stderr.write(result.stderr)
         try:
-            assert not result.exception
-        except Exception:
-            traceback.print_tb(result.exc_info[2])
-            raise
+            assert result.exit_code == 0
+        except Exception as e:
+            # use exception chaining to expose original traceback
+            raise e from result.exception
         assert (
             dedent(
                 """
@@ -292,3 +309,63 @@ def test_lookml(runner, namespaces):
             ).strip()
             == Path("looker-hub/glean-app/views/baseline.view.lkml").read_text()
         )
+
+
+def test_duplicate_dimension(runner, tmp_path):
+    namespaces = tmp_path / "namespaces.yaml"
+    namespaces.write_text(
+        dedent(
+            """
+            custom:
+              canonical_app_name: Custom
+              views:
+                baseline:
+                - channel: release
+                  table: mozdata.fail.duplicate_dimension
+            """
+        )
+    )
+    with runner.isolated_filesystem():
+        with patch("google.cloud.bigquery.Client", MockClient):
+            result = runner.invoke(
+                lookml,
+                [
+                    "--namespaces",
+                    namespaces,
+                ],
+            )
+        assert (
+            "Error: duplicate dimension 'parsed'"
+            " for table 'mozdata.fail.duplicate_dimension'\n"
+        ) == result.output
+        assert result.exit_code != 0
+
+
+def test_duplicate_measure(runner, tmp_path):
+    namespaces = tmp_path / "namespaces.yaml"
+    namespaces.write_text(
+        dedent(
+            """
+            custom:
+              canonical_app_name: Custom
+              views:
+                baseline:
+                - channel: release
+                  table: mozdata.fail.duplicate_measure
+            """
+        )
+    )
+    with runner.isolated_filesystem():
+        with patch("google.cloud.bigquery.Client", MockClient):
+            result = runner.invoke(
+                lookml,
+                [
+                    "--namespaces",
+                    namespaces,
+                ],
+            )
+        assert (
+            "Error: duplicate measure 'clients'"
+            " for table 'mozdata.fail.duplicate_measure'\n"
+        ) == result.output
+        assert result.exit_code != 0
