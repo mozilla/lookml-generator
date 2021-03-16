@@ -16,6 +16,8 @@ import yaml
 
 PROBE_INFO_BASE_URI = "https://probeinfo.telemetry.mozilla.org"
 
+OMIT_VIEWS = {"deletion_request"}
+
 
 def _get_first(tuple_):
     return tuple_[0]
@@ -76,7 +78,7 @@ def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri):
                 canonical_app_name = app["canonical_app_name"]
             dataset_id = app["bq_dataset_family"]
             for view_id in view_definitions[dataset_id]:
-                if view_id == "deletion_request":
+                if view_id in OMIT_VIEWS:
                     continue
                 table = {"table": f"mozdata.{dataset_id}.{view_id}"}
                 if "app_channel" in app:
