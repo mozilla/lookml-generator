@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from functools import cached_property
 from pathlib import Path
 from textwrap import indent
-from typing import Dict, Iterator, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import click
 import yaml
@@ -120,13 +120,28 @@ class Dimension:
     @classmethod
     def from_schema(
         klass, schema: List[bigquery.SchemaField], *prefix: str
-    ) -> Iterator["Dimension"]:
-        """Generate dimensions from a bigquery schema."""
-        for field in schema:
+    ) -> List["Dimension"]:
+        """Generate dimensions from a bigquery schema.
+
+        When schema contains both submission_timestamp and submission_date, only produce
+        a dimension group for submission_timestamp.
+
+        Raise KeyError if schema results in duplicate dimensions.
+        """
+        dimensions = {}
+        for field in sorted(schema, key=lambda f: f.name):
             if field.field_type == "RECORD" and not field.mode == "REPEATED":
-                yield from klass.from_schema(field.fields, *prefix, field.name)
+                new_dimensions = klass.from_schema(field.fields, *prefix, field.name)
             else:
-                yield klass((*prefix, field.name), field.field_type, field.mode)
+                path = *prefix, field.name
+                new_dimensions = [klass(path, field.field_type, field.mode)]
+            for dimension in new_dimensions:
+                # overwrite duplicate "submission" dimension_group, thus picking the
+                # last value sorted by field name, which is submission_timestamp
+                if dimension.name in dimensions and dimension.name != "submission":
+                    raise KeyError(dimension.name)
+                dimensions[dimension.name] = dimension
+        return list(dimensions.values())
 
 
 @dataclass
@@ -148,19 +163,25 @@ class Measure:
 
     @classmethod
     def from_dimensions(klass, dimensions: List[Dimension]) -> List["Measure"]:
-        """Generate measures from a list of dimensions."""
-        measures = []
+        """Generate measures from a list of dimensions.
+
+        When no dimension-specific measures are found, return a single "count" measure.
+
+        Raise KeyError if dimensions result in duplicate measures.
+        """
+        measures = {}
         for dimension in dimensions:
             if dimension.name in {"client_id", "client_info__client_id"}:
-                measures.append(
-                    klass("clients", "count_distinct", f"${{{dimension.name}}}")
-                )
-            if dimension.name == "document_id":
-                measures.append(klass("ping_count", "count"))
-        # add a generic count measure if no default measures were generated
-        if not measures:
-            measures.append(klass("count", "count"))
-        return measures
+                measure = klass("clients", "count_distinct", f"${{{dimension.name}}}")
+            elif dimension.name == "document_id":
+                measure = klass("ping_count", "count")
+            else:
+                continue
+            if measure.name in measures:
+                raise KeyError(measure.name)
+            measures[measure.name] = measure
+        # return a generic count measure if no default measures were generated
+        return list(measures.values()) or [klass("count", "count")]
 
 
 @click.command(help=__doc__)
@@ -194,8 +215,16 @@ def lookml(namespaces, target_dir):
             else:
                 # default to the first table
                 table = tables[0]["table"]
-            dimensions = list(Dimension.from_schema(client.get_table(table).schema))
-            measures = Measure.from_dimensions(dimensions)
+            try:
+                dimensions = Dimension.from_schema(client.get_table(table).schema)
+            except KeyError as e:
+                raise click.ClickException(
+                    f"duplicate dimension {e} for table {table!r}"
+                )
+            try:
+                measures = Measure.from_dimensions(dimensions)
+            except KeyError as e:
+                raise click.ClickException(f"duplicate measure {e} for table {table!r}")
             path.write_text(
                 f"view: {view} {{\n  sql_table_name: `{table}` ;;"
                 + "".join(
