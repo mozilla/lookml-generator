@@ -70,6 +70,8 @@ def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri):
         views = defaultdict(list)
         canonical_app_name = None
         for app in group:
+            if app.get("deprecated"):
+                continue
             if canonical_app_name is None or app.get("app_channel") == "release":
                 canonical_app_name = app["canonical_app_name"]
             dataset_id = app["bq_dataset_family"]
