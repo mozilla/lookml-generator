@@ -182,7 +182,19 @@ def test_lookml(runner, tmp_path):
             dedent(
                 """
             view: baseline {
-              sql_table_name: `mozdata.glean_app.baseline` ;;
+              parameter: channel {
+                type: unquoted
+                allowed_value: {
+                  label: "Release"
+                  value: "mozdata.glean_app.baseline"
+                }
+                allowed_value: {
+                  label: "Beta"
+                  value: "mozdata.glean_app_beta.baseline"
+                }
+              }
+
+              sql_table_name: `{% parameter channel %}` ;;
 
               dimension: client_info__client_id {
                 hidden: yes

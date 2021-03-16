@@ -206,15 +206,11 @@ def lookml(namespaces, target_dir):
         view_dir = target / key / "views"
         view_dir.mkdir(parents=True, exist_ok=True)
         for view, tables in value.get("views", {}).items():
-            path = view_dir / (view + ".view.lkml")
-            # only view one table, either channel="release" or the first one
-            for item in tables:
-                if item.get("channel") == "release":
-                    table = item["table"]
-                    break
-            else:
-                # default to the first table
-                table = tables[0]["table"]
+            # use schema for the table where channel=="release" or the first one
+            table = next(
+                (table for table in tables if table.get("channel") == "release"),
+                tables[0],
+            )["table"]
             try:
                 dimensions = Dimension.from_schema(client.get_table(table).schema)
             except KeyError as e:
@@ -225,13 +221,28 @@ def lookml(namespaces, target_dir):
                 measures = Measure.from_dimensions(dimensions)
             except KeyError as e:
                 raise click.ClickException(f"duplicate measure {e} for table {table!r}")
-            path.write_text(
-                f"view: {view} {{\n  sql_table_name: `{table}` ;;"
-                + "".join(
-                    sorted(
-                        indent(f"\n\n{field.to_lookml()}", " " * 2)
-                        for field in dimensions + measures
+            fields = []
+            sql_table_name = table
+            if len(tables) > 1:
+                # parameterize table name
+                fields.append(
+                    "\n  parameter: channel {"
+                    "\n    type: unquoted"
+                    + "".join(
+                        "\n    allowed_value: {"
+                        f'\n      label: {json.dumps(table["channel"].title())}'
+                        f'\n      value: {json.dumps(table["table"])}'
+                        "\n    }"
+                        for table in tables
                     )
+                    + "\n  }"
                 )
-                + "\n}"
+                sql_table_name = "{% parameter channel %}"
+            fields.append(f"\n  sql_table_name: `{sql_table_name}` ;;")
+            # add dimensions and measures after sql_table_name
+            fields += sorted(
+                indent(f"\n{field.to_lookml()}", " " * 2)
+                for field in dimensions + measures
             )
+            path = view_dir / (view + ".view.lkml")
+            path.write_text(f"view: {view} {{" + "\n".join(fields) + "\n}")
