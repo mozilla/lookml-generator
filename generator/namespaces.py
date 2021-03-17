@@ -91,10 +91,10 @@ def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri):
                 if "app_channel" in app:
                     table["channel"] = app["app_channel"]
                 if len(references) == 1 and references[0][-2] == f"{dataset_id}_stable":
-                    # ping views reference a single table in the stable dataset
-                    table["is_ping"] = True
+                    # view references a single table in the stable dataset
+                    table["is_ping_table"] = True
                 elif not is_release:
-                    continue  # skip non-ping tables from non-release datasets
+                    continue  # ignore non-ping tables from non-release datasets
                 views[view_id].append(table)
 
         namespaces[app_name] = {

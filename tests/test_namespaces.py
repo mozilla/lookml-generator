@@ -129,10 +129,10 @@ def test_namespaces(runner, custom_namespaces, generated_sql_uri, app_listings_u
                   views:
                     baseline:
                     - channel: release
-                      is_ping: true
+                      is_ping_table: true
                       table: mozdata.glean_app.baseline
                     - channel: beta
-                      is_ping: true
+                      is_ping_table: true
                       table: mozdata.glean_app_beta.baseline
                     baseline_clients_daily:
                     - channel: release
