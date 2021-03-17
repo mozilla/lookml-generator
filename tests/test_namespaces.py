@@ -1,7 +1,8 @@
 import gzip
 import json
+import sys
 import tarfile
-import traceback
+from io import BytesIO
 from pathlib import Path
 from textwrap import dedent
 
@@ -39,22 +40,31 @@ def generated_sql_uri(tmp_path):
     dest = tmp_path / "bigquery_etl.tar.gz"
     with tarfile.open(dest, "w:gz") as tar:
         for dataset in ("glean_app", "glean_app_beta"):
-            tar.addfile(
-                tarfile.TarInfo(
-                    name=f"sql/moz-fx-data-shared-prod/{dataset}/baseline/view.sql"
-                ),
-                dedent(
-                    f"""
-                    CREATE OR REPLACE VIEW
-                      `moz-fx-data-shared-prod`.{dataset}.baseline
-                    AS
-                    SELECT
-                      *
-                    FROM
-                      `moz-fx-data-shared-prod`.{dataset}_stable.baseline
-                    """
-                ).lstrip(),
+            content = dedent(
+                f"""
+                references:
+                  view.sql:
+                  - moz-fx-data-shared-prod.{dataset}_derived.baseline_clients_daily_v1
+                """
+            ).lstrip()
+            info = tarfile.TarInfo(
+                f"sql/moz-fx-data-shared-prod/{dataset}/"
+                "baseline_clients_daily/metadata.yaml"
             )
+            info.size = len(content)
+            tar.addfile(info, BytesIO(content.encode()))
+            content = dedent(
+                f"""
+                references:
+                  view.sql:
+                  - moz-fx-data-shared-prod.{dataset}_stable.baseline_v1
+                """
+            ).lstrip()
+            info = tarfile.TarInfo(
+                f"sql/moz-fx-data-shared-prod/{dataset}/baseline/metadata.yaml"
+            )
+            info.size = len(content)
+            tar.addfile(info, BytesIO(content.encode()))
     return dest.absolute().as_uri()
 
 
@@ -97,11 +107,14 @@ def test_namespaces(runner, custom_namespaces, generated_sql_uri, app_listings_u
                 app_listings_uri,
             ],
         )
+        sys.stdout.write(result.stdout)
+        if result.stderr_bytes is not None:
+            sys.stderr.write(result.stderr)
         try:
-            assert not result.exception
-        except Exception:
-            traceback.print_tb(result.exc_info[2])
-            raise
+            assert result.exit_code == 0
+        except Exception as e:
+            # use exception chaining to expose original traceback
+            raise e from result.exception
         assert (
             dedent(
                 """
@@ -116,9 +129,14 @@ def test_namespaces(runner, custom_namespaces, generated_sql_uri, app_listings_u
                   views:
                     baseline:
                     - channel: release
+                      is_ping_table: true
                       table: mozdata.glean_app.baseline
                     - channel: beta
+                      is_ping_table: true
                       table: mozdata.glean_app_beta.baseline
+                    baseline_clients_daily:
+                    - channel: release
+                      table: mozdata.glean_app.baseline_clients_daily
                 """
             ).lstrip()
             == Path("namespaces.yaml").read_text()

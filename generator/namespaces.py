@@ -29,10 +29,16 @@ def _get_views(uri):
     views = defaultdict(dict)
     with tarfile.open(fileobj=tarbytes, mode="r:gz") as tar:
         for tarinfo in tar:
-            if tarinfo.name.endswith("/view.sql"):
+            if tarinfo.name.endswith("/metadata.yaml"):
+                metadata = yaml.safe_load(tar.extractfile(tarinfo.name))
+                references = metadata.get("references", {})
+                if "view.sql" not in references:
+                    continue
                 *_, project, dataset_id, view_id, _ = tarinfo.name.split("/")
                 if project == "moz-fx-data-shared-prod":
-                    views[dataset_id][view_id] = tar.extractfile(tarinfo.name)
+                    views[dataset_id][view_id] = [
+                        ref.split(".") for ref in references["view.sql"]
+                    ]
     return views
 
 
@@ -74,15 +80,21 @@ def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri):
         for app in group:
             if app.get("deprecated"):
                 continue
-            if canonical_app_name is None or app.get("app_channel") == "release":
+            is_release = app.get("app_channel") == "release"
+            if canonical_app_name is None or is_release:
                 canonical_app_name = app["canonical_app_name"]
             dataset_id = app["bq_dataset_family"]
-            for view_id in view_definitions[dataset_id]:
+            for view_id, references in view_definitions[dataset_id].items():
                 if view_id in OMIT_VIEWS:
                     continue
                 table = {"table": f"mozdata.{dataset_id}.{view_id}"}
                 if "app_channel" in app:
                     table["channel"] = app["app_channel"]
+                if len(references) == 1 and references[0][-2] == f"{dataset_id}_stable":
+                    # view references a single table in the stable dataset
+                    table["is_ping_table"] = True
+                elif not is_release:
+                    continue  # ignore non-ping tables from non-release datasets
                 views[view_id].append(table)
 
         namespaces[app_name] = {
