@@ -10,9 +10,12 @@ from io import BytesIO
 from itertools import groupby
 from operator import itemgetter
 from pathlib import Path
+from typing import Dict, List
 
 import click
 import yaml
+
+from .explores import explore_types
 
 PROBE_INFO_BASE_URI = "https://probeinfo.telemetry.mozilla.org"
 
@@ -40,6 +43,15 @@ def _get_views(uri):
                         ref.split(".") for ref in references["view.sql"]
                     ]
     return views
+
+
+def _get_explores(views: Dict[str, List[Dict[str, str]]]) -> dict:
+    explores = {}
+    for klass in explore_types:
+        for explore in klass.from_views(views):
+            explores.update(explore.to_dict())
+
+    return explores
 
 
 @click.command(help=__doc__)
@@ -100,6 +112,7 @@ def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri):
         namespaces[app_name] = {
             "canonical_app_name": canonical_app_name,
             "views": dict(views),
+            "explores": _get_explores(dict(views)),
         }
 
     if custom_namespaces is not None:

@@ -126,6 +126,11 @@ def test_namespaces(runner, custom_namespaces, generated_sql_uri, app_listings_u
                       table: mozdata.custom.baseline
                 glean-app:
                   canonical_app_name: Glean App
+                  explores:
+                    baseline:
+                      type: ping_explore
+                      views:
+                        base_view: baseline
                   views:
                     baseline:
                     - channel: release
