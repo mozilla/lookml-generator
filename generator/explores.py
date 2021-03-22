@@ -22,6 +22,13 @@ class Explore:
 class PingExplore(Explore):
     """A Ping Table explore."""
 
+    def to_lookml(self) -> dict:
+        """Generate LookML to represent this explore."""
+        return {
+            "name": self.name,
+            "view_name": self.views["base_view"],
+        }
+
     @staticmethod
     def from_views(views: Dict[str, List[Dict[str, str]]]) -> Iterator[PingExplore]:
         """Generate all possible PingExplores from the views."""
@@ -30,5 +37,10 @@ class PingExplore(Explore):
             if is_ping_tbl:
                 yield PingExplore(view, "ping_explore", {"base_view": view})
 
+    @staticmethod
+    def from_dict(name: str, defn: dict) -> PingExplore:
+        """Get an instance of this explore from a name and dictionary definition."""
+        return PingExplore(name, "ping_explore", defn["views"])
 
-explore_types = [PingExplore]
+
+explore_types = {"ping_explore": PingExplore}

@@ -1,15 +1,19 @@
 """Generate lookml from namespaces."""
 import json
+import logging
 import re
 from dataclasses import dataclass
 from functools import cached_property
 from pathlib import Path
 from textwrap import indent
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, Iterable, List, Optional, Tuple
 
 import click
+import lkml
 import yaml
 from google.cloud import bigquery
+
+from .explores import explore_types
 
 BIGQUERY_TYPE_TO_DIMENSION_TYPE = {
     "BIGNUMERIC": "string",
@@ -184,6 +188,67 @@ class Measure:
         return list(measures.values()) or [klass("count", "count")]
 
 
+def _generate_views(
+    client, out_dir: Path, views: Dict[str, List[Dict[str, str]]]
+) -> Iterable[Path]:
+    for view, tables in views.items():
+        # use schema for the table where channel=="release" or the first one
+        table = next(
+            (table for table in tables if table.get("channel") == "release"),
+            tables[0],
+        )["table"]
+        try:
+            dimensions = Dimension.from_schema(client.get_table(table).schema)
+        except KeyError as e:
+            raise click.ClickException(f"duplicate dimension {e} for table {table!r}")
+        try:
+            measures = Measure.from_dimensions(dimensions)
+        except KeyError as e:
+            raise click.ClickException(f"duplicate measure {e} for table {table!r}")
+        fields = []
+        sql_table_name = table
+        if len(tables) > 1:
+            # parameterize table name
+            fields.append(
+                "\n  parameter: channel {"
+                "\n    type: unquoted"
+                + "".join(
+                    "\n    allowed_value: {"
+                    f'\n      label: {json.dumps(table["channel"].title())}'
+                    f'\n      value: {json.dumps(table["table"])}'
+                    "\n    }"
+                    for table in tables
+                )
+                + "\n  }"
+            )
+            sql_table_name = "{% parameter channel %}"
+        fields.append(f"\n  sql_table_name: `{sql_table_name}` ;;")
+        # add dimensions and measures after sql_table_name
+        fields += sorted(
+            indent(f"\n{field.to_lookml()}", " " * 2)
+            for field in dimensions + measures  # type: ignore
+        )
+        path = out_dir / (view + ".view.lkml")
+        path.write_text(f"view: {view} {{" + "\n".join(fields) + "\n}")
+
+        yield path
+
+
+def _generate_explores(
+    client, out_dir: Path, namespace: str, explores: dict
+) -> Iterable[Path]:
+    for explore_name, defn in explores.items():
+        explore = explore_types[defn["type"]].from_dict(explore_name, defn)
+        explore_lookml = explore.to_lookml()
+        file_lookml = {
+            "includes": f"/looker-hub/{namespace}/views/*.view.lkml",
+            "explores": [explore_lookml],
+        }
+        path = out_dir / (explore_name + ".explore.lkml")
+        path.write_text(lkml.dump(file_lookml))
+        yield path
+
+
 @click.command(help=__doc__)
 @click.option(
     "--namespaces",
@@ -202,47 +267,22 @@ def lookml(namespaces, target_dir):
     client = bigquery.Client()
     _namespaces = yaml.safe_load(namespaces)
     target = Path(target_dir)
-    for key, value in _namespaces.items():
-        view_dir = target / key / "views"
+    for namespace, value in _namespaces.items():
+        logging.info(f"\nGenerating namespace {namespace}")
+
+        view_dir = target / namespace / "views"
         view_dir.mkdir(parents=True, exist_ok=True)
-        for view, tables in value.get("views", {}).items():
-            # use schema for the table where channel=="release" or the first one
-            table = next(
-                (table for table in tables if table.get("channel") == "release"),
-                tables[0],
-            )["table"]
-            try:
-                dimensions = Dimension.from_schema(client.get_table(table).schema)
-            except KeyError as e:
-                raise click.ClickException(
-                    f"duplicate dimension {e} for table {table!r}"
-                )
-            try:
-                measures = Measure.from_dimensions(dimensions)
-            except KeyError as e:
-                raise click.ClickException(f"duplicate measure {e} for table {table!r}")
-            fields = []
-            sql_table_name = table
-            if len(tables) > 1:
-                # parameterize table name
-                fields.append(
-                    "\n  parameter: channel {"
-                    "\n    type: unquoted"
-                    + "".join(
-                        "\n    allowed_value: {"
-                        f'\n      label: {json.dumps(table["channel"].title())}'
-                        f'\n      value: {json.dumps(table["table"])}'
-                        "\n    }"
-                        for table in tables
-                    )
-                    + "\n  }"
-                )
-                sql_table_name = "{% parameter channel %}"
-            fields.append(f"\n  sql_table_name: `{sql_table_name}` ;;")
-            # add dimensions and measures after sql_table_name
-            fields += sorted(
-                indent(f"\n{field.to_lookml()}", " " * 2)
-                for field in dimensions + measures
-            )
-            path = view_dir / (view + ".view.lkml")
-            path.write_text(f"view: {view} {{" + "\n".join(fields) + "\n}")
+        views = value.get("views", {})
+
+        logging.info("  Generating views")
+        for view_path in _generate_views(client, view_dir, views):
+            logging.info(f"    ...Generating {view_path}")
+
+        explore_dir = target / namespace / "explores"
+        explore_dir.mkdir(parents=True, exist_ok=True)
+        explores = value.get("explores", {})
+        logging.info("  Generating explores")
+        for explore_path in _generate_explores(
+            client, explore_dir, namespace, explores
+        ):
+            logging.info(f"    ...Generating {explore_path}")
