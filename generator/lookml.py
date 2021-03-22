@@ -241,7 +241,7 @@ def _generate_explores(
         explore = explore_types[defn["type"]].from_dict(explore_name, defn)
         explore_lookml = explore.to_lookml()
         file_lookml = {
-            "includes": f"/looker-hub/{namespace}/views/*.view.lkml",
+            "includes": [f"/looker-hub/{namespace}/views/*.view.lkml"],
             "explores": [explore_lookml],
         }
         path = out_dir / (explore_name + ".explore.lkml")
@@ -268,9 +268,22 @@ def lookml(namespaces, target_dir):
     _namespaces = yaml.safe_load(namespaces)
     target = Path(target_dir)
     for namespace, value in _namespaces.items():
-        logging.info(f"\nGenerating namespace {namespace}")
+        logging.info(f"Generating namespace {namespace}")
+        model_dir = target / namespace
+        model_dir.mkdir(parents=True, exist_ok=True)
+        model_path = model_dir / f"{namespace}.model.lkml"
+        logging.info(f"  ...Generating {model_path}")
+        model_path.write_text(
+            lkml.dump(
+                {
+                    "connection": "telemetry",
+                    "label": value["canonical_app_name"],
+                    "includes": ["views/*.view", "explores/*.explore"],
+                }
+            )
+        )
 
-        view_dir = target / namespace / "views"
+        view_dir = model_dir / "views"
         view_dir.mkdir(parents=True, exist_ok=True)
         views = value.get("views", {})
 
@@ -278,7 +291,7 @@ def lookml(namespaces, target_dir):
         for view_path in _generate_views(client, view_dir, views):
             logging.info(f"    ...Generating {view_path}")
 
-        explore_dir = target / namespace / "explores"
+        explore_dir = model_dir / "explores"
         explore_dir.mkdir(parents=True, exist_ok=True)
         explores = value.get("explores", {})
         logging.info("  Generating explores")

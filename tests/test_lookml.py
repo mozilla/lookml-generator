@@ -328,7 +328,7 @@ def test_lookml(runner, tmp_path):
             == Path("looker-hub/glean-app/views/baseline.view.lkml").read_text()
         )
         assert {
-            "includes": "/looker-hub/glean-app/views/*.view.lkml",
+            "includes": ["/looker-hub/glean-app/views/*.view.lkml"],
             "explores": [
                 {
                     "name": "baseline",
@@ -338,6 +338,11 @@ def test_lookml(runner, tmp_path):
         } == lkml.load(
             Path("looker-hub/glean-app/explores/baseline.explore.lkml").read_text()
         )
+        assert {
+            "connection": "telemetry",
+            "label": "Glean App",
+            "includes": ["views/*.view", "explores/*.explore"],
+        } == lkml.load(Path("looker-hub/glean-app/glean-app.model.lkml").read_text())
 
 
 def test_duplicate_dimension(runner, tmp_path):

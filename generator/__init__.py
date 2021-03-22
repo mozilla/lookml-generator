@@ -1,5 +1,6 @@
 """Generate LookML."""
 
+import logging
 import warnings
 
 import click
@@ -13,8 +14,14 @@ def cli(prog_name=None):
     commands = {"namespaces": namespaces, "lookml": lookml}
 
     @click.group(commands=commands)
-    def group():
+    @click.option(
+        "--log-level",
+        default="WARNING",
+        help="Set logging level for the python root logger",
+    )
+    def group(log_level):
         """CLI interface for lookml automation."""
+        logging.root.setLevel(log_level)
 
     warnings.filterwarnings(
         "ignore",
