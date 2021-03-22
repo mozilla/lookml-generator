@@ -47,7 +47,7 @@ def _get_views(uri):
 
 def _get_explores(views: Dict[str, List[Dict[str, str]]]) -> dict:
     explores = {}
-    for klass in explore_types:
+    for _, klass in explore_types.items():
         for explore in klass.from_views(views):
             explores.update(explore.to_dict())
 

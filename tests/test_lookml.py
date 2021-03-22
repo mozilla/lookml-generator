@@ -3,6 +3,7 @@ from pathlib import Path
 from textwrap import dedent
 from unittest.mock import patch
 
+import lkml
 import pytest
 from click.testing import CliRunner
 from google.cloud import bigquery
@@ -123,6 +124,11 @@ def test_lookml(runner, tmp_path):
                   table: mozdata.glean_app.baseline
                 - channel: beta
                   table: mozdata.glean_app_beta.baseline
+              explores:
+                baseline:
+                  type: ping_explore
+                  views:
+                    base_view: baseline
             """
         )
     )
@@ -320,6 +326,17 @@ def test_lookml(runner, tmp_path):
             """
             ).strip()
             == Path("looker-hub/glean-app/views/baseline.view.lkml").read_text()
+        )
+        assert {
+            "includes": "/looker-hub/glean-app/views/*.view.lkml",
+            "explores": [
+                {
+                    "name": "baseline",
+                    "view_name": "baseline",
+                }
+            ],
+        } == lkml.load(
+            Path("looker-hub/glean-app/explores/baseline.explore.lkml").read_text()
         )
 
 
