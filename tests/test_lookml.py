@@ -149,183 +149,195 @@ def test_lookml(runner, tmp_path):
         except Exception as e:
             # use exception chaining to expose original traceback
             raise e from result.exception
-        assert (
-            dedent(
-                """
-            view: baseline {
-              sql_table_name: `mozdata.custom.baseline` ;;
-
-              dimension: client_id {
-                hidden: yes
-                sql: ${TABLE}.client_id ;;
-              }
-
-              dimension: country {
-                map_layer_name: countries
-                sql: ${TABLE}.country ;;
-                type: string
-              }
-
-              dimension: document_id {
-                hidden: yes
-                sql: ${TABLE}.document_id ;;
-              }
-
-              measure: clients {
-                type: count_distinct
-                sql: ${client_id} ;;
-              }
-
-              measure: ping_count {
-                type: count
-              }
-            }
-            """
-            ).strip()
-            == Path("looker-hub/custom/views/baseline.view.lkml").read_text()
-        )
-        assert (
-            dedent(
-                """
-            view: baseline {
-              parameter: channel {
-                type: unquoted
-                allowed_value: {
-                  label: "Release"
-                  value: "mozdata.glean_app.baseline"
+        assert {
+            "views": [
+                {
+                    "name": "baseline",
+                    "sql_table_name": "`mozdata.custom.baseline`",
+                    "dimensions": [
+                        {
+                            "name": "client_id",
+                            "hidden": "yes",
+                            "sql": "${TABLE}.client_id",
+                        },
+                        {
+                            "name": "country",
+                            "map_layer_name": "countries",
+                            "sql": "${TABLE}.country",
+                            "type": "string",
+                        },
+                        {
+                            "name": "document_id",
+                            "hidden": "yes",
+                            "sql": "${TABLE}.document_id",
+                        },
+                    ],
+                    "measures": [
+                        {
+                            "name": "clients",
+                            "type": "count_distinct",
+                            "sql": "${client_id}",
+                        },
+                        {
+                            "name": "ping_count",
+                            "type": "count",
+                        },
+                    ],
                 }
-                allowed_value: {
-                  label: "Beta"
-                  value: "mozdata.glean_app_beta.baseline"
+            ]
+        } == lkml.load(Path("looker-hub/custom/views/baseline.view.lkml").read_text())
+        assert {
+            "views": [
+                {
+                    "name": "baseline",
+                    "parameters": [
+                        {
+                            "name": "channel",
+                            "type": "unquoted",
+                            "allowed_values": [
+                                {
+                                    "label": "Release",
+                                    "value": "mozdata.glean_app.baseline",
+                                },
+                                {
+                                    "label": "Beta",
+                                    "value": "mozdata.glean_app_beta.baseline",
+                                },
+                            ],
+                        }
+                    ],
+                    "sql_table_name": "`{% parameter channel %}`",
+                    "dimensions": [
+                        {
+                            "name": "client_info__client_id",
+                            "hidden": "yes",
+                            "sql": "${TABLE}.client_info.client_id",
+                        },
+                        {
+                            "name": "metadata__geo__country",
+                            "map_layer_name": "countries",
+                            "group_item_label": "Country",
+                            "group_label": "Metadata Geo",
+                            "sql": "${TABLE}.metadata.geo.country",
+                            "type": "string",
+                        },
+                        {
+                            "name": "metadata__header__date",
+                            "group_item_label": "Date",
+                            "group_label": "Metadata Header",
+                            "sql": "${TABLE}.metadata.header.date",
+                            "type": "string",
+                        },
+                        {
+                            "name": "test_bignumeric",
+                            "sql": "${TABLE}.test_bignumeric",
+                            "type": "string",
+                        },
+                        {
+                            "name": "test_bool",
+                            "sql": "${TABLE}.test_bool",
+                            "type": "yesno",
+                        },
+                        {
+                            "name": "test_bytes",
+                            "sql": "${TABLE}.test_bytes",
+                            "type": "string",
+                        },
+                        {
+                            "name": "test_float64",
+                            "sql": "${TABLE}.test_float64",
+                            "type": "number",
+                        },
+                        {
+                            "name": "test_int64",
+                            "sql": "${TABLE}.test_int64",
+                            "type": "number",
+                        },
+                        {
+                            "name": "test_numeric",
+                            "sql": "${TABLE}.test_numeric",
+                            "type": "number",
+                        },
+                        {
+                            "name": "test_string",
+                            "sql": "${TABLE}.test_string",
+                            "type": "string",
+                        },
+                    ],
+                    "dimension_groups": [
+                        {
+                            "name": "client_info__parsed_first_run",
+                            "convert_tz": "no",
+                            "datatype": "date",
+                            "group_item_label": "Parsed First Run Date",
+                            "group_label": "Client Info",
+                            "sql": "${TABLE}.client_info.parsed_first_run_date",
+                            "timeframes": [
+                                "raw",
+                                "date",
+                                "week",
+                                "month",
+                                "quarter",
+                                "year",
+                            ],
+                            "type": "time",
+                        },
+                        {
+                            "name": "metadata__header__parsed",
+                            "group_item_label": "Parsed Date",
+                            "group_label": "Metadata Header",
+                            "sql": "${TABLE}.metadata.header.parsed_date",
+                            "timeframes": [
+                                "raw",
+                                "time",
+                                "date",
+                                "week",
+                                "month",
+                                "quarter",
+                                "year",
+                            ],
+                            "type": "time",
+                        },
+                        {
+                            "name": "parsed",
+                            "sql": "${TABLE}.parsed_timestamp",
+                            "timeframes": [
+                                "raw",
+                                "time",
+                                "date",
+                                "week",
+                                "month",
+                                "quarter",
+                                "year",
+                            ],
+                            "type": "time",
+                        },
+                        {
+                            "name": "submission",
+                            "sql": "${TABLE}.submission_timestamp",
+                            "timeframes": [
+                                "raw",
+                                "time",
+                                "date",
+                                "week",
+                                "month",
+                                "quarter",
+                                "year",
+                            ],
+                            "type": "time",
+                        },
+                    ],
+                    "measures": [
+                        {
+                            "name": "clients",
+                            "type": "count_distinct",
+                            "sql": "${client_info__client_id}",
+                        },
+                    ],
                 }
-              }
-
-              sql_table_name: `{% parameter channel %}` ;;
-
-              dimension: client_info__client_id {
-                hidden: yes
-                sql: ${TABLE}.client_info.client_id ;;
-              }
-
-              dimension: metadata__geo__country {
-                group_item_label: "Country"
-                group_label: "Metadata Geo"
-                map_layer_name: countries
-                sql: ${TABLE}.metadata.geo.country ;;
-                type: string
-              }
-
-              dimension: metadata__header__date {
-                group_item_label: "Date"
-                group_label: "Metadata Header"
-                sql: ${TABLE}.metadata.header.date ;;
-                type: string
-              }
-
-              dimension: test_bignumeric {
-                sql: ${TABLE}.test_bignumeric ;;
-                type: string
-              }
-
-              dimension: test_bool {
-                sql: ${TABLE}.test_bool ;;
-                type: yesno
-              }
-
-              dimension: test_bytes {
-                sql: ${TABLE}.test_bytes ;;
-                type: string
-              }
-
-              dimension: test_float64 {
-                sql: ${TABLE}.test_float64 ;;
-                type: number
-              }
-
-              dimension: test_int64 {
-                sql: ${TABLE}.test_int64 ;;
-                type: number
-              }
-
-              dimension: test_numeric {
-                sql: ${TABLE}.test_numeric ;;
-                type: number
-              }
-
-              dimension: test_string {
-                sql: ${TABLE}.test_string ;;
-                type: string
-              }
-
-              dimension_group: client_info__parsed_first_run {
-                convert_tz: no
-                datatype: date
-                group_item_label: "Parsed First Run Date"
-                group_label: "Client Info"
-                sql: ${TABLE}.client_info.parsed_first_run_date ;;
-                timeframes: [
-                  raw,
-                  date,
-                  week,
-                  month,
-                  quarter,
-                  year
-                ]
-                type: time
-              }
-
-              dimension_group: metadata__header__parsed {
-                group_item_label: "Parsed Date"
-                group_label: "Metadata Header"
-                sql: ${TABLE}.metadata.header.parsed_date ;;
-                timeframes: [
-                  raw,
-                  time,
-                  date,
-                  week,
-                  month,
-                  quarter,
-                  year
-                ]
-                type: time
-              }
-
-              dimension_group: parsed {
-                sql: ${TABLE}.parsed_timestamp ;;
-                timeframes: [
-                  raw,
-                  time,
-                  date,
-                  week,
-                  month,
-                  quarter,
-                  year
-                ]
-                type: time
-              }
-
-              dimension_group: submission {
-                sql: ${TABLE}.submission_timestamp ;;
-                timeframes: [
-                  raw,
-                  time,
-                  date,
-                  week,
-                  month,
-                  quarter,
-                  year
-                ]
-                type: time
-              }
-
-              measure: clients {
-                type: count_distinct
-                sql: ${client_info__client_id} ;;
-              }
-            }
-            """
-            ).strip()
-            == Path("looker-hub/glean-app/views/baseline.view.lkml").read_text()
+            ]
+        } == lkml.load(
+            Path("looker-hub/glean-app/views/baseline.view.lkml").read_text()
         )
         assert {
             "includes": "/looker-hub/glean-app/views/*.view.lkml",
