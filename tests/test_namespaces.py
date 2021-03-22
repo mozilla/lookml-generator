@@ -65,6 +65,7 @@ def generated_sql_uri(tmp_path):
             )
             info.size = len(content)
             tar.addfile(info, BytesIO(content.encode()))
+
     return dest.absolute().as_uri()
 
 
