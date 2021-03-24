@@ -16,17 +16,16 @@ import click
 import yaml
 
 from .explores import explore_types
+from .views import view_types
 
 PROBE_INFO_BASE_URI = "https://probeinfo.telemetry.mozilla.org"
-
-OMIT_VIEWS = {"deletion_request"}
 
 
 def _get_first(tuple_):
     return tuple_[0]
 
 
-def _get_views(uri):
+def _get_db_views(uri):
     with urllib.request.urlopen(uri) as f:
         tarbytes = BytesIO(f.read())
     views = defaultdict(dict)
@@ -42,6 +41,24 @@ def _get_views(uri):
                     views[dataset_id][view_id] = [
                         ref.split(".") for ref in references["view.sql"]
                     ]
+    return views
+
+
+def _get_looker_views(
+    app_name: str, variants: dict, db_views: Dict[str, Dict[str, List[List[str]]]]
+):
+    views = defaultdict(list)
+    for _, klass in view_types.items():
+        for view_id, tables in klass.from_db_views(variants, db_views).items():
+            if view_id in views:
+                raise KeyError(
+                    (
+                        f"Duplicate Looker View name {view_id}"
+                        f"when generating views for namespace {app_name}"
+                    )
+                )
+            views[view_id] = tables
+
     return views
 
 
@@ -84,35 +101,21 @@ def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri):
     with urllib.request.urlopen(app_listings_uri) as f:
         # groupby requires input be sorted by key to produce one result per key
         app_listings = sorted(json.loads(gzip.decompress(f.read())), key=get_app_name)
-    view_definitions = _get_views(generated_sql_uri)
+    db_views = _get_db_views(generated_sql_uri)
     namespaces = {}
     for app_name, group in groupby(app_listings, get_app_name):
-        views = defaultdict(list)
+        group = list(group)
         canonical_app_name = None
         for app in group:
-            if app.get("deprecated"):
-                continue
-            is_release = app.get("app_channel") == "release"
-            if canonical_app_name is None or is_release:
+            if canonical_app_name is None or app.get("app_channel") == "release":
                 canonical_app_name = app["canonical_app_name"]
-            dataset_id = app["bq_dataset_family"]
-            for view_id, references in view_definitions[dataset_id].items():
-                if view_id in OMIT_VIEWS:
-                    continue
-                table = {"table": f"mozdata.{dataset_id}.{view_id}"}
-                if "app_channel" in app:
-                    table["channel"] = app["app_channel"]
-                if len(references) == 1 and references[0][-2] == f"{dataset_id}_stable":
-                    # view references a single table in the stable dataset
-                    table["is_ping_table"] = True
-                elif not is_release:
-                    continue  # ignore non-ping tables from non-release datasets
-                views[view_id].append(table)
+        looker_views = dict(_get_looker_views(app_name, group, db_views))
+        explores = _get_explores(looker_views)
 
         namespaces[app_name] = {
             "canonical_app_name": canonical_app_name,
-            "views": dict(views),
-            "explores": _get_explores(dict(views)),
+            "views": looker_views,
+            "explores": explores,
         }
 
     if custom_namespaces is not None:
