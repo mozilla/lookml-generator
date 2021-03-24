@@ -43,4 +43,25 @@ class PingExplore(Explore):
         return PingExplore(name, "ping_explore", defn["views"])
 
 
-explore_types = {"ping_explore": PingExplore}
+class GrowthAccountingExplore(Explore):
+    """A Growth Accounting Explore, from Baseline Clients Last Seen."""
+
+    @staticmethod
+    def from_views(views: Dict[str, List[Dict[str, str]]]) -> Iterator[PingExplore]:
+        """
+        If possible, generate a Growth Accounting explore for this namespace.
+
+        Growth accounting explores are only created for growth_accounting views.
+        """
+        if "growth_accounting" in views.keys():
+            yield GrowthAccountingExplore(
+                "growth_accounting",
+                "growth_accounting_explore",
+                {"base_view": "growth_accounting"},
+            )
+
+
+explore_types = {
+    "ping_explore": PingExplore,
+    "growth_accounting_explore": GrowthAccountingExplore,
+}
