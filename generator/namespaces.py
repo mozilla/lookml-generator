@@ -47,8 +47,8 @@ def _get_db_views(uri):
 def _get_looker_views(
     app_name: str, variants: dict, db_views: Dict[str, Dict[str, List[List[str]]]]
 ):
-    views = defaultdict(list)
-    for _, klass in view_types.items():
+    views = {}
+    for klass in view_types.values():
         for view_id, tables in klass.from_db_views(variants, db_views).items():
             if view_id in views:
                 raise KeyError(
@@ -105,7 +105,11 @@ def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri):
     namespaces = {}
     for app_name, group in groupby(app_listings, get_app_name):
         group = list(group)
-        canonical_app_name = None
+        # use canonical_app_name where channel=="release" or the first one
+        canonical_app_name = next(
+            (app for app in group if app.get("channel") == "release"),
+            group[0],
+        )["canonical_app_name"]
         for app in group:
             if canonical_app_name is None or app.get("app_channel") == "release":
                 canonical_app_name = app["canonical_app_name"]
