@@ -1,5 +1,8 @@
 """Classes to describe Looker views."""
+from __future__ import annotations
+
 from collections import defaultdict
+from typing import Dict, Union
 
 OMIT_VIEWS = {"deletion_request"}
 
@@ -7,13 +10,17 @@ OMIT_VIEWS = {"deletion_request"}
 class View(object):
     """A generic Looker View."""
 
-    pass
+    @classmethod
+    def from_db_views(klass, variants: dict, db_views: dict) -> dict:
+        """Get Looker views from db views and app variants."""
+        raise NotImplementedError()
 
 
 class PingView(View):
     """A view on a ping table."""
 
-    def from_db_views(variants: dict, db_views: dict):
+    @classmethod
+    def from_db_views(klass, variants: dict, db_views: dict):
         """Get Looker views from db views and app variants."""
         views = defaultdict(list)
         for app in variants:
@@ -24,7 +31,9 @@ class PingView(View):
             for view_id, references in db_views[dataset_id].items():
                 if view_id in OMIT_VIEWS:
                     continue
-                table = {"table": f"mozdata.{dataset_id}.{view_id}"}
+                table: Dict[str, Union[str, bool]] = {
+                    "table": f"mozdata.{dataset_id}.{view_id}"
+                }
                 if "app_channel" in app:
                     table["channel"] = app["app_channel"]
                 if len(references) == 1 and references[0][-2] == f"{dataset_id}_stable":
@@ -40,7 +49,8 @@ class PingView(View):
 class GrowthAccountingView(View):
     """A view for growth accounting measures."""
 
-    def from_db_views(variants: dict, db_views: dict):
+    @classmethod
+    def from_db_views(klass, variants: dict, db_views: dict):
         """Get Growth Accounting Views from db views and app variants."""
         return {}
 
