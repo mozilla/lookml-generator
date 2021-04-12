@@ -10,13 +10,13 @@ from io import BytesIO
 from itertools import groupby
 from operator import itemgetter
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Union
 
 import click
 import yaml
 
 from .explores import explore_types
-from .views import view_types
+from .views import View, view_types
 
 PROBE_INFO_BASE_URI = "https://probeinfo.telemetry.mozilla.org"
 
@@ -44,28 +44,82 @@ def _get_db_views(uri):
     return views
 
 
+def _get_glean_apps(
+    app_listings_uri: str,
+) -> List[Dict[str, Union[str, List[Dict[str, str]]]]]:
+    # define key function and reuse it for sorted and groupby
+    if app_listings_uri.startswith(PROBE_INFO_BASE_URI):
+        # For probe-info-service requests, add query param to bypass cloudfront cache
+        app_listings_uri += f"?t={datetime.utcnow().isoformat()}"
+
+    get_app_name = itemgetter("app_name")
+    with urllib.request.urlopen(app_listings_uri) as f:
+        # groupby requires input be sorted by key to produce one result per key
+        app_listings = sorted(json.loads(gzip.decompress(f.read())), key=get_app_name)
+
+    apps = []
+    for app_name, group in groupby(app_listings, get_app_name):
+        variants = list(group)
+
+        # use canonical_app_name where channel=="release" or the first one
+        canonical_app_name = next(
+            (
+                channel
+                for channel in variants
+                if channel.get("app_channel") == "release"
+            ),
+            variants[0],
+        )["canonical_app_name"]
+
+        channels = [
+            {
+                "channel": channel.get("app_channel"),
+                "dataset": channel.get("bq_dataset_family"),
+            }
+            for channel in variants
+            if not channel.get("deprecated")
+        ]
+
+        # If all channels are deprecated, don't include this app
+        if channels:
+            apps.append(
+                {
+                    "app_name": app_name,
+                    "canonical_app_name": canonical_app_name,
+                    "channels": channels,
+                }
+            )
+
+    return apps
+
+
 def _get_looker_views(
-    app_name: str, variants: dict, db_views: Dict[str, Dict[str, List[List[str]]]]
-):
-    views = {}
+    app: Dict[str, Union[str, List[Dict[str, str]]]],
+    db_views: Dict[str, Dict[str, List[List[str]]]],
+) -> List[View]:
+    views, view_names = [], []
+
     for klass in view_types.values():
-        for view_id, tables in klass.from_db_views(variants, db_views).items():
-            if view_id in views:
+        for view in klass.from_db_views(  # type: ignore
+            app["app_name"], app["channels"], db_views
+        ):
+            if view.name in view_names:
                 raise KeyError(
                     (
-                        f"Duplicate Looker View name {view_id}"
-                        f"when generating views for namespace {app_name}"
+                        f"Duplicate Looker View name {view.name} "
+                        f"when generating views for namespace {app['app_name']}"
                     )
                 )
-            views[view_id] = tables
+            views.append(view)
+            view_names.append(view.name)
 
     return views
 
 
-def _get_explores(views: Dict[str, List[Dict[str, str]]]) -> dict:
+def _get_explores(views: List[View]) -> dict:
     explores = {}
     for _, klass in explore_types.items():
-        for explore in klass.from_views(views):
+        for explore in klass.from_views(views):  # type: ignore
             explores.update(explore.to_dict())
 
     return explores
@@ -93,32 +147,18 @@ def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri):
     """Generate namespaces.yaml."""
     warnings.filterwarnings("ignore", module="google.auth._default")
 
-    if app_listings_uri.startswith(PROBE_INFO_BASE_URI):
-        # For probe-info-service requests, add query param to bypass cloudfront cache
-        app_listings_uri += f"?t={datetime.utcnow().isoformat()}"
-    # define key function and reuse it for sorted and groupby
-    get_app_name = itemgetter("app_name")
-    with urllib.request.urlopen(app_listings_uri) as f:
-        # groupby requires input be sorted by key to produce one result per key
-        app_listings = sorted(json.loads(gzip.decompress(f.read())), key=get_app_name)
+    glean_apps = _get_glean_apps(app_listings_uri)
     db_views = _get_db_views(generated_sql_uri)
-    namespaces = {}
-    for app_name, group in groupby(app_listings, get_app_name):
-        group = list(group)
-        # use canonical_app_name where channel=="release" or the first one
-        canonical_app_name = next(
-            (app for app in group if app.get("channel") == "release"),
-            group[0],
-        )["canonical_app_name"]
-        for app in group:
-            if canonical_app_name is None or app.get("app_channel") == "release":
-                canonical_app_name = app["canonical_app_name"]
-        looker_views = dict(_get_looker_views(app_name, group, db_views))
-        explores = _get_explores(looker_views)
 
-        namespaces[app_name] = {
-            "canonical_app_name": canonical_app_name,
-            "views": looker_views,
+    namespaces = {}
+    for app in glean_apps:
+        looker_views = _get_looker_views(app, db_views)
+        explores = _get_explores(looker_views)
+        views_as_dict = {view.name: view.tables for view in looker_views}
+
+        namespaces[app["app_name"]] = {
+            "canonical_app_name": app["canonical_app_name"],
+            "views": views_as_dict,
             "explores": explores,
         }
 
