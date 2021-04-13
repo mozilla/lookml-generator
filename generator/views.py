@@ -31,6 +31,13 @@ class View(object):
         """Get the type of this view."""
         return self.view_type
 
+    def as_dict(self) -> dict:
+        """Get this view as a dictionary."""
+        return {
+            "type": self.view_type,
+            "tables": self.tables,
+        }
+
     def __str__(self):
         """Stringify."""
         return f"name: {self.name}, type: {self.type}, table: {self.tables}"

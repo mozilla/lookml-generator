@@ -146,7 +146,6 @@ def _get_explores(views: List[View]) -> dict:
 def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri):
     """Generate namespaces.yaml."""
     warnings.filterwarnings("ignore", module="google.auth._default")
-
     glean_apps = _get_glean_apps(app_listings_uri)
     db_views = _get_db_views(generated_sql_uri)
 
@@ -154,7 +153,7 @@ def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri):
     for app in glean_apps:
         looker_views = _get_looker_views(app, db_views)
         explores = _get_explores(looker_views)
-        views_as_dict = {view.name: view.tables for view in looker_views}
+        views_as_dict = {view.name: view.as_dict() for view in looker_views}
 
         namespaces[app["app_name"]] = {
             "canonical_app_name": app["canonical_app_name"],

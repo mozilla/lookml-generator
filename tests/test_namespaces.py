@@ -33,8 +33,10 @@ def custom_namespaces(tmp_path):
               canonical_app_name: Custom
               views:
                 baseline:
-                - channel: release
-                  table: mozdata.custom.baseline
+                  type: ping_view
+                  tables:
+                  - channel: release
+                    table: mozdata.custom.baseline
             """
         ).lstrip()
     )
@@ -163,8 +165,10 @@ def test_namespaces_full(
                   canonical_app_name: Custom
                   views:
                     baseline:
-                    - channel: release
-                      table: mozdata.custom.baseline
+                      tables:
+                      - channel: release
+                        table: mozdata.custom.baseline
+                      type: ping_view
                 glean-app:
                   canonical_app_name: Glean App
                   explores:
@@ -178,12 +182,16 @@ def test_namespaces_full(
                         base_view: growth_accounting
                   views:
                     baseline:
-                    - channel: release
-                      table: mozdata.glean_app.baseline
-                    - channel: beta
-                      table: mozdata.glean_app_beta.baseline
+                      tables:
+                      - channel: release
+                        table: mozdata.glean_app.baseline
+                      - channel: beta
+                        table: mozdata.glean_app_beta.baseline
+                      type: ping_view
                     growth_accounting:
-                    - table: mozdata.glean_app.baseline_clients_last_seen
+                      tables:
+                      - table: mozdata.glean_app.baseline_clients_last_seen
+                      type: growth_accounting_view
                 """
             ).lstrip()
             == Path("namespaces.yaml").read_text()
