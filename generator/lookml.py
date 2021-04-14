@@ -144,7 +144,8 @@ def _generate_measures(dimensions: List[dict], table: str) -> List[Dict[str, str
 def _generate_views(
     client, out_dir: Path, views: Dict[str, List[Dict[str, str]]]
 ) -> Iterable[Path]:
-    for name, tables in views.items():
+    for name, defn in views.items():
+        tables = defn["tables"]
         view: Dict[str, Any] = {"name": name}
         # use schema for the table where channel=="release" or the first one
         table = next(
@@ -184,6 +185,9 @@ def _generate_explores(
     client, out_dir: Path, namespace: str, explores: dict
 ) -> Iterable[Path]:
     for explore_name, defn in explores.items():
+        if defn["type"] != "ping_explore":
+            continue
+
         explore = explore_types[defn["type"]].from_dict(explore_name, defn)
         explore_lookml = explore.to_lookml()
         file_lookml = {
