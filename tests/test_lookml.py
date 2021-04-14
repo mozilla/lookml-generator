@@ -114,16 +114,20 @@ def test_lookml(runner, tmp_path):
               canonical_app_name: Custom
               views:
                 baseline:
-                - channel: release
-                  table: mozdata.custom.baseline
+                  type: ping_view
+                  tables:
+                  - channel: release
+                    table: mozdata.custom.baseline
             glean-app:
               canonical_app_name: Glean App
               views:
                 baseline:
-                - channel: release
-                  table: mozdata.glean_app.baseline
-                - channel: beta
-                  table: mozdata.glean_app_beta.baseline
+                  type: ping_view
+                  tables:
+                  - channel: release
+                    table: mozdata.glean_app.baseline
+                  - channel: beta
+                    table: mozdata.glean_app_beta.baseline
               explores:
                 baseline:
                   type: ping_explore
@@ -361,8 +365,10 @@ def test_duplicate_dimension(runner, tmp_path):
               canonical_app_name: Custom
               views:
                 baseline:
-                - channel: release
-                  table: mozdata.fail.duplicate_dimension
+                  type: ping_explore
+                  tables:
+                  - channel: release
+                    table: mozdata.fail.duplicate_dimension
             """
         )
     )
@@ -391,8 +397,10 @@ def test_duplicate_measure(runner, tmp_path):
               canonical_app_name: Custom
               views:
                 baseline:
-                - channel: release
-                  table: mozdata.fail.duplicate_measure
+                  type: ping_explore
+                  tables:
+                  - channel: release
+                    table: mozdata.fail.duplicate_measure
             """
         )
     )
