@@ -117,6 +117,6 @@ class GrowthAccountingView(View):
 
 
 view_types = {
-    "ping_view": PingView,
-    "growth_accounting": GrowthAccountingView,
+    PingView.type: PingView,
+    GrowthAccountingView.type: GrowthAccountingView,
 }
