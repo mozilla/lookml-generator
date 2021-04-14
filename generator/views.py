@@ -27,6 +27,11 @@ class View(object):
         """Get Looker views from app."""
         raise NotImplementedError("Only implemented in subclass.")
 
+    @classmethod
+    def from_dict(klass, name: str, _dict: List[Dict[str, str]]) -> View:
+        """Get a view from a name and dict definition."""
+        raise NotImplementedError("Only implemented in subclass.")
+
     def get_type(self) -> str:
         """Get the type of this view."""
         return self.view_type
@@ -55,6 +60,9 @@ class View(object):
                 and comparable_dict(self.tables) == comparable_dict(other.tables)
             )
         return False
+
+    def generate_dimensions(self):
+        pass
 
 
 class PingView(View):
@@ -91,6 +99,16 @@ class PingView(View):
         for view_id, tables in views.items():
             yield PingView(view_id, tables)
 
+    @classmethod
+    def from_dict(klass, name: str, _dict: List[Dict[str, str]]) -> PingView:
+        return PingView(name, _dict["tables"])
+
+    def generate_dimensions(self):
+        pass
+
+    def generate_measures(self):
+        pass
+
 
 class GrowthAccountingView(View):
     """A view for growth accounting measures."""
@@ -114,6 +132,12 @@ class GrowthAccountingView(View):
         for view_id, references in db_views[dataset].items():
             if view_id == "baseline_clients_last_seen":
                 yield GrowthAccountingView([{"table": f"mozdata.{dataset}.{view_id}"}])
+
+    @classmethod
+    def from_dict(
+        klass, name: str, _dict: List[Dict[str, str]]
+    ) -> GrowthAccountingView:
+        return GrowthAccountingView(_dict["tables"])
 
 
 view_types = {

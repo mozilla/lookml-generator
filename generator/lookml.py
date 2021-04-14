@@ -11,6 +11,7 @@ import yaml
 from google.cloud import bigquery
 
 from .explores import explore_types
+from .views import GrowthAccountingView, View, view_types
 
 BIGQUERY_TYPE_TO_DIMENSION_TYPE = {
     "BIGNUMERIC": "string",
@@ -36,13 +37,6 @@ MAP_LAYER_NAMES = {
     ("country",): "countries",
     ("metadata", "geo", "country"): "countries",
 }
-
-
-class ViewDict(TypedDict):
-    """Represent a view definition."""
-
-    type: str
-    tables: List[Dict[str, str]]
 
 
 def _get_dimension(path: Tuple[str, ...], field_type: str, mode: str) -> Dict[str, Any]:
@@ -148,26 +142,26 @@ def _generate_measures(dimensions: List[dict], table: str) -> List[Dict[str, str
     return list(measures.values()) or [{"name": "count", "type": "count"}]
 
 
-def _generate_views(
-    client, out_dir: Path, views: Dict[str, ViewDict]
-) -> Iterable[Path]:
-    for name, defn in views.items():
-        tables = defn["tables"]
-        view: Dict[str, Any] = {"name": name}
+def _generate_views(client, out_dir: Path, views: Iterable[View]) -> Iterable[Path]:
+    for view in views:
+        if view.type == GrowthAccountingView.type:
+            continue
+
+        view_defn: Dict[str, Any] = {"name": view.name}
         # use schema for the table where channel=="release" or the first one
         table = next(
-            (table for table in tables if table.get("channel") == "release"),
-            tables[0],
+            (table for table in view.tables if table.get("channel") == "release"),
+            view.tables[0],
         )["table"]
         # add dimensions and dimension groups
         dimensions = _generate_dimensions(client, table)
-        view["dimensions"] = list(filterfalse(_is_dimension_group, dimensions))
-        view["dimension_groups"] = list(filter(_is_dimension_group, dimensions))
+        view_defn["dimensions"] = list(filterfalse(_is_dimension_group, dimensions))
+        view_defn["dimension_groups"] = list(filter(_is_dimension_group, dimensions))
         # add measures
-        view["measures"] = _generate_measures(dimensions, table)
-        if len(tables) > 1:
+        view_defn["measures"] = _generate_measures(dimensions, table)
+        if len(view.tables) > 1:
             # parameterize table name
-            view["parameters"] = [
+            view_defn["parameters"] = [
                 {
                     "name": "channel",
                     "type": "unquoted",
@@ -176,15 +170,15 @@ def _generate_views(
                             "label": table["channel"].title(),
                             "value": table["table"],
                         }
-                        for table in tables
+                        for table in view.tables
                     ],
                 }
             ]
-            view["sql_table_name"] = "`{% parameter channel %}`"
+            view_defn["sql_table_name"] = "`{% parameter channel %}`"
         else:
-            view["sql_table_name"] = f"`{table}`"
-        path = out_dir / f"{name}.view.lkml"
-        path.write_text(lkml.dump({"views": [view]}))
+            view_defn["sql_table_name"] = f"`{table}`"
+        path = out_dir / f"{view.name}.view.lkml"
+        path.write_text(lkml.dump({"views": [view_defn]}))
         yield path
 
 
@@ -206,6 +200,11 @@ def _generate_explores(
         yield path
 
 
+def _get_views_from_dict(views: Dict[str, List[Dict[str, str]]]) -> Iterable[View]:
+    for view_name, view_info in views.items():
+        yield view_types[view_info["type"]].from_dict(view_name, view_info)
+
+
 @click.command(help=__doc__)
 @click.option(
     "--namespaces",
@@ -224,12 +223,12 @@ def lookml(namespaces, target_dir):
     client = bigquery.Client()
     _namespaces = yaml.safe_load(namespaces)
     target = Path(target_dir)
-    for namespace, value in _namespaces.items():
+    for namespace, lookml_objects in _namespaces.items():
         logging.info(f"\nGenerating namespace {namespace}")
 
         view_dir = target / namespace / "views"
         view_dir.mkdir(parents=True, exist_ok=True)
-        views = value.get("views", {})
+        views = _get_views_from_dict(lookml_objects.get("views", {}))
 
         logging.info("  Generating views")
         for view_path in _generate_views(client, view_dir, views):
@@ -237,7 +236,7 @@ def lookml(namespaces, target_dir):
 
         explore_dir = target / namespace / "explores"
         explore_dir.mkdir(parents=True, exist_ok=True)
-        explores = value.get("explores", {})
+        explores = lookml_objects.get("explores", {})
         logging.info("  Generating explores")
         for explore_path in _generate_explores(
             client, explore_dir, namespace, explores
