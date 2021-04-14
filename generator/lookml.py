@@ -3,7 +3,7 @@ import logging
 import re
 from itertools import filterfalse
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Tuple
+from typing import Any, Dict, Iterable, List, Tuple, TypedDict
 
 import click
 import lkml
@@ -36,6 +36,13 @@ MAP_LAYER_NAMES = {
     ("country",): "countries",
     ("metadata", "geo", "country"): "countries",
 }
+
+
+class ViewDict(TypedDict):
+    """Represent a view definition."""
+
+    type: str
+    tables: List[Dict[str, str]]
 
 
 def _get_dimension(path: Tuple[str, ...], field_type: str, mode: str) -> Dict[str, Any]:
@@ -142,7 +149,7 @@ def _generate_measures(dimensions: List[dict], table: str) -> List[Dict[str, str
 
 
 def _generate_views(
-    client, out_dir: Path, views: Dict[str, List[Dict[str, str]]]
+    client, out_dir: Path, views: Dict[str, ViewDict]
 ) -> Iterable[Path]:
     for name, defn in views.items():
         tables = defn["tables"]
