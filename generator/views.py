@@ -2,9 +2,21 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import Dict, Iterator, List
+from itertools import filterfalse
+from typing import Any, Dict, Iterator, List, TypedDict
+
+import click
+
+from . import lookml_utils
 
 OMIT_VIEWS = {"deletion_request"}
+
+
+class ViewDict(TypedDict):
+    """Represent a view definition."""
+
+    type: str
+    tables: List[Dict[str, str]]
 
 
 class View(object):
@@ -28,7 +40,7 @@ class View(object):
         raise NotImplementedError("Only implemented in subclass.")
 
     @classmethod
-    def from_dict(klass, name: str, _dict: List[Dict[str, str]]) -> View:
+    def from_dict(klass, name: str, _dict: ViewDict) -> View:
         """Get a view from a name and dict definition."""
         raise NotImplementedError("Only implemented in subclass.")
 
@@ -61,8 +73,15 @@ class View(object):
             )
         return False
 
-    def generate_dimensions(self):
-        pass
+    def to_lookml(self, bq_client) -> List[dict]:
+        """
+        Generate Lookml for this view.
+
+        View instances can generate more than one Looker view,
+        for e.g. nested fields and joins, so this returns
+        a list.
+        """
+        raise NotImplementedError("Only implemented in subclass.")
 
 
 class PingView(View):
@@ -100,14 +119,87 @@ class PingView(View):
             yield PingView(view_id, tables)
 
     @classmethod
-    def from_dict(klass, name: str, _dict: List[Dict[str, str]]) -> PingView:
+    def from_dict(klass, name: str, _dict: ViewDict) -> PingView:
+        """Get a view from a name and dict definition."""
         return PingView(name, _dict["tables"])
 
-    def generate_dimensions(self):
-        pass
+    def to_lookml(self, bq_client) -> List[dict]:
+        """Generate LookML for this view."""
+        view_defn: Dict[str, Any] = {"name": self.name}
 
-    def generate_measures(self):
-        pass
+        # use schema for the table where channel=="release" or the first one
+        table = next(
+            (table for table in self.tables if table.get("channel") == "release"),
+            self.tables[0],
+        )["table"]
+
+        # add dimensions and dimension groups
+        dimensions = lookml_utils._generate_dimensions(bq_client, table)
+        view_defn["dimensions"] = list(
+            filterfalse(lookml_utils._is_dimension_group, dimensions)
+        )
+        view_defn["dimension_groups"] = list(
+            filter(lookml_utils._is_dimension_group, dimensions)
+        )
+
+        # add measures
+        view_defn["measures"] = self.get_measures(dimensions, table)
+
+        # parameterize table name
+        if len(self.tables) > 1:
+            view_defn["parameters"] = [
+                {
+                    "name": "channel",
+                    "type": "unquoted",
+                    "allowed_values": [
+                        {
+                            "label": table["channel"].title(),
+                            "value": table["table"],
+                        }
+                        for table in self.tables
+                    ],
+                }
+            ]
+            view_defn["sql_table_name"] = "`{% parameter channel %}`"
+        else:
+            view_defn["sql_table_name"] = f"`{table}`"
+
+        return [view_defn]
+
+    def get_measures(self, dimensions: List[dict], table: str) -> List[Dict[str, str]]:
+        """Generate measures from a list of dimensions.
+
+        When no dimension-specific measures are found, return a single "count" measure.
+
+        Raise ClickException if dimensions result in duplicate measures.
+        """
+        measures = {}
+
+        for dimension in dimensions:
+            dimension_name = dimension["name"]
+            if dimension_name in {"client_id", "client_info__client_id"}:
+                measure = {
+                    "name": "clients",
+                    "type": "count_distinct",
+                    "sql": f"${{{dimension_name}}}",
+                }
+            elif dimension_name == "document_id":
+                measure = {"name": "ping_count", "type": "count"}
+            else:
+                continue
+            name = measure["name"]
+            if name in measures:
+                raise click.ClickException(
+                    f"duplicate measure {name!r} for table {table!r}"
+                )
+            measures[name] = measure
+
+        if len(measures) == 0:
+            raise click.ClickException(
+                f"Missing client_id and doc_id dimensions in {table!r}"
+            )
+
+        return list(measures.values())
 
 
 class GrowthAccountingView(View):
@@ -134,10 +226,13 @@ class GrowthAccountingView(View):
                 yield GrowthAccountingView([{"table": f"mozdata.{dataset}.{view_id}"}])
 
     @classmethod
-    def from_dict(
-        klass, name: str, _dict: List[Dict[str, str]]
-    ) -> GrowthAccountingView:
+    def from_dict(klass, name: str, _dict: ViewDict) -> GrowthAccountingView:
+        """Get a view from a name and dict definition."""
         return GrowthAccountingView(_dict["tables"])
+
+    def to_lookml(self, bq_client) -> List[dict]:
+        """Generate LookML for this view."""
+        pass
 
 
 view_types = {

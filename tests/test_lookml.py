@@ -365,7 +365,7 @@ def test_duplicate_dimension(runner, tmp_path):
               canonical_app_name: Custom
               views:
                 baseline:
-                  type: ping_explore
+                  type: ping_view
                   tables:
                   - channel: release
                     table: mozdata.fail.duplicate_dimension
@@ -397,7 +397,7 @@ def test_duplicate_measure(runner, tmp_path):
               canonical_app_name: Custom
               views:
                 baseline:
-                  type: ping_explore
+                  type: ping_view
                   tables:
                   - channel: release
                     table: mozdata.fail.duplicate_measure
@@ -406,6 +406,8 @@ def test_duplicate_measure(runner, tmp_path):
     )
     with runner.isolated_filesystem():
         with patch("google.cloud.bigquery.Client", MockClient):
+            # print(f"{namespaces}")
+            # lookml(str(namespaces), "looker-hub/")
             result = runner.invoke(
                 lookml,
                 [
