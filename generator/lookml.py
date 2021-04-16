@@ -9,14 +9,11 @@ import yaml
 from google.cloud import bigquery
 
 from .explores import explore_types
-from .views import GrowthAccountingView, View, ViewDict, view_types
+from .views import View, ViewDict, view_types
 
 
 def _generate_views(client, out_dir: Path, views: Iterable[View]) -> Iterable[Path]:
     for view in views:
-        if view.view_type == GrowthAccountingView.type:
-            continue
-
         path = out_dir / f"{view.name}.view.lkml"
         lookml = {"views": view.to_lookml(client)}
         path.write_text(lkml.dump(lookml))
@@ -27,12 +24,15 @@ def _generate_explores(
     client, out_dir: Path, namespace: str, explores: dict
 ) -> Iterable[Path]:
     for explore_name, defn in explores.items():
-        if defn["type"] != "ping_explore":
-            continue
-
         explore = explore_types[defn["type"]].from_dict(explore_name, defn)
         file_lookml = {
-            "includes": f"/looker-hub/{namespace}/views/*.view.lkml",
+            # Looker validates all included files,
+            # so if we're not explicit about files here, validation takes
+            # forever as looker re-validates all views for every explore (if we used *).
+            "includes": [
+                f"/looker-hub/{namespace}/views/{view}.view.lkml"
+                for view in explore.get_dependent_views()
+            ],
             "explores": [explore.to_lookml()],
         }
         path = out_dir / (explore_name + ".explore.lkml")

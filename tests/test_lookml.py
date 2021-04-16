@@ -9,6 +9,9 @@ from click.testing import CliRunner
 from google.cloud import bigquery
 
 from generator.lookml import lookml
+from generator.views import GrowthAccountingView
+
+from .utils import print_and_test
 
 
 @pytest.fixture
@@ -23,6 +26,15 @@ class MockClient:
         """Mock bigquery.Client.get_table."""
 
         if table_ref == "mozdata.custom.baseline":
+            return bigquery.Table(
+                table_ref,
+                schema=[
+                    bigquery.schema.SchemaField("client_id", "STRING"),
+                    bigquery.schema.SchemaField("country", "STRING"),
+                    bigquery.schema.SchemaField("document_id", "STRING"),
+                ],
+            )
+        if table_ref == "mozdata.glean_app.baseline_clients_last_seen":
             return bigquery.Table(
                 table_ref,
                 schema=[
@@ -105,7 +117,7 @@ class MockClient:
         raise ValueError(f"Table not found: {table_ref}")
 
 
-def test_lookml(runner, tmp_path):
+def test_lookml_actual(runner, tmp_path):
     namespaces = tmp_path / "namespaces.yaml"
     namespaces.write_text(
         dedent(
@@ -128,11 +140,19 @@ def test_lookml(runner, tmp_path):
                     table: mozdata.glean_app.baseline
                   - channel: beta
                     table: mozdata.glean_app_beta.baseline
+                growth_accounting:
+                  type: growth_accounting_view
+                  tables:
+                  - table: mozdata.glean_app.baseline_clients_last_seen
               explores:
                 baseline:
                   type: ping_explore
                   views:
                     base_view: baseline
+                growth_accounting:
+                  type: growth_accounting_explore
+                  views:
+                    base_view: growth_accounting
             """
         )
     )
@@ -153,7 +173,7 @@ def test_lookml(runner, tmp_path):
         except Exception as e:
             # use exception chaining to expose original traceback
             raise e from result.exception
-        assert {
+        expected = {
             "views": [
                 {
                     "name": "baseline",
@@ -189,8 +209,12 @@ def test_lookml(runner, tmp_path):
                     ],
                 }
             ]
-        } == lkml.load(Path("looker-hub/custom/views/baseline.view.lkml").read_text())
-        assert {
+        }
+        print_and_test(
+            expected,
+            lkml.load(Path("looker-hub/custom/views/baseline.view.lkml").read_text()),
+        )
+        expected = {
             "views": [
                 {
                     "name": "baseline",
@@ -340,19 +364,67 @@ def test_lookml(runner, tmp_path):
                     ],
                 }
             ]
-        } == lkml.load(
-            Path("looker-hub/glean-app/views/baseline.view.lkml").read_text()
+        }
+
+        print_and_test(
+            expected,
+            lkml.load(
+                Path("looker-hub/glean-app/views/baseline.view.lkml").read_text()
+            ),
         )
-        assert {
-            "includes": "/looker-hub/glean-app/views/*.view.lkml",
+        expected = {
+            "views": [
+                {
+                    "name": "growth_accounting",
+                    "sql_table_name": "`mozdata.glean_app.baseline_clients_last_seen`",
+                    "dimensions": [
+                        {
+                            "name": "client_id",
+                            "hidden": "yes",
+                            "sql": "${TABLE}.client_id",
+                        },
+                        {
+                            "name": "country",
+                            "map_layer_name": "countries",
+                            "sql": "${TABLE}.country",
+                            "type": "string",
+                        },
+                        {
+                            "name": "document_id",
+                            "hidden": "yes",
+                            "sql": "${TABLE}.document_id",
+                        },
+                    ]
+                    + GrowthAccountingView.default_dimensions,
+                    "measures": GrowthAccountingView.default_measures,
+                }
+            ]
+        }
+
+        # lkml changes the format of lookml, so we need to cycle it through to match
+        print_and_test(
+            lkml.load(lkml.dump(expected)),
+            lkml.load(
+                Path(
+                    "looker-hub/glean-app/views/growth_accounting.view.lkml"
+                ).read_text()
+            ),
+        )
+
+        expected = {
+            "includes": ["/looker-hub/glean-app/views/baseline.view.lkml"],
             "explores": [
                 {
                     "name": "baseline",
                     "view_name": "baseline",
                 }
             ],
-        } == lkml.load(
-            Path("looker-hub/glean-app/explores/baseline.explore.lkml").read_text()
+        }
+        print_and_test(
+            expected,
+            lkml.load(
+                Path("looker-hub/glean-app/explores/baseline.explore.lkml").read_text()
+            ),
         )
 
 
