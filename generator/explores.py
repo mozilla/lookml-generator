@@ -26,6 +26,10 @@ class Explore:
         """Generate LookML for this explore."""
         raise NotImplementedError("Only implemented in subclasses")
 
+    def get_dependent_views(self) -> List[str]:
+        """Get views this explore is dependent on."""
+        return [view for _, view in self.views.items()]
+
     @staticmethod
     def from_dict(name: str, defn: dict) -> Explore:
         """Get an instance of an explore from a namespace definition."""
