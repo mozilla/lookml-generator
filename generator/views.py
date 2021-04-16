@@ -81,7 +81,7 @@ class PingView(View):
 
                 table: Dict[str, str] = {"table": f"mozdata.{dataset}.{view_id}"}
 
-                if channel.get("channel"):
+                if "channel" in channel:
                     table["channel"] = channel["channel"]
                 if len(references) != 1 or references[0][-2] != f"{dataset}_stable":
                     continue  # This view is only for ping tables
