@@ -168,7 +168,7 @@ def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri, allowlist
         }
 
     if custom_namespaces is not None:
-        namespaces.update(yaml.safe_load(custom_namespaces.read()))
+        namespaces.update(yaml.safe_load(custom_namespaces.read()) or {})
 
     allowed_namespaces = yaml.safe_load(allowlist.read())
     namespaces = {
