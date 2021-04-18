@@ -3,5 +3,11 @@
 
 from . import cli
 
-if __name__ == "__main__":
+
+def main():
+    """Run the CLI."""
     cli("generator")
+
+
+if __name__ == "__main__":
+    main()
