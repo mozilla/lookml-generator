@@ -52,3 +52,15 @@ Run integration tests
 ```bash
 venv/bin/pytest -m integration
 ```
+
+## Container Development
+
+Most code changes will not require changes to the generation script or container.
+However, you can test it locally. The following script will test generation, pushing
+a new branch to the `looker-hub` repository:
+
+```
+export HUB_BRANCH_PUBLISH="yourname-generation-test-1"
+export HUB_SSH_KEY_BASE64=$(cat ~/.ssh/id_rsa | base64)
+make build && make run
+```

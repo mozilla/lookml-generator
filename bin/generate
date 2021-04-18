@@ -20,7 +20,7 @@
 #                       branch doesn't exist, creates it from source.
 #   GCLOUD_SERVICE_KEY: The service key used to authenticate with GCP.
 #                       Needs to have read access to all tables specified
-#                       in `namespaces.yaml`.
+#                       in `namespaces.yaml`. Not required in local dev.
 #
 # Example usage:
 #   export HUB_SSH_KEY_BASE64=$(cat ~/.ssh/id_rsa | base64)
@@ -35,8 +35,10 @@ function setup_gcloud_auth() {
   # Google's client libraries will check for GOOGLE_APPLICATION_CREDENTIALS
   # and use a file in that location for credentials if present;
   # See https://cloud.google.com/docs/authentication/production
-  export GOOGLE_APPLICATION_CREDENTIALS="${GOOGLE_APPLICATION_CREDENTIALS:-/tmp/gcp.json}"
-  echo "$GCLOUD_SERVICE_KEY" > "$GOOGLE_APPLICATION_CREDENTIALS"
+  if [ -n "$GCLOUD_SERVICE_KEY" ]; then
+    export GOOGLE_APPLICATION_CREDENTIALS="${GOOGLE_APPLICATION_CREDENTIALS:-/tmp/gcp.json}"
+    echo "$GCLOUD_SERVICE_KEY" > "$GOOGLE_APPLICATION_CREDENTIALS"
+  fi
 }
 
 function setup_git_auth() {
