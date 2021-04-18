@@ -1,0 +1,19 @@
+---
+version: '2'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: "no"
+    command: "true"
+    volumes:
+      - ~/.config/gcloud:/root/.config/gcloud
+    environment:
+      - HUB_SSH_KEY_BASE64
+      - HUB_REPO_URL
+      - HUB_BRANCH_SOURCE
+      - HUB_BRANCH_PUBLISH
+      - GCLOUD_SERVICE_KEY
+
