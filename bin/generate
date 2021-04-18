@@ -1,0 +1,151 @@
+#!/bin/bash
+
+# A script for generating `namespaces.yaml` and the associated LookML.
+# This repository builds namespaces.yaml from Glean applications and
+# `custom-namespaces.yaml`, and then generates files and LookML that
+# match the specification in `namespaces.yaml` and table definitions
+# in BigQuery. The resulting LookML is pushed to our `looker-hub`
+# repository.
+#
+# Environment variables:
+#   HUB_SSH_KEY_BASE64: A base64-encoded ssh secret key with permissions to push
+#                       to looker-hub.
+#   HUB_REPO_URL:       The URL to the looker-hub repository
+#   HUB_BRANCH_SOURCE:  The source branch for generating LookML.
+#                       Defaults to 'base'. Files present the source
+#                       branch will remain unchanged by generation.
+#   HUB_BRANCH_PUBLISH: The destination branch for publishing LookML.
+#                       Defaults to 'main-dev'.
+#   GCLOUD_SERVICE_KEY: The service key used to authenticate with GCP.
+#                       Needs to have read access to all tables specified
+#                       in `namespaces.yaml`.
+#
+# Example usage:
+#   export HUB_SSH_KEY_BASE64=$(cat ~/.ssh/id_rsa | base64)
+#   make build && make run
+
+HUB_REPO_URL=${HUB_REPO_URL:-"https://www.github.com/mozilla/looker-hub.git"}
+HUB_BRANCH_SOURCE=${HUB_BRANCH_SOURCE:-"base"}
+HUB_BRANCH_PUBLISH=${HUB_BRANCH_PUBLISH:-"test-lookml-generation"}
+
+# Use credentials from environment
+#if [ -n "$GCLOUD_SERVICE_KEY" ]; then
+#    # Google's client libraries will check for GOOGLE_APPLICATION_CREDENTIALS
+#    # and use a file in that location for credentials if present;
+#    # See https://cloud.google.com/docs/authentication/production
+#    export GOOGLE_APPLICATION_CREDENTIALS="${GOOGLE_APPLICATION_CREDENTIALS:-/tmp/gcp.json}"
+#    echo "$GCLOUD_SERVICE_KEY" > "$GOOGLE_APPLICATION_CREDENTIALS"
+#fi
+#
+#if [ -n "$GOOGLE_APPLICATION_CREDENTIALS" ] && which gcloud > /dev/null; then
+#    gcloud --quiet auth activate-service-account --key-file "$GOOGLE_APPLICATION_CREDENTIALS"
+##    python -W ignore -c 'import google.auth; print("project = ", google.auth.default()[1])' >> ~/.config/gcloud/configurations/config_default
+##    sed "1i--project_id=$(gcloud config get-value project)" -i ~/.bigqueryrc
+#fi
+
+# 0. Set up Git
+function setup_git() {
+    # Configure the container for pushing to github.
+
+    if [[ -z "$HUB_SSH_KEY_BASE64" ]]; then
+        echo "Missing secret key" 1>&2
+        exit 1
+    fi
+
+    git config --global user.name "Generated LookML Creator"
+    git config --global user.email "dataops+pipeline-schemas@mozilla.com"
+
+    mkdir -p "$HOME/.ssh"
+
+    echo "$HUB_SSH_KEY_BASE64" | base64 --decode > /app/.ssh/id_ed25519
+    # Makes the future git-push non-interactive
+    ssh-keyscan github.com > /app/.ssh/known_hosts
+
+    chown -R "$(id -u):$(id -g)" "$HOME/.ssh"
+    chmod 700 "$HOME/.ssh"
+    chmod 700 "$HOME/.ssh/id_ed25519"
+
+    # add private key to the ssh agent to prompt for password once
+    eval "$(ssh-agent)"
+    ssh-add
+}
+
+function setup_hub() {
+    # Checkout looker-hub and changes directory to prepare for
+    # LookML generation.
+    pushd .
+
+    [[ -d looker-hub ]] && rm -rf looker-hub
+    git clone "$HUB_REPO_URL"
+    cd looker-hub
+    git fetch --all
+    git checkout $HUB_BRANCH_SOURCE
+
+    popd
+}
+
+function generate_commit() {
+  # Generate commit on publish branch with
+  # generated LookML.
+
+  HUB_DIR="looker-hub"
+  GENERATION_DISALLOW_LIST="/app/GENERATION_DISALLOW_LIST"
+  CUSTOM_NAMESPACES_FILENAME="custom-namespaces.yaml"
+  GENERATED_SQL_URI="https://github.com/mozilla/bigquery-etl/archive/generated-sql.tar.gz"
+  APP_LISTINGS_URI="https://probeinfo.telemetry.mozilla.org/v2/glean/app-listings"
+
+  pushd .
+  cd /app
+
+  # Generate namespaces.yaml and LookML
+  python3 -m generator namespaces \
+    --custom-namespaces $CUSTOM_NAMESPACES_FILENAME \
+    --generated-sql-uri $GENERATED_SQL_URI \
+    --app-listings-uri $APP_LISTINGS_URI
+  python3 -m generator lookml \
+    --namespaces "namespaces.yaml" \
+    --target-dir $HUB_DIR
+
+  cd $HUB_DIR
+
+  # Keep files in GENERATION_DISALLOW_LIST unchanged.
+  cat $GENERATION_DISALLOW_LIST | xargs -I % git checkout %
+
+  # Check that base branch files are unchanged. Error if they are.
+  git diff-index --quiet HEAD
+  if [ $? -ne 0 ]
+  then
+    git diff-index HEAD | cut -f 2 | xargs -I % echo "Error: lookml-generator modified %"
+    exit 1
+  fi
+
+  # Add only new files, generate commit.
+  git add $(git ls-files -o --exclude-standard)
+  git commit -m "Auto-push from LookML generation"
+
+  # Checkout main. Cherry-pick new commit.
+  git checkout $HUB_BRANCH_PUBLISH
+  git cherry-pick $HUB_BRANCH_SOURCE
+
+  popd
+}
+
+function main() {
+  pushd .
+  cd /app
+
+  # don't print git setup
+  set -x
+  setup_git
+
+  # print following commands
+  set -x
+  setup_hub
+  generate_commit
+
+  cd looker-hub
+  git push || git push --set-upstream origin "$HUB_BRANCH_PUBLISH"
+  popd
+}
+
+main "$@"
