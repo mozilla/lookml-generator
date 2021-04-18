@@ -75,6 +75,34 @@ jobs:
           export GOOGLE_APPLICATION_CREDENTIALS="/tmp/gcp.json"
           echo "$GCLOUD_SERVICE_KEY" > "$GOOGLE_APPLICATION_CREDENTIALS"
           venv/bin/pytest -m integration
+  deploy:
+    docker:
+      - image: docker:20.10.2
+    working_directory: ~/mozilla/lookml-generator
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 20.10.2
+      - run: |
+          printf '{"commit":"%s","version":"%s","source":"https://github.com/%s/%s","build":"%s"}\n' "$CIRCLE_SHA1" "$CIRCLE_TAG" "$CIRCLE_PROJECT_USERNAME" "$CIRCLE_PROJECT_REPONAME" "$CIRCLE_BUILD_URL" > version.json
+      - run: docker build -t app:build .
+      - run:
+          name: Deploy to Dockerhub
+          command: |
+            # Deploy main
+            if [ "${CIRCLE_BRANCH}" == "main" ]; then
+              docker login -u $DOCKER_USER -p $DOCKER_PASS
+              docker tag app:build ${DOCKERHUB_REPO}:latest
+              docker push ${DOCKERHUB_REPO}:latest
+            elif  [ ! -z "${CIRCLE_TAG}" ]; then
+            # Deploy a release tag...
+              docker login -u $DOCKER_USER -p $DOCKER_PASS
+              echo "${DOCKERHUB_REPO}:${CIRCLE_TAG}"
+              docker tag app:build "${DOCKERHUB_REPO}:${CIRCLE_TAG}"
+              docker images
+              docker push "${DOCKERHUB_REPO}:${CIRCLE_TAG}"
+            fi
+
 
 workflows:
   version: 2
@@ -84,3 +112,12 @@ workflows:
     - integration-tests:
         context: data-eng-circleci-tests
     - verify-requirements
+    - deploy:
+        requires:
+          - unit-test
+          - integration-tests
+        filters:
+          tags:
+            only: /.*/
+          branches:
+            only: main
