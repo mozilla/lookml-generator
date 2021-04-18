@@ -10,12 +10,14 @@
 # Environment variables:
 #   HUB_SSH_KEY_BASE64: A base64-encoded ssh secret key with permissions to push
 #                       to looker-hub.
-#   HUB_REPO_URL:       The URL to the looker-hub repository
+#   HUB_REPO_URL:       The URL to the looker-hub repository.
+#                       Requires the SSH format, e.g. git@github.com:user/repo.git
 #   HUB_BRANCH_SOURCE:  The source branch for generating LookML.
 #                       Defaults to 'base'. Files present the source
 #                       branch will remain unchanged by generation.
 #   HUB_BRANCH_PUBLISH: The destination branch for publishing LookML.
-#                       Defaults to 'main-dev'.
+#                       Defaults to 'test-lookml-generation'. If the
+#                       branch doesn't exist, creates it from source.
 #   GCLOUD_SERVICE_KEY: The service key used to authenticate with GCP.
 #                       Needs to have read access to all tables specified
 #                       in `namespaces.yaml`.
@@ -24,27 +26,20 @@
 #   export HUB_SSH_KEY_BASE64=$(cat ~/.ssh/id_rsa | base64)
 #   make build && make run
 
-HUB_REPO_URL=${HUB_REPO_URL:-"https://www.github.com/mozilla/looker-hub.git"}
+HUB_REPO_URL=${HUB_REPO_URL:-"git@github.com:mozilla/looker-hub.git"}
 HUB_BRANCH_SOURCE=${HUB_BRANCH_SOURCE:-"base"}
 HUB_BRANCH_PUBLISH=${HUB_BRANCH_PUBLISH:-"test-lookml-generation"}
 
-# Use credentials from environment
-#if [ -n "$GCLOUD_SERVICE_KEY" ]; then
-#    # Google's client libraries will check for GOOGLE_APPLICATION_CREDENTIALS
-#    # and use a file in that location for credentials if present;
-#    # See https://cloud.google.com/docs/authentication/production
-#    export GOOGLE_APPLICATION_CREDENTIALS="${GOOGLE_APPLICATION_CREDENTIALS:-/tmp/gcp.json}"
-#    echo "$GCLOUD_SERVICE_KEY" > "$GOOGLE_APPLICATION_CREDENTIALS"
-#fi
-#
-#if [ -n "$GOOGLE_APPLICATION_CREDENTIALS" ] && which gcloud > /dev/null; then
-#    gcloud --quiet auth activate-service-account --key-file "$GOOGLE_APPLICATION_CREDENTIALS"
-##    python -W ignore -c 'import google.auth; print("project = ", google.auth.default()[1])' >> ~/.config/gcloud/configurations/config_default
-##    sed "1i--project_id=$(gcloud config get-value project)" -i ~/.bigqueryrc
-#fi
+function setup_gcloud_auth() {
+  # Use credentials from environment
+  # Google's client libraries will check for GOOGLE_APPLICATION_CREDENTIALS
+  # and use a file in that location for credentials if present;
+  # See https://cloud.google.com/docs/authentication/production
+  export GOOGLE_APPLICATION_CREDENTIALS="${GOOGLE_APPLICATION_CREDENTIALS:-/tmp/gcp.json}"
+  echo "$GCLOUD_SERVICE_KEY" > "$GOOGLE_APPLICATION_CREDENTIALS"
+}
 
-# 0. Set up Git
-function setup_git() {
+function setup_git_auth() {
     # Configure the container for pushing to github.
 
     if [[ -z "$HUB_SSH_KEY_BASE64" ]]; then
@@ -57,9 +52,9 @@ function setup_git() {
 
     mkdir -p "$HOME/.ssh"
 
-    echo "$HUB_SSH_KEY_BASE64" | base64 --decode > /app/.ssh/id_ed25519
+    echo "$HUB_SSH_KEY_BASE64" | base64 --decode > $HOME/.ssh/id_ed25519
     # Makes the future git-push non-interactive
-    ssh-keyscan github.com > /app/.ssh/known_hosts
+    ssh-keyscan github.com > $HOME/.ssh/known_hosts
 
     chown -R "$(id -u):$(id -g)" "$HOME/.ssh"
     chmod 700 "$HOME/.ssh"
@@ -79,6 +74,8 @@ function setup_hub() {
     git clone "$HUB_REPO_URL"
     cd looker-hub
     git fetch --all
+    # If publish branch doesn't exist, create it from source
+    git checkout $HUB_BRANCH_PUBLISH || git checkout $HUB_BRANCH_SOURCE && git checkout -b $HUB_BRANCH_PUBLISH
     git checkout $HUB_BRANCH_SOURCE
 
     popd
@@ -89,8 +86,8 @@ function generate_commit() {
   # generated LookML.
 
   HUB_DIR="looker-hub"
-  GENERATION_DISALLOW_LIST="/app/GENERATION_DISALLOW_LIST"
-  CUSTOM_NAMESPACES_FILENAME="custom-namespaces.yaml"
+  GENERATION_DISALLOW_LIST="/app/lookml-generator/GENERATION_DISALLOW_LIST"
+  CUSTOM_NAMESPACES_FILENAME="lookml-generator/custom-namespaces.yaml"
   GENERATED_SQL_URI="https://github.com/mozilla/bigquery-etl/archive/generated-sql.tar.gz"
   APP_LISTINGS_URI="https://probeinfo.telemetry.mozilla.org/v2/glean/app-listings"
 
@@ -98,11 +95,11 @@ function generate_commit() {
   cd /app
 
   # Generate namespaces.yaml and LookML
-  python3 -m generator namespaces \
+  lookml-generator namespaces \
     --custom-namespaces $CUSTOM_NAMESPACES_FILENAME \
     --generated-sql-uri $GENERATED_SQL_URI \
     --app-listings-uri $APP_LISTINGS_URI
-  python3 -m generator lookml \
+  lookml-generator lookml \
     --namespaces "namespaces.yaml" \
     --target-dir $HUB_DIR
 
@@ -134,9 +131,10 @@ function main() {
   pushd .
   cd /app
 
-  # don't print git setup
+  # don't print auth setup
   set -x
-  setup_git
+  setup_gcloud_auth
+  setup_git_auth
 
   # print following commands
   set -x
