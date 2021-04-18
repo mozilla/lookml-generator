@@ -8,6 +8,8 @@ services:
       dockerfile: Dockerfile
     restart: "no"
     command: "true"
+    volumes:
+      - ~/.config:/app/.config
     environment:
       - HUB_SSH_KEY_BASE64
       - HUB_REPO_URL
