@@ -64,8 +64,11 @@ def generate_directories(namespaces: Dict[str, NamespaceDict], spoke_dir: Path):
 
         (spoke_dir / namespace).mkdir()
         (spoke_dir / namespace / "views").mkdir()
+        (spoke_dir / namespace / "views" / ".gitkeep").touch()
         (spoke_dir / namespace / "explores").mkdir()
+        (spoke_dir / namespace / "explores" / ".gitkeep").touch()
         (spoke_dir / namespace / "dashboards").mkdir()
+        (spoke_dir / namespace / "explores" / ".gitkeep").touch()
 
         generate_model(spoke_dir, namespace, defn)
 
