@@ -54,9 +54,9 @@ function setup_git_auth() {
 
     mkdir -p "$HOME/.ssh"
 
-    echo "$HUB_SSH_KEY_BASE64" | base64 --decode > $HOME/.ssh/id_ed25519
+    echo "$HUB_SSH_KEY_BASE64" | base64 --decode > "$HOME"/.ssh/id_ed25519
     # Makes the future git-push non-interactive
-    ssh-keyscan github.com > $HOME/.ssh/known_hosts
+    ssh-keyscan github.com > "$HOME"/.ssh/known_hosts
 
     chown -R "$(id -u):$(id -g)" "$HOME/.ssh"
     chmod 700 "$HOME/.ssh"
@@ -77,8 +77,8 @@ function setup_hub() {
     cd looker-hub
     git fetch --all
     # If publish branch doesn't exist, create it from source
-    git checkout $HUB_BRANCH_PUBLISH || git checkout $HUB_BRANCH_SOURCE && git checkout -b $HUB_BRANCH_PUBLISH
-    git checkout $HUB_BRANCH_SOURCE
+    git checkout "$HUB_BRANCH_PUBLISH" || git checkout "$HUB_BRANCH_SOURCE" && git checkout -b "$HUB_BRANCH_PUBLISH"
+    git checkout "$HUB_BRANCH_SOURCE"
 
     popd
 }
@@ -111,20 +111,19 @@ function generate_commit() {
   cat $GENERATION_DISALLOW_LIST | xargs -I % git checkout %
 
   # Check that base branch files are unchanged. Error if they are.
-  git diff-index --quiet HEAD
-  if [ $? -ne 0 ]
+  if ! git diff-index --quiet HEAD;
   then
     git diff-index HEAD | cut -f 2 | xargs -I % echo "Error: lookml-generator modified %"
     exit 1
   fi
 
   # Add only new files, generate commit.
-  git add $(git ls-files -o --exclude-standard)
+  git add "$(git ls-files -o --exclude-standard)"
   git commit -m "Auto-push from LookML generation"
 
   # Checkout main. Cherry-pick new commit.
-  git checkout $HUB_BRANCH_PUBLISH
-  git cherry-pick $HUB_BRANCH_SOURCE
+  git checkout "$HUB_BRANCH_PUBLISH"
+  git cherry-pick "$HUB_BRANCH_SOURCE"
 
   popd
 }
