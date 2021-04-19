@@ -80,7 +80,15 @@ jobs:
           export GOOGLE_APPLICATION_CREDENTIALS="/tmp/gcp.json"
           echo "$GCLOUD_SERVICE_KEY" > "$GOOGLE_APPLICATION_CREDENTIALS"
           venv/bin/pytest -m integration
-
+  build-container:
+    docker:
+      - image: docker:20.10.2
+    working_directory: ~/mozilla/lookml-generator
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 20.10.2
+      - run: docker build -t app:build .
 
 workflows:
   version: 2
@@ -90,6 +98,7 @@ workflows:
     - integration-tests:
         context: data-eng-circleci-tests
     - verify-requirements
+    - build-container
 
     - gcp-gcr/build-and-push-image:
         name: Build and push lookml-generator
@@ -98,6 +107,7 @@ workflows:
           - unit-tests
           - verify-requirements
           - integration-tests
+          - build-container
         image: lookml-generator
         filters:
           tags:

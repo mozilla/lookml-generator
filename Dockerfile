@@ -1,11 +1,10 @@
 FROM python:3.8-slim
 MAINTAINER Frank Bertsch <frank@mozilla.com>
 
-ARG USER_ID="10001"
-ARG GROUP_ID="app"
-ARG HOME="/app"
+ENV USER_ID="10001"
+ENV GROUP_ID="app"
+ENV HOME="/app"
 
-ENV HOME=${HOME}
 RUN groupadd --gid ${USER_ID} ${GROUP_ID} && \
     useradd --create-home --uid ${USER_ID} --gid ${GROUP_ID} --home-dir /app ${GROUP_ID}
 
