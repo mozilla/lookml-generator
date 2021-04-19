@@ -478,8 +478,6 @@ def test_duplicate_measure(runner, tmp_path):
     )
     with runner.isolated_filesystem():
         with patch("google.cloud.bigquery.Client", MockClient):
-            # print(f"{namespaces}")
-            # lookml(str(namespaces), "looker-hub/")
             result = runner.invoke(
                 lookml,
                 [
