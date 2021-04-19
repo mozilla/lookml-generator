@@ -37,8 +37,31 @@ def custom_namespaces(tmp_path):
                   tables:
                   - channel: release
                     table: mozdata.custom.baseline
+            disallowed:
+              canonical_app_name: Disallowed
+              views:
+                baseline:
+                  type: ping_view
+                  tables:
+                  - channel: release
+                    table: mozdata.disallowed.baseline
             """
         ).lstrip()
+    )
+    return dest.absolute()
+
+
+@pytest.fixture
+def namespace_allowlist(tmp_path):
+    dest = tmp_path / "namespace_allowlist.yaml"
+    dest.write_text(
+        dedent(
+            """
+            ---
+            - custom
+            - glean-app
+            """
+        )
     )
     return dest.absolute()
 
@@ -135,7 +158,7 @@ def glean_apps():
 
 
 def test_namespaces_full(
-    runner, custom_namespaces, generated_sql_uri, app_listings_uri
+    runner, custom_namespaces, generated_sql_uri, app_listings_uri, namespace_allowlist
 ):
     with runner.isolated_filesystem():
         result = runner.invoke(
@@ -147,6 +170,8 @@ def test_namespaces_full(
                 generated_sql_uri,
                 "--app-listings-uri",
                 app_listings_uri,
+                "--allowlist",
+                namespace_allowlist,
             ],
         )
         sys.stdout.write(result.stdout)

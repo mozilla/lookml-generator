@@ -143,7 +143,13 @@ def _get_explores(views: List[View]) -> dict:
     default="https://probeinfo.telemetry.mozilla.org/v2/glean/app-listings",
     help="URI for probeinfo service v2 glean app listings",
 )
-def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri):
+@click.option(
+    "--allowlist",
+    type=click.File(),
+    default="namespace_allowlist.yaml",
+    help="Path to namespace allow list",
+)
+def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri, allowlist):
     """Generate namespaces.yaml."""
     warnings.filterwarnings("ignore", module="google.auth._default")
     glean_apps = _get_glean_apps(app_listings_uri)
@@ -163,5 +169,10 @@ def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri):
 
     if custom_namespaces is not None:
         namespaces.update(yaml.safe_load(custom_namespaces.read()))
+
+    allowed_namespaces = yaml.safe_load(allowlist.read())
+    namespaces = {
+        name: defn for name, defn in namespaces.items() if name in allowed_namespaces
+    }
 
     Path("namespaces.yaml").write_text(yaml.safe_dump(namespaces))
