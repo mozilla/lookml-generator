@@ -6,11 +6,16 @@ import click
 
 from .lookml import lookml
 from .namespaces import namespaces
+from .spoke import update_spoke
 
 
 def cli(prog_name=None):
     """Generate and run CLI."""
-    commands = {"namespaces": namespaces, "lookml": lookml}
+    commands = {
+        "namespaces": namespaces,
+        "lookml": lookml,
+        "update-spoke": update_spoke,
+    }
 
     @click.group(commands=commands)
     def group():
