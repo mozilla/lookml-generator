@@ -113,9 +113,6 @@ workflows:
         context: data-eng-circleci-tests
     - verify-requirements
     - deploy:
-        requires:
-          - unit-test
-          - integration-tests
         filters:
           tags:
             only: /.*/
