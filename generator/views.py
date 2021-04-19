@@ -231,19 +231,22 @@ class GrowthAccountingView(View):
         },
         {
             "name": "new_this_week",
-            "sql": (
-                "DATE_DIFF(${submission_date}," "first_run_date, DAY) BETWEEN 0 AND 6"
-            ),
+            "sql": "DATE_DIFF(${submission_date}, first_run_date, DAY) BETWEEN 0 AND 6",
             "type": "yesno",
             "hidden": "yes",
         },
         {
             "name": "new_last_week",
-            "sql": (
-                "DATE_DIFF(${submission_date}," "first_run_date, DAY) BETWEEN 7 AND 13"
-            ),
+            "sql": "DATE_DIFF(${submission_date}, first_run_date, DAY) BETWEEN 7 AND 13",
             "type": "yesno",
             "hidden": "yes",
+        },
+        {
+            "name": "client_id_day",
+            "sql": "CONCAT(CAST(${TABLE}.submission_date AS STRING), client_id)",
+            "type": "string",
+            "hidden": "yes",
+            "primary_key": "yes",
         },
     ]
 
@@ -396,8 +399,8 @@ class GrowthAccountingView(View):
             "type": "number",
             "sql": (
                 "SAFE_DIVIDE("
-                "(${new_users} + ${overall_resurrected}),"
-                "(${established_users_churned_count} + ${new_users_churned_count})"
+                "${new_users} + ${overall_resurrected},"
+                "${established_users_churned_count} + ${new_users_churned_count}"
                 ")"
             ),
         },

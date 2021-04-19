@@ -1,22 +1,19 @@
 """All possible generated explores."""
 from __future__ import annotations
 
+from dataclasses import dataclass, field
 from typing import Dict, Iterator, List
 
 from .views import PingView, View
 
 
+@dataclass
 class Explore:
     """A generic explore."""
 
     name: str
     views: Dict[str, str]
-    type: str
-
-    def __init__(self, name, views):
-        """Create an instance of a view."""
-        self.name = name
-        self.views = views
+    type: str = field(init=False)
 
     def to_dict(self) -> dict:
         """Explore instance represented as a dict."""
