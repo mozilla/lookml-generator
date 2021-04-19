@@ -50,7 +50,7 @@ function setup_git_auth() {
     fi
 
     git config --global user.name "Generated LookML Creator"
-    git config --global user.email "dataops+pipeline-schemas@mozilla.com"
+    git config --global user.email "dataops+looker@mozilla.com"
 
     mkdir -p "$HOME/.ssh"
 
@@ -133,7 +133,7 @@ function main() {
   cd /app
 
   # don't print auth setup
-  set -x
+  set +x
   setup_gcloud_auth
   setup_git_auth
 
