@@ -19,10 +19,12 @@ WORKDIR ${HOME}
 RUN chown -R ${USER_ID}:${GROUP_ID} ${HOME}
 
 RUN pip install --upgrade pip
-COPY --chown=${USER_ID}:${GROUP_ID} requirements.txt ${HOME}
+COPY requirements.txt ${HOME}
+RUN chown ${USER_ID}:${GROUP_ID} ${HOME}/requirements.txt
 RUN pip install -r ${HOME}/requirements.txt
 
-COPY --chown=${USER_ID}:${GROUP_ID} . ${HOME}/lookml-generator
+COPY . ${HOME}/lookml-generator
+RUN chown -R ${USER_ID}:${GROUP_ID} ${HOME}/lookml-generator
 ENV PATH $PATH:${HOME}/lookml-generator/bin
 RUN pip install --no-dependencies -e ${HOME}/lookml-generator
 
