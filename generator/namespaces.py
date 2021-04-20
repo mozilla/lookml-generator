@@ -62,14 +62,17 @@ def _get_glean_apps(
         variants = list(group)
 
         # use canonical_app_name where channel=="release" or the first one
-        canonical_app_name = next(
+        release_variant = next(
             (
                 channel
                 for channel in variants
                 if channel.get("app_channel") == "release"
             ),
             variants[0],
-        )["canonical_app_name"]
+        )
+
+        canonical_app_name = release_variant["canonical_app_name"]
+        emails = release_variant["notification_emails"]
 
         channels = [
             {
@@ -87,6 +90,7 @@ def _get_glean_apps(
                     "app_name": app_name,
                     "canonical_app_name": canonical_app_name,
                     "channels": channels,
+                    "owners": emails,
                 }
             )
 
@@ -162,6 +166,7 @@ def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri, allowlist
         views_as_dict = {view.name: view.as_dict() for view in looker_views}
 
         namespaces[app["app_name"]] = {
+            "owners": app["owners"],
             "canonical_app_name": app["canonical_app_name"],
             "views": views_as_dict,
             "explores": explores,

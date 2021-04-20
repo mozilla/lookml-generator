@@ -30,6 +30,8 @@ def custom_namespaces(tmp_path):
         dedent(
             """
             custom:
+              owners:
+              - custom-owner@allizom.com
               canonical_app_name: Custom
               views:
                 baseline:
@@ -38,6 +40,8 @@ def custom_namespaces(tmp_path):
                   - channel: release
                     table: mozdata.custom.baseline
             disallowed:
+              owners:
+              - disallowed-owner@allizom.com
               canonical_app_name: Disallowed
               views:
                 baseline:
@@ -123,12 +127,14 @@ def app_listings_uri(tmp_path):
                         "app_channel": "release",
                         "canonical_app_name": "Glean App",
                         "bq_dataset_family": "glean_app",
+                        "notification_emails": ["glean-app-owner@allizom.com"],
                     },
                     {
                         "app_name": "glean-app",
                         "app_channel": "beta",
                         "canonical_app_name": "Glean App Beta",
                         "bq_dataset_family": "glean_app_beta",
+                        "notification_emails": ["glean-app-owner-beta@allizom.com"],
                     },
                 ]
             ).encode()
@@ -143,6 +149,9 @@ def glean_apps():
         {
             "app_name": "glean-app",
             "canonical_app_name": "Glean App",
+            "owners": [
+                "glean-app-owner@allizom.com",
+            ],
             "channels": [
                 {
                     "channel": "release",
@@ -182,12 +191,13 @@ def test_namespaces_full(
         except Exception as e:
             # use exception chaining to expose original traceback
             raise e from result.exception
-        print(Path("namespaces.yaml").read_text())
         assert (
             dedent(
                 """
                 custom:
                   canonical_app_name: Custom
+                  owners:
+                  - custom-owner@allizom.com
                   views:
                     baseline:
                       tables:
@@ -205,6 +215,8 @@ def test_namespaces_full(
                       type: growth_accounting_explore
                       views:
                         base_view: growth_accounting
+                  owners:
+                  - glean-app-owner@allizom.com
                   views:
                     baseline:
                       tables:
