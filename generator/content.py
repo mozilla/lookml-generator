@@ -32,15 +32,14 @@ def generate_content(namespaces):
     logging.info("Looker SDK 3.1 initialized successfully.")
 
     shared_folders = list(sdk.search_folders(name="home"))
-    if len(shared_folders) > 1:
-        logging.error("Error: Found more than one shared folder")
-        exit(1)
+    if len(shared_folders) != 1:
+        raise click.ClickException(
+            f"Found wrong number of shared folders: {shared_folders}"
+        )
 
     shared_folder_id = shared_folders[0].id
 
     for namespace, defn in yaml.safe_load(namespaces).items():
-        if namespace != "burnham":
-            continue
         pretty_name = defn["canonical_app_name"]
 
         try:
@@ -93,11 +92,23 @@ def generate_content(namespaces):
                 )
 
             admins = sdk.role_users(admin_roles[0].id)
-            for admin in admins:
+            write_access_users = {admin.id for admin in admins}
+
+            # Write access for all owners
+            for owner in defn["owners"]:
+                email_users = sdk.search_users(email=owner)
+                if len(email_users) > 1:
+                    raise click.ClickException(
+                        f"Found more than one user with email {owner}"
+                    )
+                elif len(email_users) == 1:
+                    write_access_users.add(email_users[0].id)
+
+            for user_id in write_access_users:
                 sdk.create_content_metadata_access(
                     looker_sdk.models.ContentMetaGroupUser(
                         content_metadata_id=content_metadata.id,
                         permission_type="edit",
-                        user_id=admin.id,
+                        user_id=user_id,
                     )
                 )
