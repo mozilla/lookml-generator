@@ -51,7 +51,7 @@ def test_new_namespace(looker_sdk, namespaces):
     generate_folders(namespaces)
 
     sdk.search_folders.assert_any_call(name="home")
-    sdk.search_folders.assert_any_call(name="Burnham", parent_id=1)
+    sdk.search_folders.assert_any_call(name="Burnham", parent_id="1")
     sdk.create_folder.assert_called_once()
     sdk.all_content_metadatas.assert_called_once_with(parent_id=1)
     sdk.update_content_metadata.assert_called_once()
@@ -89,7 +89,7 @@ def test_existing_namespace(looker_sdk, namespaces):
     generate_folders(namespaces)
 
     sdk.search_folders.assert_any_call(name="home")
-    sdk.search_folders.assert_any_call(name="Burnham", parent_id=1)
+    sdk.search_folders.assert_any_call(name="Burnham", parent_id="1")
     sdk.create_folder.assert_not_called()
     sdk.all_content_metadatas.assert_called_once_with(parent_id=1)
     sdk.update_content_metadata.assert_called_once()
