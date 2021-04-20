@@ -195,9 +195,17 @@ function generate_spoke_commit() {
 }
 
 function generate_looker_content() {
-  if [ -v $LOOKER_API_CLIENT_ID ] && [ -v $LOOKER_API_CLIENT_SECRET ]; then
+  pushd .
+  cd /app
 
-  fi;
+  if [[ -z $LOOKER_API_CLIENT_ID || -z $LOOKER_API_CLIENT_SECRET ]]; then
+    echo "Looker API vars are not set."
+  else
+    lookml-generator content \
+      --namespaces "namespaces.yaml"
+  fi
+
+  popd
 }
 
 function main() {
