@@ -14,6 +14,8 @@ attrs==20.3.0 \
     --hash=sha256:31b2eced602aa8423c2aea9c76a724617ed67cf9513173fd3a4f03e3a929c7e6 \
     --hash=sha256:832aa3cde19744e49938b91fea06d69ecb9e649c93ba974535d08ad92164f700
     # via
+    #   cattrs
+    #   looker-sdk
     #   pytest
     #   pytest-mypy
 black==20.8b1 \
@@ -23,6 +25,10 @@ cachetools==4.2.1 \
     --hash=sha256:1d9d5f567be80f7c07d765e21b814326d78c61eb0c3a637dffc0e5d1796cb2e2 \
     --hash=sha256:f469e29e7aa4cff64d8de4aad95ce76de8ea1125a16c68e0d93f65c3c3dc92e9
     # via google-auth
+cattrs==1.1.2 \
+    --hash=sha256:967ce8f99b79f112a500fc03d02c4da669966055ea190b0c59a023af0ae33e5f \
+    --hash=sha256:a5873cd4745a74388557730247b4bb005d762f8aba0ab7aa55bcbd190bdf3322
+    # via looker-sdk
 certifi==2020.12.5 \
     --hash=sha256:1a4995114262bffbc2413b159f2a1a480c969de6e6eb13ee966d470af86af59c \
     --hash=sha256:719a74fb9e33b9bd44cc7f3a8d94bc35e4049deebe19ba7d8e108280cfd59830
@@ -221,6 +227,10 @@ isort==5.7.0 \
 lkml==1.1.0 \
     --hash=sha256:0c09f19dd43a49cff4c0deff1f090320cf2ccb90293fb3d376a6b540f6ffca07 \
     --hash=sha256:8c1b090a85469db2b318a73ea4fc8e5605aedc24d64d384189656720f58b58c8
+    # via -r requirements.in
+looker-sdk==21.4.1 \
+    --hash=sha256:dc560e1baf0c2459c10ddbb5407d706cdd60dfb23a9b44e3696b6a2886dce9f6 \
+    --hash=sha256:dee27a234a86ca9b68c0b06bacdb68bb618cff9334415aa95d821323c2585fde
     # via -r requirements.in
 mccabe==0.6.1 \
     --hash=sha256:ab8a6258860da4b6677da4bd2fe5dc2c659cff31b3ee4f7f5d64e79735b80d42 \
@@ -450,7 +460,9 @@ regex==2020.11.13 \
 requests==2.25.1 \
     --hash=sha256:27973dd4a904a4f13b263a19c866c13b92a39ed1c964655f025f3f8d3d75b804 \
     --hash=sha256:c210084e36a42ae6b9219e00e48287def368a26d03a048ddad7bfee44f75871e
-    # via google-api-core
+    # via
+    #   google-api-core
+    #   looker-sdk
 rsa==4.7.1 \
     --hash=sha256:74ba16e7ef58920b80b5c54c1c1066d391a2c1e812c466773f74c634eb12253b \
     --hash=sha256:9d74d1ff850745c9802cd6b53382bfeec7f6dbe4e26ee2759241ed1e7b0ecf5d
