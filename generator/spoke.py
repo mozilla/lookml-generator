@@ -5,8 +5,10 @@ from typing import Dict, List, TypedDict
 
 import click
 import lkml
+import looker_sdk
 import yaml
 
+from .content import _setup_env_with_looker_creds
 from .lookml import ViewDict
 
 
@@ -53,9 +55,20 @@ def generate_model(spoke_path: Path, name: str, namespace_defn: NamespaceDict) -
 
     return path
 
+def configure_model(sdk: looker_sdk.methods.Looker31SDK, model_name: str)
+    sdk.create_lookml_model(
+        sdk.models.WriteLookmlModel(
+            allowed_db_connection_names=["telemetry"],
+            name=model_name,
+            project_name="spoke-default",
+        )
+    )
 
 def generate_directories(namespaces: Dict[str, NamespaceDict], spoke_dir: Path):
     """Generate directories and model for a namespace, if it doesn't exist."""
+    sdk = looker_sdk.init31()
+    logging.info("Looker SDK 3.1 initialized successfully.")
+
     existing_dirs = {p.name for p in spoke_dir.iterdir()}
     for namespace, defn in namespaces.items():
         if namespace in existing_dirs:
@@ -89,4 +102,5 @@ def generate_directories(namespaces: Dict[str, NamespaceDict], spoke_dir: Path):
 def update_spoke(namespaces, spoke_dir):
     """Generate updates to spoke project."""
     _namespaces = yaml.safe_load(namespaces)
+    _setup_env_with_looker_creds()
     generate_directories(_namespaces, Path(spoke_dir))
