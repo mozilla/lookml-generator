@@ -10,7 +10,7 @@ RUN groupadd --gid ${USER_ID} ${GROUP_ID} && \
 
 # For grpc https://github.com/grpc/grpc/issues/24556#issuecomment-751797589
 RUN apt-get update -qqy && \
-    apt-get install -qqy python-dev build-essential git
+    apt-get install -qqy python-dev build-essential git curl
 
 COPY --from=google/cloud-sdk:alpine /google-cloud-sdk /google-cloud-sdk
 ENV PATH /google-cloud-sdk/bin:$PATH
