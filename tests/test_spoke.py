@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 import lkml
 import pytest
 
@@ -27,7 +29,8 @@ def namespaces() -> dict:
     }
 
 
-def test_generate_directories(namespaces, tmp_path):
+@patch("generator.spoke.looker_sdk")
+def test_generate_directories(looker_sdk, namespaces, tmp_path):
     generate_directories(namespaces, tmp_path)
     dirs = list(tmp_path.iterdir())
     assert dirs == [tmp_path / "glean-app"]
@@ -41,8 +44,12 @@ def test_generate_directories(namespaces, tmp_path):
         app_path / "glean-app.model.lkml",
     }
 
+    sdk = looker_sdk.init31()
+    sdk.create_lookml_model.assert_called_once()
 
-def test_existing_dir(namespaces, tmp_path):
+
+@patch("generator.spoke.looker_sdk")
+def test_existing_dir(looker_sdk, namespaces, tmp_path):
     generate_directories(namespaces, tmp_path)
     tmp_file = tmp_path / "glean-app" / "tmp-file"
     tmp_file.write_text("hello, world")
@@ -53,7 +60,8 @@ def test_existing_dir(namespaces, tmp_path):
     assert tmp_file.is_file()
 
 
-def test_generate_model(namespaces, tmp_path):
+@patch("generator.spoke.looker_sdk")
+def test_generate_model(looker_sdk, namespaces, tmp_path):
     generate_directories(namespaces, tmp_path)
     expected = {
         "connection": "telemetry",
