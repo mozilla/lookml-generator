@@ -70,7 +70,9 @@ def configure_model(sdk: looker_sdk.methods.Looker31SDK, model_name: str):
     )
 
 
-def generate_directories(namespaces: Dict[str, NamespaceDict], spoke_dir: Path):
+def generate_directories(
+    namespaces: Dict[str, NamespaceDict], spoke_dir: Path, sdk_setup=False
+):
     """Generate directories and model for a namespace, if it doesn't exist."""
     sdk = looker_sdk.init31()
     logging.info("Looker SDK 3.1 initialized successfully.")
@@ -90,7 +92,9 @@ def generate_directories(namespaces: Dict[str, NamespaceDict], spoke_dir: Path):
         (spoke_dir / namespace / "explores" / ".gitkeep").touch()
 
         generate_model(spoke_dir, namespace, defn)
-        configure_model(sdk, namespace)
+
+        if sdk_setup:
+            configure_model(sdk, namespace)
 
 
 @click.command(help=__doc__)
@@ -109,5 +113,5 @@ def generate_directories(namespaces: Dict[str, NamespaceDict], spoke_dir: Path):
 def update_spoke(namespaces, spoke_dir):
     """Generate updates to spoke project."""
     _namespaces = yaml.safe_load(namespaces)
-    _setup_env_with_looker_creds()
-    generate_directories(_namespaces, Path(spoke_dir))
+    sdk_setup = _setup_env_with_looker_creds()
+    generate_directories(_namespaces, Path(spoke_dir), sdk_setup)

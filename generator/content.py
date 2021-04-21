@@ -8,10 +8,13 @@ import looker_sdk
 import yaml
 
 
-def _setup_env_with_looker_creds():
-    client_id = os.environ["LOOKER_API_CLIENT_ID"]
-    client_secret = os.environ["LOOKER_API_CLIENT_SECRET"]
-    instance = os.environ["LOOKER_INSTANCE_URI"]
+def _setup_env_with_looker_creds() -> bool:
+    client_id = os.environ.get("LOOKER_API_CLIENT_ID")
+    client_secret = os.environ.get("LOOKER_API_CLIENT_SECRET")
+    instance = os.environ.get("LOOKER_INSTANCE_URI")
+
+    if client_id is None or client_secret is None or instance is None:
+        return False
 
     os.environ["LOOKERSDK_BASE_URL"] = instance
     os.environ["LOOKERSDK_API_VERSION"] = "3.1"
@@ -19,6 +22,8 @@ def _setup_env_with_looker_creds():
     os.environ["LOOKERSDK_TIMEOUT"] = "120"
     os.environ["LOOKERSDK_CLIENT_ID"] = client_id
     os.environ["LOOKERSDK_CLIENT_SECRET"] = client_secret
+
+    return True
 
 
 def _get_id_from_list(arr: Sequence[Any], item: str) -> int:
