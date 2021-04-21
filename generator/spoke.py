@@ -1,5 +1,6 @@
 """Generate directories and models for new namespaces."""
 
+import logging
 from pathlib import Path
 from typing import Dict, List, TypedDict
 
@@ -38,6 +39,7 @@ def generate_model(spoke_path: Path, name: str, namespace_defn: NamespaceDict) -
     Views are not imported by default, since they should
     be added one-by-one if they are included in an explore.
     """
+    logging.info(f"Generating model {name}...")
     model_defn = {
         "connection": "telemetry",
         "label": namespace_defn["canonical_app_name"],
@@ -55,14 +57,18 @@ def generate_model(spoke_path: Path, name: str, namespace_defn: NamespaceDict) -
 
     return path
 
-def configure_model(sdk: looker_sdk.methods.Looker31SDK, model_name: str)
+
+def configure_model(sdk: looker_sdk.methods.Looker31SDK, model_name: str):
+    """Configure a Looker model by name."""
+    logging.info(f"Configuring model {model_name}...")
     sdk.create_lookml_model(
-        sdk.models.WriteLookmlModel(
+        looker_sdk.models.WriteLookmlModel(
             allowed_db_connection_names=["telemetry"],
             name=model_name,
             project_name="spoke-default",
         )
     )
+
 
 def generate_directories(namespaces: Dict[str, NamespaceDict], spoke_dir: Path):
     """Generate directories and model for a namespace, if it doesn't exist."""
@@ -84,6 +90,7 @@ def generate_directories(namespaces: Dict[str, NamespaceDict], spoke_dir: Path):
         (spoke_dir / namespace / "explores" / ".gitkeep").touch()
 
         generate_model(spoke_dir, namespace, defn)
+        configure_model(sdk, namespace)
 
 
 @click.command(help=__doc__)
