@@ -208,6 +208,13 @@ function generate_looker_content() {
   popd
 }
 
+function hit_looker_webhooks() {
+  # These webhooks ensure production is up-to-date.
+  # See https://help.looker.com/hc/en-us/articles/360001288268-Deploy-Webhook-Pulling-From-Remote-Git-Repository
+  curl "$LOOKER_INSTANCE_URI/webhooks/projects/looker-hub/deploy"
+  curl "$LOOKER_INSTANCE_URI/webhooks/projects/looker-spoke-default/deploy"
+}
+
 function main() {
   pushd .
   cd /app
@@ -235,6 +242,8 @@ function main() {
 
   # Update Looker content
   generate_looker_content
+  hit_looker_webhooks
+
   popd
 }
 
