@@ -1,3 +1,4 @@
+import os
 from unittest.mock import Mock, patch
 
 import lkml
@@ -30,6 +31,7 @@ def namespaces() -> dict:
 
 
 @patch("generator.spoke.looker_sdk")
+@patch.dict(os.environ, {"LOOKER_INSTANCE_URI": "https://mozilladev.cloud.looker.com"})
 def test_generate_directories(looker_sdk, namespaces, tmp_path):
     sdk = looker_sdk.init31()
     sdk.search_model_sets.return_value = [Mock(models=["model"], id=1)]
@@ -72,6 +74,7 @@ def test_generate_directories_no_sdk(looker_sdk, namespaces, tmp_path):
 
 
 @patch("generator.spoke.looker_sdk")
+@patch.dict(os.environ, {"LOOKER_INSTANCE_URI": "https://mozilladev.cloud.looker.com"})
 def test_existing_dir(looker_sdk, namespaces, tmp_path):
     sdk = looker_sdk.init31()
     sdk.search_model_sets.return_value = [Mock(models=["model"], id=1)]
@@ -87,6 +90,7 @@ def test_existing_dir(looker_sdk, namespaces, tmp_path):
 
 
 @patch("generator.spoke.looker_sdk")
+@patch.dict(os.environ, {"LOOKER_INSTANCE_URI": "https://mozilladev.cloud.looker.com"})
 def test_generate_model(looker_sdk, namespaces, tmp_path):
     sdk = looker_sdk.init31()
     sdk.search_model_sets.return_value = [Mock(models=["model"], id=1)]
