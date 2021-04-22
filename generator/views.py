@@ -254,65 +254,65 @@ class GrowthAccountingView(View):
         {
             "name": "overall_active_previous",
             "type": "count",
-            "filters": {"active_last_week": "yes"},
+            "filters": [{"active_last_week": "yes"}],
         },
         {
             "name": "overall_active_current",
             "type": "count",
-            "filters": {"active_this_week": "yes"},
+            "filters": [{"active_this_week": "yes"}],
         },
         {
             "name": "overall_resurrected",
             "type": "count",
-            "filters": {
-                "new_last_week": "no",
-                "new_this_week": "no",
-                "active_last_week": "no",
-                "active_this_week": "yes",
-            },
+            "filters": [
+                {"new_last_week": "no"},
+                {"new_this_week": "no"},
+                {"active_last_week": "no"},
+                {"active_this_week": "yes"},
+            ],
         },
         {
             "name": "new_users",
             "type": "count",
-            "filters": {"new_this_week": "yes", "active_this_week": "yes"},
+            "filters": [{"new_this_week": "yes"}, {"active_this_week": "yes"}],
         },
         {
             "name": "established_users_returning",
             "type": "count",
-            "filters": {
-                "new_last_week": "no",
-                "new_this_week": "no",
-                "active_last_week": "yes",
-                "active_this_week": "yes",
-            },
+            "filters": [
+                {"new_last_week": "no"},
+                {"new_this_week": "no"},
+                {"active_last_week": "yes"},
+                {"active_this_week": "yes"},
+            ],
         },
         {
             "name": "new_users_returning",
             "type": "count",
-            "filters": {
-                "new_last_week": "yes",
-                "active_last_week": "yes",
-                "active_this_week": "yes",
-            },
+            "filters": [
+                {"new_last_week": "yes"},
+                {"active_last_week": "yes"},
+                {"active_this_week": "yes"},
+            ],
         },
         {
             "name": "new_users_churned_count",
             "type": "count",
-            "filters": {
-                "new_last_week": "yes",
-                "active_last_week": "yes",
-                "active_this_week": "no",
-            },
+            "filters": [
+                {"new_last_week": "yes"},
+                {"active_last_week": "yes"},
+                {"active_this_week": "no"},
+            ],
         },
         {
             "name": "established_users_churned_count",
             "type": "count",
-            "filters": {
-                "new_last_week": "no",
-                "new_this_week": "no",
-                "active_last_week": "yes",
-                "active_this_week": "no",
-            },
+            "filters": [
+                {"new_last_week": "no"},
+                {"new_this_week": "no"},
+                {"active_last_week": "yes"},
+                {"active_this_week": "no"},
+            ],
         },
         {
             "name": "new_users_churned",
