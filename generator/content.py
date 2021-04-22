@@ -8,7 +8,12 @@ import looker_sdk
 import yaml
 
 
-def _setup_env_with_looker_creds() -> bool:
+def setup_env_with_looker_creds() -> bool:
+    """
+    Set up env with looker credentials.
+
+    Returns TRUE if the config is complete.
+    """
     client_id = os.environ.get("LOOKER_API_CLIENT_ID")
     client_secret = os.environ.get("LOOKER_API_CLIENT_SECRET")
     instance = os.environ.get("LOOKER_INSTANCE_URI")
@@ -148,5 +153,5 @@ def generate_folders(namespaces: dict):
 )
 def generate_content(namespaces):
     """Generate content folders."""
-    _setup_env_with_looker_creds()
+    setup_env_with_looker_creds()
     generate_folders(yaml.safe_load(namespaces))

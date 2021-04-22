@@ -250,7 +250,7 @@ class GrowthAccountingView(View):
         },
     ]
 
-    default_measures: List[Dict[str, Union[str, Dict[str, str]]]] = [
+    default_measures: List[Dict[str, Union[str, List[Dict[str, str]]]]] = [
         {
             "name": "overall_active_previous",
             "type": "count",
@@ -454,7 +454,7 @@ class GrowthAccountingView(View):
 
         return [view_defn]
 
-    def get_measures(self) -> List[Dict[str, Union[str, Dict[str, str]]]]:
+    def get_measures(self) -> List[Dict[str, Union[str, List[Dict[str, str]]]]]:
         """Generate measures for the Growth Accounting Framework."""
         return deepcopy(GrowthAccountingView.default_measures)
 
