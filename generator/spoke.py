@@ -1,6 +1,7 @@
 """Generate directories and models for new namespaces."""
 
 import logging
+import os
 from pathlib import Path
 from typing import Dict, List, TypedDict
 
@@ -9,8 +10,14 @@ import lkml
 import looker_sdk
 import yaml
 
-from .content import _setup_env_with_looker_creds
+from .content import setup_env_with_looker_creds
 from .lookml import ViewDict
+
+MODEL_SETS_BY_INSTANCE = {
+    "https://mozilladev.cloud.looker.com": "mozilla_confidential",
+    "https://mozillastaging.cloud.looker.com": "mozilla_confidential",
+    "https://mozilla.cloud.looker.com": "user-spokes",
+}
 
 
 class ExploreDict(TypedDict):
@@ -60,13 +67,28 @@ def generate_model(spoke_path: Path, name: str, namespace_defn: NamespaceDict) -
 
 def configure_model(sdk: looker_sdk.methods.Looker31SDK, model_name: str):
     """Configure a Looker model by name."""
+    instance = os.environ["LOOKER_INSTANCE_URI"]
     logging.info(f"Configuring model {model_name}...")
+
     sdk.create_lookml_model(
         looker_sdk.models.WriteLookmlModel(
             allowed_db_connection_names=["telemetry"],
             name=model_name,
             project_name="spoke-default",
         )
+    )
+
+    model_sets = sdk.search_model_sets(name=MODEL_SETS_BY_INSTANCE[instance])
+    if len(model_sets) != 1:
+        raise click.ClickException("Error: Found more than one matching model set")
+
+    model_set = model_sets[0]
+    models, _id = model_set.models, model_set.id
+    if models is None or _id is None:
+        raise click.ClickException("Error: Missing models or name from model_set")
+
+    sdk.update_model_set(
+        _id, looker_sdk.models.WriteModelSet(models=list(models) + [model_name])
     )
 
 
@@ -80,7 +102,6 @@ def generate_directories(
     existing_dirs = {p.name for p in spoke_dir.iterdir()}
     for namespace, defn in namespaces.items():
         if namespace in existing_dirs:
-            # already generated, skip this namespace
             continue
 
         (spoke_dir / namespace).mkdir()
@@ -113,5 +134,5 @@ def generate_directories(
 def update_spoke(namespaces, spoke_dir):
     """Generate updates to spoke project."""
     _namespaces = yaml.safe_load(namespaces)
-    sdk_setup = _setup_env_with_looker_creds()
+    sdk_setup = setup_env_with_looker_creds()
     generate_directories(_namespaces, Path(spoke_dir), sdk_setup)

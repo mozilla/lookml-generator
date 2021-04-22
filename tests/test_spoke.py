@@ -1,4 +1,4 @@
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import lkml
 import pytest
@@ -31,6 +31,9 @@ def namespaces() -> dict:
 
 @patch("generator.spoke.looker_sdk")
 def test_generate_directories(looker_sdk, namespaces, tmp_path):
+    sdk = looker_sdk.init31()
+    sdk.search_model_sets.return_value = [Mock(models=["model"], id=1)]
+
     generate_directories(namespaces, tmp_path, True)
     dirs = list(tmp_path.iterdir())
     assert dirs == [tmp_path / "glean-app"]
@@ -44,12 +47,14 @@ def test_generate_directories(looker_sdk, namespaces, tmp_path):
         app_path / "glean-app.model.lkml",
     }
 
-    sdk = looker_sdk.init31()
     sdk.create_lookml_model.assert_called_once()
 
 
 @patch("generator.spoke.looker_sdk")
 def test_generate_directories_no_sdk(looker_sdk, namespaces, tmp_path):
+    sdk = looker_sdk.init31()
+    sdk.search_model_sets.return_value = [Mock(models=["model"], id=1)]
+
     generate_directories(namespaces, tmp_path, False)
     dirs = list(tmp_path.iterdir())
     assert dirs == [tmp_path / "glean-app"]
@@ -63,12 +68,14 @@ def test_generate_directories_no_sdk(looker_sdk, namespaces, tmp_path):
         app_path / "glean-app.model.lkml",
     }
 
-    sdk = looker_sdk.init31()
     sdk.create_lookml_model.assert_not_called()
 
 
 @patch("generator.spoke.looker_sdk")
 def test_existing_dir(looker_sdk, namespaces, tmp_path):
+    sdk = looker_sdk.init31()
+    sdk.search_model_sets.return_value = [Mock(models=["model"], id=1)]
+
     generate_directories(namespaces, tmp_path, True)
     tmp_file = tmp_path / "glean-app" / "tmp-file"
     tmp_file.write_text("hello, world")
@@ -81,6 +88,9 @@ def test_existing_dir(looker_sdk, namespaces, tmp_path):
 
 @patch("generator.spoke.looker_sdk")
 def test_generate_model(looker_sdk, namespaces, tmp_path):
+    sdk = looker_sdk.init31()
+    sdk.search_model_sets.return_value = [Mock(models=["model"], id=1)]
+
     generate_directories(namespaces, tmp_path, True)
     expected = {
         "connection": "telemetry",
