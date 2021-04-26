@@ -29,9 +29,6 @@
 #                             A PR to merge the changes from SPOKE_BRANCH_WORKING
 #                             to here will be opened. This branch also serves as
 #                             the source branch.
-#   GCLOUD_SERVICE_KEY:       The service key used to authenticate with GCP.
-#                             Needs to have read access to all tables specified
-#                             in `namespaces.yaml`. Not required in local dev.
 #   LOOKER_INSTANCE_URI:      The URI of our looker instance. Defaults to dev.
 #   LOOKER_API_CLIENT_ID:     Client ID for Looker access. If unset, does
 #                             not run `generator content`.
@@ -53,17 +50,6 @@ SPOKE_BRANCH_PUBLISH=${SPOKE_BRANCH_PUBLISH:-"main-nonprod"}
 SPOKE_BRANCH_WORKING=${SPOKE_BRANCH_WORKING:-"${SPOKE_BRANCH_PUBLISH}-working"}
 
 LOOKER_INSTANCE_URI=${LOOKER_INSTANCE_URI:-"https://mozilladev.cloud.looker.com"}
-
-function setup_gcloud_auth() {
-  # Use credentials from environment
-  # Google's client libraries will check for GOOGLE_APPLICATION_CREDENTIALS
-  # and use a file in that location for credentials if present;
-  # See https://cloud.google.com/docs/authentication/production
-  if [ -n "$GCLOUD_SERVICE_KEY" ]; then
-    export GOOGLE_APPLICATION_CREDENTIALS="${GOOGLE_APPLICATION_CREDENTIALS:-/tmp/gcp.json}"
-    echo "$GCLOUD_SERVICE_KEY" > "$GOOGLE_APPLICATION_CREDENTIALS"
-  fi
-}
 
 function setup_git_auth() {
     # Configure the container for pushing to github.
@@ -251,7 +237,6 @@ function main() {
   cd /app
 
   set +x  # don't print these commands
-  setup_gcloud_auth
   setup_git_auth
   setup_github_auth
 
