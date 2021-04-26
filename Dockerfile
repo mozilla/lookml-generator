@@ -10,7 +10,13 @@ RUN groupadd --gid ${USER_ID} ${GROUP_ID} && \
 
 # For grpc https://github.com/grpc/grpc/issues/24556#issuecomment-751797589
 RUN apt-get update -qqy && \
-    apt-get install -qqy python-dev build-essential git curl
+    apt-get install -qqy python-dev build-essential git curl software-properties-common
+
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
+RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key C99B11DEB97541F0
+RUN apt-add-repository https://cli.github.com/packages
+RUN apt update
+RUN apt install -y gh
 
 COPY --from=google/cloud-sdk:alpine /google-cloud-sdk /google-cloud-sdk
 ENV PATH /google-cloud-sdk/bin:$PATH
