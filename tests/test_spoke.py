@@ -70,6 +70,8 @@ def test_generate_directories_no_sdk(looker_sdk, namespaces, tmp_path):
         app_path / "glean-app.model.lkml",
     }
 
+    assert (app_path / "dashboards" / ".gitkeep").exists()
+
     sdk.create_lookml_model.assert_not_called()
 
 
