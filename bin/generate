@@ -20,10 +20,15 @@
 #                             branch doesn't exist, creates it from source.
 #   SPOKE_REPO_URL:           The URL to the looker-spoke-default repository.
 #                             Requires the SSH format, w.g. git@github.com:user/repo.git.
+#   SPOKE_BRANCH_WORKING:     The working branch for the spoke project.
+#                             This is the branch that changes will be
+#                             published to, and a PR opened to merge
+#                             them in to SPOKE_BRANCH_PUBLISH.
+#                             Defaults to SPOKE_BRANCH_PUBLISH-working.
 #   SPOKE_BRANCH_PUBLISH:     The publish branch for the spoke project.
-#                             We use this as source as well, since we
-#                             don't want to overwrite files that are
-#                             already published.
+#                             A PR to merge the changes from SPOKE_BRANCH_WORKING
+#                             to here will be opened. This branch also serves as
+#                             the source branch.
 #   GCLOUD_SERVICE_KEY:       The service key used to authenticate with GCP.
 #                             Needs to have read access to all tables specified
 #                             in `namespaces.yaml`. Not required in local dev.
@@ -32,6 +37,8 @@
 #                             not run `generator content`.
 #   LOOKER_API_CLIENT_SECRET: Client Secret for Looker access. If unset, does
 #                             not run `generator content`.
+#   GITHUB_ACCESS_TOKEN:      Access token for Github. Needs read and write
+#                             access to repos. Not required in dev.
 #
 # Example usage:
 #   export GIT_SSH_KEY_BASE64=$(cat ~/.ssh/id_rsa | base64)
@@ -39,10 +46,11 @@
 
 HUB_REPO_URL=${HUB_REPO_URL:-"git@github.com:mozilla/looker-hub.git"}
 HUB_BRANCH_SOURCE=${HUB_BRANCH_SOURCE:-"base"}
-HUB_BRANCH_PUBLISH=${HUB_BRANCH_PUBLISH:-"test-lookml-generation"}
+HUB_BRANCH_PUBLISH=${HUB_BRANCH_PUBLISH:-"main-nonprod"}
 
 SPOKE_REPO_URL=${SPOKE_REPO_URL:-"git@github.com:mozilla/looker-spoke-default.git"}
-SPOKE_BRANCH_PUBLISH=${SPOKE_BRANCH_PUBLISH:-"test-lookml-generation"}
+SPOKE_BRANCH_PUBLISH=${SPOKE_BRANCH_PUBLISH:-"main-nonprod"}
+SPOKE_BRANCH_WORKING=${SPOKE_BRANCH_WORKING:-"${SPOKE_BRANCH_PUBLISH}-working"}
 
 LOOKER_INSTANCE_URI=${LOOKER_INSTANCE_URI:-"https://mozilladev.cloud.looker.com"}
 
@@ -83,6 +91,16 @@ function setup_git_auth() {
     ssh-add
 }
 
+function setup_github_auth() {
+  # Configure Github CLI auth.
+
+  if [[ -z "$GITHUB_ACCESS_TOKEN" ]]; then
+    gh auth login
+  else
+    gh auth login --with-token <<< "$GITHUB_ACCESS_TOKEN"
+  fi
+}
+
 function setup_hub() {
     # Checkout looker-hub and changes directory to prepare for
     # LookML generation.
@@ -110,7 +128,9 @@ function setup_spoke() {
     git clone "$SPOKE_REPO_URL"
     cd looker-spoke-default
     git fetch --all
-    git checkout "$SPOKE_BRANCH_PUBLISH" || git checkout main && git checkout -b "$SPOKE_BRANCH_PUBLISH"
+    git checkout $SPOKE_BRANCH_PUBLISH || exit 1
+    git branch -D $SPOKE_BRANCH_WORKING
+    git checkout -b $SPOKE_BRANCH_WORKING
 
     popd
 }
@@ -215,6 +235,17 @@ function hit_looker_webhooks() {
   curl "$LOOKER_INSTANCE_URI/webhooks/projects/spoke-default/deploy"
 }
 
+function open_spoke_pull_request() {
+  # Open a PR to merge the changes from working branch
+  # in to the publish branch.
+  gh pr create \
+    --title "Auto-push from LookML Generator" \
+    --reviewer fbertsch \
+    --base $SPOKE_BRANCH_PUBLISH \
+    --head $SPOKE_BRANCH_WORKING \
+    --body ""
+}
+
 function main() {
   pushd .
   cd /app
@@ -222,6 +253,7 @@ function main() {
   set +x  # don't print these commands
   setup_gcloud_auth
   setup_git_auth
+  setup_github_auth
 
   # Set up hub and commit
   set -x  # print these commands
@@ -236,9 +268,10 @@ function main() {
   setup_spoke
   generate_spoke_commit
 
-  # Publish spoke
+  # Publish spoke - force push to working branch
   cd /app/looker-spoke-default
-  git push || git push --set-upstream origin "$SPOKE_BRANCH_PUBLISH"
+  git push -f || git push -f --set-upstream origin "$SPOKE_BRANCH_WORKING"
+  open_spoke_pull_request
 
   # Update Looker content
   generate_looker_content
