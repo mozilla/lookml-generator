@@ -226,7 +226,7 @@ function open_spoke_pull_request() {
   # in to the publish branch.
   gh pr create \
     --title "Auto-push from LookML Generator" \
-    --reviewer fbertsch \
+    --reviewer mozilla/data-looker \
     --base $SPOKE_BRANCH_PUBLISH \
     --head $SPOKE_BRANCH_WORKING \
     --body ""
