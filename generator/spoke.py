@@ -105,12 +105,9 @@ def generate_directories(
             continue
 
         (spoke_dir / namespace).mkdir()
-        (spoke_dir / namespace / "views").mkdir()
-        (spoke_dir / namespace / "views" / ".gitkeep").touch()
-        (spoke_dir / namespace / "explores").mkdir()
-        (spoke_dir / namespace / "explores" / ".gitkeep").touch()
-        (spoke_dir / namespace / "dashboards").mkdir()
-        (spoke_dir / namespace / "explores" / ".gitkeep").touch()
+        for dirname in ("views", "explores", "dashboards"):
+            (spoke_dir / namespace / dirname).mkdir()
+            (spoke_dir / namespace / dirname / ".gitkeep").touch()
 
         generate_model(spoke_dir, namespace, defn)
 
