@@ -94,11 +94,34 @@ workflows:
   version: 2
   build-and-deploy:
     jobs:
-    - unit-tests
+    - unit-tests:
+        filters:
+          tags:
+            only: /.*/
+          branches:
+            only: main
+
     - integration-tests:
         context: data-eng-circleci-tests
-    - verify-requirements
-    - build-container
+        filters:
+          tags:
+            only: /.*/
+          branches:
+            only: main
+
+    - verify-requirements:
+        filters:
+          tags:
+            only: /.*/
+          branches:
+            only: main
+
+    - build-container:
+        filters:
+          tags:
+            only: /.*/
+          branches:
+            only: main
 
     - gcp-gcr/build-and-push-image:
         name: Build and push lookml-generator
