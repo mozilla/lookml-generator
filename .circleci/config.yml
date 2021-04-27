@@ -98,30 +98,22 @@ workflows:
         filters:
           tags:
             only: /.*/
-          branches:
-            only: main
 
     - integration-tests:
         context: data-eng-circleci-tests
         filters:
           tags:
             only: /.*/
-          branches:
-            only: main
 
     - verify-requirements:
         filters:
           tags:
             only: /.*/
-          branches:
-            only: main
 
     - build-container:
         filters:
           tags:
             only: /.*/
-          branches:
-            only: main
 
     - gcp-gcr/build-and-push-image:
         name: Build and push lookml-generator
