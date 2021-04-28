@@ -70,6 +70,13 @@ def configure_model(sdk: looker_sdk.methods.Looker31SDK, model_name: str):
     instance = os.environ["LOOKER_INSTANCE_URI"]
     logging.info(f"Configuring model {model_name}...")
 
+    try:
+        sdk.lookml_model(model_name)
+        logging.info("Model is configured!")
+        return
+    except looker_sdk.error.SDKError:
+        pass
+
     sdk.create_lookml_model(
         looker_sdk.models.WriteLookmlModel(
             allowed_db_connection_names=["telemetry"],
