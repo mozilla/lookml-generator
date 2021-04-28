@@ -87,10 +87,11 @@ def _get_glean_apps(
         if channels:
             apps.append(
                 {
-                    "app_name": app_name,
-                    "canonical_app_name": canonical_app_name,
+                    "name": app_name,
+                    "pretty_name": canonical_app_name,
                     "channels": channels,
                     "owners": emails,
+                    "glean_app": True,
                 }
             )
 
@@ -105,7 +106,7 @@ def _get_looker_views(
 
     for klass in view_types.values():
         for view in klass.from_db_views(  # type: ignore
-            app["app_name"], app["channels"], db_views
+            app["name"], app["channels"], db_views
         ):
             if view.name in view_names:
                 raise KeyError(
@@ -165,11 +166,12 @@ def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri, allowlist
         explores = _get_explores(looker_views)
         views_as_dict = {view.name: view.as_dict() for view in looker_views}
 
-        namespaces[app["app_name"]] = {
+        namespaces[app["name"]] = {
             "owners": app["owners"],
-            "canonical_app_name": app["canonical_app_name"],
+            "pretty_name": app["pretty_name"],
             "views": views_as_dict,
             "explores": explores,
+            "glean_app": True,
         }
 
     if custom_namespaces is not None:

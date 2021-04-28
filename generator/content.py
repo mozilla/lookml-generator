@@ -49,7 +49,7 @@ def generate_folders(namespaces: dict):
     shared_folder_id = _get_id_from_list(shared_folders, "Shared folders")
 
     for namespace, defn in namespaces.items():
-        pretty_name = defn["canonical_app_name"]
+        pretty_name = defn["pretty_name"]
         owners = defn["owners"]
 
         try:
