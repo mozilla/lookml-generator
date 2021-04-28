@@ -10,7 +10,8 @@ from generator.content import generate_folders
 def namespaces():
     return {
         "burnham": {
-            "canonical_app_name": "Burnham",
+            "pretty_name": "Burnham",
+            "glean_app": True,
             "owners": ["owner@mozilla.com"],
             "explores": [],
             "views": [],

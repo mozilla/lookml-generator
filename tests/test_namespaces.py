@@ -30,9 +30,10 @@ def custom_namespaces(tmp_path):
         dedent(
             """
             custom:
+              glean_app: false
+              pretty_name: Custom
               owners:
               - custom-owner@allizom.com
-              canonical_app_name: Custom
               views:
                 baseline:
                   type: ping_view
@@ -40,9 +41,9 @@ def custom_namespaces(tmp_path):
                   - channel: release
                     table: mozdata.custom.baseline
             disallowed:
+              pretty_name: Disallowed
               owners:
               - disallowed-owner@allizom.com
-              canonical_app_name: Disallowed
               views:
                 baseline:
                   type: ping_view
@@ -147,8 +148,9 @@ def app_listings_uri(tmp_path):
 def glean_apps():
     return [
         {
-            "app_name": "glean-app",
-            "canonical_app_name": "Glean App",
+            "name": "glean-app",
+            "glean_app": True,
+            "pretty_name": "Glean App",
             "owners": [
                 "glean-app-owner@allizom.com",
             ],
@@ -195,9 +197,10 @@ def test_namespaces_full(
             dedent(
                 """
                 custom:
-                  canonical_app_name: Custom
+                  glean_app: false
                   owners:
                   - custom-owner@allizom.com
+                  pretty_name: Custom
                   views:
                     baseline:
                       tables:
@@ -205,7 +208,6 @@ def test_namespaces_full(
                         table: mozdata.custom.baseline
                       type: ping_view
                 glean-app:
-                  canonical_app_name: Glean App
                   explores:
                     baseline:
                       type: ping_explore
@@ -215,8 +217,10 @@ def test_namespaces_full(
                       type: growth_accounting_explore
                       views:
                         base_view: growth_accounting
+                  glean_app: true
                   owners:
                   - glean-app-owner@allizom.com
+                  pretty_name: Glean App
                   views:
                     baseline:
                       tables:

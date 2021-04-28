@@ -32,7 +32,8 @@ class NamespaceDict(TypedDict):
 
     views: ViewDict
     explores: ExploreDict
-    canonical_app_name: str
+    pretty_name: str
+    glean_app: bool
 
 
 def generate_model(spoke_path: Path, name: str, namespace_defn: NamespaceDict) -> Path:
@@ -49,7 +50,7 @@ def generate_model(spoke_path: Path, name: str, namespace_defn: NamespaceDict) -
     logging.info(f"Generating model {name}...")
     model_defn = {
         "connection": "telemetry",
-        "label": namespace_defn["canonical_app_name"],
+        "label": namespace_defn["pretty_name"],
         "includes": [
             f"//looker-hub/{name}/explores/*",
             f"//looker-hub/{name}/dashboards/*",
