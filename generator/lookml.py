@@ -21,10 +21,10 @@ def _generate_views(client, out_dir: Path, views: Iterable[View]) -> Iterable[Pa
 
 
 def _generate_explores(
-    client, out_dir: Path, namespace: str, explores: dict
+    client, out_dir: Path, namespace: str, explores: dict, views_dir: Path
 ) -> Iterable[Path]:
     for explore_name, defn in explores.items():
-        explore = explore_types[defn["type"]].from_dict(explore_name, defn)
+        explore = explore_types[defn["type"]].from_dict(explore_name, defn, views_dir)
         file_lookml = {
             # Looker validates all included files,
             # so if we're not explicit about files here, validation takes
@@ -45,21 +45,7 @@ def _get_views_from_dict(views: Dict[str, ViewDict]) -> Iterable[View]:
         yield view_types[view_info["type"]].from_dict(view_name, view_info)  # type: ignore
 
 
-@click.command(help=__doc__)
-@click.option(
-    "--namespaces",
-    default="namespaces.yaml",
-    type=click.File(),
-    help="Path to a yaml namespaces file",
-)
-@click.option(
-    "--target-dir",
-    default="looker-hub/",
-    type=click.Path(),
-    help="Path to a directory where lookml will be written",
-)
-def lookml(namespaces, target_dir):
-    """Generate lookml from namespaces."""
+def _lookml(namespaces, target_dir):
     client = bigquery.Client()
     _namespaces = yaml.safe_load(namespaces)
     target = Path(target_dir)
@@ -79,6 +65,24 @@ def lookml(namespaces, target_dir):
         explores = lookml_objects.get("explores", {})
         logging.info("  Generating explores")
         for explore_path in _generate_explores(
-            client, explore_dir, namespace, explores
+            client, explore_dir, namespace, explores, view_dir
         ):
             logging.info(f"    ...Generating {explore_path}")
+
+
+@click.command(help=__doc__)
+@click.option(
+    "--namespaces",
+    default="namespaces.yaml",
+    type=click.File(),
+    help="Path to a yaml namespaces file",
+)
+@click.option(
+    "--target-dir",
+    default="looker-hub/",
+    type=click.Path(),
+    help="Path to a directory where lookml will be written",
+)
+def lookml(namespaces, target_dir):
+    """Generate lookml from namespaces."""
+    return _lookml(namespaces, target_dir)
