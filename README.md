@@ -64,3 +64,18 @@ export HUB_BRANCH_PUBLISH="yourname-generation-test-1"
 export GIT_SSH_KEY_BASE64=$(cat ~/.ssh/id_rsa | base64)
 make build && make run
 ```
+
+## Deploying new `lookml-generator` changes
+
+`lookml-generator` runs daily to update the `looker-hub` and `looker-spoke-default` code. Changes
+to the underlying tables should automatically propogate to their respective views and explores.
+
+However, changes to `lookml-generator` need to be tested on stage and deployed. The general process
+is the following:
+1. Create a PR, test on dev. It is not necessary to add Looker credentials, but the container changes
+   should run using `make build && make run`, with changes reflected in LookML repos.
+2. Once merged, the changes should run on stage. They will run automatically after schema deploys,
+   but they can be run manually by clearing the `lookml_generator_staging` task in [Airflow](https://workflow.telemetry.mozilla.org/tree?dag_id=probe_scraper).
+3. Once the changes are confirmed in stage, we first tag a new release here. Add a description with
+   what the new release includes. Finally, submit a PR to update the [production image](https://github.com/mozilla/telemetry-airflow/blob/main/dags/probe_scraper.py#L109)
+   that is running in Airflow.

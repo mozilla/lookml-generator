@@ -2,6 +2,7 @@ import os
 from unittest.mock import Mock, patch
 
 import lkml
+import looker_sdk as _looker_sdk
 import pytest
 
 from generator.spoke import generate_directories
@@ -36,6 +37,8 @@ def namespaces() -> dict:
 def test_generate_directories(looker_sdk, namespaces, tmp_path):
     sdk = looker_sdk.init31()
     sdk.search_model_sets.return_value = [Mock(models=["model"], id=1)]
+    sdk.lookml_model.side_effect = _looker_sdk.error.SDKError
+    looker_sdk.error = Mock(SDKError=_looker_sdk.error.SDKError)
 
     generate_directories(namespaces, tmp_path, True)
     dirs = list(tmp_path.iterdir())
