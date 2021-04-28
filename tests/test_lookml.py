@@ -123,7 +123,8 @@ def test_lookml_actual(runner, tmp_path):
         dedent(
             """
             custom:
-              canonical_app_name: Custom
+              pretty_name: Custom
+              glean_app: false
               views:
                 baseline:
                   type: ping_view
@@ -131,7 +132,8 @@ def test_lookml_actual(runner, tmp_path):
                   - channel: release
                     table: mozdata.custom.baseline
             glean-app:
-              canonical_app_name: Glean App
+              pretty_name: Glean App
+              glean_app: true
               views:
                 baseline:
                   type: ping_view
@@ -434,7 +436,8 @@ def test_duplicate_dimension(runner, tmp_path):
         dedent(
             """
             custom:
-              canonical_app_name: Custom
+              pretty_name: Custom
+              glean_app: false
               views:
                 baseline:
                   type: ping_view
@@ -466,7 +469,8 @@ def test_duplicate_measure(runner, tmp_path):
         dedent(
             """
             custom:
-              canonical_app_name: Custom
+              pretty_name: Custom
+              glean_app: false
               views:
                 baseline:
                   type: ping_view

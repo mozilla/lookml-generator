@@ -11,7 +11,8 @@ from generator.spoke import generate_directories
 def namespaces() -> dict:
     return {
         "glean-app": {
-            "canonical_app_name": "Glean App",
+            "pretty_name": "Glean App",
+            "glean_app": True,
             "views": {
                 "baseline": {
                     "type": "ping_view",
