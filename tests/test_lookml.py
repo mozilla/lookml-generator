@@ -1,4 +1,3 @@
-import sys
 from pathlib import Path
 from textwrap import dedent
 from unittest.mock import patch
@@ -8,7 +7,7 @@ import pytest
 from click.testing import CliRunner
 from google.cloud import bigquery
 
-from generator.lookml import lookml
+from generator.lookml import _lookml, lookml
 from generator.views import GrowthAccountingView
 
 from .utils import print_and_test
@@ -160,21 +159,7 @@ def test_lookml_actual(runner, tmp_path):
     )
     with runner.isolated_filesystem():
         with patch("google.cloud.bigquery.Client", MockClient):
-            result = runner.invoke(
-                lookml,
-                [
-                    "--namespaces",
-                    namespaces.absolute(),
-                ],
-            )
-        sys.stdout.write(result.stdout)
-        if result.stderr_bytes is not None:
-            sys.stderr.write(result.stderr)
-        try:
-            assert result.exit_code == 0
-        except Exception as e:
-            # use exception chaining to expose original traceback
-            raise e from result.exception
+            _lookml(Path(namespaces.absolute()).read_text(), "looker-hub/")
         expected = {
             "views": [
                 {
@@ -419,9 +404,15 @@ def test_lookml_actual(runner, tmp_path):
                 {
                     "name": "baseline",
                     "view_name": "baseline",
+                    "always_filter": [
+                        {"submission_date": "28 days"},
+                        {"channel": "mozdata.glean_app.baseline"},
+                    ],
                 }
             ],
         }
+        print("\n lookml generated")
+        print(Path("looker-hub/glean-app/explores/baseline.explore.lkml").read_text())
         print_and_test(
             expected,
             lkml.load(

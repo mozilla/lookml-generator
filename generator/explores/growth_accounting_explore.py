@@ -1,6 +1,7 @@
 """Growth Accounting explore type."""
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Iterator, List
 
 from ..views import View
@@ -34,6 +35,6 @@ class GrowthAccountingExplore(Explore):
                 )
 
     @staticmethod
-    def from_dict(name: str, defn: dict) -> GrowthAccountingExplore:
+    def from_dict(name: str, defn: dict, views_path: Path) -> GrowthAccountingExplore:
         """Get an instance of this explore from a dictionary definition."""
-        return GrowthAccountingExplore(name, defn["views"])
+        return GrowthAccountingExplore(name, defn["views"], views_path)
