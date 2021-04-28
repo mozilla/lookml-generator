@@ -1,1 +1,17 @@
 ---
+duet:
+  glean_app: false
+  owners:
+  - ascholtz@mozilla.com
+  pretty_name: DUET
+  views:
+    install:
+      type: ping_view
+      tables:
+      - channel: release
+        table: mozdata.firefox_installer.install
+    new_profile:
+      type: ping_view
+      tables:
+      - channel: release
+        table: mozdata.telemetry.new_profile
