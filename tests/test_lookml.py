@@ -159,7 +159,7 @@ def test_lookml_actual(runner, tmp_path):
     )
     with runner.isolated_filesystem():
         with patch("google.cloud.bigquery.Client", MockClient):
-            _lookml(Path(namespaces.absolute()).read_text(), "looker-hub/")
+            _lookml(open(namespaces), "looker-hub/")
         expected = {
             "views": [
                 {
