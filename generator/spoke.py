@@ -13,10 +13,10 @@ import yaml
 from .content import setup_env_with_looker_creds
 from .lookml import ViewDict
 
-MODEL_SETS_BY_INSTANCE = {
-    "https://mozilladev.cloud.looker.com": "mozilla_confidential",
-    "https://mozillastaging.cloud.looker.com": "mozilla_confidential",
-    "https://mozilla.cloud.looker.com": "user-spokes",
+MODEL_SETS_BY_INSTANCE: Dict[str, List[str]] = {
+    "https://mozilladev.cloud.looker.com": ["mozilla_confidential"],
+    "https://mozillastaging.cloud.looker.com": ["mozilla_confidential"],
+    "https://mozilla.cloud.looker.com": ["user-spokes", "spokes"],
 }
 
 
@@ -86,18 +86,19 @@ def configure_model(sdk: looker_sdk.methods.Looker31SDK, model_name: str):
         )
     )
 
-    model_sets = sdk.search_model_sets(name=MODEL_SETS_BY_INSTANCE[instance])
-    if len(model_sets) != 1:
-        raise click.ClickException("Error: Found more than one matching model set")
+    for model_name in MODEL_SETS_BY_INSTANCE[instance]:
+        model_sets = sdk.search_model_sets(name=model_name)
+        if len(model_sets) != 1:
+            raise click.ClickException("Error: Found more than one matching model set")
 
-    model_set = model_sets[0]
-    models, _id = model_set.models, model_set.id
-    if models is None or _id is None:
-        raise click.ClickException("Error: Missing models or name from model_set")
+        model_set = model_sets[0]
+        models, _id = model_set.models, model_set.id
+        if models is None or _id is None:
+            raise click.ClickException("Error: Missing models or name from model_set")
 
-    sdk.update_model_set(
-        _id, looker_sdk.models.WriteModelSet(models=list(models) + [model_name])
-    )
+        sdk.update_model_set(
+            _id, looker_sdk.models.WriteModelSet(models=list(models) + [model_name])
+        )
 
 
 def generate_directories(

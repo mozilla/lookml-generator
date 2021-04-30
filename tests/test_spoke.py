@@ -54,6 +54,7 @@ def test_generate_directories(looker_sdk, namespaces, tmp_path):
     }
 
     sdk.create_lookml_model.assert_called_once()
+    sdk.update_model_set.assert_called_once()
 
 
 @patch("generator.spoke.looker_sdk")
@@ -96,10 +97,18 @@ def test_existing_dir(looker_sdk, namespaces, tmp_path):
 
 
 @patch("generator.spoke.looker_sdk")
-@patch.dict(os.environ, {"LOOKER_INSTANCE_URI": "https://mozilladev.cloud.looker.com"})
+@patch.dict(os.environ, {"LOOKER_INSTANCE_URI": "https://mozilla.cloud.looker.com"})
 def test_generate_model(looker_sdk, namespaces, tmp_path):
     sdk = looker_sdk.init31()
-    sdk.search_model_sets.return_value = [Mock(models=["model"], id=1)]
+    sdk.search_model_sets.side_effect = [
+        [Mock(models=["model"], id=1)],
+        [Mock(models=["model2"], id=2)],
+    ]
+    sdk.lookml_model.side_effect = _looker_sdk.error.SDKError
+    looker_sdk.error = Mock(SDKError=_looker_sdk.error.SDKError)
+
+    write_model = Mock()
+    looker_sdk.models.WriteModelSet.return_value = write_model
 
     generate_directories(namespaces, tmp_path, True)
     expected = {
@@ -115,3 +124,6 @@ def test_generate_model(looker_sdk, namespaces, tmp_path):
     }
     actual = lkml.load((tmp_path / "glean-app" / "glean-app.model.lkml").read_text())
     assert expected == actual
+
+    sdk.update_model_set.assert_any_call(1, write_model)
+    sdk.update_model_set.assert_any_call(2, write_model)
