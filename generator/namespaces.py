@@ -15,8 +15,8 @@ from typing import Dict, List, Union
 import click
 import yaml
 
-from .explores import explore_types
-from .views import View, view_types
+from .explores import EXPLORE_TYPES
+from .views import VIEW_TYPES, View
 
 PROBE_INFO_BASE_URI = "https://probeinfo.telemetry.mozilla.org"
 
@@ -104,7 +104,7 @@ def _get_looker_views(
 ) -> List[View]:
     views, view_names = [], []
 
-    for klass in view_types.values():
+    for klass in VIEW_TYPES.values():
         for view in klass.from_db_views(  # type: ignore
             app["name"], app["channels"], db_views
         ):
@@ -123,7 +123,7 @@ def _get_looker_views(
 
 def _get_explores(views: List[View]) -> dict:
     explores = {}
-    for _, klass in explore_types.items():
+    for _, klass in EXPLORE_TYPES.items():
         for explore in klass.from_views(views):  # type: ignore
             explores.update(explore.to_dict())
 

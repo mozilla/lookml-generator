@@ -8,8 +8,8 @@ import lkml
 import yaml
 from google.cloud import bigquery
 
-from .explores import explore_types
-from .views import View, ViewDict, view_types
+from .explores import EXPLORE_TYPES
+from .views import VIEW_TYPES, View, ViewDict
 
 
 def _generate_views(client, out_dir: Path, views: Iterable[View]) -> Iterable[Path]:
@@ -24,7 +24,7 @@ def _generate_explores(
     client, out_dir: Path, namespace: str, explores: dict, views_dir: Path
 ) -> Iterable[Path]:
     for explore_name, defn in explores.items():
-        explore = explore_types[defn["type"]].from_dict(explore_name, defn, views_dir)
+        explore = EXPLORE_TYPES[defn["type"]].from_dict(explore_name, defn, views_dir)
         file_lookml = {
             # Looker validates all included files,
             # so if we're not explicit about files here, validation takes
@@ -42,7 +42,7 @@ def _generate_explores(
 
 def _get_views_from_dict(views: Dict[str, ViewDict]) -> Iterable[View]:
     for view_name, view_info in views.items():
-        yield view_types[view_info["type"]].from_dict(view_name, view_info)  # type: ignore
+        yield VIEW_TYPES[view_info["type"]].from_dict(view_name, view_info)  # type: ignore
 
 
 def _lookml(namespaces, target_dir):
