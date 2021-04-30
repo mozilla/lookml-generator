@@ -218,7 +218,7 @@ class GrowthAccountingView(View):
 
     @classmethod
     def from_db_views(
-        klass, app: str, channels: List[Dict[str, str]], db_views: dict
+        klass, name: str, channels: List[Dict[str, str]], db_views: dict, **kwargs
     ) -> Iterator[GrowthAccountingView]:
         """Get Growth Accounting Views from db views and app variants."""
         dataset = next(
@@ -231,7 +231,7 @@ class GrowthAccountingView(View):
                 yield GrowthAccountingView([{"table": f"mozdata.{dataset}.{view_id}"}])
 
     @classmethod
-    def from_dict(klass, name: str, _dict: ViewDict) -> GrowthAccountingView:
+    def from_dict(klass, name: str, _dict: ViewDict, **kwargs) -> GrowthAccountingView:
         """Get a view from a name and dict definition."""
         return GrowthAccountingView(_dict["tables"])
 

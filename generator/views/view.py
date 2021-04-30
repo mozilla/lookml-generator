@@ -20,7 +20,9 @@ class View(object):
     view_type: str
     tables: List[Dict[str, str]]
 
-    def __init__(self, name: str, view_type: str, tables: List[Dict[str, str]]):
+    def __init__(
+        self, name: str, view_type: str, tables: List[Dict[str, str]], **kwargs
+    ):
         """Create an instance of a view."""
         self.tables = tables
         self.name = name
@@ -66,6 +68,10 @@ class View(object):
                 and comparable_dict(self.tables) == comparable_dict(other.tables)
             )
         return False
+
+    def get_dimensions(self, *args) -> List[Dict[str, Any]]:
+        """Gets the set of dimensions for this view"""
+        raise NotImplementedError("Only implemented in subclass.")
 
     def to_lookml(self, bq_client) -> List[dict]:
         """

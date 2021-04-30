@@ -9,6 +9,7 @@ import yaml
 from google.cloud import bigquery
 
 from .explores import EXPLORE_TYPES
+from .namespaces import _get_glean_apps
 from .views import VIEW_TYPES, View, ViewDict
 
 
@@ -40,12 +41,15 @@ def _generate_explores(
         yield path
 
 
-def _get_views_from_dict(views: Dict[str, ViewDict]) -> Iterable[View]:
+def _get_views_from_dict(
+    views: Dict[str, ViewDict], namespace: str, glean_apps
+) -> Iterable[View]:
     for view_name, view_info in views.items():
-        yield VIEW_TYPES[view_info["type"]].from_dict(view_name, view_info)  # type: ignore
+        app = next(a for a in glean_apps if a["name"] == namespace)
+        yield VIEW_TYPES[view_info["type"]].from_dict(view_name, view_info, app=app)  # type: ignore
 
 
-def _lookml(namespaces, target_dir):
+def _lookml(namespaces, glean_apps, target_dir):
     client = bigquery.Client()
     _namespaces = yaml.safe_load(namespaces)
     target = Path(target_dir)
@@ -54,7 +58,9 @@ def _lookml(namespaces, target_dir):
 
         view_dir = target / namespace / "views"
         view_dir.mkdir(parents=True, exist_ok=True)
-        views = _get_views_from_dict(lookml_objects.get("views", {}))
+        views = _get_views_from_dict(
+            lookml_objects.get("views", {}), namespace, glean_apps
+        )
 
         logging.info("  Generating views")
         for view_path in _generate_views(client, view_dir, views):
@@ -78,11 +84,17 @@ def _lookml(namespaces, target_dir):
     help="Path to a yaml namespaces file",
 )
 @click.option(
+    "--app-listings-uri",
+    default="https://probeinfo.telemetry.mozilla.org/v2/glean/app-listings",
+    help="URI for probeinfo service v2 glean app listings",
+)
+@click.option(
     "--target-dir",
     default="looker-hub/",
     type=click.Path(),
     help="Path to a directory where lookml will be written",
 )
-def lookml(namespaces, target_dir):
+def lookml(namespaces, app_listings_uri, target_dir):
     """Generate lookml from namespaces."""
-    return _lookml(namespaces, target_dir)
+    glean_apps = _get_glean_apps(app_listings_uri)
+    return _lookml(namespaces, glean_apps, target_dir)

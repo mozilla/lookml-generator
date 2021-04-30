@@ -16,13 +16,13 @@ class PingView(View):
 
     type: str = "ping_view"
 
-    def __init__(self, name: str, tables: List[Dict[str, str]]):
+    def __init__(self, name: str, tables: List[Dict[str, str]], **kwargs):
         """Create instance of a PingView."""
-        super().__init__(name, PingView.type, tables)
+        super().__init__(name, self.__class__.type, tables, **kwargs)
 
     @classmethod
     def from_db_views(
-        klass, app: str, channels: List[Dict[str, str]], db_views: dict
+        klass, name: str, channels: List[Dict[str, str]], db_views: dict, **kwargs
     ) -> Iterator[PingView]:
         """Get Looker views for a namespace."""
         views = defaultdict(list)
@@ -43,12 +43,12 @@ class PingView(View):
                 views[view_id].append(table)
 
         for view_id, tables in views.items():
-            yield PingView(view_id, tables)
+            yield klass(view_id, tables, **kwargs)
 
     @classmethod
-    def from_dict(klass, name: str, _dict: ViewDict) -> PingView:
+    def from_dict(klass, name: str, _dict: ViewDict, **kwargs) -> PingView:
         """Get a view from a name and dict definition."""
-        return PingView(name, _dict["tables"])
+        return klass(name, _dict["tables"], **kwargs)
 
     def to_lookml(self, bq_client) -> List[dict]:
         """Generate LookML for this view."""
@@ -60,8 +60,7 @@ class PingView(View):
             self.tables[0],
         )["table"]
 
-        # add dimensions and dimension groups
-        dimensions = lookml_utils._generate_dimensions(bq_client, table)
+        dimensions = self.get_dimensions(bq_client, table)
         view_defn["dimensions"] = list(
             filterfalse(lookml_utils._is_dimension_group, dimensions)
         )
@@ -92,6 +91,12 @@ class PingView(View):
             view_defn["sql_table_name"] = f"`{table}`"
 
         return [view_defn]
+
+    def get_dimensions(self, bq_client, table) -> List[Dict[str, Any]]:
+        """Gets the set of dimensions for this view"""
+
+        # add dimensions and dimension groups
+        return lookml_utils._generate_dimensions(bq_client, table)
 
     def get_measures(self, dimensions: List[dict], table: str) -> List[Dict[str, str]]:
         """Generate measures from a list of dimensions.
