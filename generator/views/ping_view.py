@@ -1,7 +1,7 @@
 """Class to describe a Ping View."""
 from __future__ import annotations
 
-from collections import defaultdict
+from collections import Counter, defaultdict
 from itertools import filterfalse
 from typing import Any, Dict, Iterator, List
 
@@ -108,8 +108,9 @@ class PingView(View):
 
         Raise ClickException if dimensions result in duplicate measures.
         """
-        measures = {}
-
+        measures = []
+        # iterate through each of the dimensions and accumulate any measures
+        # that we want to include in the view
         for dimension in dimensions:
             dimension_name = dimension["name"]
             if dimension_name in {"client_id", "client_info__client_id"}:
@@ -122,16 +123,21 @@ class PingView(View):
                 measure = {"name": "ping_count", "type": "count"}
             else:
                 continue
-            name = measure["name"]
-            if name in measures:
-                raise click.ClickException(
-                    f"duplicate measure {name!r} for table {table!r}"
-                )
-            measures[name] = measure
+            measures.append(measure)
 
-        if len(measures) == 0:
+        # check if there are any duplicate values, and report the first one that
+        # shows up
+        names = [measure["name"] for measure in measures]
+        duplicates = [k for k, v in Counter(names).items() if v > 1]
+        if duplicates:
+            name = duplicates[0]
+            raise click.ClickException(
+                f"duplicate measure {name!r} for table {table!r}"
+            )
+
+        if not measures:
             raise click.ClickException(
                 f"Missing client_id and doc_id dimensions in {table!r}"
             )
 
-        return list(measures.values())
+        return measures
