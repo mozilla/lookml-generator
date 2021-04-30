@@ -100,7 +100,7 @@ class MockClient:
                     bigquery.schema.SchemaField("parsed_date", "DATE"),
                 ],
             )
-        if table_ref == "mozdata.fail.duplicate_measure":
+        if table_ref == "mozdata.fail.duplicate_client":
             return bigquery.Table(
                 table_ref,
                 schema=[
@@ -445,7 +445,7 @@ def test_duplicate_dimension(runner, glean_apps, tmp_path):
                 _lookml(open(namespaces), glean_apps, "looker-hub/")
 
 
-def test_duplicate_measure(runner, glean_apps, tmp_path):
+def test_duplicate_client_id(runner, glean_apps, tmp_path):
     namespaces = tmp_path / "namespaces.yaml"
     namespaces.write_text(
         dedent(
@@ -458,7 +458,7 @@ def test_duplicate_measure(runner, glean_apps, tmp_path):
                   type: ping_view
                   tables:
                   - channel: release
-                    table: mozdata.fail.duplicate_measure
+                    table: mozdata.fail.duplicate_client
             """
         )
     )

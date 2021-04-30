@@ -1,7 +1,7 @@
 """Class to describe a Ping View."""
 from __future__ import annotations
 
-from collections import Counter, defaultdict
+from collections import defaultdict
 from itertools import filterfalse
 from typing import Any, Dict, Iterator, List
 
@@ -101,6 +101,19 @@ class PingView(View):
         # add dimensions and dimension groups
         return lookml_utils._generate_dimensions(bq_client, table)
 
+    def _get_client_id(self, dimensions: List[dict], table: str) -> str:
+        """Return the first field that looks like a client identifier."""
+        client_id_fields = [
+            d["name"]
+            for d in dimensions
+            if d["name"] in {"client_id", "client_info__client_id"}
+        ]
+        if not client_id_fields:
+            raise click.ClickException(f"Missing client_id dimension in {table!r}")
+        if len(client_id_fields) > 1:
+            raise click.ClickException(f"Duplicate client_id dimension in {table!r}")
+        return client_id_fields[0]
+
     def get_measures(self, dimensions: List[dict], table: str) -> List[Dict[str, str]]:
         """Generate measures from a list of dimensions.
 
@@ -108,36 +121,21 @@ class PingView(View):
 
         Raise ClickException if dimensions result in duplicate measures.
         """
-        measures = []
-        # iterate through each of the dimensions and accumulate any measures
-        # that we want to include in the view
+        # Iterate through each of the dimensions and accumulate any measures
+        # that we want to include in the view. We pull out the client id first
+        # since we'll use it to calculate per-measure client counts.
+        client_id_field = self._get_client_id(dimensions, table)
+        measures = [
+            {
+                "name": "clients",
+                "type": "count_distinct",
+                "sql": f"${{{client_id_field}}}",
+            }
+        ]
+
         for dimension in dimensions:
             dimension_name = dimension["name"]
-            if dimension_name in {"client_id", "client_info__client_id"}:
-                measure = {
-                    "name": "clients",
-                    "type": "count_distinct",
-                    "sql": f"${{{dimension_name}}}",
-                }
-            elif dimension_name == "document_id":
-                measure = {"name": "ping_count", "type": "count"}
-            else:
-                continue
-            measures.append(measure)
-
-        # check if there are any duplicate values, and report the first one that
-        # shows up
-        names = [measure["name"] for measure in measures]
-        duplicates = [k for k, v in Counter(names).items() if v > 1]
-        if duplicates:
-            name = duplicates[0]
-            raise click.ClickException(
-                f"duplicate measure {name!r} for table {table!r}"
-            )
-
-        if not measures:
-            raise click.ClickException(
-                f"Missing client_id and doc_id dimensions in {table!r}"
-            )
+            if dimension_name == "document_id":
+                measures += [{"name": "ping_count", "type": "count"}]
 
         return measures
