@@ -92,6 +92,34 @@ class MockClient:
                     bigquery.schema.SchemaField("test_string", "STRING"),
                 ],
             )
+        if table_ref == "mozdata.glean_app.metrics":
+            return bigquery.Table(
+                table_ref,
+                schema=[
+                    bigquery.schema.SchemaField(
+                        "client_info",
+                        "RECORD",
+                        fields=[
+                            bigquery.schema.SchemaField("client_id", "STRING"),
+                        ],
+                    ),
+                    bigquery.schema.SchemaField(
+                        "metrics",
+                        "RECORD",
+                        fields=[
+                            bigquery.schema.SchemaField(
+                                "counter",
+                                "RECORD",
+                                fields=[
+                                    bigquery.schema.SchemaField(
+                                        "test_counter", "INTEGER"
+                                    )
+                                ],
+                            )
+                        ],
+                    ),
+                ],
+            )
         if table_ref == "mozdata.fail.duplicate_dimension":
             return bigquery.Table(
                 table_ref,
@@ -136,19 +164,24 @@ def test_lookml_actual(runner, glean_apps, tmp_path):
               glean_app: true
               views:
                 baseline:
-                  type: ping_view
+                  type: glean_ping_view
                   tables:
                   - channel: release
                     table: mozdata.glean_app.baseline
                   - channel: beta
                     table: mozdata.glean_app_beta.baseline
+                metrics:
+                  type: glean_ping_view
+                  tables:
+                  - channel: release
+                    table: mozdata.glean_app.metrics
                 growth_accounting:
                   type: growth_accounting_view
                   tables:
                   - table: mozdata.glean_app.baseline_clients_last_seen
               explores:
                 baseline:
-                  type: ping_explore
+                  type: glean_ping_explore
                   views:
                     base_view: baseline
                 growth_accounting:
@@ -359,6 +392,61 @@ def test_lookml_actual(runner, glean_apps, tmp_path):
             lkml.load(
                 Path("looker-hub/glean-app/views/baseline.view.lkml").read_text()
             ),
+        )
+        expected = {
+            "views": [
+                {
+                    "name": "metrics",
+                    "sql_table_name": "`mozdata.glean_app.metrics`",
+                    "dimensions": [
+                        {
+                            "name": "client_info__client_id",
+                            "hidden": "yes",
+                            "sql": "${TABLE}.client_info.client_id",
+                        },
+                        {
+                            "group_item_label": "Test Counter",
+                            "group_label": "Metrics Counter",
+                            "name": "metrics__counter__test_counter",
+                            "sql": "${TABLE}.metrics.counter.test_counter",
+                            "type": "number",
+                            "links": [
+                                {
+                                    "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
+                                    "label": "Glean Dictionary "
+                                    "reference for Test "
+                                    "Counter",
+                                    "url": "https://dictionary.telemetry.mozilla.org/apps/metrics/metrics/test_counter",  # noqa: E501
+                                }
+                            ],
+                        },
+                    ],
+                    "measures": [
+                        {
+                            "name": "clients",
+                            "type": "count_distinct",
+                            "sql": "${client_info__client_id}",
+                        },
+                        {
+                            "name": "counter__test_counter",
+                            "type": "sum",
+                            "sql": "${metrics__counter__test_counter}",
+                        },
+                        {
+                            "name": "counter__test_counter_client_count",
+                            "type": "count_distinct",
+                            "sql": (
+                                "case when ${metrics__counter__test_counter} > 0 then "
+                                "${client_info__client_id}"
+                            ),
+                        },
+                    ],
+                }
+            ]
+        }
+        print_and_test(
+            expected,
+            lkml.load(Path("looker-hub/glean-app/views/metrics.view.lkml").read_text()),
         )
         expected = {
             "views": [
