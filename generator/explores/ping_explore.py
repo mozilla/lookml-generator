@@ -15,7 +15,7 @@ class PingExplore(Explore):
 
     def to_lookml(self) -> dict:
         """Generate LookML to represent this explore."""
-        filters = [{"submission_date": '"28 days"'}]
+        filters = [{"submission_date": "28 days"}]
         view = self.views["base_view"]
 
         # Add a default filter on channel, if it's present in the view
@@ -33,12 +33,14 @@ class PingExplore(Explore):
                 allowed_values[0],
             )["value"]
 
-            filters.append({"channel": f'"{default_value}"'})
+            filters.append({"channel": default_value})
 
         return {
             "name": self.name,
             "view_name": self.views["base_view"],
-            "always_filter": filters,
+            "always_filter": {
+                "filters": filters,
+            },
         }
 
     @staticmethod

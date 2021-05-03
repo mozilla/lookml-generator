@@ -404,17 +404,17 @@ def test_lookml_actual(runner, tmp_path):
                 {
                     "name": "baseline",
                     "view_name": "baseline",
-                    "always_filter": [
-                        {"submission_date": "28 days"},
-                        {"channel": "mozdata.glean_app.baseline"},
-                    ],
+                    "always_filter": {
+                        "filters": [
+                            {"submission_date": "28 days"},
+                            {"channel": "mozdata.glean_app.baseline"},
+                        ]
+                    },
                 }
             ],
         }
-        print("\n lookml generated")
-        print(Path("looker-hub/glean-app/explores/baseline.explore.lkml").read_text())
         print_and_test(
-            expected,
+            lkml.load(lkml.dump(expected)),
             lkml.load(
                 Path("looker-hub/glean-app/explores/baseline.explore.lkml").read_text()
             ),
