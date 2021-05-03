@@ -165,7 +165,7 @@ function generate_hub_commit() {
   cd $HUB_DIR
 
   # Keep files in GENERATION_DISALLOW_LIST unchanged.
-  cat $GENERATION_DISALLOW_LIST | xargs -I % git checkout %
+  cat $GENERATION_DISALLOW_LIST | xargs -I % sh -c "git checkout % || rm %"
 
   check_files_and_commit
 

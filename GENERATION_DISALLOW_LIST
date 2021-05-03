@@ -1,3 +1,8 @@
 firefox_ios/views/baseline.view.lkml
 firefox_ios/views/events.view.lkml
 firefox_ios/views/metrics.view.lkml
+firefox_ios/views/growth_accounting.view.lkml
+firefox_ios/explores/events.explore.lkml
+firefox_ios/explores/growth_accounting.explore.lkml
+firefox_ios/explores/metrics.explore.lkml
+firefox_ios/explores/baseline.explore.lkml
