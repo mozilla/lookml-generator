@@ -1,9 +1,12 @@
-from typing import Any, Dict, Iterable, List
+"""Class to describe a Glean Ping View."""
+from typing import Any, Dict, List
 
 from .ping_view import PingView
 
 
 class GleanPingView(PingView):
+    """A view on a ping table for an application using the Glean SDK."""
+
     type: str = "glean_ping_view"
 
     def __init__(self, name: str, tables: List[Dict[str, str]], app=None, **kwargs):
@@ -21,12 +24,15 @@ class GleanPingView(PingView):
             metric_name = dimension["name"].split("__")[-1]
             annotations["link"] = {
                 "label": f"Glean Dictionary reference for {dimension['group_item_label']}",
-                "url": f"https://dictionary.telemetry.mozilla.org/apps/{self.app['name']}/metrics/{metric_name}",
+                "url": "https://dictionary.telemetry.mozilla.org/apps/{}/metrics/{}".format(
+                    self.app["name"], metric_name
+                ),
                 "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",
             }
         return dict(dimension, **annotations)
 
     def get_dimensions(self, bq_client, table) -> List[Dict[str, Any]]:
+        """Get the set of dimensions for this view."""
         return [
             self._annotate_dimension(d)
             for d in super().get_dimensions(bq_client, table)
