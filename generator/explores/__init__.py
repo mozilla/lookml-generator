@@ -9,9 +9,3 @@ EXPLORE_TYPES = {
     PingExplore.type: PingExplore,
     GrowthAccountingExplore.type: GrowthAccountingExplore,
 }
-
-GLEAN_EXPLORE_TYPES = {
-    t: v
-    for (t, v) in EXPLORE_TYPES.items()
-    if t in [GleanPingExplore.type, GrowthAccountingExplore.type]
-}
