@@ -1,7 +1,8 @@
+"""Glean Ping explore type."""
 from typing import Iterator, List
 
-from .ping_explore import PingExplore
 from ..views import GleanPingView, View
+from .ping_explore import PingExplore
 
 
 class GleanPingExplore(PingExplore):
@@ -11,7 +12,7 @@ class GleanPingExplore(PingExplore):
 
     @staticmethod
     def from_views(views: List[View]) -> Iterator[PingExplore]:
-        """Generate all possible PingExplores from the views."""
+        """Generate all possible GleanPingExplores from the views."""
         for view in views:
             if view.view_type == GleanPingView.type:
                 yield GleanPingExplore(view.name, {"base_view": view.name})

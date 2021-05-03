@@ -93,8 +93,7 @@ class PingView(View):
         return [view_defn]
 
     def get_dimensions(self, bq_client, table) -> List[Dict[str, Any]]:
-        """Gets the set of dimensions for this view"""
-
+        """Get the set of dimensions for this view."""
         # add dimensions and dimension groups
         return lookml_utils._generate_dimensions(bq_client, table)
 
