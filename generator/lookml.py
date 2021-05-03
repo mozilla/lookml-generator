@@ -47,8 +47,8 @@ def _get_views_from_dict(
     for view_name, view_info in views.items():
         app = next((a for a in glean_apps if a["name"] == namespace), None)
         yield VIEW_TYPES[view_info["type"]].from_dict(  # type: ignore
-            view_name, view_info, app=app  # type: ignore
-        )  # type: ignore
+            view_name, view_info, app=app
+        )
 
 
 def _lookml(namespaces, glean_apps, target_dir):
