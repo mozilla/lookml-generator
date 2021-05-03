@@ -1,5 +1,3 @@
-import gzip
-import json
 import sys
 import tarfile
 from io import BytesIO
@@ -13,10 +11,10 @@ from click.testing import CliRunner
 from generator.namespaces import (
     _get_db_views,
     _get_glean_apps,
-    _get_looker_views,
+    _get_glean_looker_views,
     namespaces,
 )
-from generator.views import GrowthAccountingView, PingView, TableView
+from generator.views import GleanPingView, GrowthAccountingView, PingView, TableView
 
 from .utils import print_and_test
 
@@ -119,58 +117,6 @@ def generated_sql_uri(tmp_path):
     return dest.absolute().as_uri()
 
 
-@pytest.fixture
-def app_listings_uri(tmp_path):
-    dest = tmp_path / "app-listings"
-    dest.write_bytes(
-        gzip.compress(
-            json.dumps(
-                [
-                    {
-                        "app_name": "glean-app",
-                        "app_channel": "release",
-                        "canonical_app_name": "Glean App",
-                        "bq_dataset_family": "glean_app",
-                        "notification_emails": ["glean-app-owner@allizom.com"],
-                    },
-                    {
-                        "app_name": "glean-app",
-                        "app_channel": "beta",
-                        "canonical_app_name": "Glean App Beta",
-                        "bq_dataset_family": "glean_app_beta",
-                        "notification_emails": ["glean-app-owner-beta@allizom.com"],
-                    },
-                ]
-            ).encode()
-        )
-    )
-    return dest.absolute().as_uri()
-
-
-@pytest.fixture
-def glean_apps():
-    return [
-        {
-            "name": "glean-app",
-            "glean_app": True,
-            "pretty_name": "Glean App",
-            "owners": [
-                "glean-app-owner@allizom.com",
-            ],
-            "channels": [
-                {
-                    "channel": "release",
-                    "dataset": "glean_app",
-                },
-                {
-                    "channel": "beta",
-                    "dataset": "glean_app_beta",
-                },
-            ],
-        }
-    ]
-
-
 def test_namespaces_full(
     runner, custom_namespaces, generated_sql_uri, app_listings_uri, namespace_allowlist
 ):
@@ -196,6 +142,7 @@ def test_namespaces_full(
         except Exception as e:
             # use exception chaining to expose original traceback
             raise e from result.exception
+<<<<<<< HEAD
 
         expected = {
             "custom": {
@@ -296,16 +243,17 @@ def test_get_glean_apps(app_listings_uri, glean_apps):
     assert _get_glean_apps(app_listings_uri) == glean_apps
 
 
-def test_get_looker_views(glean_apps, generated_sql_uri):
+def test_get_glean_looker_views(glean_apps, generated_sql_uri):
     db_views = _get_db_views(generated_sql_uri)
-    actual = _get_looker_views(glean_apps[0], db_views)
+    actual = _get_glean_looker_views(glean_apps[0], db_views)
     expected = [
-        PingView(
+        GleanPingView(
             "baseline",
             [
                 {"channel": "release", "table": "mozdata.glean_app.baseline"},
                 {"channel": "beta", "table": "mozdata.glean_app_beta.baseline"},
             ],
+            app=glean_apps[0],
         ),
         GrowthAccountingView(
             [

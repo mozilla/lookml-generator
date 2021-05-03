@@ -116,7 +116,7 @@ class MockClient:
         raise ValueError(f"Table not found: {table_ref}")
 
 
-def test_lookml_actual(runner, tmp_path):
+def test_lookml_actual(runner, glean_apps, tmp_path):
     namespaces = tmp_path / "namespaces.yaml"
     namespaces.write_text(
         dedent(
@@ -159,7 +159,7 @@ def test_lookml_actual(runner, tmp_path):
     )
     with runner.isolated_filesystem():
         with patch("google.cloud.bigquery.Client", MockClient):
-            _lookml(open(namespaces), "looker-hub/")
+            _lookml(open(namespaces), glean_apps, "looker-hub/")
         expected = {
             "views": [
                 {
@@ -447,11 +447,11 @@ def test_duplicate_dimension(runner, tmp_path):
                     namespaces,
                 ],
             )
+        assert result.exit_code != 0
         assert (
             "Error: duplicate dimension 'parsed'"
             " for table 'mozdata.fail.duplicate_dimension'\n"
         ) == result.output
-        assert result.exit_code != 0
 
 
 def test_duplicate_measure(runner, tmp_path):
