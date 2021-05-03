@@ -112,7 +112,7 @@ def _get_glean_looker_views(
                 raise KeyError(
                     (
                         f"Duplicate Looker View name {view.name} "
-                        f"when generating views for namespace {app['app_name']}"
+                        f"when generating views for namespace {app['name']}"
                     )
                 )
             views.append(view)
