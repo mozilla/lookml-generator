@@ -218,7 +218,7 @@ class GrowthAccountingView(View):
 
     @classmethod
     def from_db_views(
-        klass, app: str, channels: List[Dict[str, str]], db_views: dict, **kwargs
+        klass, name: str, channels: List[Dict[str, str]], db_views: dict, **kwargs
     ) -> Iterator[GrowthAccountingView]:
         """Get Growth Accounting Views from db views and app variants."""
         dataset = next(
