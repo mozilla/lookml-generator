@@ -4,10 +4,11 @@ from unittest.mock import patch
 
 import lkml
 import pytest
+from click import ClickException
 from click.testing import CliRunner
 from google.cloud import bigquery
 
-from generator.lookml import _lookml, lookml
+from generator.lookml import _lookml
 from generator.views import GrowthAccountingView
 
 from .utils import print_and_test
@@ -421,7 +422,7 @@ def test_lookml_actual(runner, glean_apps, tmp_path):
         )
 
 
-def test_duplicate_dimension(runner, tmp_path):
+def test_duplicate_dimension(runner, glean_apps, tmp_path):
     namespaces = tmp_path / "namespaces.yaml"
     namespaces.write_text(
         dedent(
@@ -440,21 +441,11 @@ def test_duplicate_dimension(runner, tmp_path):
     )
     with runner.isolated_filesystem():
         with patch("google.cloud.bigquery.Client", MockClient):
-            result = runner.invoke(
-                lookml,
-                [
-                    "--namespaces",
-                    namespaces,
-                ],
-            )
-        assert result.exit_code != 0
-        assert (
-            "Error: duplicate dimension 'parsed'"
-            " for table 'mozdata.fail.duplicate_dimension'\n"
-        ) == result.output
+            with pytest.raises(ClickException):
+                _lookml(open(namespaces), glean_apps, "looker-hub/")
 
 
-def test_duplicate_measure(runner, tmp_path):
+def test_duplicate_measure(runner, glean_apps, tmp_path):
     namespaces = tmp_path / "namespaces.yaml"
     namespaces.write_text(
         dedent(
@@ -473,15 +464,5 @@ def test_duplicate_measure(runner, tmp_path):
     )
     with runner.isolated_filesystem():
         with patch("google.cloud.bigquery.Client", MockClient):
-            result = runner.invoke(
-                lookml,
-                [
-                    "--namespaces",
-                    namespaces,
-                ],
-            )
-        assert (
-            "Error: duplicate measure 'clients'"
-            " for table 'mozdata.fail.duplicate_measure'\n"
-        ) == result.output
-        assert result.exit_code != 0
+            with pytest.raises(ClickException):
+                _lookml(open(namespaces), glean_apps, "looker-hub/")

@@ -30,7 +30,11 @@ class View(object):
 
     @classmethod
     def from_db_views(
-        klass, name: str, channels: List[Dict[str, str]], db_views: dict, **kwargs
+        klass,
+        name: str,
+        is_glean: bool,
+        channels: List[Dict[str, str]],
+        db_views: dict,
     ) -> Iterator[View]:
         """Get Looker views from app."""
         raise NotImplementedError("Only implemented in subclass.")

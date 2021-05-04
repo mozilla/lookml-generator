@@ -11,10 +11,10 @@ from click.testing import CliRunner
 from generator.namespaces import (
     _get_db_views,
     _get_glean_apps,
-    _get_glean_looker_views,
+    _get_looker_views,
     namespaces,
 )
-from generator.views import GleanPingView, GrowthAccountingView, PingView, TableView
+from generator.views import GleanPingView, GrowthAccountingView, TableView
 
 from .utils import print_and_test
 
@@ -142,7 +142,6 @@ def test_namespaces_full(
         except Exception as e:
             # use exception chaining to expose original traceback
             raise e from result.exception
-<<<<<<< HEAD
 
         expected = {
             "custom": {
@@ -161,7 +160,7 @@ def test_namespaces_full(
             "glean-app": {
                 "explores": {
                     "baseline": {
-                        "type": "ping_explore",
+                        "type": "glean_ping_explore",
                         "views": {"base_view": "baseline"},
                     },
                     "growth_accounting": {
@@ -223,7 +222,7 @@ def test_namespaces_full(
                                 "table": "mozdata.glean_app_beta.baseline",
                             },
                         ],
-                        "type": "ping_view",
+                        "type": "glean_ping_view",
                     },
                     "growth_accounting": {
                         "tables": [
@@ -243,9 +242,9 @@ def test_get_glean_apps(app_listings_uri, glean_apps):
     assert _get_glean_apps(app_listings_uri) == glean_apps
 
 
-def test_get_glean_looker_views(glean_apps, generated_sql_uri):
+def test_get_looker_views(glean_apps, generated_sql_uri):
     db_views = _get_db_views(generated_sql_uri)
-    actual = _get_glean_looker_views(glean_apps[0], db_views)
+    actual = _get_looker_views(glean_apps[0], db_views)
     expected = [
         GleanPingView(
             "baseline",
