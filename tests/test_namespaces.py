@@ -7,6 +7,7 @@ from pathlib import Path
 from textwrap import dedent
 
 import pytest
+import yaml
 from click.testing import CliRunner
 
 from generator.namespaces import (
@@ -15,7 +16,9 @@ from generator.namespaces import (
     _get_looker_views,
     namespaces,
 )
-from generator.views import GrowthAccountingView, PingView
+from generator.views import GrowthAccountingView, PingView, TableView
+
+from .utils import print_and_test
 
 
 @pytest.fixture
@@ -193,50 +196,100 @@ def test_namespaces_full(
         except Exception as e:
             # use exception chaining to expose original traceback
             raise e from result.exception
-        assert (
-            dedent(
-                """
-                custom:
-                  glean_app: false
-                  owners:
-                  - custom-owner@allizom.com
-                  pretty_name: Custom
-                  views:
-                    baseline:
-                      tables:
-                      - channel: release
-                        table: mozdata.custom.baseline
-                      type: ping_view
-                glean-app:
-                  explores:
-                    baseline:
-                      type: ping_explore
-                      views:
-                        base_view: baseline
-                    growth_accounting:
-                      type: growth_accounting_explore
-                      views:
-                        base_view: growth_accounting
-                  glean_app: true
-                  owners:
-                  - glean-app-owner@allizom.com
-                  pretty_name: Glean App
-                  views:
-                    baseline:
-                      tables:
-                      - channel: release
-                        table: mozdata.glean_app.baseline
-                      - channel: beta
-                        table: mozdata.glean_app_beta.baseline
-                      type: ping_view
-                    growth_accounting:
-                      tables:
-                      - table: mozdata.glean_app.baseline_clients_last_seen
-                      type: growth_accounting_view
-                """
-            ).lstrip()
-            == Path("namespaces.yaml").read_text()
-        )
+
+        expected = {
+            "custom": {
+                "glean_app": False,
+                "owners": ["custom-owner@allizom.com"],
+                "pretty_name": "Custom",
+                "views": {
+                    "baseline": {
+                        "tables": [
+                            {"channel": "release", "table": "mozdata.custom.baseline"}
+                        ],
+                        "type": "ping_view",
+                    }
+                },
+            },
+            "glean-app": {
+                "explores": {
+                    "baseline": {
+                        "type": "ping_explore",
+                        "views": {"base_view": "baseline"},
+                    },
+                    "growth_accounting": {
+                        "type": "growth_accounting_explore",
+                        "views": {"base_view": "growth_accounting"},
+                    },
+                },
+                "glean_app": True,
+                "owners": ["glean-app-owner@allizom.com"],
+                "pretty_name": "Glean App",
+                "views": {
+                    "baseline_clients_daily_table": {
+                        "tables": [
+                            {
+                                "channel": "release",
+                                "table": "mozdata.glean_app.baseline_clients_daily",
+                            },
+                            {
+                                "channel": "beta",
+                                "table": "mozdata.glean_app_beta.baseline_clients_daily",
+                            },
+                        ],
+                        "type": "table_view",
+                    },
+                    "baseline_clients_last_seen_table": {
+                        "tables": [
+                            {
+                                "channel": "release",
+                                "table": "mozdata.glean_app.baseline_clients_last_seen",
+                            },
+                            {
+                                "channel": "beta",
+                                "table": "mozdata.glean_app_beta.baseline_clients_last_seen",  # noqa: E501
+                            },
+                        ],
+                        "type": "table_view",
+                    },
+                    "baseline_table": {
+                        "tables": [
+                            {
+                                "channel": "release",
+                                "table": "mozdata.glean_app.baseline",
+                            },
+                            {
+                                "channel": "beta",
+                                "table": "mozdata.glean_app_beta.baseline",
+                            },
+                        ],
+                        "type": "table_view",
+                    },
+                    "baseline": {
+                        "tables": [
+                            {
+                                "channel": "release",
+                                "table": "mozdata.glean_app.baseline",
+                            },
+                            {
+                                "channel": "beta",
+                                "table": "mozdata.glean_app_beta.baseline",
+                            },
+                        ],
+                        "type": "ping_view",
+                    },
+                    "growth_accounting": {
+                        "tables": [
+                            {"table": "mozdata.glean_app.baseline_clients_last_seen"}
+                        ],
+                        "type": "growth_accounting_view",
+                    },
+                },
+            },
+        }
+        actual = yaml.load(Path("namespaces.yaml").read_text())
+
+        print_and_test(expected, actual)
 
 
 def test_get_glean_apps(app_listings_uri, glean_apps):
@@ -245,8 +298,8 @@ def test_get_glean_apps(app_listings_uri, glean_apps):
 
 def test_get_looker_views(glean_apps, generated_sql_uri):
     db_views = _get_db_views(generated_sql_uri)
-    views = _get_looker_views(glean_apps[0], db_views)
-    assert views == [
+    actual = _get_looker_views(glean_apps[0], db_views)
+    expected = [
         PingView(
             "baseline",
             [
@@ -262,4 +315,39 @@ def test_get_looker_views(glean_apps, generated_sql_uri):
                 }
             ]
         ),
+        TableView(
+            "baseline_clients_daily_table",
+            [
+                {
+                    "table": "mozdata.glean_app.baseline_clients_daily",
+                    "channel": "release",
+                },
+                {
+                    "table": "mozdata.glean_app_beta.baseline_clients_daily",
+                    "channel": "beta",
+                },
+            ],
+        ),
+        TableView(
+            "baseline_table",
+            [
+                {"table": "mozdata.glean_app.baseline", "channel": "release"},
+                {"table": "mozdata.glean_app_beta.baseline", "channel": "beta"},
+            ],
+        ),
+        TableView(
+            "baseline_clients_last_seen_table",
+            [
+                {
+                    "table": "mozdata.glean_app.baseline_clients_last_seen",
+                    "channel": "release",
+                },
+                {
+                    "table": "mozdata.glean_app_beta.baseline_clients_last_seen",
+                    "channel": "beta",
+                },
+            ],
+        ),
     ]
+
+    print_and_test(expected, actual)
