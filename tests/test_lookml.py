@@ -407,7 +407,7 @@ def test_lookml_actual(runner, tmp_path):
                     "always_filter": {
                         "filters": [
                             {"submission_date": "28 days"},
-                            {"channel": "mozdata.glean_app.baseline"},
+                            {"channel": "mozdata.glean^_app.baseline"},
                         ]
                     },
                 }
