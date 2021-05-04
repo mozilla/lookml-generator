@@ -16,7 +16,7 @@ import click
 import yaml
 
 from .explores import EXPLORE_TYPES
-from .views import GLEAN_VIEW_TYPES, View
+from .views import VIEW_TYPES, View
 
 PROBE_INFO_BASE_URI = "https://probeinfo.telemetry.mozilla.org"
 
@@ -98,15 +98,15 @@ def _get_glean_apps(
     return apps
 
 
-def _get_glean_looker_views(
+def _get_looker_views(
     app: Dict[str, Union[str, List[Dict[str, str]]]],
     db_views: Dict[str, Dict[str, List[List[str]]]],
 ) -> List[View]:
     views, view_names = [], []
 
-    for klass in GLEAN_VIEW_TYPES.values():
+    for klass in VIEW_TYPES.values():
         for view in klass.from_db_views(  # type: ignore
-            app["name"], app["channels"], db_views, app=app
+            app["name"], app["glean_app"], app["channels"], db_views
         ):
             if view.name in view_names:
                 raise KeyError(
@@ -162,7 +162,7 @@ def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri, allowlist
 
     namespaces = {}
     for app in glean_apps:
-        looker_views = _get_glean_looker_views(app, db_views)
+        looker_views = _get_looker_views(app, db_views)
         explores = _get_explores(looker_views)
         views_as_dict = {view.name: view.as_dict() for view in looker_views}
 

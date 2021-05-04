@@ -11,9 +11,3 @@ VIEW_TYPES = {
     GrowthAccountingView.type: GrowthAccountingView,
     TableView.type: TableView,
 }
-
-GLEAN_VIEW_TYPES = {
-    t: v
-    for (t, v) in VIEW_TYPES.items()
-    if t in [GleanPingView.type, GrowthAccountingView.type]
-}

@@ -15,6 +15,7 @@ class PingView(View):
     """A view on a ping table."""
 
     type: str = "ping_view"
+    allow_glean: bool = False
 
     def __init__(self, name: str, tables: List[Dict[str, str]], **kwargs):
         """Create instance of a PingView."""
@@ -22,9 +23,12 @@ class PingView(View):
 
     @classmethod
     def from_db_views(
-        klass, name: str, channels: List[Dict[str, str]], db_views: dict, **kwargs
+        klass, name: str, is_glean: bool, channels: List[Dict[str, str]], db_views: dict
     ) -> Iterator[PingView]:
         """Get Looker views for a namespace."""
+        if (klass.allow_glean and not is_glean) or (not klass.allow_glean and is_glean):
+            return
+
         views = defaultdict(list)
         for channel in channels:
             dataset = channel["dataset"]
@@ -35,7 +39,7 @@ class PingView(View):
 
                 table: Dict[str, str] = {"table": f"mozdata.{dataset}.{view_id}"}
 
-                if "channel" in channel:
+                if channel.get("channel") is not None:
                     table["channel"] = channel["channel"]
                 if len(references) != 1 or references[0][-2] != f"{dataset}_stable":
                     continue  # This view is only for ping tables
@@ -43,12 +47,12 @@ class PingView(View):
                 views[view_id].append(table)
 
         for view_id, tables in views.items():
-            yield klass(view_id, tables, **kwargs)
+            yield klass(view_id, tables)
 
     @classmethod
-    def from_dict(klass, name: str, _dict: ViewDict, **kwargs) -> PingView:
+    def from_dict(klass, name: str, _dict: ViewDict) -> PingView:
         """Get a view from a name and dict definition."""
-        return klass(name, _dict["tables"], **kwargs)
+        return klass(name, _dict["tables"])
 
     def to_lookml(self, bq_client) -> List[dict]:
         """Generate LookML for this view."""

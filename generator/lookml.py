@@ -45,9 +45,8 @@ def _get_views_from_dict(
     views: Dict[str, ViewDict], namespace: str, glean_apps
 ) -> Iterable[View]:
     for view_name, view_info in views.items():
-        app = next((a for a in glean_apps if a["name"] == namespace), None)
         yield VIEW_TYPES[view_info["type"]].from_dict(  # type: ignore
-            view_name, view_info, app=app
+            view_name, view_info
         )
 
 

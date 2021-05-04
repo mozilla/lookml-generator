@@ -20,7 +20,7 @@ class TableView(View):
 
     @classmethod
     def from_db_views(
-        klass, app: str, channels: List[Dict[str, str]], db_views: dict
+        klass, app: str, is_glean: bool, channels: List[Dict[str, str]], db_views: dict
     ) -> Iterator[TableView]:
         """Get Looker views for a namespace."""
         views = defaultdict(list)

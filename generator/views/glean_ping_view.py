@@ -8,12 +8,10 @@ class GleanPingView(PingView):
     """A view on a ping table for an application using the Glean SDK."""
 
     type: str = "glean_ping_view"
+    allow_glean: bool = True
 
-    def __init__(self, name: str, tables: List[Dict[str, str]], app=None, **kwargs):
+    def __init__(self, name: str, tables: List[Dict[str, str]], **kwargs):
         """Create instance of a GleanPingView."""
-        if not app:
-            raise Exception("Glean pings must have an application specified")
-        self.app = app
         super().__init__(name, tables, **kwargs)
 
     def _annotate_dimension(self, dimension):
@@ -25,7 +23,7 @@ class GleanPingView(PingView):
             annotations["link"] = {
                 "label": f"Glean Dictionary reference for {dimension['group_item_label']}",
                 "url": "https://dictionary.telemetry.mozilla.org/apps/{}/metrics/{}".format(
-                    self.app["name"], metric_name
+                    self.name, metric_name
                 ),
                 "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",
             }
