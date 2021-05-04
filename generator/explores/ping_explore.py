@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Iterator, List
 
 from ..views import PingView, View
+from ..views.lookml_utils import escape_filter_expr
 from . import Explore
 
 
@@ -33,7 +34,7 @@ class PingExplore(Explore):
                 allowed_values[0],
             )["value"]
 
-            filters.append({"channel": default_value})
+            filters.append({"channel": escape_filter_expr(default_value)})
 
         return {
             "name": self.name,

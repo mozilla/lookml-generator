@@ -102,3 +102,8 @@ def _generate_dimensions(client: bigquery.Client, table: str) -> List[Dict[str, 
 def _is_dimension_group(dimension: dict):
     """Determine if a dimension is actually a dimension group."""
     return "timeframes" in dimension or "intervals" in dimension
+
+
+def escape_filter_expr(expr: str) -> str:
+    """Escape filter expression for special Looker chars."""
+    return re.sub(r'((?:^-)|["_%,^])', r"^\1", expr, count=0)
