@@ -46,15 +46,12 @@ class GleanPingView(PingView):
 
         Raise ClickException if dimensions result in duplicate measures.
         """
-        print(f"Generation measures for table {table}")
         measures = super().get_measures(dimensions, table)
         client_id_field = self._get_client_id(dimensions, table)
 
         for dimension in dimensions:
-            print(f"Dimension: {dimension}")
             dimension_name = dimension["name"]
             if "metrics__counter__" in dimension_name:
-                print("Is counter!")
                 # handle the counters in the metric ping
                 name = "__".join(dimension_name.split("__")[1:])
                 measures += [
