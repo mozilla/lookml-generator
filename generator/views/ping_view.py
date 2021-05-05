@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from itertools import filterfalse
-from typing import Any, Dict, Iterator, List
+from typing import Any, Dict, Iterator, List, Union
 
 import click
 
@@ -114,7 +114,9 @@ class PingView(View):
             raise click.ClickException(f"Duplicate client_id dimension in {table!r}")
         return client_id_fields[0]
 
-    def get_measures(self, dimensions: List[dict], table: str) -> List[Dict[str, str]]:
+    def get_measures(
+        self, dimensions: List[dict], table: str
+    ) -> List[Dict[str, Union[str, List[Dict[str, str]]]]]:
         """Generate measures from a list of dimensions.
 
         When no dimension-specific measures are found, return a single "count" measure.
@@ -125,7 +127,7 @@ class PingView(View):
         # that we want to include in the view. We pull out the client id first
         # since we'll use it to calculate per-measure client counts.
         client_id_field = self._get_client_id(dimensions, table)
-        measures = [
+        measures: List[Dict[str, Union[str, List[Dict[str, str]]]]] = [
             {
                 "name": "clients",
                 "type": "count_distinct",
