@@ -73,7 +73,6 @@ class PingView(View):
         )
 
         # add measures
-        print(f"super: Getting measures for {table}")
         view_defn["measures"] = self.get_measures(dimensions, table)
 
         # parameterize table name
