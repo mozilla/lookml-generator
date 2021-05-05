@@ -4,6 +4,7 @@ google-api-core==1.26.3
 google-cloud-bigquery==2.8.0
 lkml==1.1.0
 looker-sdk==21.4.1
+mozilla-schema-generator==0.3.0
 pip-tools==5.5.0
 pre-commit==2.10.1
 pytest-black==0.3.12

@@ -1,7 +1,7 @@
 """Generic class to describe Looker views."""
 from __future__ import annotations
 
-from typing import Any, Dict, Iterator, List, TypedDict
+from typing import Any, Dict, Iterator, List, Optional, TypedDict
 
 OMIT_VIEWS = {"deletion_request"}
 
@@ -80,11 +80,13 @@ class View(object):
             )
         return False
 
-    def get_dimensions(self, bq_client, table) -> List[Dict[str, Any]]:
+    def get_dimensions(
+        self, bq_client, table, v1_name: Optional[str]
+    ) -> List[Dict[str, Any]]:
         """Get the set of dimensions for this view."""
         raise NotImplementedError("Only implemented in subclass.")
 
-    def to_lookml(self, bq_client) -> List[dict]:
+    def to_lookml(self, bq_client, v1_name: Optional[str]) -> List[dict]:
         """
         Generate Lookml for this view.
 

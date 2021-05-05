@@ -1,12 +1,13 @@
 from pathlib import Path
 from textwrap import dedent
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import lkml
 import pytest
 from click import ClickException
 from click.testing import CliRunner
 from google.cloud import bigquery
+from mozilla_schema_generator.probes import GleanProbe
 
 from generator.lookml import _lookml
 from generator.views import GrowthAccountingView
@@ -163,7 +164,8 @@ class MockClient:
         raise ValueError(f"Table not found: {table_ref}")
 
 
-def test_lookml_actual(runner, glean_apps, tmp_path):
+@patch("generator.views.glean_ping_view.GleanPing")
+def test_lookml_actual(mock_glean_ping, runner, glean_apps, tmp_path):
     namespaces = tmp_path / "namespaces.yaml"
     namespaces.write_text(
         dedent(
@@ -209,6 +211,26 @@ def test_lookml_actual(runner, glean_apps, tmp_path):
             """
         )
     )
+    mock_glean_ping.get_repos.return_value = [{"name": "glean-app-release"}]
+    glean_app = Mock()
+    mock_glean_ping.return_value = glean_app
+    history = [
+        {"dates": {"first": "2020-01-01 00:00:00", "last": "2020-01-02 00:00:00"}}
+    ]
+    glean_app.get_probes.return_value = [
+        GleanProbe(
+            "test.counter",
+            {"type": "counter", "history": history, "name": "test.counter"},
+        ),
+        GleanProbe(
+            "glean.validation.metrics_ping_count",
+            {
+                "type": "counter",
+                "history": history,
+                "name": "glean.validation.metrics_ping_count",
+            },
+        ),
+    ]
     with runner.isolated_filesystem():
         with patch("google.cloud.bigquery.Client", MockClient):
             _lookml(open(namespaces), glean_apps, "looker-hub/")
@@ -296,8 +318,8 @@ def test_lookml_actual(runner, glean_apps, tmp_path):
                             "type": "string",
                         },
                         {
-                            "group_item_label": "Test Counter",
-                            "group_label": "Metrics Counter",
+                            "group_item_label": "Counter",
+                            "group_label": "Test",
                             "name": "metrics__counter__test_counter",
                             "sql": "${TABLE}.metrics.counter.test_counter",
                             "type": "number",
@@ -470,8 +492,8 @@ def test_lookml_actual(runner, glean_apps, tmp_path):
                             "sql": "${TABLE}.client_info.client_id",
                         },
                         {
-                            "group_item_label": "Glean Validation Metrics Ping Count",
-                            "group_label": "Metrics Counter",
+                            "group_item_label": "Metrics Ping Count",
+                            "group_label": "Glean Validation",
                             "name": "metrics__counter__glean_validation_metrics_ping_count",
                             "sql": "${TABLE}.metrics.counter.glean_validation_metrics_ping_count",  # noqa: E501
                             "type": "number",
@@ -484,8 +506,8 @@ def test_lookml_actual(runner, glean_apps, tmp_path):
                             ],
                         },
                         {
-                            "group_item_label": "Test Counter",
-                            "group_label": "Metrics Counter",
+                            "group_item_label": "Counter",
+                            "group_label": "Test",
                             "name": "metrics__counter__test_counter",
                             "sql": "${TABLE}.metrics.counter.test_counter",
                             "type": "number",
