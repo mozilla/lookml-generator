@@ -128,9 +128,12 @@ class MockClient:
                                 fields=[
                                     bigquery.schema.SchemaField(
                                         "test_counter", "INTEGER"
-                                    )
+                                    ),
+                                    bigquery.schema.SchemaField(
+                                        "glean_validation_metrics_ping_count", "INTEGER"
+                                    ),
                                 ],
-                            )
+                            ),
                         ],
                     ),
                 ],
@@ -414,17 +417,35 @@ def test_lookml_actual(runner, glean_apps, tmp_path):
                             "sql": "${client_info__client_id}",
                         },
                         {
-                            "name": "counter__test_counter",
+                            "name": "test_counter",
                             "type": "sum",
                             "sql": "${metrics__counter__test_counter}",
+                            "links": [
+                                {
+                                    "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
+                                    "label": "Glean Dictionary "
+                                    "reference for Test "
+                                    "Counter",
+                                    "url": "https://dictionary.telemetry.mozilla.org/apps/baseline/metrics/test_counter",  # noqa: E501
+                                }
+                            ],
                         },
                         {
-                            "name": "counter__test_counter_client_count",
+                            "name": "test_counter_client_count",
                             "type": "count_distinct",
                             "sql": (
                                 "case when ${metrics__counter__test_counter} > 0 then "
                                 "${client_info__client_id}"
                             ),
+                            "links": [
+                                {
+                                    "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
+                                    "label": "Glean Dictionary "
+                                    "reference for Test "
+                                    "Counter",
+                                    "url": "https://dictionary.telemetry.mozilla.org/apps/baseline/metrics/test_counter",  # noqa: E501
+                                }
+                            ],
                         },
                     ],
                 }
@@ -449,6 +470,20 @@ def test_lookml_actual(runner, glean_apps, tmp_path):
                             "sql": "${TABLE}.client_info.client_id",
                         },
                         {
+                            "group_item_label": "Glean Validation Metrics Ping Count",
+                            "group_label": "Metrics Counter",
+                            "name": "metrics__counter__glean_validation_metrics_ping_count",
+                            "sql": "${TABLE}.metrics.counter.glean_validation_metrics_ping_count",  # noqa: E501
+                            "type": "number",
+                            "links": [
+                                {
+                                    "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
+                                    "label": "Glean Dictionary reference for Glean Validation Metrics Ping Count",  # noqa: E501
+                                    "url": "https://dictionary.telemetry.mozilla.org/apps/metrics/metrics/glean_validation_metrics_ping_count",  # noqa: E501
+                                }
+                            ],
+                        },
+                        {
                             "group_item_label": "Test Counter",
                             "group_label": "Metrics Counter",
                             "name": "metrics__counter__test_counter",
@@ -457,9 +492,7 @@ def test_lookml_actual(runner, glean_apps, tmp_path):
                             "links": [
                                 {
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
-                                    "label": "Glean Dictionary "
-                                    "reference for Test "
-                                    "Counter",
+                                    "label": "Glean Dictionary reference for Test Counter",
                                     "url": "https://dictionary.telemetry.mozilla.org/apps/metrics/metrics/test_counter",  # noqa: E501
                                 }
                             ],
@@ -472,17 +505,64 @@ def test_lookml_actual(runner, glean_apps, tmp_path):
                             "sql": "${client_info__client_id}",
                         },
                         {
-                            "name": "counter__test_counter",
+                            "name": "glean_validation_metrics_ping_count",
                             "type": "sum",
-                            "sql": "${metrics__counter__test_counter}",
+                            "sql": "${metrics__counter__glean_validation_metrics_ping_count}",  # noqa: E501
+                            "links": [
+                                {
+                                    "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
+                                    "label": "Glean Dictionary "
+                                    "reference for Glean Validation Metrics Ping Count",
+                                    "url": "https://dictionary.telemetry.mozilla.org/apps/metrics/metrics/glean_validation_metrics_ping_count",  # noqa: E501
+                                }
+                            ],
                         },
                         {
-                            "name": "counter__test_counter_client_count",
+                            "name": "glean_validation_metrics_ping_count_client_count",
+                            "type": "count_distinct",
+                            "sql": (
+                                "case when ${metrics__counter__glean_validation_metrics_ping_count} > 0 then "
+                                "${client_info__client_id}"
+                            ),
+                            "links": [
+                                {
+                                    "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
+                                    "label": "Glean Dictionary "
+                                    "reference for Glean Validation Metrics Ping Count",
+                                    "url": "https://dictionary.telemetry.mozilla.org/apps/metrics/metrics/glean_validation_metrics_ping_count",  # noqa: E501
+                                }
+                            ],
+                        },
+                        {
+                            "name": "test_counter",
+                            "type": "sum",
+                            "sql": "${metrics__counter__test_counter}",
+                            "links": [
+                                {
+                                    "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
+                                    "label": "Glean Dictionary "
+                                    "reference for Test "
+                                    "Counter",
+                                    "url": "https://dictionary.telemetry.mozilla.org/apps/metrics/metrics/test_counter",  # noqa: E501
+                                }
+                            ],
+                        },
+                        {
+                            "name": "test_counter_client_count",
                             "type": "count_distinct",
                             "sql": (
                                 "case when ${metrics__counter__test_counter} > 0 then "
                                 "${client_info__client_id}"
                             ),
+                            "links": [
+                                {
+                                    "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
+                                    "label": "Glean Dictionary "
+                                    "reference for Test "
+                                    "Counter",
+                                    "url": "https://dictionary.telemetry.mozilla.org/apps/metrics/metrics/test_counter",  # noqa: E501
+                                }
+                            ],
                         },
                     ],
                 }
