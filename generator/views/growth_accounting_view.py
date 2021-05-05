@@ -212,13 +212,19 @@ class GrowthAccountingView(View):
         },
     ]
 
-    def __init__(self, tables: List[Dict[str, str]]):
+    def __init__(self, namespace: str, tables: List[Dict[str, str]]):
         """Get an instance of a GrowthAccountingView."""
-        super().__init__("growth_accounting", GrowthAccountingView.type, tables)
+        super().__init__(
+            namespace, "growth_accounting", GrowthAccountingView.type, tables
+        )
 
     @classmethod
     def from_db_views(
-        klass, name: str, is_glean: bool, channels: List[Dict[str, str]], db_views: dict
+        klass,
+        namespace: str,
+        is_glean: bool,
+        channels: List[Dict[str, str]],
+        db_views: dict,
     ) -> Iterator[GrowthAccountingView]:
         """Get Growth Accounting Views from db views and app variants."""
         dataset = next(
@@ -228,12 +234,16 @@ class GrowthAccountingView(View):
 
         for view_id, references in db_views[dataset].items():
             if view_id == "baseline_clients_last_seen":
-                yield GrowthAccountingView([{"table": f"mozdata.{dataset}.{view_id}"}])
+                yield GrowthAccountingView(
+                    namespace, [{"table": f"mozdata.{dataset}.{view_id}"}]
+                )
 
     @classmethod
-    def from_dict(klass, name: str, _dict: ViewDict) -> GrowthAccountingView:
+    def from_dict(
+        klass, namespace: str, name: str, _dict: ViewDict
+    ) -> GrowthAccountingView:
         """Get a view from a name and dict definition."""
-        return GrowthAccountingView(_dict["tables"])
+        return GrowthAccountingView(namespace, _dict["tables"])
 
     def to_lookml(self, bq_client) -> List[dict]:
         """Generate LookML for this view."""

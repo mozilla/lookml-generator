@@ -19,11 +19,18 @@ class View(object):
     name: str
     view_type: str
     tables: List[Dict[str, str]]
+    namespace: str
 
     def __init__(
-        self, name: str, view_type: str, tables: List[Dict[str, str]], **kwargs
+        self,
+        namespace: str,
+        name: str,
+        view_type: str,
+        tables: List[Dict[str, str]],
+        **kwargs,
     ):
         """Create an instance of a view."""
+        self.namespace = namespace
         self.tables = tables
         self.name = name
         self.view_type = view_type
@@ -31,7 +38,7 @@ class View(object):
     @classmethod
     def from_db_views(
         klass,
-        name: str,
+        namespace: str,
         is_glean: bool,
         channels: List[Dict[str, str]],
         db_views: dict,
@@ -40,7 +47,7 @@ class View(object):
         raise NotImplementedError("Only implemented in subclass.")
 
     @classmethod
-    def from_dict(klass, name: str, _dict: ViewDict) -> View:
+    def from_dict(klass, namespace: str, name: str, _dict: ViewDict) -> View:
         """Get a view from a name and dict definition."""
         raise NotImplementedError("Only implemented in subclass.")
 

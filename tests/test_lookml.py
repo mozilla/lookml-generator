@@ -307,7 +307,7 @@ def test_lookml_actual(runner, glean_apps, tmp_path):
                                     "label": "Glean Dictionary "
                                     "reference for Test "
                                     "Counter",
-                                    "url": "https://dictionary.telemetry.mozilla.org/apps/baseline/metrics/test_counter",  # noqa: E501
+                                    "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/test_counter",  # noqa: E501
                                 }
                             ],
                         },
@@ -426,7 +426,7 @@ def test_lookml_actual(runner, glean_apps, tmp_path):
                                     "label": "Glean Dictionary "
                                     "reference for Test "
                                     "Counter",
-                                    "url": "https://dictionary.telemetry.mozilla.org/apps/baseline/metrics/test_counter",  # noqa: E501
+                                    "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/test_counter",  # noqa: E501
                                 }
                             ],
                         },
@@ -443,7 +443,7 @@ def test_lookml_actual(runner, glean_apps, tmp_path):
                                     "label": "Glean Dictionary "
                                     "reference for Test "
                                     "Counter",
-                                    "url": "https://dictionary.telemetry.mozilla.org/apps/baseline/metrics/test_counter",  # noqa: E501
+                                    "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/test_counter",  # noqa: E501
                                 }
                             ],
                         },
@@ -479,7 +479,7 @@ def test_lookml_actual(runner, glean_apps, tmp_path):
                                 {
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
                                     "label": "Glean Dictionary reference for Glean Validation Metrics Ping Count",  # noqa: E501
-                                    "url": "https://dictionary.telemetry.mozilla.org/apps/metrics/metrics/glean_validation_metrics_ping_count",  # noqa: E501
+                                    "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/glean_validation_metrics_ping_count",  # noqa: E501
                                 }
                             ],
                         },
@@ -493,7 +493,7 @@ def test_lookml_actual(runner, glean_apps, tmp_path):
                                 {
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
                                     "label": "Glean Dictionary reference for Test Counter",
-                                    "url": "https://dictionary.telemetry.mozilla.org/apps/metrics/metrics/test_counter",  # noqa: E501
+                                    "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/test_counter",  # noqa: E501
                                 }
                             ],
                         },
@@ -513,7 +513,7 @@ def test_lookml_actual(runner, glean_apps, tmp_path):
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
                                     "label": "Glean Dictionary "
                                     "reference for Glean Validation Metrics Ping Count",
-                                    "url": "https://dictionary.telemetry.mozilla.org/apps/metrics/metrics/glean_validation_metrics_ping_count",  # noqa: E501
+                                    "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/glean_validation_metrics_ping_count",  # noqa: E501
                                 }
                             ],
                         },
@@ -529,7 +529,7 @@ def test_lookml_actual(runner, glean_apps, tmp_path):
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
                                     "label": "Glean Dictionary "
                                     "reference for Glean Validation Metrics Ping Count",
-                                    "url": "https://dictionary.telemetry.mozilla.org/apps/metrics/metrics/glean_validation_metrics_ping_count",  # noqa: E501
+                                    "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/glean_validation_metrics_ping_count",  # noqa: E501
                                 }
                             ],
                         },
@@ -543,7 +543,7 @@ def test_lookml_actual(runner, glean_apps, tmp_path):
                                     "label": "Glean Dictionary "
                                     "reference for Test "
                                     "Counter",
-                                    "url": "https://dictionary.telemetry.mozilla.org/apps/metrics/metrics/test_counter",  # noqa: E501
+                                    "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/test_counter",  # noqa: E501
                                 }
                             ],
                         },
@@ -560,7 +560,7 @@ def test_lookml_actual(runner, glean_apps, tmp_path):
                                     "label": "Glean Dictionary "
                                     "reference for Test "
                                     "Counter",
-                                    "url": "https://dictionary.telemetry.mozilla.org/apps/metrics/metrics/test_counter",  # noqa: E501
+                                    "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/test_counter",  # noqa: E501
                                 }
                             ],
                         },
