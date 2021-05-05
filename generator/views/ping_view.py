@@ -17,13 +17,17 @@ class PingView(View):
     type: str = "ping_view"
     allow_glean: bool = False
 
-    def __init__(self, name: str, tables: List[Dict[str, str]], **kwargs):
+    def __init__(self, namespace: str, name: str, tables: List[Dict[str, str]]):
         """Create instance of a PingView."""
-        super().__init__(name, self.__class__.type, tables, **kwargs)
+        super().__init__(namespace, name, self.__class__.type, tables)
 
     @classmethod
     def from_db_views(
-        klass, name: str, is_glean: bool, channels: List[Dict[str, str]], db_views: dict
+        klass,
+        namespace: str,
+        is_glean: bool,
+        channels: List[Dict[str, str]],
+        db_views: dict,
     ) -> Iterator[PingView]:
         """Get Looker views for a namespace."""
         if (klass.allow_glean and not is_glean) or (not klass.allow_glean and is_glean):
@@ -47,12 +51,12 @@ class PingView(View):
                 views[view_id].append(table)
 
         for view_id, tables in views.items():
-            yield klass(view_id, tables)
+            yield klass(namespace, view_id, tables)
 
     @classmethod
-    def from_dict(klass, name: str, _dict: ViewDict) -> PingView:
+    def from_dict(klass, namespace: str, name: str, _dict: ViewDict) -> PingView:
         """Get a view from a name and dict definition."""
-        return klass(name, _dict["tables"])
+        return klass(namespace, name, _dict["tables"])
 
     def to_lookml(self, bq_client) -> List[dict]:
         """Generate LookML for this view."""

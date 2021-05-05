@@ -46,7 +46,7 @@ def _get_views_from_dict(
 ) -> Iterable[View]:
     for view_name, view_info in views.items():
         yield VIEW_TYPES[view_info["type"]].from_dict(  # type: ignore
-            view_name, view_info
+            namespace, view_name, view_info
         )
 
 

@@ -14,13 +14,17 @@ class TableView(View):
 
     type: str = "table_view"
 
-    def __init__(self, name: str, tables: List[Dict[str, str]]):
+    def __init__(self, namespace: str, name: str, tables: List[Dict[str, str]]):
         """Create instance of a TableView."""
-        super().__init__(name, TableView.type, tables)
+        super().__init__(namespace, name, TableView.type, tables)
 
     @classmethod
     def from_db_views(
-        klass, app: str, is_glean: bool, channels: List[Dict[str, str]], db_views: dict
+        klass,
+        namespace: str,
+        is_glean: bool,
+        channels: List[Dict[str, str]],
+        db_views: dict,
     ) -> Iterator[TableView]:
         """Get Looker views for a namespace."""
         views = defaultdict(list)
@@ -39,12 +43,12 @@ class TableView(View):
                 views[view_id].append(table)
 
         for view_id, tables in views.items():
-            yield TableView(f"{view_id}_table", tables)
+            yield TableView(namespace, f"{view_id}_table", tables)
 
     @classmethod
-    def from_dict(klass, name: str, _dict: ViewDict) -> TableView:
+    def from_dict(klass, namespace: str, name: str, _dict: ViewDict) -> TableView:
         """Get a view from a name and dict definition."""
-        return TableView(name, _dict["tables"])
+        return TableView(namespace, name, _dict["tables"])
 
     def to_lookml(self, bq_client) -> List[dict]:
         """Generate LookML for this view."""

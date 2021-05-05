@@ -13,10 +13,6 @@ class GleanPingView(PingView):
     type: str = "glean_ping_view"
     allow_glean: bool = True
 
-    def __init__(self, name: str, tables: List[Dict[str, str]], **kwargs):
-        """Create instance of a GleanPingView."""
-        super().__init__(name, tables, **kwargs)
-
     def _get_links(self, dimension: dict) -> List[Dict[str, str]]:
         """Get a link annotation given a metric name."""
         name = self._get_name(dimension)
@@ -26,7 +22,7 @@ class GleanPingView(PingView):
                 "label": (f"Glean Dictionary reference for {title}"),
                 "url": (
                     f"https://dictionary.telemetry.mozilla.org"
-                    f"/apps/{self.name}/metrics/{name}"
+                    f"/apps/{self.namespace}/metrics/{name}"
                 ),
                 "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",
             }

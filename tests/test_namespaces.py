@@ -245,24 +245,27 @@ def test_get_glean_apps(app_listings_uri, glean_apps):
 def test_get_looker_views(glean_apps, generated_sql_uri):
     db_views = _get_db_views(generated_sql_uri)
     actual = _get_looker_views(glean_apps[0], db_views)
+    namespace = glean_apps[0]["name"]
     expected = [
         GleanPingView(
+            namespace,
             "baseline",
             [
                 {"channel": "release", "table": "mozdata.glean_app.baseline"},
                 {"channel": "beta", "table": "mozdata.glean_app_beta.baseline"},
             ],
-            app=glean_apps[0],
         ),
         GrowthAccountingView(
+            namespace,
             [
                 {
                     "channel": "release",
                     "table": "mozdata.glean_app.baseline_clients_daily",
                 }
-            ]
+            ],
         ),
         TableView(
+            namespace,
             "baseline_clients_daily_table",
             [
                 {
@@ -276,6 +279,7 @@ def test_get_looker_views(glean_apps, generated_sql_uri):
             ],
         ),
         TableView(
+            namespace,
             "baseline_table",
             [
                 {"table": "mozdata.glean_app.baseline", "channel": "release"},
@@ -283,6 +287,7 @@ def test_get_looker_views(glean_apps, generated_sql_uri):
             ],
         ),
         TableView(
+            namespace,
             "baseline_clients_last_seen_table",
             [
                 {
