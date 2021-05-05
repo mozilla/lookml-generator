@@ -1,7 +1,7 @@
 """Generate lookml from namespaces."""
 import logging
 from pathlib import Path
-from typing import Dict, Iterable
+from typing import Dict, Iterable, Optional
 
 import click
 import lkml
@@ -13,10 +13,12 @@ from .namespaces import _get_glean_apps
 from .views import VIEW_TYPES, View, ViewDict
 
 
-def _generate_views(client, out_dir: Path, views: Iterable[View]) -> Iterable[Path]:
+def _generate_views(
+    client, out_dir: Path, views: Iterable[View], v1_name: Optional[str]
+) -> Iterable[Path]:
     for view in views:
         path = out_dir / f"{view.name}.view.lkml"
-        lookml = {"views": view.to_lookml(client)}
+        lookml = {"views": view.to_lookml(client, v1_name)}
         path.write_text(lkml.dump(lookml))
         yield path
 
@@ -41,30 +43,32 @@ def _generate_explores(
         yield path
 
 
-def _get_views_from_dict(
-    views: Dict[str, ViewDict], namespace: str, glean_apps
-) -> Iterable[View]:
+def _get_views_from_dict(views: Dict[str, ViewDict], namespace: str) -> Iterable[View]:
     for view_name, view_info in views.items():
         yield VIEW_TYPES[view_info["type"]].from_dict(  # type: ignore
             namespace, view_name, view_info
         )
 
 
+def _glean_apps_to_v1_map(glean_apps):
+    return {d["name"]: d["v1_name"] for d in glean_apps}
+
+
 def _lookml(namespaces, glean_apps, target_dir):
     client = bigquery.Client()
     _namespaces = yaml.safe_load(namespaces)
     target = Path(target_dir)
+    v1_mapping = _glean_apps_to_v1_map(glean_apps)
     for namespace, lookml_objects in _namespaces.items():
         logging.info(f"\nGenerating namespace {namespace}")
 
         view_dir = target / namespace / "views"
         view_dir.mkdir(parents=True, exist_ok=True)
-        views = _get_views_from_dict(
-            lookml_objects.get("views", {}), namespace, glean_apps
-        )
+        views = _get_views_from_dict(lookml_objects.get("views", {}), namespace)
 
         logging.info("  Generating views")
-        for view_path in _generate_views(client, view_dir, views):
+        v1_name: Optional[str] = v1_mapping.get(namespace)
+        for view_path in _generate_views(client, view_dir, views, v1_name):
             logging.info(f"    ...Generating {view_path}")
 
         explore_dir = target / namespace / "explores"

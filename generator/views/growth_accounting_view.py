@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from itertools import filterfalse
-from typing import Any, Dict, Iterator, List, Union
+from typing import Any, Dict, Iterator, List, Optional, Union
 
 from . import lookml_utils
 from .view import View, ViewDict
@@ -245,7 +245,7 @@ class GrowthAccountingView(View):
         """Get a view from a name and dict definition."""
         return GrowthAccountingView(namespace, _dict["tables"])
 
-    def to_lookml(self, bq_client) -> List[dict]:
+    def to_lookml(self, bq_client, v1_name: Optional[str]) -> List[dict]:
         """Generate LookML for this view."""
         view_defn: Dict[str, Any] = {"name": self.name}
         table = self.tables[0]["table"]

@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from itertools import filterfalse
-from typing import Any, Dict, Iterator, List, Union
+from typing import Any, Dict, Iterator, List, Optional, Union
 
 import click
 
@@ -58,7 +58,7 @@ class PingView(View):
         """Get a view from a name and dict definition."""
         return klass(namespace, name, _dict["tables"])
 
-    def to_lookml(self, bq_client) -> List[dict]:
+    def to_lookml(self, bq_client, v1_name: Optional[str]) -> List[dict]:
         """Generate LookML for this view."""
         view_defn: Dict[str, Any] = {"name": self.name}
 
@@ -68,7 +68,7 @@ class PingView(View):
             self.tables[0],
         )["table"]
 
-        dimensions = self.get_dimensions(bq_client, table)
+        dimensions = self.get_dimensions(bq_client, table, v1_name)
         view_defn["dimensions"] = list(
             filterfalse(lookml_utils._is_dimension_group, dimensions)
         )
@@ -100,7 +100,9 @@ class PingView(View):
 
         return [view_defn]
 
-    def get_dimensions(self, bq_client, table) -> List[Dict[str, Any]]:
+    def get_dimensions(
+        self, bq_client, table, v1_name: Optional[str]
+    ) -> List[Dict[str, Any]]:
         """Get the set of dimensions for this view."""
         # add dimensions and dimension groups
         return lookml_utils._generate_dimensions(bq_client, table)

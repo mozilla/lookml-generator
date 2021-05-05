@@ -1,9 +1,9 @@
-"""Class to describe a Ping View."""
+"""Class to describe a Table View."""
 from __future__ import annotations
 
 from collections import defaultdict
 from itertools import filterfalse
-from typing import Any, Dict, Iterator, List
+from typing import Any, Dict, Iterator, List, Optional
 
 from . import lookml_utils
 from .view import OMIT_VIEWS, View, ViewDict
@@ -50,7 +50,7 @@ class TableView(View):
         """Get a view from a name and dict definition."""
         return TableView(namespace, name, _dict["tables"])
 
-    def to_lookml(self, bq_client) -> List[dict]:
+    def to_lookml(self, bq_client, v1_name: Optional[str]) -> List[dict]:
         """Generate LookML for this view."""
         view_defn: Dict[str, Any] = {"name": self.name}
 

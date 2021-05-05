@@ -38,6 +38,7 @@ def app_listings_uri(tmp_path):
                         "canonical_app_name": "Glean App",
                         "bq_dataset_family": "glean_app",
                         "notification_emails": ["glean-app-owner@allizom.com"],
+                        "v1_name": "glean-app-release",
                     },
                     {
                         "app_name": "glean-app",
@@ -45,12 +46,34 @@ def app_listings_uri(tmp_path):
                         "canonical_app_name": "Glean App Beta",
                         "bq_dataset_family": "glean_app_beta",
                         "notification_emails": ["glean-app-owner-beta@allizom.com"],
+                        "v1_name": "glean-app-beta",
                     },
                 ]
             ).encode()
         )
     )
     return dest.absolute().as_uri()
+
+
+@pytest.fixture
+def metrics_listings_file(tmp_path):
+    """Mock metrics listings."""
+    dest = tmp_path / "metrics-listings"
+    dest.write_bytes(
+        gzip.compress(
+            json.dumps(
+                {
+                    "test.counter": {
+                        "type": "counter",
+                    },
+                    "glean_validation_metrics.ping_count": {
+                        "type": "counter",
+                    },
+                }
+            ).encode()
+        )
+    )
+    return dest.absolute()
 
 
 @pytest.fixture
@@ -74,5 +97,6 @@ def glean_apps():
                     "dataset": "glean_app_beta",
                 },
             ],
+            "v1_name": "glean-app-release",
         }
     ]

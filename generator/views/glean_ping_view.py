@@ -1,8 +1,10 @@
 """Class to describe a Glean Ping View."""
+import logging
 from collections import Counter
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import click
+from mozilla_schema_generator.glean_ping import GleanPing
 
 from .ping_view import PingView
 
@@ -37,19 +39,46 @@ class GleanPingView(PingView):
     def _is_metric(self, dimension) -> bool:
         return dimension["name"].startswith("metrics__")
 
-    def _annotate_dimension(self, dimension):
+    def _get_metric_names(self, v1_name: Optional[str]) -> Dict[str, Tuple[str, str]]:
+        if v1_name is None:
+            return {}
+
+        repo = next((r for r in GleanPing.get_repos() if r["name"] == v1_name))
+        glean_app = GleanPing(repo)
+        metrics = glean_app.get_probes()
+
+        mapping = {}
+        for metric in metrics:
+            logging.info(f"Parsing Glean metric {metric.id} for app {self.namespace}")
+            *category, name = metric.id.split(".")
+            category = "_".join(category)
+            looker_name = f"metrics__{metric.type}__{category}_{name}"
+            mapping[looker_name] = (category, name)
+
+        return mapping
+
+    def _annotate_dimension(self, dimension, metric_names: Dict[str, Tuple[str, str]]):
         annotations = {}
         if self._is_metric(dimension) and not self._get_metric_type(
             dimension
         ).startswith("labeled"):
             annotations["links"] = self._get_links(dimension)
+
+        if metric_names.get(dimension["name"]) is not None:
+            category, name = metric_names[dimension["name"]]
+            dimension["group_label"] = category.replace("_", " ").title()
+            dimension["group_item_label"] = name.replace("_", " ").title()
+
         return dict(dimension, **annotations)
 
-    def get_dimensions(self, bq_client, table) -> List[Dict[str, Any]]:
+    def get_dimensions(
+        self, bq_client, table, v1_name: Optional[str]
+    ) -> List[Dict[str, Any]]:
         """Get the set of dimensions for this view."""
+        metric_names = self._get_metric_names(v1_name)
         return [
-            self._annotate_dimension(d)
-            for d in super().get_dimensions(bq_client, table)
+            self._annotate_dimension(d, metric_names)
+            for d in super().get_dimensions(bq_client, table, v1_name)
         ]
 
     def get_measures(

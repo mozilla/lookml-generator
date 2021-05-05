@@ -72,6 +72,7 @@ def _get_glean_apps(
         )
 
         canonical_app_name = release_variant["canonical_app_name"]
+        v1_name = release_variant["v1_name"]
         emails = release_variant["notification_emails"]
 
         channels = [
@@ -92,6 +93,7 @@ def _get_glean_apps(
                     "channels": channels,
                     "owners": emails,
                     "glean_app": True,
+                    "v1_name": v1_name,
                 }
             )
 
