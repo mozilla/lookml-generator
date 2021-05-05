@@ -80,6 +80,21 @@ class MockClient:
                             ),
                         ],
                     ),
+                    bigquery.schema.SchemaField(
+                        "metrics",
+                        "RECORD",
+                        fields=[
+                            bigquery.schema.SchemaField(
+                                "counter",
+                                "RECORD",
+                                fields=[
+                                    bigquery.schema.SchemaField(
+                                        "test_counter", "INTEGER"
+                                    )
+                                ],
+                            )
+                        ],
+                    ),
                     bigquery.schema.SchemaField("parsed_timestamp", "TIMESTAMP"),
                     bigquery.schema.SchemaField("submission_timestamp", "TIMESTAMP"),
                     bigquery.schema.SchemaField("submission_date", "DATE"),
@@ -278,6 +293,22 @@ def test_lookml_actual(runner, glean_apps, tmp_path):
                             "type": "string",
                         },
                         {
+                            "group_item_label": "Test Counter",
+                            "group_label": "Metrics Counter",
+                            "name": "metrics__counter__test_counter",
+                            "sql": "${TABLE}.metrics.counter.test_counter",
+                            "type": "number",
+                            "links": [
+                                {
+                                    "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
+                                    "label": "Glean Dictionary "
+                                    "reference for Test "
+                                    "Counter",
+                                    "url": "https://dictionary.telemetry.mozilla.org/apps/baseline/metrics/test_counter",  # noqa: E501
+                                }
+                            ],
+                        },
+                        {
                             "name": "test_bignumeric",
                             "sql": "${TABLE}.test_bignumeric",
                             "type": "string",
@@ -381,6 +412,19 @@ def test_lookml_actual(runner, glean_apps, tmp_path):
                             "name": "clients",
                             "type": "count_distinct",
                             "sql": "${client_info__client_id}",
+                        },
+                        {
+                            "name": "counter__test_counter",
+                            "type": "sum",
+                            "sql": "${metrics__counter__test_counter}",
+                        },
+                        {
+                            "name": "counter__test_counter_client_count",
+                            "type": "count_distinct",
+                            "sql": (
+                                "case when ${metrics__counter__test_counter} > 0 then "
+                                "${client_info__client_id}"
+                            ),
                         },
                     ],
                 }
