@@ -15,6 +15,19 @@ DISTRIBUTION_TYPES = {
 }
 
 
+ALLOWED_TYPES = DISTRIBUTION_TYPES | {
+    "boolean",
+    "counter",
+    "datetime",
+    "jwe",
+    "quantity",
+    "string",
+    "rate",
+    "timespan",
+    "uuid",
+}
+
+
 class GleanPingView(PingView):
     """A view on a ping table for an application using the Glean SDK."""
 
@@ -64,16 +77,21 @@ class GleanPingView(PingView):
         category = "_".join(category)
 
         label = name
-        looker_name = f"metrics__{metric.type}__{category}_{name}"
+        sep = "_"
+        if not category:
+            sep = ""
+        looker_name = f"metrics__{metric.type}__{category}{sep}{name}"
         if suffix:
             label = f"{name}_{suffix}"
-            looker_name = f"metrics__{metric.type}__{category}_{name}__{suffix}"
+            looker_name = f"metrics__{metric.type}__{category}{sep}{name}__{suffix}"
 
         group_label = category.replace("_", " ").title()
         group_item_label = label.replace("_", " ").title()
+        hidden = "yes" if category.startswith("glean") else "no"
 
         return {
             "name": looker_name,
+            "hidden": hidden,
             "sql": sql_map[looker_name]["sql"],
             "type": sql_map[looker_name]["type"],
             "group_label": group_label,
@@ -102,7 +120,7 @@ class GleanPingView(PingView):
             yield self._make_dimension(metric, "sum", sql_map)
         elif metric.type == "timespan":
             yield self._make_dimension(metric, "value", sql_map)
-        else:
+        elif metric.type in ALLOWED_TYPES:
             yield self._make_dimension(metric, "", sql_map)
 
     def _get_glean_metric_dimensions(
