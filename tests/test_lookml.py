@@ -131,6 +131,7 @@ class MockClient:
                                     SchemaField(
                                         "glean_validation_metrics_ping_count", "INTEGER"
                                     ),
+                                    SchemaField("no_category_counter", "INTEGER"),
                                 ],
                             ),
                             SchemaField(
@@ -376,67 +377,35 @@ class MockClient:
         raise ValueError(f"Table not found: {table_ref}")
 
 
-@patch("generator.views.glean_ping_view.GleanPing")
-def test_lookml_actual(mock_glean_ping, runner, glean_apps, tmp_path):
-    namespaces = tmp_path / "namespaces.yaml"
-    namespaces.write_text(
-        dedent(
-            """
-            custom:
-              pretty_name: Custom
-              glean_app: false
-              views:
-                baseline:
-                  type: ping_view
-                  tables:
-                  - channel: release
-                    table: mozdata.custom.baseline
-            glean-app:
-              pretty_name: Glean App
-              glean_app: true
-              views:
-                baseline:
-                  type: glean_ping_view
-                  tables:
-                  - channel: release
-                    table: mozdata.glean_app.baseline
-                  - channel: beta
-                    table: mozdata.glean_app_beta.baseline
-                metrics:
-                  type: glean_ping_view
-                  tables:
-                  - channel: release
-                    table: mozdata.glean_app.metrics
-                growth_accounting:
-                  type: growth_accounting_view
-                  tables:
-                  - table: mozdata.glean_app.baseline_clients_last_seen
-              explores:
-                baseline:
-                  type: glean_ping_explore
-                  views:
-                    base_view: baseline
-                growth_accounting:
-                  type: growth_accounting_explore
-                  views:
-                    base_view: growth_accounting
-            """
-        )
-    )
-    mock_glean_ping.get_repos.return_value = [{"name": "glean-app-release"}]
-    glean_app = Mock()
-    mock_glean_ping.return_value = glean_app
+@pytest.fixture
+def msg_glean_probes():
     history = [
         {"dates": {"first": "2020-01-01 00:00:00", "last": "2020-01-02 00:00:00"}}
     ]
-    glean_app.get_probes.return_value = [
+
+    history_with_descr = [
+        {
+            "dates": {"first": "2020-01-01 00:00:00", "last": "2020-01-02 00:00:00"},
+            "description": "test counter description",
+        }
+    ]
+
+    return [
         GleanProbe(
+            "test.boolean",
+            {"type": "boolean", "history": history, "name": "test.boolean"},
+        ),
+        GleanProbe(  # This probe should be ignored as a dupe
             "test.boolean",
             {"type": "boolean", "history": history, "name": "test.boolean"},
         ),
         GleanProbe(
             "test.counter",
-            {"type": "counter", "history": history, "name": "test.counter"},
+            {"type": "counter", "history": history_with_descr, "name": "test.counter"},
+        ),
+        GleanProbe(
+            "no_category_counter",
+            {"type": "counter", "history": history, "name": "no_category_counter"},
         ),
         GleanProbe(
             "glean.validation.metrics_ping_count",
@@ -499,6 +468,60 @@ def test_lookml_actual(mock_glean_ping, runner, glean_apps, tmp_path):
             {"type": "uuid", "history": history, "name": "test.uuid"},
         ),
     ]
+
+
+@patch("generator.views.glean_ping_view.GleanPing")
+def test_lookml_actual(mock_glean_ping, runner, glean_apps, tmp_path, msg_glean_probes):
+    namespaces = tmp_path / "namespaces.yaml"
+    namespaces.write_text(
+        dedent(
+            """
+            custom:
+              pretty_name: Custom
+              glean_app: false
+              views:
+                baseline:
+                  type: ping_view
+                  tables:
+                  - channel: release
+                    table: mozdata.custom.baseline
+            glean-app:
+              pretty_name: Glean App
+              glean_app: true
+              views:
+                baseline:
+                  type: glean_ping_view
+                  tables:
+                  - channel: release
+                    table: mozdata.glean_app.baseline
+                  - channel: beta
+                    table: mozdata.glean_app_beta.baseline
+                metrics:
+                  type: glean_ping_view
+                  tables:
+                  - channel: release
+                    table: mozdata.glean_app.metrics
+                growth_accounting:
+                  type: growth_accounting_view
+                  tables:
+                  - table: mozdata.glean_app.baseline_clients_last_seen
+              explores:
+                baseline:
+                  type: glean_ping_explore
+                  views:
+                    base_view: baseline
+                growth_accounting:
+                  type: growth_accounting_explore
+                  views:
+                    base_view: growth_accounting
+            """
+        )
+    )
+    mock_glean_ping.get_repos.return_value = [{"name": "glean-app-release"}]
+    glean_app = Mock()
+    mock_glean_ping.return_value = glean_app
+    glean_app.get_probes.return_value = msg_glean_probes
+
     with runner.isolated_filesystem():
         with patch("google.cloud.bigquery.Client", MockClient):
             _lookml(open(namespaces), glean_apps, "looker-hub/")
@@ -539,10 +562,10 @@ def test_lookml_actual(mock_glean_ping, runner, glean_apps, tmp_path):
                 }
             ]
         }
-        # print_and_test(
-        #    expected,
-        #    lkml.load(Path("looker-hub/custom/views/baseline.view.lkml").read_text()),
-        # )
+        print_and_test(
+            expected,
+            lkml.load(Path("looker-hub/custom/views/baseline.view.lkml").read_text()),
+        )
         expected = {
             "views": [
                 {
@@ -584,22 +607,6 @@ def test_lookml_actual(mock_glean_ping, runner, glean_apps, tmp_path):
                             "group_label": "Metadata Header",
                             "sql": "${TABLE}.metadata.header.date",
                             "type": "string",
-                        },
-                        {
-                            "group_item_label": "Counter",
-                            "group_label": "Test",
-                            "name": "metrics__counter__test_counter",
-                            "sql": "${TABLE}.metrics.counter.test_counter",
-                            "type": "number",
-                            "links": [
-                                {
-                                    "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
-                                    "label": "Glean Dictionary "
-                                    "reference for Test "
-                                    "Counter",
-                                    "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/test_counter",  # noqa: E501
-                                }
-                            ],
                         },
                         {
                             "name": "test_bignumeric",
@@ -706,48 +713,17 @@ def test_lookml_actual(mock_glean_ping, runner, glean_apps, tmp_path):
                             "type": "count_distinct",
                             "sql": "${client_info__client_id}",
                         },
-                        {
-                            "name": "test_counter",
-                            "type": "sum",
-                            "sql": "${metrics__counter__test_counter}",
-                            "links": [
-                                {
-                                    "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
-                                    "label": "Glean Dictionary "
-                                    "reference for Test "
-                                    "Counter",
-                                    "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/test_counter",  # noqa: E501
-                                }
-                            ],
-                        },
-                        {
-                            "name": "test_counter_client_count",
-                            "type": "count_distinct",
-                            "sql": (
-                                "case when ${metrics__counter__test_counter} > 0 then "
-                                "${client_info__client_id}"
-                            ),
-                            "links": [
-                                {
-                                    "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
-                                    "label": "Glean Dictionary "
-                                    "reference for Test "
-                                    "Counter",
-                                    "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/test_counter",  # noqa: E501
-                                }
-                            ],
-                        },
                     ],
                 }
             ]
         }
 
-        # print_and_test(
-        #    expected,
-        #    lkml.load(
-        #        Path("looker-hub/glean-app/views/baseline.view.lkml").read_text()
-        #    ),
-        # )
+        print_and_test(
+            expected,
+            lkml.load(
+                Path("looker-hub/glean-app/views/baseline.view.lkml").read_text()
+            ),
+        )
         expected = {
             "views": [
                 {
@@ -772,6 +748,7 @@ def test_lookml_actual(mock_glean_ping, runner, glean_apps, tmp_path):
                             "group_item_label": "Counter",
                             "group_label": "Test",
                             "name": "metrics__counter__test_counter",
+                            "description": "test counter description",
                             "sql": "${TABLE}.metrics.counter.test_counter",
                             "type": "number",
                             "links": [
@@ -781,6 +758,22 @@ def test_lookml_actual(mock_glean_ping, runner, glean_apps, tmp_path):
                                     "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/test_counter",  # noqa: E501
                                 }
                             ],
+                        },
+                        {
+                            "group_item_label": "No Category Counter",
+                            "group_label": "Glean",
+                            "links": [
+                                {
+                                    "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",
+                                    "label": "Glean Dictionary "
+                                    "reference for Glean No "
+                                    "Category Counter",
+                                    "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/no_category_counter",  # noqa: 501
+                                }
+                            ],
+                            "name": "metrics__counter__no_category_counter",
+                            "sql": "${TABLE}.metrics.counter.no_category_counter",
+                            "type": "number",
                         },
                         {
                             "group_item_label": "Metrics Ping Count",
@@ -979,10 +972,10 @@ def test_lookml_actual(mock_glean_ping, runner, glean_apps, tmp_path):
                         {
                             "name": "test_counter_client_count",
                             "type": "count_distinct",
-                            "sql": (
-                                "case when ${metrics__counter__test_counter} > 0 then "
-                                "${client_info__client_id}"
-                            ),
+                            "filters__all": [
+                                [{"metrics__counter__test_counter": ">0"}]
+                            ],
+                            "sql": "${client_info__client_id}",
                             "links": [
                                 {
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
@@ -992,6 +985,37 @@ def test_lookml_actual(mock_glean_ping, runner, glean_apps, tmp_path):
                                     "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/test_counter",  # noqa: E501
                                 }
                             ],
+                        },
+                        {
+                            "links": [
+                                {
+                                    "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",
+                                    "label": "Glean Dictionary "
+                                    "reference for No "
+                                    "Category Counter",
+                                    "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/no_category_counter",  # noqa: 501
+                                }
+                            ],
+                            "name": "no_category_counter",
+                            "sql": "${metrics__counter__no_category_counter}",
+                            "type": "sum",
+                        },
+                        {
+                            "filters__all": [
+                                [{"metrics__counter__no_category_counter": ">0"}]
+                            ],
+                            "links": [
+                                {
+                                    "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",
+                                    "label": "Glean Dictionary "
+                                    "reference for No "
+                                    "Category Counter",
+                                    "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/no_category_counter",  # noqa: 501
+                                }
+                            ],
+                            "name": "no_category_counter_client_count",
+                            "sql": "${client_info__client_id}",
+                            "type": "count_distinct",
                         },
                         {
                             "links": [
@@ -1016,10 +1040,14 @@ def test_lookml_actual(mock_glean_ping, runner, glean_apps, tmp_path):
                                 }
                             ],
                             "name": "glean_validation_metrics_ping_count_client_count",
-                            "sql": (
-                                "case when ${metrics__counter__glean_validation_metrics_ping_count} > 0 then "
-                                "${client_info__client_id}"
-                            ),
+                            "filters__all": [
+                                [
+                                    {
+                                        "metrics__counter__glean_validation_metrics_ping_count": ">0"
+                                    }
+                                ]
+                            ],
+                            "sql": "${client_info__client_id}",
                             "type": "count_distinct",
                         },
                     ],

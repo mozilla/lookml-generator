@@ -64,11 +64,20 @@ class GleanPingView(PingView):
 
         repo = next((r for r in GleanPing.get_repos() if r["name"] == v1_name))
         glean_app = GleanPing(repo)
-        return [
-            probe
-            for probe in glean_app.get_probes()
-            if self.name in probe.definition["send_in_pings"]
-        ]
+
+        ping_probes = []
+        probe_ids = set()
+        for probe in glean_app.get_probes():
+            if self.name not in probe.definition["send_in_pings"]:
+                continue
+            if probe.id in probe_ids:
+                # Some ids are duplicated, ignore them
+                continue
+
+            ping_probes.append(probe)
+            probe_ids.add(probe.id)
+
+        return ping_probes
 
     def _make_dimension(
         self, metric: GleanProbe, suffix: str, sql_map: Dict[str, Dict[str, str]]
@@ -87,11 +96,12 @@ class GleanPingView(PingView):
 
         group_label = category.replace("_", " ").title()
         group_item_label = label.replace("_", " ").title()
-        hidden = "yes" if category.startswith("glean") else "no"
 
-        return {
+        if not group_label:
+            group_label = "Glean"
+
+        lookml = {
             "name": looker_name,
-            "hidden": hidden,
             "sql": sql_map[looker_name]["sql"],
             "type": sql_map[looker_name]["type"],
             "group_label": group_label,
@@ -103,12 +113,17 @@ class GleanPingView(PingView):
                     ),
                     "url": (
                         f"https://dictionary.telemetry.mozilla.org"
-                        f"/apps/{self.namespace}/metrics/{category}_{name}"
+                        f"/apps/{self.namespace}/metrics/{category}{sep}{name}"
                     ),
                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",
                 },
             ],
         }
+
+        if metric.description:
+            lookml["description"] = metric.description
+
+        return lookml
 
     def _get_metric_dimensions(
         self, metric: GleanProbe, sql_map: Dict[str, Dict[str, str]]
@@ -187,10 +202,8 @@ class GleanPingView(PingView):
                     {
                         "name": f"{name}_client_count",
                         "type": "count_distinct",
-                        "sql": (
-                            f"case when ${{{dimension_name}}} > 0 then "
-                            f"${{{client_id_field}}}"
-                        ),
+                        "filters": [{dimension_name: ">0"}],
+                        "sql": f"${{{client_id_field}}}",
                         "links": self._get_links(dimension),
                     },
                 ]
