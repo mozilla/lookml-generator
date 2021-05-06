@@ -21,7 +21,7 @@ def _generate_views(
             f"Generating lookml for {view.name} in {view.namespace} of type {view.view_type}"
         )
         path = out_dir / f"{view.name}.view.lkml"
-        lookml = {"views": view.to_lookml(client, v1_name)}
+        lookml = view.to_lookml(client, v1_name)
         path.write_text(lkml.dump(lookml))
         yield path
 

@@ -58,7 +58,7 @@ class PingView(View):
         """Get a view from a name and dict definition."""
         return klass(namespace, name, _dict["tables"])
 
-    def to_lookml(self, bq_client, v1_name: Optional[str]) -> List[dict]:
+    def to_lookml(self, bq_client, v1_name: Optional[str]) -> Dict[str, Any]:
         """Generate LookML for this view."""
         view_defn: Dict[str, Any] = {"name": self.name}
 
@@ -98,7 +98,7 @@ class PingView(View):
         else:
             view_defn["sql_table_name"] = f"`{table}`"
 
-        return [view_defn]
+        return {"views": [view_defn]}
 
     def get_dimensions(
         self, bq_client, table, v1_name: Optional[str]

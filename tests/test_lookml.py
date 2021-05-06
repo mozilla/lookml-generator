@@ -11,7 +11,7 @@ from google.cloud.bigquery.schema import SchemaField
 from mozilla_schema_generator.probes import GleanProbe
 
 from generator.lookml import _lookml
-from generator.views import GrowthAccountingView
+from generator.views import ClientCountView, GrowthAccountingView
 
 from .utils import print_and_test
 
@@ -34,6 +34,15 @@ class MockClient:
                     SchemaField("client_id", "STRING"),
                     SchemaField("country", "STRING"),
                     SchemaField("document_id", "STRING"),
+                ],
+            )
+        if table_ref == "mozdata.glean_app.baseline_clients_daily":
+            return bigquery.Table(
+                table_ref,
+                schema=[
+                    bigquery.schema.SchemaField("client_id", "STRING"),
+                    bigquery.schema.SchemaField("country", "STRING"),
+                    bigquery.schema.SchemaField("document_id", "STRING"),
                 ],
             )
         if table_ref == "mozdata.glean_app.baseline_clients_last_seen":
@@ -505,6 +514,10 @@ def test_lookml_actual(mock_glean_ping, runner, glean_apps, tmp_path, msg_glean_
                   type: growth_accounting_view
                   tables:
                   - table: mozdata.glean_app.baseline_clients_last_seen
+                client_counts:
+                  type: client_count_view
+                  tables:
+                  - table: mozdata.glean_app.baseline_clients_daily
               explores:
                 baseline:
                   type: glean_ping_explore
@@ -1116,6 +1129,26 @@ def test_lookml_actual(mock_glean_ping, runner, glean_apps, tmp_path, msg_glean_
             lkml.load(lkml.dump(expected)),
             lkml.load(
                 Path("looker-hub/glean-app/explores/baseline.explore.lkml").read_text()
+            ),
+        )
+
+        expected = {
+            "includes": ["baseline_clients_daily_table.view.lkml"],
+            "views": [
+                {
+                    "extends": ["baseline_clients_daily_table"],
+                    "name": "client_counts",
+                    "dimensions": ClientCountView.default_dimensions,
+                    "dimension_groups": ClientCountView.default_dimension_groups,
+                    "measures": ClientCountView.default_measures,
+                }
+            ],
+        }
+
+        print_and_test(
+            lkml.load(lkml.dump(expected)),
+            lkml.load(
+                Path("looker-hub/glean-app/views/client_counts.view.lkml").read_text()
             ),
         )
 

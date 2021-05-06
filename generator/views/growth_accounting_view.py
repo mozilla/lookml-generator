@@ -245,7 +245,7 @@ class GrowthAccountingView(View):
         """Get a view from a name and dict definition."""
         return GrowthAccountingView(namespace, _dict["tables"])
 
-    def to_lookml(self, bq_client, v1_name: Optional[str]) -> List[dict]:
+    def to_lookml(self, bq_client, v1_name: Optional[str]) -> Dict[str, Any]:
         """Generate LookML for this view."""
         view_defn: Dict[str, Any] = {"name": self.name}
         table = self.tables[0]["table"]
@@ -268,7 +268,7 @@ class GrowthAccountingView(View):
         # SQL Table Name
         view_defn["sql_table_name"] = f"`{table}`"
 
-        return [view_defn]
+        return {"views": [view_defn]}
 
     def get_measures(self) -> List[Dict[str, Union[str, List[Dict[str, str]]]]]:
         """Generate measures for the Growth Accounting Framework."""
