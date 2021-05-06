@@ -50,7 +50,7 @@ class TableView(View):
         """Get a view from a name and dict definition."""
         return TableView(namespace, name, _dict["tables"])
 
-    def to_lookml(self, bq_client, v1_name: Optional[str]) -> List[dict]:
+    def to_lookml(self, bq_client, v1_name: Optional[str]) -> Dict[str, Any]:
         """Generate LookML for this view."""
         view_defn: Dict[str, Any] = {"name": self.name}
 
@@ -90,4 +90,4 @@ class TableView(View):
         else:
             view_defn["sql_table_name"] = f"`{table}`"
 
-        return [view_defn]
+        return {"views": [view_defn]}

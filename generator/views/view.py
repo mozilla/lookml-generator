@@ -86,7 +86,7 @@ class View(object):
         """Get the set of dimensions for this view."""
         raise NotImplementedError("Only implemented in subclass.")
 
-    def to_lookml(self, bq_client, v1_name: Optional[str]) -> List[dict]:
+    def to_lookml(self, bq_client, v1_name: Optional[str]) -> Dict[str, Any]:
         """
         Generate Lookml for this view.
 

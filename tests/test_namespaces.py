@@ -14,7 +14,12 @@ from generator.namespaces import (
     _get_looker_views,
     namespaces,
 )
-from generator.views import GleanPingView, GrowthAccountingView, TableView
+from generator.views import (
+    ClientCountView,
+    GleanPingView,
+    GrowthAccountingView,
+    TableView,
+)
 
 from .utils import print_and_test
 
@@ -224,6 +229,12 @@ def test_namespaces_full(
                         ],
                         "type": "glean_ping_view",
                     },
+                    "client_counts": {
+                        "tables": [
+                            {"table": "mozdata.glean_app.baseline_clients_daily"}
+                        ],
+                        "type": "client_count_view",
+                    },
                     "growth_accounting": {
                         "tables": [
                             {"table": "mozdata.glean_app.baseline_clients_last_seen"}
@@ -247,6 +258,15 @@ def test_get_looker_views(glean_apps, generated_sql_uri):
     actual = _get_looker_views(glean_apps[0], db_views)
     namespace = glean_apps[0]["name"]
     expected = [
+        ClientCountView(
+            namespace,
+            [
+                {
+                    "channel": "release",
+                    "table": "mozdata.glean_app.baseline_clients_daily",
+                }
+            ],
+        ),
         GleanPingView(
             namespace,
             "baseline",
@@ -260,7 +280,7 @@ def test_get_looker_views(glean_apps, generated_sql_uri):
             [
                 {
                     "channel": "release",
-                    "table": "mozdata.glean_app.baseline_clients_daily",
+                    "table": "mozdata.glean_app.baseline_clients_last_seen",
                 }
             ],
         ),
