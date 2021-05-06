@@ -77,7 +77,7 @@ class PingView(View):
         )
 
         # add measures
-        view_defn["measures"] = self.get_measures(dimensions, table)
+        view_defn["measures"] = self.get_measures(dimensions, table, v1_name)
 
         # parameterize table name
         if len(self.tables) > 1:
@@ -121,7 +121,7 @@ class PingView(View):
         return client_id_fields[0]
 
     def get_measures(
-        self, dimensions: List[dict], table: str
+        self, dimensions: List[dict], table: str, v1_name: Optional[str]
     ) -> List[Dict[str, Union[str, List[Dict[str, str]]]]]:
         """Generate measures from a list of dimensions.
 
