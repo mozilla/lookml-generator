@@ -17,7 +17,7 @@ def _generate_views(
     client, out_dir: Path, views: Iterable[View], v1_name: Optional[str]
 ) -> Iterable[Path]:
     for view in views:
-        print(
+        logging.info(
             f"Generating lookml for {view.name} in {view.namespace} of type {view.view_type}"
         )
         path = out_dir / f"{view.name}.view.lkml"
