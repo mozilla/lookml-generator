@@ -114,7 +114,7 @@ function setup_spoke() {
     git clone "$SPOKE_REPO_URL"
     cd looker-spoke-default
     git fetch --all
-    git checkout $SPOKE_BRANCH_PUBLISH || exit 1
+    git checkout $SPOKE_BRANCH_PUBLISH || git checkout main && git checkout -b $SPOKE_BRANCH_PUBLISH
     git branch -D $SPOKE_BRANCH_WORKING
     git checkout -b $SPOKE_BRANCH_WORKING
 
