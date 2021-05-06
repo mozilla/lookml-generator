@@ -107,7 +107,7 @@ class PingView(View):
         # add dimensions and dimension groups
         return lookml_utils._generate_dimensions(bq_client, table)
 
-    def _get_client_id(self, dimensions: List[dict], table: str) -> str:
+    def _get_client_id(self, dimensions: List[dict], table: str) -> Optional[str]:
         """Return the first field that looks like a client identifier."""
         client_id_fields = [
             d["name"]
@@ -115,7 +115,7 @@ class PingView(View):
             if d["name"] in {"client_id", "client_info__client_id"}
         ]
         if not client_id_fields:
-            raise click.ClickException(f"Missing client_id dimension in {table!r}")
+            return None
         if len(client_id_fields) > 1:
             raise click.ClickException(f"Duplicate client_id dimension in {table!r}")
         return client_id_fields[0]
@@ -132,14 +132,17 @@ class PingView(View):
         # Iterate through each of the dimensions and accumulate any measures
         # that we want to include in the view. We pull out the client id first
         # since we'll use it to calculate per-measure client counts.
+        measures: List[Dict[str, Union[str, List[Dict[str, str]]]]] = []
+
         client_id_field = self._get_client_id(dimensions, table)
-        measures: List[Dict[str, Union[str, List[Dict[str, str]]]]] = [
-            {
-                "name": "clients",
-                "type": "count_distinct",
-                "sql": f"${{{client_id_field}}}",
-            }
-        ]
+        if client_id_field is not None:
+            measures.append(
+                {
+                    "name": "clients",
+                    "type": "count_distinct",
+                    "sql": f"${{{client_id_field}}}",
+                }
+            )
 
         for dimension in dimensions:
             dimension_name = dimension["name"]
