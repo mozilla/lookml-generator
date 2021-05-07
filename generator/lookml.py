@@ -4,11 +4,11 @@ from pathlib import Path
 from typing import Dict, Iterable, Optional
 
 import click
-import lkml
 import yaml
 from google.cloud import bigquery
 
 from .explores import EXPLORE_TYPES
+from .lkml_update import dump
 from .namespaces import _get_glean_apps
 from .views import VIEW_TYPES, View, ViewDict
 
@@ -18,11 +18,11 @@ def _generate_views(
 ) -> Iterable[Path]:
     for view in views:
         logging.info(
-            f"Generating lookml for {view.name} in {view.namespace} of type {view.view_type}"
+            f"Generating lookml for view {view.name} in {view.namespace} of type {view.view_type}"
         )
         path = out_dir / f"{view.name}.view.lkml"
         lookml = view.to_lookml(client, v1_name)
-        path.write_text(lkml.dump(lookml))
+        path.write_text(dump(lookml))
         yield path
 
 
@@ -30,6 +30,7 @@ def _generate_explores(
     client, out_dir: Path, namespace: str, explores: dict, views_dir: Path
 ) -> Iterable[Path]:
     for explore_name, defn in explores.items():
+        logging.info(f"Generating lookml for explore {explore_name} in {namespace}")
         explore = EXPLORE_TYPES[defn["type"]].from_dict(explore_name, defn, views_dir)
         file_lookml = {
             # Looker validates all included files,
@@ -41,8 +42,9 @@ def _generate_explores(
             ],
             "explores": [explore.to_lookml()],
         }
+        print(file_lookml)
         path = out_dir / (explore_name + ".explore.lkml")
-        path.write_text(lkml.dump(file_lookml))
+        path.write_text(dump(file_lookml))
         yield path
 
 

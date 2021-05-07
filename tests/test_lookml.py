@@ -11,6 +11,7 @@ from google.cloud.bigquery.schema import SchemaField
 from mozilla_schema_generator.probes import GleanProbe
 
 from generator.explores import ClientCountsExplore
+from generator.lkml_update import dump
 from generator.lookml import _lookml
 from generator.views import ClientCountsView, GrowthAccountingView
 
@@ -1187,12 +1188,9 @@ def test_lookml_actual(mock_glean_ping, runner, glean_apps, tmp_path, msg_glean_
                 }
             ],
         }
-        print("\nExpected!\n")
-        print(expected)
-        print("\n")
 
         print_and_test(
-            expected,
+            lkml.load(dump(expected)),
             lkml.load(
                 Path(
                     "looker-hub/glean-app/explores/client_counts.explore.lkml"

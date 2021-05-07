@@ -19,12 +19,10 @@ class ClientCountsExplore(Explore):
             "dimensions": ["days_since_first_seen", "first_seen_week"],
             "measures": ["client_count"],
             "pivots": ["first_seen_week"],
-            "filters__all": [
-                [
-                    {"submission_date": "8 weeks"},
-                    {"first_seen_date": "8 weeks"},
-                    {"have_completed_period": "yes"},
-                ]
+            "filters": [
+                {"submission_date": "8 weeks"},
+                {"first_seen_date": "8 weeks"},
+                {"have_completed_period": "yes"},
             ],
             "sorts": [{"days_since_first_seen": "asc"}],
             "name": "cohort_analysis",
