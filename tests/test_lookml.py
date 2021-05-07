@@ -10,6 +10,7 @@ from google.cloud import bigquery
 from google.cloud.bigquery.schema import SchemaField
 from mozilla_schema_generator.probes import GleanProbe
 
+from generator.explores import ClientCountsExplore
 from generator.lookml import _lookml
 from generator.views import ClientCountView, GrowthAccountingView
 
@@ -41,6 +42,7 @@ class MockClient:
                 table_ref,
                 schema=[
                     bigquery.schema.SchemaField("client_id", "STRING"),
+                    bigquery.schema.SchemaField("submission_date", "DATE"),
                     bigquery.schema.SchemaField("country", "STRING"),
                     bigquery.schema.SchemaField("document_id", "STRING"),
                 ],
@@ -498,6 +500,13 @@ def test_lookml_actual(mock_glean_ping, runner, glean_apps, tmp_path, msg_glean_
               pretty_name: Glean App
               glean_app: true
               views:
+                baseline_clients_daily_table:
+                  type: table_view
+                  tables:
+                  - channel: release
+                    table: mozdata.glean_app.baseline_clients_daily
+                  - channel: beta
+                    table: mozdata.glean_app_beta.baseline_clients_daily
                 baseline:
                   type: glean_ping_view
                   tables:
@@ -527,6 +536,11 @@ def test_lookml_actual(mock_glean_ping, runner, glean_apps, tmp_path, msg_glean_
                   type: growth_accounting_explore
                   views:
                     base_view: growth_accounting
+                client_counts:
+                  type: client_counts_explore
+                  views:
+                    extended_view: baseline_clients_daily_table
+                    base_view: client_counts
             """
         )
     )
@@ -1118,8 +1132,8 @@ def test_lookml_actual(mock_glean_ping, runner, glean_apps, tmp_path, msg_glean_
                     "view_name": "baseline",
                     "always_filter": {
                         "filters": [
-                            {"submission_date": "28 days"},
                             {"channel": "mozdata.glean^_app.baseline"},
+                            {"submission_date": "28 days"},
                         ]
                     },
                 }
@@ -1149,6 +1163,40 @@ def test_lookml_actual(mock_glean_ping, runner, glean_apps, tmp_path, msg_glean_
             lkml.load(lkml.dump(expected)),
             lkml.load(
                 Path("looker-hub/glean-app/views/client_counts.view.lkml").read_text()
+            ),
+        )
+
+        expected = {
+            "includes": ["/looker-hub/glean-app/views/client_counts.view.lkml"],
+            "explores": [
+                {
+                    "name": "client_counts",
+                    "view_name": "client_counts",
+                    "description": "Client counts across dimensions and cohorts.",
+                    "always_filter": {
+                        "filters__all": [
+                            [
+                                {
+                                    "channel": "mozdata.glean^_app.baseline^_clients^_daily"
+                                },
+                                {"submission_date": "28 days"},
+                            ],
+                        ],
+                    },
+                    "queries": ClientCountsExplore.queries,
+                }
+            ],
+        }
+        print("\nExpected!\n")
+        print(expected)
+        print("\n")
+
+        print_and_test(
+            expected,
+            lkml.load(
+                Path(
+                    "looker-hub/glean-app/explores/client_counts.explore.lkml"
+                ).read_text()
             ),
         )
 

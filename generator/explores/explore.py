@@ -7,6 +7,8 @@ from typing import Dict, List, Optional
 
 import lkml
 
+from ..views.lookml_utils import escape_filter_expr
+
 
 @dataclass
 class Explore:
@@ -27,7 +29,11 @@ class Explore:
 
     def get_dependent_views(self) -> List[str]:
         """Get views this explore is dependent on."""
-        return [view for _, view in self.views.items()]
+        return [
+            view
+            for _type, view in self.views.items()
+            if not _type.startswith("extended")
+        ]
 
     @staticmethod
     def from_dict(name: str, defn: dict, views_path: Path) -> Explore:
@@ -39,3 +45,50 @@ class Explore:
         if self.views_path is not None:
             return lkml.load((self.views_path / f"{view}.view.lkml").read_text())
         raise Exception("Missing view path for get_view_lookml")
+
+    def _get_default_channel(self, view: str) -> Optional[str]:
+        channel_params = [
+            param
+            for _view_defn in self.get_view_lookml(view)["views"]
+            for param in _view_defn.get("parameters", [])
+            if _view_defn["name"] == view and param["name"] == "channel"
+        ]
+
+        if channel_params:
+            allowed_values = channel_params[0]["allowed_values"]
+            default_value = next(
+                (value for value in allowed_values if value["label"] == "Release"),
+                allowed_values[0],
+            )["value"]
+
+            return escape_filter_expr(default_value)
+        return None
+
+    def _get_view_has_submission(self, view: str) -> bool:
+        return (
+            len(
+                [
+                    dim
+                    for _view_defn in self.get_view_lookml(view)["views"]
+                    for dim in _view_defn.get("dimension_groups", [])
+                    if _view_defn["name"] == view and dim["name"] == "submission"
+                ]
+            )
+            > 0
+        )
+
+    def get_required_filters(self, view_name: str) -> List[Dict[str, str]]:
+        """Get required filters for this view."""
+        filters = []
+        view = self.views[view_name]
+
+        # Add a default filter on channel, if it's present in the view
+        default_channel = self._get_default_channel(view)
+        if default_channel is not None:
+            filters.append({"channel": default_channel})
+
+        # Add submission filter, if present in the view
+        if self._get_view_has_submission(view):
+            filters.append({"submission_date": "28 days"})
+
+        return filters
