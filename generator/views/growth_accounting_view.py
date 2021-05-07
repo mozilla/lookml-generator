@@ -149,7 +149,7 @@ class GrowthAccountingView(View):
             "name": "established_user_retention_rate",
             "type": "number",
             "sql": (
-                "SAFE_DIVIDE(,"
+                "SAFE_DIVIDE("
                 "${established_users_returning},"
                 "(${established_users_returning} + ${established_users_churned_count})"
                 ")"
