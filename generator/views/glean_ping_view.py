@@ -1,4 +1,5 @@
 """Class to describe a Glean Ping View."""
+import logging
 from collections import Counter
 from typing import Any, Dict, Iterable, List, Optional, Union
 
@@ -60,6 +61,9 @@ class GleanPingView(PingView):
 
     def _get_glean_metrics(self, v1_name: Optional[str]) -> List[GleanProbe]:
         if v1_name is None:
+            logging.error(
+                f"Error: Missing v1 name for ping {self.name} in namespace {self.namespace}"
+            )
             return []
 
         repo = next((r for r in GleanPing.get_repos() if r["name"] == v1_name))
