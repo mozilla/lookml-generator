@@ -7,8 +7,8 @@ import click
 import yaml
 from google.cloud import bigquery
 
+from . import lkml_update
 from .explores import EXPLORE_TYPES
-from .lkml_update import dump
 from .namespaces import _get_glean_apps
 from .views import VIEW_TYPES, View, ViewDict
 
@@ -22,7 +22,7 @@ def _generate_views(
         )
         path = out_dir / f"{view.name}.view.lkml"
         lookml = view.to_lookml(client, v1_name)
-        path.write_text(dump(lookml))
+        path.write_text(lkml_update.dump(lookml))
         yield path
 
 
@@ -43,7 +43,7 @@ def _generate_explores(
             "explores": [explore.to_lookml()],
         }
         path = out_dir / (explore_name + ".explore.lkml")
-        path.write_text(dump(file_lookml))
+        path.write_text(lkml_update.dump(file_lookml))
         yield path
 
 

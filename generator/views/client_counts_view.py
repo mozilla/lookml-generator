@@ -88,6 +88,9 @@ class ClientCountsView(View):
         db_views: dict,
     ) -> Iterator[ClientCountsView]:
         """Get Client Count Views from db views and app variants."""
+        # We can guarantee there will always be at least one channel,
+        # because this comes from the associated _get_glean_repos in
+        # namespaces.py
         dataset = next(
             (channel for channel in channels if channel.get("channel") == "release"),
             channels[0],

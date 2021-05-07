@@ -35,6 +35,9 @@ class UpdatedDictParser(DictParser):
             return self.parse_pair(key, value)
         elif isinstance(value, (list, tuple)):
             if self.is_plural_key(key) and not self.parent_key == "query":
+                # See https://github.com/joshtemple/lkml/issues/53
+                # We check that the parent is not a query to ensure the
+                # query fields don't get unnested
                 return self.expand_list(key, value)
             else:
                 print(f"Parsing list of {key}, {value} with parent {self.parent_key}")
