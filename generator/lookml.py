@@ -42,7 +42,6 @@ def _generate_explores(
             ],
             "explores": [explore.to_lookml()],
         }
-        print(file_lookml)
         path = out_dir / (explore_name + ".explore.lkml")
         path.write_text(dump(file_lookml))
         yield path
