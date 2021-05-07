@@ -12,7 +12,7 @@ from mozilla_schema_generator.probes import GleanProbe
 
 from generator.explores import ClientCountsExplore
 from generator.lookml import _lookml
-from generator.views import ClientCountView, GrowthAccountingView
+from generator.views import ClientCountsView, GrowthAccountingView
 
 from .utils import print_and_test
 
@@ -524,7 +524,7 @@ def test_lookml_actual(mock_glean_ping, runner, glean_apps, tmp_path, msg_glean_
                   tables:
                   - table: mozdata.glean_app.baseline_clients_last_seen
                 client_counts:
-                  type: client_count_view
+                  type: client_counts_view
                   tables:
                   - table: mozdata.glean_app.baseline_clients_daily
               explores:
@@ -1152,9 +1152,9 @@ def test_lookml_actual(mock_glean_ping, runner, glean_apps, tmp_path, msg_glean_
                 {
                     "extends": ["baseline_clients_daily_table"],
                     "name": "client_counts",
-                    "dimensions": ClientCountView.default_dimensions,
-                    "dimension_groups": ClientCountView.default_dimension_groups,
-                    "measures": ClientCountView.default_measures,
+                    "dimensions": ClientCountsView.default_dimensions,
+                    "dimension_groups": ClientCountsView.default_dimension_groups,
+                    "measures": ClientCountsView.default_measures,
                 }
             ],
         }

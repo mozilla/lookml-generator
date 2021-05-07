@@ -1,4 +1,4 @@
-"""Class to describe a Client Count View."""
+"""Class to describe a Client Counts View."""
 from __future__ import annotations
 
 from copy import deepcopy
@@ -7,10 +7,10 @@ from typing import Any, Dict, Iterator, List, Optional, Union
 from .view import View, ViewDict
 
 
-class ClientCountView(View):
+class ClientCountsView(View):
     """A view for Client Counting measures."""
 
-    type: str = "client_count_view"
+    type: str = "client_counts_view"
 
     default_dimension_groups: List[Dict[str, Union[str, List[str]]]] = [
         {
@@ -76,8 +76,8 @@ class ClientCountView(View):
     ]
 
     def __init__(self, namespace: str, tables: List[Dict[str, str]]):
-        """Get an instance of a ClientCountView."""
-        super().__init__(namespace, "client_counts", ClientCountView.type, tables)
+        """Get an instance of a ClientCountsView."""
+        super().__init__(namespace, "client_counts", ClientCountsView.type, tables)
 
     @classmethod
     def from_db_views(
@@ -86,7 +86,7 @@ class ClientCountView(View):
         is_glean: bool,
         channels: List[Dict[str, str]],
         db_views: dict,
-    ) -> Iterator[ClientCountView]:
+    ) -> Iterator[ClientCountsView]:
         """Get Client Count Views from db views and app variants."""
         dataset = next(
             (channel for channel in channels if channel.get("channel") == "release"),
@@ -95,14 +95,16 @@ class ClientCountView(View):
 
         for view_id, references in db_views[dataset].items():
             if view_id == "baseline_clients_daily":
-                yield ClientCountView(
+                yield ClientCountsView(
                     namespace, [{"table": f"mozdata.{dataset}.{view_id}"}]
                 )
 
     @classmethod
-    def from_dict(klass, namespace: str, name: str, _dict: ViewDict) -> ClientCountView:
+    def from_dict(
+        klass, namespace: str, name: str, _dict: ViewDict
+    ) -> ClientCountsView:
         """Get a view from a name and dict definition."""
-        return ClientCountView(namespace, _dict["tables"])
+        return ClientCountsView(namespace, _dict["tables"])
 
     def to_lookml(self, bq_client, v1_name: Optional[str]) -> Dict[str, Any]:
         """Generate LookML for this view."""
@@ -112,9 +114,9 @@ class ClientCountView(View):
         }
 
         # add dimensions and dimension groups
-        view_defn["dimensions"] = deepcopy(ClientCountView.default_dimensions)
+        view_defn["dimensions"] = deepcopy(ClientCountsView.default_dimensions)
         view_defn["dimension_groups"] = deepcopy(
-            ClientCountView.default_dimension_groups
+            ClientCountsView.default_dimension_groups
         )
 
         # add measures
@@ -127,4 +129,4 @@ class ClientCountView(View):
 
     def get_measures(self) -> List[Dict[str, Union[str, List[Dict[str, str]]]]]:
         """Generate measures for the Growth Accounting Framework."""
-        return deepcopy(ClientCountView.default_measures)
+        return deepcopy(ClientCountsView.default_measures)
