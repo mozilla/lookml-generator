@@ -10,8 +10,8 @@ from google.cloud import bigquery
 from google.cloud.bigquery.schema import SchemaField
 from mozilla_schema_generator.probes import GleanProbe
 
+from generator import lkml_update
 from generator.explores import ClientCountsExplore
-from generator.lkml_update import dump
 from generator.lookml import _lookml
 from generator.views import ClientCountsView, GrowthAccountingView
 
@@ -1117,7 +1117,7 @@ def test_lookml_actual(mock_glean_ping, runner, glean_apps, tmp_path, msg_glean_
 
         # lkml changes the format of lookml, so we need to cycle it through to match
         print_and_test(
-            lkml.load(lkml.dump(expected)),
+            lkml.load(lkml_update.dump(expected)),
             lkml.load(
                 Path(
                     "looker-hub/glean-app/views/growth_accounting.view.lkml"
@@ -1141,7 +1141,7 @@ def test_lookml_actual(mock_glean_ping, runner, glean_apps, tmp_path, msg_glean_
             ],
         }
         print_and_test(
-            lkml.load(lkml.dump(expected)),
+            lkml.load(lkml_update.dump(expected)),
             lkml.load(
                 Path("looker-hub/glean-app/explores/baseline.explore.lkml").read_text()
             ),
@@ -1161,7 +1161,7 @@ def test_lookml_actual(mock_glean_ping, runner, glean_apps, tmp_path, msg_glean_
         }
 
         print_and_test(
-            lkml.load(lkml.dump(expected)),
+            lkml.load(lkml_update.dump(expected)),
             lkml.load(
                 Path("looker-hub/glean-app/views/client_counts.view.lkml").read_text()
             ),
@@ -1190,7 +1190,7 @@ def test_lookml_actual(mock_glean_ping, runner, glean_apps, tmp_path, msg_glean_
         }
 
         print_and_test(
-            lkml.load(dump(expected)),
+            lkml.load(lkml_update.dump(expected)),
             lkml.load(
                 Path(
                     "looker-hub/glean-app/explores/client_counts.explore.lkml"
