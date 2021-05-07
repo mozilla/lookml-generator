@@ -168,6 +168,13 @@ def test_namespaces_full(
                         "type": "glean_ping_explore",
                         "views": {"base_view": "baseline"},
                     },
+                    "client_counts": {
+                        "type": "client_counts_explore",
+                        "views": {
+                            "base_view": "client_counts",
+                            "extended_view": "baseline_clients_daily_table",
+                        },
+                    },
                     "growth_accounting": {
                         "type": "growth_accounting_explore",
                         "views": {"base_view": "growth_accounting"},
