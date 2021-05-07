@@ -15,7 +15,7 @@ from generator.namespaces import (
     namespaces,
 )
 from generator.views import (
-    ClientCountView,
+    ClientCountsView,
     GleanPingView,
     GrowthAccountingView,
     TableView,
@@ -240,7 +240,7 @@ def test_namespaces_full(
                         "tables": [
                             {"table": "mozdata.glean_app.baseline_clients_daily"}
                         ],
-                        "type": "client_count_view",
+                        "type": "client_counts_view",
                     },
                     "growth_accounting": {
                         "tables": [
@@ -265,7 +265,7 @@ def test_get_looker_views(glean_apps, generated_sql_uri):
     actual = _get_looker_views(glean_apps[0], db_views)
     namespace = glean_apps[0]["name"]
     expected = [
-        ClientCountView(
+        ClientCountsView(
             namespace,
             [
                 {
