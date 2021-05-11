@@ -57,7 +57,7 @@ def test_new_namespace(looker_sdk, namespaces, namespace_allowlist):
     sdk.all_content_metadata_accesses.return_value = [Mock(id=5)]
     sdk.search_roles.return_value = [Mock(id=6)]
     sdk.role_users.return_value = [Mock(id=7)]
-    sdk.search_users.return_value = [Mock(id=8)]
+    sdk.search_users.side_effect = [[Mock(id=8)], [Mock(id=0)]]
 
     # Do the thing, Julie
     generate_folders(namespaces, namespace_allowlist)
@@ -75,7 +75,7 @@ def test_new_namespace(looker_sdk, namespaces, namespace_allowlist):
     sdk.search_users.assert_any_call(email="owner2@mozilla.com")
 
     # Called three times: for all users, for admin, and for owner
-    assert len(sdk.create_content_metadata_access.call_args_list) == 3
+    assert len(sdk.create_content_metadata_access.call_args_list) == 4
 
 
 @patch("generator.content.looker_sdk")
