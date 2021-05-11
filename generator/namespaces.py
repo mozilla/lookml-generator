@@ -153,7 +153,7 @@ def _get_explores(views: List[View]) -> dict:
 @click.option(
     "--allowlist",
     type=click.File(),
-    default="namespace_allowlist.yaml",
+    default="namespace-allowlist.yaml",
     help="Path to namespace allow list",
 )
 def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri, allowlist):
