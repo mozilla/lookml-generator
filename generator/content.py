@@ -40,7 +40,7 @@ def _get_id_from_list(arr: Sequence[Any], item: str) -> int:
     return int(first.id)
 
 
-def generate_folders(namespaces: dict):
+def generate_folders(namespaces: dict, addl_owners: dict = {}):
     """Generate folders and ACLs for namespaces."""
     sdk = looker_sdk.init31()
     logging.info("Looker SDK 3.1 initialized successfully.")
@@ -50,7 +50,7 @@ def generate_folders(namespaces: dict):
 
     for namespace, defn in namespaces.items():
         pretty_name = defn["pretty_name"]
-        owners = defn["owners"]
+        owners = defn["owners"] + addl_owners.get(namespace, {}).get("owners", [])
 
         try:
             folders = sdk.search_folders(
@@ -151,7 +151,13 @@ def generate_folders(namespaces: dict):
     type=click.File(),
     help="Path to a yaml namespaces file",
 )
-def generate_content(namespaces):
+@click.option(
+    "--allowlist",
+    default="namespace_allowlist.yaml",
+    type=click.File(),
+    help="Path to the namespace allowlist yaml file",
+)
+def generate_content(namespaces, allowlist):
     """Generate content folders."""
     setup_env_with_looker_creds()
-    generate_folders(yaml.safe_load(namespaces))
+    generate_folders(yaml.safe_load(namespaces), yaml.safe_load(allowlist))

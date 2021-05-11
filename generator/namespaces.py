@@ -135,7 +135,7 @@ def _get_explores(views: List[View]) -> dict:
 @click.command(help=__doc__)
 @click.option(
     "--custom-namespaces",
-    default=None,
+    default="custom-namespaces.yaml",
     type=click.File(),
     help="Path to a custom namespaces file",
 )

@@ -19,6 +19,17 @@ def namespaces():
     }
 
 
+@pytest.fixture
+def namespace_allowlist():
+    return {
+        "burnham": {
+            "owners": [
+                "owner2@mozilla.com",
+            ],
+        }
+    }
+
+
 @patch("generator.content.looker_sdk")
 def test_more_than_one_namespace_folder(looker_sdk, namespaces):
     sdk = looker_sdk.init31()
@@ -28,7 +39,7 @@ def test_more_than_one_namespace_folder(looker_sdk, namespaces):
 
 
 @patch("generator.content.looker_sdk")
-def test_new_namespace(looker_sdk, namespaces):
+def test_new_namespace(looker_sdk, namespaces, namespace_allowlist):
     sdk = looker_sdk.init31()
 
     def search_folders(name=None, parent_id=None):
@@ -49,7 +60,7 @@ def test_new_namespace(looker_sdk, namespaces):
     sdk.search_users.return_value = [Mock(id=8)]
 
     # Do the thing, Julie
-    generate_folders(namespaces)
+    generate_folders(namespaces, namespace_allowlist)
 
     sdk.search_folders.assert_any_call(name="home")
     sdk.search_folders.assert_any_call(name="Burnham", parent_id="1")
@@ -60,7 +71,8 @@ def test_new_namespace(looker_sdk, namespaces):
     sdk.delete_content_metadata_access.assert_called_once_with(5)
     sdk.search_roles.assert_called_once_with(name="Admin")
     sdk.role_users.assert_called_once_with(6)
-    sdk.search_users.assert_called_once_with(email="owner@mozilla.com")
+    sdk.search_users.assert_any_call(email="owner@mozilla.com")
+    sdk.search_users.assert_any_call(email="owner2@mozilla.com")
 
     # Called three times: for all users, for admin, and for owner
     assert len(sdk.create_content_metadata_access.call_args_list) == 3
