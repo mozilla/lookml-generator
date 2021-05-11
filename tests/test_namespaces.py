@@ -69,8 +69,12 @@ def namespace_allowlist(tmp_path):
         dedent(
             """
             ---
-            - custom
-            - glean-app
+            custom:
+              owners:
+                - custom-owner2@allizom.com
+            glean-app:
+              owners:
+                - glean-app-owner2@allizom.com
             """
         )
     )
