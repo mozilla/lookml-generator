@@ -64,7 +64,7 @@ def custom_namespaces(tmp_path):
 
 @pytest.fixture
 def namespace_allowlist(tmp_path):
-    dest = tmp_path / "namespace-allowlist.yaml"
+    dest = tmp_path / "namespaces-allowlist.yaml"
     dest.write_text(
         dedent(
             """
