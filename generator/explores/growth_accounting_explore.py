@@ -13,7 +13,7 @@ class GrowthAccountingExplore(Explore):
 
     type: str = "growth_accounting_explore"
 
-    def to_lookml(self) -> dict:
+    def _to_lookml(self) -> dict:
         """Generate LookML to represent this explore."""
         return {
             "name": self.name,

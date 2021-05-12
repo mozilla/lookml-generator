@@ -25,6 +25,19 @@ class Explore:
 
     def to_lookml(self) -> dict:
         """Generate LookML for this explore."""
+        base_lookml = {}
+        for view_type, view in self.views.items():
+            if "join" in view_type:
+                continue
+            if self._get_view_has_submission(view):
+                base_lookml[
+                    "sql_always_where"
+                ] = f"${{{self.name}.submission_date}} >= '2010-01-01'"
+
+        base_lookml.update(self._to_lookml())
+        return base_lookml
+
+    def _to_lookml(self) -> dict:
         raise NotImplementedError("Only implemented in subclasses")
 
     def get_dependent_views(self) -> List[str]:
