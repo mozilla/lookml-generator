@@ -682,8 +682,7 @@ def test_lookml_actual(mock_glean_ping, runner, glean_apps, tmp_path, msg_glean_
                             "name": "client_info__parsed_first_run",
                             "convert_tz": "no",
                             "datatype": "date",
-                            "group_item_label": "Parsed First Run Date",
-                            "group_label": "Client Info",
+                            "label": "Client Info: Parsed First Run Date",
                             "sql": "${TABLE}.client_info.parsed_first_run_date",
                             "timeframes": [
                                 "raw",
@@ -697,8 +696,7 @@ def test_lookml_actual(mock_glean_ping, runner, glean_apps, tmp_path, msg_glean_
                         },
                         {
                             "name": "metadata__header__parsed",
-                            "group_item_label": "Parsed Date",
-                            "group_label": "Metadata Header",
+                            "label": "Metadata Header: Parsed Date",
                             "sql": "${TABLE}.metadata.header.parsed_date",
                             "timeframes": [
                                 "raw",

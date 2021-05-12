@@ -39,6 +39,11 @@ def _get_dimension(path: Tuple[str, ...], field_type: str, mode: str) -> Dict[st
         result["hidden"] = "yes"
     else:
         result["type"] = BIGQUERY_TYPE_TO_DIMENSION_TYPE[field_type]
+
+        group_label, group_item_label = None, None
+        if len(path) > 1:
+            group_label = " ".join(path[:-1]).replace("_", " ").title()
+            group_item_label = path[-1].replace("_", " ").title()
         if result["type"] == "time":
             # Remove _{type} suffix from the last path element for dimension group
             # names For example submission_date and submission_timestamp become
@@ -59,7 +64,10 @@ def _get_dimension(path: Tuple[str, ...], field_type: str, mode: str) -> Dict[st
                 result["timeframes"].remove("time")
                 result["convert_tz"] = "no"
                 result["datatype"] = "date"
-        if len(path) > 1:
+            if group_label and group_item_label:
+                # Dimension groups should not be nested, see issue #82
+                result["label"] = f"{group_label}: {group_item_label}"
+        elif len(path) > 1:
             result["group_label"] = " ".join(path[:-1]).replace("_", " ").title()
             result["group_item_label"] = path[-1].replace("_", " ").title()
         if path in MAP_LAYER_NAMES:
