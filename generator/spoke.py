@@ -86,8 +86,8 @@ def configure_model(sdk: looker_sdk.methods.Looker31SDK, model_name: str):
         )
     )
 
-    for model_name in MODEL_SETS_BY_INSTANCE[instance]:
-        model_sets = sdk.search_model_sets(name=model_name)
+    for model_set_name in MODEL_SETS_BY_INSTANCE[instance]:
+        model_sets = sdk.search_model_sets(name=model_set_name)
         if len(model_sets) != 1:
             raise click.ClickException("Error: Found more than one matching model set")
 
