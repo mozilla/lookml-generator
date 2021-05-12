@@ -155,7 +155,7 @@ def test_namespaces_full(
         expected = {
             "custom": {
                 "glean_app": False,
-                "owners": ["custom-owner@allizom.com"],
+                "owners": ["custom-owner@allizom.com", "custom-owner2@allizom.com"],
                 "pretty_name": "Custom",
                 "views": {
                     "baseline": {
@@ -185,7 +185,10 @@ def test_namespaces_full(
                     },
                 },
                 "glean_app": True,
-                "owners": ["glean-app-owner@allizom.com"],
+                "owners": [
+                    "glean-app-owner@allizom.com",
+                    "glean-app-owner2@allizom.com",
+                ],
                 "pretty_name": "Glean App",
                 "views": {
                     "baseline_clients_daily_table": {
