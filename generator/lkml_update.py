@@ -48,5 +48,4 @@ class UpdatedDictParser(DictParser):
                 name = value.pop("name")
             return self.parse_block(key, value, name)
         else:
-            print(f"Accessing key {key!r}")
             raise TypeError("Value must be a string, list, tuple, or dict.")
