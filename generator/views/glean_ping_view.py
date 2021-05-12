@@ -85,7 +85,7 @@ class GleanPingView(PingView):
 
     def _make_dimension(
         self, metric: GleanProbe, suffix: str, sql_map: Dict[str, Dict[str, str]]
-    ) -> Dict[str, Union[str, List[Dict[str, str]]]]:
+    ) -> Optional[Dict[str, Union[str, List[Dict[str, str]]]]]:
         *category, name = metric.id.split(".")
         category = "_".join(category)
 
@@ -97,6 +97,9 @@ class GleanPingView(PingView):
         if suffix:
             label = f"{name}_{suffix}"
             looker_name = f"metrics__{metric.type}__{category}{sep}{name}__{suffix}"
+
+        if looker_name not in sql_map:
+            return None
 
         group_label = category.replace("_", " ").title()
         group_item_label = label.replace("_", " ").title()
@@ -131,7 +134,7 @@ class GleanPingView(PingView):
 
     def _get_metric_dimensions(
         self, metric: GleanProbe, sql_map: Dict[str, Dict[str, str]]
-    ) -> Iterable[Dict[str, Union[str, List[Dict[str, str]]]]]:
+    ) -> Iterable[Optional[Dict[str, Union[str, List[Dict[str, str]]]]]]:
         if metric.type == "rate":
             for suffix in ("numerator", "denominator"):
                 yield self._make_dimension(metric, suffix, sql_map)
@@ -154,6 +157,7 @@ class GleanPingView(PingView):
             dimension
             for metric in metrics
             for dimension in self._get_metric_dimensions(metric, sql_map)
+            if dimension is not None
         ]
 
     def _add_link(self, dimension):
