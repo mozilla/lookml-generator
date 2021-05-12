@@ -68,8 +68,8 @@ def _get_dimension(path: Tuple[str, ...], field_type: str, mode: str) -> Dict[st
                 # Dimension groups should not be nested, see issue #82
                 result["label"] = f"{group_label}: {group_item_label}"
         elif len(path) > 1:
-            result["group_label"] = " ".join(path[:-1]).replace("_", " ").title()
-            result["group_item_label"] = path[-1].replace("_", " ").title()
+            result["group_label"] = group_label
+            result["group_item_label"] = group_item_label
         if path in MAP_LAYER_NAMES:
             result["map_layer_name"] = MAP_LAYER_NAMES[path]
     result["name"] = "__".join(name)
