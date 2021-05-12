@@ -135,7 +135,7 @@ def _get_explores(views: List[View]) -> dict:
 @click.command(help=__doc__)
 @click.option(
     "--custom-namespaces",
-    default=None,
+    default="custom-namespaces.yaml",
     type=click.File(),
     help="Path to a custom namespaces file",
 )
@@ -153,7 +153,7 @@ def _get_explores(views: List[View]) -> dict:
 @click.option(
     "--allowlist",
     type=click.File(),
-    default="namespace_allowlist.yaml",
+    default="namespaces-allowlist.yaml",
     help="Path to namespace allow list",
 )
 def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri, allowlist):
@@ -180,8 +180,11 @@ def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri, allowlist
         namespaces.update(yaml.safe_load(custom_namespaces.read()) or {})
 
     allowed_namespaces = yaml.safe_load(allowlist.read())
-    namespaces = {
-        name: defn for name, defn in namespaces.items() if name in allowed_namespaces
-    }
 
-    Path("namespaces.yaml").write_text(yaml.safe_dump(namespaces))
+    updated_namespaces = {}
+    for namespace, updated in allowed_namespaces.items():
+        if isinstance(updated, dict) and "owners" in updated:
+            namespaces[namespace]["owners"] += updated["owners"]
+        updated_namespaces[namespace] = namespaces[namespace]
+
+    Path("namespaces.yaml").write_text(yaml.safe_dump(updated_namespaces))

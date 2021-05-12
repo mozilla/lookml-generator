@@ -85,12 +85,13 @@ class PingView(View):
                 {
                     "name": "channel",
                     "type": "unquoted",
+                    "default_value": table,
                     "allowed_values": [
                         {
-                            "label": table["channel"].title(),
-                            "value": table["table"],
+                            "label": _table["channel"].title(),
+                            "value": _table["table"],
                         }
-                        for table in self.tables
+                        for _table in self.tables
                     ],
                 }
             ]

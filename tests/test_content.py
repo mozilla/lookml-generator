@@ -46,7 +46,7 @@ def test_new_namespace(looker_sdk, namespaces):
     sdk.all_content_metadata_accesses.return_value = [Mock(id=5)]
     sdk.search_roles.return_value = [Mock(id=6)]
     sdk.role_users.return_value = [Mock(id=7)]
-    sdk.search_users.return_value = [Mock(id=8)]
+    sdk.search_users.side_effect = [[Mock(id=8)], [Mock(id=0)]]
 
     # Do the thing, Julie
     generate_folders(namespaces)

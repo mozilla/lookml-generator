@@ -24,7 +24,36 @@ class Explore:
         return {self.name: {"type": self.type, "views": self.views}}
 
     def to_lookml(self) -> dict:
-        """Generate LookML for this explore."""
+        """
+        Generate LookML for this explore.
+
+        Any generation done in dependent explore's
+        `_to_lookml` takes precedence over these fields.
+        """
+        base_lookml = {}
+        for view_type, view in self.views.items():
+            # We look at our dependent views to see if they have a
+            # "submission" field. Dependent views are any that are:
+            # - base_view
+            # - extended_view*
+            #
+            # We do not want to look at joined views. Those should be
+            # labeled as:
+            # - join*
+            #
+            # If they have a submission field, we filter on the date.
+            # This allows for filter queries to succeed.
+            if "join" in view_type:
+                continue
+            if self._get_view_has_submission(view):
+                base_lookml[
+                    "sql_always_where"
+                ] = f"${{{self.name}.submission_date}} >= '2010-01-01'"
+
+        base_lookml.update(self._to_lookml())
+        return base_lookml
+
+    def _to_lookml(self) -> dict:
         raise NotImplementedError("Only implemented in subclasses")
 
     def get_dependent_views(self) -> List[str]:

@@ -64,13 +64,17 @@ def custom_namespaces(tmp_path):
 
 @pytest.fixture
 def namespace_allowlist(tmp_path):
-    dest = tmp_path / "namespace_allowlist.yaml"
+    dest = tmp_path / "namespaces-allowlist.yaml"
     dest.write_text(
         dedent(
             """
             ---
-            - custom
-            - glean-app
+            custom:
+              owners:
+                - custom-owner2@allizom.com
+            glean-app:
+              owners:
+                - glean-app-owner2@allizom.com
             """
         )
     )
@@ -151,7 +155,7 @@ def test_namespaces_full(
         expected = {
             "custom": {
                 "glean_app": False,
-                "owners": ["custom-owner@allizom.com"],
+                "owners": ["custom-owner@allizom.com", "custom-owner2@allizom.com"],
                 "pretty_name": "Custom",
                 "views": {
                     "baseline": {
@@ -181,7 +185,10 @@ def test_namespaces_full(
                     },
                 },
                 "glean_app": True,
-                "owners": ["glean-app-owner@allizom.com"],
+                "owners": [
+                    "glean-app-owner@allizom.com",
+                    "glean-app-owner2@allizom.com",
+                ],
                 "pretty_name": "Glean App",
                 "views": {
                     "baseline_clients_daily_table": {

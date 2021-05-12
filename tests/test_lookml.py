@@ -602,6 +602,7 @@ def test_lookml_actual(mock_glean_ping, runner, glean_apps, tmp_path, msg_glean_
                         {
                             "name": "channel",
                             "type": "unquoted",
+                            "default_value": "mozdata.glean_app.baseline",
                             "allowed_values": [
                                 {
                                     "label": "Release",
@@ -1135,6 +1136,7 @@ def test_lookml_actual(mock_glean_ping, runner, glean_apps, tmp_path, msg_glean_
                             {"submission_date": "28 days"},
                         ]
                     },
+                    "sql_always_where": "${baseline.submission_date} >= '2010-01-01'",
                 }
             ],
         }
@@ -1183,6 +1185,7 @@ def test_lookml_actual(mock_glean_ping, runner, glean_apps, tmp_path, msg_glean_
                         ],
                     },
                     "queries": ClientCountsExplore.queries,
+                    "sql_always_where": "${client_counts.submission_date} >= '2010-01-01'",
                 }
             ],
         }

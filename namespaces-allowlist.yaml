@@ -1,0 +1,8 @@
+---
+duet: null
+firefox_ios:
+  owners:
+    - athomas@mozilla.com
+fenix:
+  owners:
+    - vzare@mozilla.com
