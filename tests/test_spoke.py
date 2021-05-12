@@ -102,7 +102,7 @@ def test_generate_model(looker_sdk, namespaces, tmp_path):
     sdk = looker_sdk.init31()
     sdk.search_model_sets.side_effect = [
         [Mock(models=["model"], id=1)],
-        [Mock(models=["model2"], id=2)],
+        [Mock(models=["model", "model2"], id=2)],
     ]
     sdk.lookml_model.side_effect = _looker_sdk.error.SDKError
     looker_sdk.error = Mock(SDKError=_looker_sdk.error.SDKError)
@@ -124,6 +124,12 @@ def test_generate_model(looker_sdk, namespaces, tmp_path):
     }
     actual = lkml.load((tmp_path / "glean-app" / "glean-app.model.lkml").read_text())
     assert expected == actual
+
+    looker_sdk.models.WriteModelSet.assert_any_call(models=["model", "glean-app"])
+    looker_sdk.models.WriteModelSet.assert_any_call(
+        models=["model", "model2", "glean-app"]
+    )
+    assert looker_sdk.models.WriteModelSet.call_count == 2
 
     sdk.update_model_set.assert_any_call(1, write_model)
     sdk.update_model_set.assert_any_call(2, write_model)
