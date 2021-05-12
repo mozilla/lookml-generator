@@ -479,6 +479,10 @@ def msg_glean_probes():
             "test.uuid",
             {"type": "uuid", "history": history, "name": "test.uuid"},
         ),
+        GleanProbe(
+            "test.missing_from_bq",
+            {"type": "counter", "history": history, "name": "test.missing_from_bq"},
+        ),
     ]
 
 
