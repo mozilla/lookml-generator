@@ -40,7 +40,6 @@ class UpdatedDictParser(DictParser):
                 # query fields don't get unnested
                 return self.expand_list(key, value)
             else:
-                print(f"Parsing list of {key}, {value} with parent {self.parent_key}")
                 return self.parse_list(key, value)
         elif isinstance(value, dict):
             if key in KEYS_WITH_NAME_FIELDS or "name" not in value.keys():
@@ -49,4 +48,5 @@ class UpdatedDictParser(DictParser):
                 name = value.pop("name")
             return self.parse_block(key, value, name)
         else:
+            print(f"Accessing key {key!r}")
             raise TypeError("Value must be a string, list, tuple, or dict.")
