@@ -4,7 +4,7 @@ google-cloud-bigquery==2.16.1
 lkml==1.1.0
 looker-sdk==21.6.0
 mozilla-schema-generator==0.3.0
-pip-tools==5.5.0
+pip-tools==6.1.0
 pre-commit==2.12.1
 pytest-black==0.3.12
 pytest-flake8==1.0.7
