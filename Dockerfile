@@ -18,7 +18,7 @@ RUN apt-add-repository https://cli.github.com/packages
 RUN apt update
 RUN apt install -y gh
 
-COPY --from=google/cloud-sdk:alpine /google-cloud-sdk /google-cloud-sdk
+COPY --from=google/cloud-sdk:339.0.0-alpine /google-cloud-sdk /google-cloud-sdk
 ENV PATH /google-cloud-sdk/bin:$PATH
 
 WORKDIR ${HOME}
