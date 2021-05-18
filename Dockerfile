@@ -1,4 +1,4 @@
-FROM python:3.8-slim
+FROM python:3.8.9-slim
 MAINTAINER Frank Bertsch <frank@mozilla.com>
 
 ENV USER_ID="10001"
