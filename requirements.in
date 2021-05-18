@@ -12,4 +12,4 @@ pytest-isort==1.3.0
 pytest-mypy==0.8.0
 pytest-pydocstyle==2.2.0
 pytest==6.2.2
-yamllint==1.26.0
+yamllint==1.26.1
