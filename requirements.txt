@@ -581,9 +581,8 @@ virtualenv==20.4.6 \
     --hash=sha256:307a555cf21e1550885c82120eccaf5acedf42978fd362d32ba8410f9593f543 \
     --hash=sha256:72cf267afc04bf9c86ec932329b7e94db6a0331ae9847576daaa7ca3c86b29a4
     # via pre-commit
-yamllint==1.26.0 \
-    --hash=sha256:8a5f8e442f49309eaf3e9d7232ce76f2fc8026f5c0c0b164b83f33fed1399637 \
-    --hash=sha256:b0e4c89985c7f5f8451c2eb8c67d804d10ac13a4abe031cbf49bdf3465d01087
+yamllint==1.26.1 \
+    --hash=sha256:87d9462b3ed7e9dfa19caa177f7a77cd9888b3dc4044447d6ae0ab233bcd1324
     # via -r requirements.in
 
 # The following packages are considered to be unsafe in a requirements file:
@@ -598,4 +597,3 @@ setuptools==56.2.0 \
     #   google-api-core
     #   google-auth
     #   jsonschema
-    #   yamllint
