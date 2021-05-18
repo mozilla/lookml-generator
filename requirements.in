@@ -2,7 +2,7 @@ PyYAML==5.4.1
 click==7.1.2
 google-cloud-bigquery==2.16.1
 lkml==1.1.0
-looker-sdk==21.4.1
+looker-sdk==21.6.0
 mozilla-schema-generator==0.3.0
 pip-tools==5.5.0
 pre-commit==2.10.1
