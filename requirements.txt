@@ -124,9 +124,9 @@ google-auth==1.30.0 \
     # via
     #   google-api-core
     #   google-cloud-core
-google-cloud-bigquery==2.8.0 \
-    --hash=sha256:ba0827a75a0f524a69cc1a6d4d788fae23c39ee01bd2ce8d4e14d9585ce2fb6e \
-    --hash=sha256:c4c43f7f440d6e5bb2895d21122af5de65b487ea2c69cea466a516bb826ab921
+google-cloud-bigquery==2.16.1 \
+    --hash=sha256:69ce0d64cf06e4163072898ed50623af30c4601fb11f972cbde85c355bb45a89 \
+    --hash=sha256:cb88d27522d88a2fb41e9f330d8f835c4abd9c341815fe1bf8fe4bb82d3436dd
     # via -r requirements.in
 google-cloud-core==1.6.0 \
     --hash=sha256:40d9c2da2d03549b5ac3dcccf289d4f15e6d1210044c6381ce45c92913e62904 \
@@ -299,6 +299,7 @@ packaging==20.9 \
     --hash=sha256:67714da7f7bc052e064859c05c595155bd1ee9f69f76557e21f051443c20947a
     # via
     #   google-api-core
+    #   google-cloud-bigquery
     #   pytest
 pathspec==0.8.1 \
     --hash=sha256:86379d6b86d75816baba717e64b1a3a3469deb93bb76d613c9ce79edc5cb68fd \
@@ -502,6 +503,7 @@ requests==2.25.1 \
     --hash=sha256:c210084e36a42ae6b9219e00e48287def368a26d03a048ddad7bfee44f75871e
     # via
     #   google-api-core
+    #   google-cloud-bigquery
     #   looker-sdk
     #   mozilla-schema-generator
 rsa==4.7.2 \
