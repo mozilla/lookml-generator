@@ -400,9 +400,9 @@ pytest-isort==1.3.0 \
     --hash=sha256:074255ad393088a2daee6ca7f2305b7b86358ff632f62302896d8d4b2b339107 \
     --hash=sha256:46a12331a701e2f21d48548b2828c8b0a7956dbf1cd5347163f537deb24332dd
     # via -r requirements.in
-pytest-mypy==0.8.0 \
-    --hash=sha256:63d418a4fea7d598ac40b659723c00804d16a251d90a5cfbca213eeba5aaf01c \
-    --hash=sha256:8d2112972c1debf087943f48963a0daf04f3424840aea0cf437cc97053b1b0ef
+pytest-mypy==0.8.1 \
+    --hash=sha256:1fa55723a4bf1d054fcba1c3bd694215a2a65cc95ab10164f5808afd893f3b11 \
+    --hash=sha256:6e68e8eb7ceeb7d1c83a1590912f784879f037b51adfb9c17b95c6b2fc57466b
     # via -r requirements.in
 pytest-pydocstyle==2.2.0 \
     --hash=sha256:b4e7eee47252fbb7495f4a0126e547a25f5f114f3096c504e738db49a5034333
