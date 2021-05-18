@@ -6,6 +6,4 @@ updates:
     schedule:
       interval: daily
     reviewers:
-      - relud
-      - fbertsch
-      - wlach
+      - mozilla/data-looker
