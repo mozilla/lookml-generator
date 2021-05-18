@@ -80,6 +80,10 @@ jobs:
           export GOOGLE_APPLICATION_CREDENTIALS="/tmp/gcp.json"
           echo "$GCLOUD_SERVICE_KEY" > "$GOOGLE_APPLICATION_CREDENTIALS"
           venv/bin/pytest -m integration
+    - run:
+        name: Test build namespaces.yaml
+        command: |
+          ./bin/generator namespaces
   build-container:
     docker:
       - image: docker:20.10.2
