@@ -11,6 +11,7 @@ from click.testing import CliRunner
 
 from generator.namespaces import (
     _get_db_views,
+    _get_explores,
     _get_glean_apps,
     _get_looker_views,
     namespaces,
@@ -396,5 +397,39 @@ def test_get_funnel_view(glean_apps, tmp_path):
             ],
         ),
     ]
+
+    print_and_test(expected, actual)
+
+
+def test_get_funnel_explore(glean_apps, tmp_path):
+    dest = tmp_path / "funnels.tar.gz"
+    paths = {
+        "sql/moz-fx-data-shared-prod/glean_app/events_daily/metadata.yaml": """
+                references:
+                  view.sql:
+                    - moz-fx-data-shared-prod.glean_app_derived.events_daily_v1""",
+        "sql/moz-fx-data-shared-prod/glean_app/event_types/metadata.yaml": """
+                references:
+                  view.sql:
+                    - moz-fx-data-shared-prod.glean_app_derived.event_types_v1""",
+    }
+
+    sql_uri = paths_to_tar(dest, paths)
+
+    db_views = _get_db_views(sql_uri)
+    views = _get_looker_views(glean_apps[0], db_views)
+    actual = _get_explores(views)
+    expected = {
+        "funnel_analysis": {
+            "type": "funnel_analysis_explore",
+            "views": {
+                "base_view": "funnel_analysis",
+                "joined_event_type_1": "event_type_1",
+                "joined_event_type_2": "event_type_2",
+                "joined_event_type_3": "event_type_3",
+                "joined_event_type_4": "event_type_4",
+            },
+        }
+    }
 
     print_and_test(expected, actual)
