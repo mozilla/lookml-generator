@@ -151,6 +151,7 @@ function generate_hub_commit() {
   CUSTOM_NAMESPACES_FILENAME="/app/lookml-generator/custom-namespaces.yaml"
   GENERATED_SQL_URI="https://github.com/mozilla/bigquery-etl/archive/generated-sql.tar.gz"
   APP_LISTINGS_URI="https://probeinfo.telemetry.mozilla.org/v2/glean/app-listings"
+  NAMESPACE_GCS_BUCKET="wlach-test-gcs"
 
   # Generate namespaces.yaml and LookML
   lookml-generator namespaces \
@@ -158,6 +159,7 @@ function generate_hub_commit() {
     --generated-sql-uri $GENERATED_SQL_URI \
     --app-listings-uri $APP_LISTINGS_URI \
     --allowlist $NAMESPACE_ALLOWLIST
+    --gcs-bucket $NAMESPACE_GCS_BUCKET
   lookml-generator lookml \
     --namespaces "namespaces.yaml" \
     --target-dir $HUB_DIR

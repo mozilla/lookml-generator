@@ -124,6 +124,7 @@ google-auth==1.30.0 \
     # via
     #   google-api-core
     #   google-cloud-core
+    #   google-cloud-storage
 google-cloud-bigquery==2.16.1 \
     --hash=sha256:69ce0d64cf06e4163072898ed50623af30c4601fb11f972cbde85c355bb45a89 \
     --hash=sha256:cb88d27522d88a2fb41e9f330d8f835c4abd9c341815fe1bf8fe4bb82d3436dd
@@ -131,7 +132,13 @@ google-cloud-bigquery==2.16.1 \
 google-cloud-core==1.6.0 \
     --hash=sha256:40d9c2da2d03549b5ac3dcccf289d4f15e6d1210044c6381ce45c92913e62904 \
     --hash=sha256:c6abb18527545379fc82efc4de75ce9a3772ccad2fc645adace593ba097cbb02
-    # via google-cloud-bigquery
+    # via
+    #   google-cloud-bigquery
+    #   google-cloud-storage
+google-cloud-storage==1.38.0 \
+    --hash=sha256:162011d66f64b8dc5d7936609a5daf0066cc521231546aea02c126a5559446c4 \
+    --hash=sha256:69499560ec8234339ce831704419a2288c409a422f6e9ed1facc9345412ee637
+    # via -r requirements.in
 google-crc32c==1.1.2 \
     --hash=sha256:0ae3cf54e0d4d83c8af1afe96fc0970fbf32f1b29275f3bfd44ce25c4b622a2b \
     --hash=sha256:0dd9b61d0c63043b013349c9ec8a83ec2b05c96410c5bc257da5d0de743fc171 \
@@ -166,7 +173,9 @@ google-crc32c==1.1.2 \
 google-resumable-media==1.2.0 \
     --hash=sha256:dbe670cd7f02f3586705fd5a108c8ab8552fa36a1cad8afbc5a54e982cf34f0c \
     --hash=sha256:ee98b1921e5bda94867a08c864e55b4763d63887664f49ee1c231988f56b9d43
-    # via google-cloud-bigquery
+    # via
+    #   google-cloud-bigquery
+    #   google-cloud-storage
 googleapis-common-protos==1.53.0 \
     --hash=sha256:a88ee8903aa0a81f6c3cec2d5cf62d3c8aa67c06439b0496b49048fb1854ebf4 \
     --hash=sha256:f6d561ab8fb16b30020b940e2dd01cd80082f4762fa9f3ee670f4419b4b8dbd0
@@ -508,6 +517,7 @@ requests==2.25.1 \
     # via
     #   google-api-core
     #   google-cloud-bigquery
+    #   google-cloud-storage
     #   looker-sdk
     #   mozilla-schema-generator
 rsa==4.7.2 \

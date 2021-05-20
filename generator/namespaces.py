@@ -14,6 +14,7 @@ from typing import Dict, List, Union
 
 import click
 import yaml
+from google.cloud import storage
 
 from .explores import EXPLORE_TYPES
 from .views import VIEW_TYPES, View
@@ -156,7 +157,14 @@ def _get_explores(views: List[View]) -> dict:
     default="namespaces-allowlist.yaml",
     help="Path to namespace allow list",
 )
-def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri, allowlist):
+@click.option(
+    "--gcs-bucket",
+    default=None,
+    help="A GCS bucket to publish to",
+)
+def namespaces(
+    custom_namespaces, generated_sql_uri, app_listings_uri, allowlist, gcs_bucket
+):
     """Generate namespaces.yaml."""
     warnings.filterwarnings("ignore", module="google.auth._default")
     glean_apps = _get_glean_apps(app_listings_uri)
@@ -187,4 +195,12 @@ def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri, allowlist
             namespaces[namespace]["owners"] += updated["owners"]
         updated_namespaces[namespace] = namespaces[namespace]
 
-    Path("namespaces.yaml").write_text(yaml.safe_dump(updated_namespaces))
+    updated_namespaces_content = yaml.safe_dump(updated_namespaces)
+
+    Path("namespaces.yaml").write_text(updated_namespaces_content)
+
+    if gcs_bucket:
+        storage_client = storage.Client()
+        bucket = storage_client.bucket(gcs_bucket)
+        blob = bucket.blob("namespaces.yaml")
+        blob.upload_from_string(updated_namespaces_content)
