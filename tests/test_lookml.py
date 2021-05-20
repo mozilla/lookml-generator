@@ -489,9 +489,8 @@ def msg_glean_probes():
 @patch("generator.views.glean_ping_view.GleanPing")
 def test_lookml_actual(mock_glean_ping, runner, glean_apps, tmp_path, msg_glean_probes):
     namespaces = tmp_path / "namespaces.yaml"
-    namespaces.write_text(
-        dedent(
-            """
+    namespaces_text = dedent(
+        """
             custom:
               pretty_name: Custom
               glean_app: false
@@ -547,8 +546,8 @@ def test_lookml_actual(mock_glean_ping, runner, glean_apps, tmp_path, msg_glean_
                     extended_view: baseline_clients_daily_table
                     base_view: client_counts
             """
-        )
     )
+    namespaces.write_text(namespaces_text)
     mock_glean_ping.get_repos.return_value = [{"name": "glean-app-release"}]
     glean_app = Mock()
     mock_glean_ping.return_value = glean_app
@@ -598,6 +597,7 @@ def test_lookml_actual(mock_glean_ping, runner, glean_apps, tmp_path, msg_glean_
             expected,
             lkml.load(Path("looker-hub/custom/views/baseline.view.lkml").read_text()),
         )
+        print_and_test(namespaces_text, open(Path("looker-hub/namespaces.yaml")).read())
         expected = {
             "views": [
                 {

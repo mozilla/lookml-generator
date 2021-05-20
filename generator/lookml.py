@@ -60,8 +60,17 @@ def _glean_apps_to_v1_map(glean_apps):
 
 def _lookml(namespaces, glean_apps, target_dir):
     client = bigquery.Client()
-    _namespaces = yaml.safe_load(namespaces)
+
+    namespaces_content = namespaces.read()
+    _namespaces = yaml.safe_load(namespaces_content)
     target = Path(target_dir)
+    target.mkdir(parents=True, exist_ok=True)
+
+    # Write namespaces file to target directory, for use
+    # by the Glean Dictionary and other tools
+    with open(target / "namespaces.yaml", "w") as target_namespaces_file:
+        target_namespaces_file.write(namespaces_content)
+
     v1_mapping = _glean_apps_to_v1_map(glean_apps)
     for namespace, lookml_objects in _namespaces.items():
         logging.info(f"\nGenerating namespace {namespace}")
