@@ -1,5 +1,5 @@
 PyYAML==5.4.1
-click==8.0.0
+click==8.0.1
 google-cloud-bigquery==2.16.1
 lkml==1.1.0
 looker-sdk==21.6.0
