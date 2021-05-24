@@ -6,7 +6,7 @@ LookML Generator for Glean and Mozilla Data.
 
 The lookml-generator has two important roles:
 1. Generate a listing of all Glean/Mozilla namespaces and their associated BigQuery tables
-2. From that listing, generate LookML for views, explores, and dashbaords and push those to the [Look Hub project](https://github.com/mozilla/looker-hub)
+2. From that listing, generate LookML for views, explores, and dashboards and push those to the [Look Hub project](https://github.com/mozilla/looker-hub)
 
 ## Generating Namespace Listings
 
@@ -16,7 +16,7 @@ We also support custom namespaces, which can use wildcards to denote their BigQu
 
 ![alt text](https://github.com/mozilla/lookml-generator/blob/main/architecture/namespaces.jpg?raw=true)
 
-* Though namespaces are not limited to a single model, we advise it for clarity's sake.
+> \*  Though namespaces are not limited to a single model, we advise it for clarity's sake.
 
 ## Generating LookML
 Once we know which tables are associated with which namespaces, we can generate LookML files and update our Looker instance.
