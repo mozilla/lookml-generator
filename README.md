@@ -10,7 +10,7 @@ The lookml-generator has two important roles:
 
 ## Generating Namespace Listings
 
-At Mozilla, a namespace is a single functional area that is represented in Looker with (usually) one model*.
+At Mozilla, a namespace is a single functional area that is represented in Looker with (usually) *one model**.
 Each Glean application is self-contained within a single namespace, containing the data from [across that application's channels](https://probeinfo.telemetry.mozilla.org/v2/glean/app-listings).
 We also support custom namespaces, which can use wildcards to denote their BigQuery datasets and tables. These are described in `custom-namespaces.yaml`.
 
