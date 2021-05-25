@@ -33,27 +33,30 @@ class FunnelAnalysisExplore(Explore):
         """Get an instance of this explore from a dictionary definition."""
         return FunnelAnalysisExplore(name, defn["views"], views_path)
 
-    def _to_lookml(self) -> Dict[str, Any]:
+    def _to_lookml(self) -> List[Dict[str, Any]]:
         view_lookml = self.get_view_lookml("funnel_analysis")
         views = view_lookml["views"]
         n_events = len([d for d in views if d["name"].startswith("event_type_")])
-        defn = {
-            "name": "funnel_analysis",
-            "view_label": " User-Day Funnels",
-            "always_filter": {
-                "filters": [
-                    {"submission_date": "14 days"},
-                ]
+        defn: List[Dict[str, Any]] = [
+            {
+                "name": "funnel_analysis",
+                "view_label": " User-Day Funnels",
+                "always_filter": {
+                    "filters": [
+                        {"submission_date": "14 days"},
+                    ]
+                },
+                "joins": [
+                    {
+                        "name": f"event_type_{n}",
+                        "relationship": "many_to_one",
+                        "type": "cross",
+                    }
+                    for n in range(1, n_events + 1)
+                ],
+                "sql_always_where": "${funnel_analysis.submission_date} >= '2010-01-01'",
             },
-            "joins": [
-                {
-                    "name": f"event_type_{n}",
-                    "relationship": "many_to_one",
-                    "type": "cross",
-                }
-                for n in range(1, n_events + 1)
-            ],
-            "sql_always_where": "${funnel_analysis.submission_date} >= '2010-01-01'",
-        }
+            {"name": "event_names", "hidden": "yes"},
+        ]
 
         return defn

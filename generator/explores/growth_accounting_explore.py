@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Iterator, List
+from typing import Any, Dict, Iterator, List
 
 from ..views import View
 from . import Explore
@@ -13,12 +13,14 @@ class GrowthAccountingExplore(Explore):
 
     type: str = "growth_accounting_explore"
 
-    def _to_lookml(self) -> dict:
+    def _to_lookml(self) -> List[Dict[str, Any]]:
         """Generate LookML to represent this explore."""
-        return {
-            "name": self.name,
-            "view_name": self.views["base_view"],
-        }
+        return [
+            {
+                "name": self.name,
+                "view_name": self.views["base_view"],
+            }
+        ]
 
     @staticmethod
     def from_views(views: List[View]) -> Iterator[GrowthAccountingExplore]:
