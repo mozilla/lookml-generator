@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, Iterator, List, Optional
 
-from .view import View
+from .view import View, ViewDict
 
 
 class FunnelAnalysisView(View):
@@ -55,6 +55,13 @@ class FunnelAnalysisView(View):
                 namespace,
                 [tables],
             )
+
+    @classmethod
+    def from_dict(
+        klass, namespace: str, name: str, _dict: ViewDict
+    ) -> FunnelAnalysisView:
+        """Get a FunnalAnalysisView from a dict representation."""
+        return FunnelAnalysisView(namespace, _dict["tables"])
 
     def to_lookml(self, bq_client, v1_name: Optional[str]) -> Dict[str, Any]:
         """Get this view as LookML."""

@@ -58,6 +58,26 @@ def test_view_from_db_views(funnel_analysis_view):
     assert actual == funnel_analysis_view
 
 
+def test_view_from_dict(funnel_analysis_view):
+    actual = FunnelAnalysisView.from_dict(
+        "glean_app",
+        "funnel_analysis",
+        {
+            "type": "funnel_analysis_view",
+            "tables": [
+                {
+                    "funnel_analysis": "events_daily_table",
+                    "event_types": "`mozdata.glean_app.event_types`",
+                    "event_type_1": "event_types",
+                    "event_type_2": "event_types",
+                }
+            ],
+        },
+    )
+
+    assert actual == funnel_analysis_view
+
+
 def test_explore_from_views(funnel_analysis_view):
     expected = FunnelAnalysisExplore(
         "funnel_analysis", {"base_view": "funnel_analysis"}
