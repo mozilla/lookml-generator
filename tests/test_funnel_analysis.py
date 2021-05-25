@@ -2,6 +2,7 @@ from unittest.mock import Mock
 
 import pytest
 
+from generator import lkml_update
 from generator.explores import FunnelAnalysisExplore
 from generator.views import FunnelAnalysisView
 
@@ -24,14 +25,14 @@ def funnel_analysis_view():
 
 
 @pytest.fixture()
-def funnel_analysis_explore():
+def funnel_analysis_explore(tmp_path, funnel_analysis_view):
+    (tmp_path / "funnel_analysis.view.lkml").write_text(
+        lkml_update.dump(funnel_analysis_view.to_lookml(Mock(), None))
+    )
     return FunnelAnalysisExplore(
         "funnel_analysis",
-        {
-            "base_view": "funnel_analysis",
-            "joined_event_type_1": "event_type_1",
-            "joined_event_type_2": "event_type_2",
-        },
+        {"base_view": "funnel_analysis"},
+        tmp_path,
     )
 
 
@@ -57,11 +58,14 @@ def test_view_from_db_views(funnel_analysis_view):
     assert actual == funnel_analysis_view
 
 
-def test_explore_from_views(funnel_analysis_view, funnel_analysis_explore):
+def test_explore_from_views(funnel_analysis_view):
+    expected = FunnelAnalysisExplore(
+        "funnel_analysis", {"base_view": "funnel_analysis"}
+    )
     views = [funnel_analysis_view]
     actual = next(FunnelAnalysisExplore.from_views(views))
 
-    assert actual == funnel_analysis_explore
+    assert actual == expected
 
 
 def test_view_lookml(funnel_analysis_view):
@@ -168,4 +172,32 @@ def test_view_lookml(funnel_analysis_view):
     }
     actual = funnel_analysis_view.to_lookml(Mock(), None)
 
+    print_and_test(expected=expected, actual=actual)
+
+
+def test_explore_lookml(funnel_analysis_explore):
+    expected = {
+        "name": "funnel_analysis",
+        "view_label": " User-Day Funnels",
+        "always_filter": {
+            "filters": [
+                {"submission_date": "14 days"},
+            ]
+        },
+        "joins": [
+            {
+                "name": "event_type_1",
+                "relationship": "many_to_one",
+                "type": "cross",
+            },
+            {
+                "name": "event_type_2",
+                "relationship": "many_to_one",
+                "type": "cross",
+            },
+        ],
+        "sql_always_where": "${funnel_analysis.submission_date} >= '2010-01-01'",
+    }
+
+    actual = funnel_analysis_explore.to_lookml()
     print_and_test(expected=expected, actual=actual)
