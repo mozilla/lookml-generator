@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 import lkml
 
@@ -23,7 +23,7 @@ class Explore:
         """Explore instance represented as a dict."""
         return {self.name: {"type": self.type, "views": self.views}}
 
-    def to_lookml(self) -> dict:
+    def to_lookml(self) -> List[Dict[str, Any]]:
         """
         Generate LookML for this explore.
 
@@ -57,10 +57,14 @@ class Explore:
                     "sql_always_where"
                 ] = f"${{{base_view_name}.submission_date}} >= '2010-01-01'"
 
-        base_lookml.update(self._to_lookml())
-        return base_lookml
+        # We only update the first returned explore
+        new_lookml = self._to_lookml()
+        base_lookml.update(new_lookml[0])
+        new_lookml[0] = base_lookml
 
-    def _to_lookml(self) -> dict:
+        return new_lookml
+
+    def _to_lookml(self) -> List[Dict[str, Any]]:
         raise NotImplementedError("Only implemented in subclasses")
 
     def get_dependent_views(self) -> List[str]:

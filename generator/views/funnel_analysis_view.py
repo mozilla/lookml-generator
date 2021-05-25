@@ -113,50 +113,91 @@ class FunnelAnalysisView(View):
         ]
 
     def _event_types_lookml(self) -> List[Dict[str, Any]]:
-        events = [
-            {
-                "name": "event_types",
-                "derived_table": {
-                    "sql": (
-                        "SELECT "
-                        "mozfun.event_analysis.aggregate_match_strings( "
-                        "ARRAY_AGG( "
-                        "mozfun.event_analysis.event_index_to_match_string(index))) AS match_string "
-                        "FROM "
-                        f"{self.tables[0]['event_types']} "
-                        "WHERE "
-                        "{% condition message_id %} event_types.category {% endcondition %} "
-                        "AND {% condition event_type %} event_types.event {% endcondition %}"
-                    )
-                },
-                "filters": [
-                    {
-                        "name": "category",
-                        "type": "string",
-                        "suggest_explore": "event_names",
-                        "suggest_dimension": "event_names.category",
+        events = (
+            [
+                {
+                    "name": "event_types",
+                    "derived_table": {
+                        "sql": (
+                            "SELECT "
+                            "mozfun.event_analysis.aggregate_match_strings( "
+                            "ARRAY_AGG( "
+                            "mozfun.event_analysis.event_index_to_match_string(index))) AS match_string "
+                            "FROM "
+                            f"{self.tables[0]['event_types']} "
+                            "WHERE "
+                            "{% condition message_id %} event_types.category {% endcondition %} "
+                            "AND {% condition event_type %} event_types.event {% endcondition %}"
+                        )
                     },
-                    {
-                        "name": "name",
-                        "type": "string",
-                        "suggest_explore": "event_names",
-                        "suggest_dimension": "event_names.name",
+                    "filters": [
+                        {
+                            "name": "category",
+                            "type": "string",
+                            "suggest_explore": "event_names",
+                            "suggest_dimension": "event_names.category",
+                        },
+                        {
+                            "name": "name",
+                            "type": "string",
+                            "suggest_explore": "event_names",
+                            "suggest_dimension": "event_names.name",
+                        },
+                    ],
+                    "dimensions": [
+                        {
+                            "name": "match_string",
+                            "hidden": "yes",
+                            "sql": "${TABLE}.match_string",
+                        }
+                    ],
+                }
+            ]
+            + [
+                {
+                    "name": f"event_type_{n}",
+                    "extends": ["event_types"],
+                }
+                for n in range(1, self.n_events() + 1)
+            ]
+            + [
+                {
+                    "name": "event_names",
+                    "derived_table": {
+                        "sql": (
+                            "SELECT category, "
+                            "  event, "
+                            "  property.key AS property_name, "
+                            "  property_value.key AS property_value, "
+                            f"FROM {self.tables[0]['event_types']} "
+                            "LEFT JOIN UNNEST(event_properties) AS property "
+                            "LEFT JOIN UNNEST(property.value) AS property_value "
+                        )
                     },
-                ],
-                "dimensions": [
-                    {
-                        "name": "match_string",
-                        "hidden": "yes",
-                        "sql": "${TABLE}.match_string",
-                    }
-                ],
-            }
-        ] + [
-            {
-                "name": f"event_type_{n}",
-                "extends": ["event_types"],
-            }
-            for n in range(1, self.n_events() + 1)
-        ]
+                    "dimensions": [
+                        {
+                            "name": "category",
+                            "type": "string",
+                            "sql": "${TABLE}.category",
+                        },
+                        {
+                            "name": "event",
+                            "type": "string",
+                            "sql": "${TABLE}.event",
+                        },
+                        {
+                            "name": "property_name",
+                            "type": "string",
+                            "sql": "${TABLE}.property_name",
+                        },
+                        {
+                            "name": "property_value",
+                            "type": "string",
+                            "sql": "${TABLE}.property_value",
+                        },
+                    ],
+                }
+            ]
+        )
 
         return events

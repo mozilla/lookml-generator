@@ -188,6 +188,42 @@ def test_view_lookml(funnel_analysis_view):
                 "name": "event_type_2",
                 "extends": ["event_types"],
             },
+            {
+                "name": "event_names",
+                "derived_table": {
+                    "sql": (
+                        "SELECT category, "
+                        "  event, "
+                        "  property.key AS property_name, "
+                        "  property_value.key AS property_value, "
+                        "FROM `mozdata.glean_app.event_types` "
+                        "LEFT JOIN UNNEST(event_properties) AS property "
+                        "LEFT JOIN UNNEST(property.value) AS property_value "
+                    )
+                },
+                "dimensions": [
+                    {
+                        "name": "category",
+                        "type": "string",
+                        "sql": "${TABLE}.category",
+                    },
+                    {
+                        "name": "event",
+                        "type": "string",
+                        "sql": "${TABLE}.event",
+                    },
+                    {
+                        "name": "property_name",
+                        "type": "string",
+                        "sql": "${TABLE}.property_name",
+                    },
+                    {
+                        "name": "property_value",
+                        "type": "string",
+                        "sql": "${TABLE}.property_value",
+                    },
+                ],
+            },
         ],
     }
     actual = funnel_analysis_view.to_lookml(Mock(), None)
@@ -196,28 +232,31 @@ def test_view_lookml(funnel_analysis_view):
 
 
 def test_explore_lookml(funnel_analysis_explore):
-    expected = {
-        "name": "funnel_analysis",
-        "view_label": " User-Day Funnels",
-        "always_filter": {
-            "filters": [
-                {"submission_date": "14 days"},
-            ]
+    expected = [
+        {
+            "name": "funnel_analysis",
+            "view_label": " User-Day Funnels",
+            "always_filter": {
+                "filters": [
+                    {"submission_date": "14 days"},
+                ]
+            },
+            "joins": [
+                {
+                    "name": "event_type_1",
+                    "relationship": "many_to_one",
+                    "type": "cross",
+                },
+                {
+                    "name": "event_type_2",
+                    "relationship": "many_to_one",
+                    "type": "cross",
+                },
+            ],
+            "sql_always_where": "${funnel_analysis.submission_date} >= '2010-01-01'",
         },
-        "joins": [
-            {
-                "name": "event_type_1",
-                "relationship": "many_to_one",
-                "type": "cross",
-            },
-            {
-                "name": "event_type_2",
-                "relationship": "many_to_one",
-                "type": "cross",
-            },
-        ],
-        "sql_always_where": "${funnel_analysis.submission_date} >= '2010-01-01'",
-    }
+        {"name": "event_names", "hidden": "yes"},
+    ]
 
     actual = funnel_analysis_explore.to_lookml()
     print_and_test(expected=expected, actual=actual)
