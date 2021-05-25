@@ -289,7 +289,6 @@ def test_get_looker_views(glean_apps, generated_sql_uri):
             namespace,
             [
                 {
-                    "channel": "release",
                     "table": "mozdata.glean_app.baseline_clients_daily",
                 }
             ],
@@ -306,7 +305,6 @@ def test_get_looker_views(glean_apps, generated_sql_uri):
             namespace,
             [
                 {
-                    "channel": "release",
                     "table": "mozdata.glean_app.baseline_clients_last_seen",
                 }
             ],
@@ -375,8 +373,12 @@ def test_get_funnel_view(glean_apps, tmp_path):
             namespace,
             [
                 {
-                    "events_daily_view": "events_daily_table",
-                    "event_types_view": "event_types_table",
+                    "funnel_analysis": "events_daily_table",
+                    "event_types": "`mozdata.glean_app.event_types`",
+                    "event_type_1": "event_types",
+                    "event_type_2": "event_types",
+                    "event_type_3": "event_types",
+                    "event_type_4": "event_types",
                 }
             ],
         ),
@@ -386,6 +388,7 @@ def test_get_funnel_view(glean_apps, tmp_path):
             [
                 {
                     "table": "mozdata.glean_app.events_daily",
+                    "channel": "release",
                 },
             ],
         ),
@@ -393,7 +396,10 @@ def test_get_funnel_view(glean_apps, tmp_path):
             namespace,
             "event_types_table",
             [
-                {"table": "mozdata.glean_app.event_types"},
+                {
+                    "table": "mozdata.glean_app.event_types",
+                    "channel": "release",
+                },
             ],
         ),
     ]

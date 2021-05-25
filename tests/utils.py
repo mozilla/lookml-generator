@@ -58,9 +58,11 @@ def get_differences(expected, result, path="", sep="."):
     return differences
 
 
-def print_and_test(expected, result):
+def print_and_test(expected, result=None, actual=None):
     """Print objects and differences, then test equality."""
     pp = pprint.PrettyPrinter(indent=2)
+    if actual is not None:
+        result = actual
 
     print("\nExpected:")
     pp.pprint(expected)

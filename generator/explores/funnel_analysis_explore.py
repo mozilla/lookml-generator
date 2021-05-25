@@ -23,9 +23,11 @@ class FunnelAnalysisExplore(Explore):
         """
         for view in views:
             if view.name == "funnel_analysis":
+                tables = view.tables
                 dict_views = {
-                    f"joined_event_type_{n}": f"event_type_{n}"
-                    for n in range(1, FunnelAnalysisExplore.n_funnel_steps + 1)
+                    f"joined_{name}": name
+                    for name in tables[0].keys()
+                    if name.startswith("event_type_")
                 }
                 dict_views["base_view"] = "funnel_analysis"
 
