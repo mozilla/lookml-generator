@@ -126,8 +126,8 @@ class FunnelAnalysisView(View):
                             "FROM "
                             f"{self.tables[0]['event_types']} "
                             "WHERE "
-                            "{% condition message_id %} event_types.category {% endcondition %} "
-                            "AND {% condition event_type %} event_types.event {% endcondition %}"
+                            "{% condition category %} category {% endcondition %} "
+                            "AND {% condition event %} event {% endcondition %}"
                         )
                     },
                     "filters": [
@@ -138,10 +138,10 @@ class FunnelAnalysisView(View):
                             "suggest_dimension": "event_names.category",
                         },
                         {
-                            "name": "name",
+                            "name": "event",
                             "type": "string",
                             "suggest_explore": "event_names",
-                            "suggest_dimension": "event_names.name",
+                            "suggest_dimension": "event_names.event",
                         },
                     ],
                     "dimensions": [

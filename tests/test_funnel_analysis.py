@@ -154,8 +154,8 @@ def test_view_lookml(funnel_analysis_view):
                         "FROM "
                         "`mozdata.glean_app.event_types` "
                         "WHERE "
-                        "{% condition message_id %} event_types.category {% endcondition %} "
-                        "AND {% condition event_type %} event_types.event {% endcondition %}"
+                        "{% condition category %} category {% endcondition %} "
+                        "AND {% condition event %} event {% endcondition %}"
                     )
                 },
                 "filters": [
@@ -166,10 +166,10 @@ def test_view_lookml(funnel_analysis_view):
                         "suggest_dimension": "event_names.category",
                     },
                     {
-                        "name": "name",
+                        "name": "event",
                         "type": "string",
                         "suggest_explore": "event_names",
-                        "suggest_dimension": "event_names.name",
+                        "suggest_dimension": "event_names.event",
                     },
                 ],
                 "dimensions": [
