@@ -64,7 +64,7 @@ class View(object):
 
     def __str__(self):
         """Stringify."""
-        return f"name: {self.name}, type: {self.type}, table: {self.tables}"
+        return f"name: {self.name}, type: {self.type}, table: {self.tables}, namespace: {self.namespace}"
 
     def __eq__(self, other) -> bool:
         """Check for equality with other View."""
