@@ -430,10 +430,6 @@ def test_get_funnel_explore(glean_apps, tmp_path):
             "type": "funnel_analysis_explore",
             "views": {
                 "base_view": "funnel_analysis",
-                "joined_event_type_1": "event_type_1",
-                "joined_event_type_2": "event_type_2",
-                "joined_event_type_3": "event_type_3",
-                "joined_event_type_4": "event_type_4",
             },
         }
     }

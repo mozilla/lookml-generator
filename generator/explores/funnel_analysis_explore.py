@@ -23,17 +23,9 @@ class FunnelAnalysisExplore(Explore):
         """
         for view in views:
             if view.name == "funnel_analysis":
-                tables = view.tables
-                dict_views = {
-                    f"joined_{name}": name
-                    for name in tables[0].keys()
-                    if name.startswith("event_type_")
-                }
-                dict_views["base_view"] = "funnel_analysis"
-
                 yield FunnelAnalysisExplore(
                     "funnel_analysis",
-                    dict_views,
+                    {"base_view": view.name},
                 )
 
     @staticmethod
