@@ -70,3 +70,27 @@ search:
       type: ping_explore
       views:
         base_view: mobile_search_clients_engines_sources_daily
+contextual_services:
+  glean_app: false
+  connection: bigquery-oauth
+  pretty_name: Contextual Services
+  owners:
+    - mmccorquodale@mozilla.com
+  views:
+    event_aggregates:
+      type: ping_view
+      tables:
+      - table: mozdata.contextual_services.event_aggregates
+    topsites_click:
+      type: ping_view
+      tables:
+      - table: mozdata.contextual_services.topsites_click
+  explores:
+    event_aggregates:
+      type: ping_explore
+      views:
+        base_view: event_aggregates
+    topsites_clicks:
+      type: ping_explore
+      views:
+        base_view: topsites_click
