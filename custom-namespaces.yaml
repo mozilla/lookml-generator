@@ -46,3 +46,27 @@ activity_stream:
       type: ping_explore
       views:
         base_view: impression_stats_flat
+search:
+  glean_app: false
+  owners:
+  - mmccorquodale@mozilla.com
+  - xluo@mozilla.com
+  pretty_name: Search
+  views:
+    search_clients_engines_sources_daily:
+      type: ping_view
+      tables:
+      - table: mozdata.search.search_clients_engines_sources_daily
+    mobile_search_clients_engines_sources_daily:
+      type: ping_view
+      tables:
+      - table: mozdata.search.mobile_search_clients_engines_sources_daily
+  explores:
+    desktop_search_counts:
+      type: ping_explore
+      views:
+        base_view: search_clients_engines_sources_daily
+    mobile_search_counts:
+      type: ping_explore
+      views:
+        base_view: mobile_search_clients_engines_sources_daily
