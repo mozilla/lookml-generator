@@ -113,7 +113,7 @@ class PingView(View):
         client_id_fields = [
             d["name"]
             for d in dimensions
-            if d["name"] in {"client_id", "client_info__client_id"}
+            if d["name"] in {"client_id", "client_info__client_id", "context_id"}
         ]
         if not client_id_fields:
             # Some pings purposely disinclude client_ids, e.g. firefox installer
