@@ -7,6 +7,8 @@ import pytest
 
 from generator.spoke import generate_directories
 
+from .utils import print_and_test
+
 
 @pytest.fixture()
 def namespaces() -> dict:
@@ -178,6 +180,20 @@ def test_alternate_connection(looker_sdk, custom_namespaces, tmp_path):
         app_path / "dashboards",
         app_path / "custom.model.lkml",
     }
+
+    expected = {
+        "connection": "bigquery-oauth",
+        "label": "Custom",
+        "includes": [
+            "//looker-hub/custom/explores/*",
+            "//looker-hub/custom/dashboards/*",
+            "views/*",
+            "explores/*",
+            "dashboards/*",
+        ],
+    }
+    actual = lkml.load((tmp_path / "custom" / "custom.model.lkml").read_text())
+    print_and_test(expected, actual)
 
     looker_sdk.models.WriteLookmlModel.assert_called_with(
         allowed_db_connection_names=["bigquery-oauth"],

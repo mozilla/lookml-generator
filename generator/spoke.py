@@ -39,7 +39,9 @@ class NamespaceDict(TypedDict):
     connection: str
 
 
-def generate_model(spoke_path: Path, name: str, namespace_defn: NamespaceDict) -> Path:
+def generate_model(
+    spoke_path: Path, name: str, namespace_defn: NamespaceDict, db_connection: str
+) -> Path:
     """
     Generate a model file for a namespace.
 
@@ -52,7 +54,7 @@ def generate_model(spoke_path: Path, name: str, namespace_defn: NamespaceDict) -
     """
     logging.info(f"Generating model {name}...")
     model_defn = {
-        "connection": "telemetry",
+        "connection": db_connection,
         "label": namespace_defn["pretty_name"],
         "includes": [
             f"//looker-hub/{name}/explores/*",
@@ -123,10 +125,10 @@ def generate_directories(
             (spoke_dir / namespace / dirname).mkdir()
             (spoke_dir / namespace / dirname / ".gitkeep").touch()
 
-        generate_model(spoke_dir, namespace, defn)
+        db_connection: str = defn.get("connection", DEFAULT_DB_CONNECTION)
+        generate_model(spoke_dir, namespace, defn, db_connection)
 
         if sdk_setup:
-            db_connection: str = defn.get("connection", DEFAULT_DB_CONNECTION)
             configure_model(sdk, namespace, db_connection)
 
 
