@@ -36,6 +36,7 @@ def custom_namespaces(tmp_path):
         dedent(
             """
             custom:
+              connection: bigquery-oauth
               glean_app: false
               pretty_name: Custom
               owners:
@@ -155,6 +156,7 @@ def test_namespaces_full(
         expected = {
             "custom": {
                 "glean_app": False,
+                "connection": "bigquery-oauth",
                 "owners": ["custom-owner@allizom.com", "custom-owner2@allizom.com"],
                 "pretty_name": "Custom",
                 "views": {

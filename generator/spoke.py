@@ -19,6 +19,8 @@ MODEL_SETS_BY_INSTANCE: Dict[str, List[str]] = {
     "https://mozilla.cloud.looker.com": ["user-spokes", "spokes"],
 }
 
+DEFAULT_DB_CONNECTION = "telemetry"
+
 
 class ExploreDict(TypedDict):
     """Represent an explore definition."""
@@ -34,6 +36,7 @@ class NamespaceDict(TypedDict):
     explores: ExploreDict
     pretty_name: str
     glean_app: bool
+    connection: str
 
 
 def generate_model(spoke_path: Path, name: str, namespace_defn: NamespaceDict) -> Path:
@@ -66,7 +69,9 @@ def generate_model(spoke_path: Path, name: str, namespace_defn: NamespaceDict) -
     return path
 
 
-def configure_model(sdk: looker_sdk.methods.Looker31SDK, model_name: str):
+def configure_model(
+    sdk: looker_sdk.methods.Looker31SDK, model_name: str, db_connection: str
+):
     """Configure a Looker model by name."""
     instance = os.environ["LOOKER_INSTANCE_URI"]
     logging.info(f"Configuring model {model_name}...")
@@ -80,7 +85,7 @@ def configure_model(sdk: looker_sdk.methods.Looker31SDK, model_name: str):
 
     sdk.create_lookml_model(
         looker_sdk.models.WriteLookmlModel(
-            allowed_db_connection_names=["telemetry"],
+            allowed_db_connection_names=[db_connection],
             name=model_name,
             project_name="spoke-default",
         )
@@ -121,7 +126,8 @@ def generate_directories(
         generate_model(spoke_dir, namespace, defn)
 
         if sdk_setup:
-            configure_model(sdk, namespace)
+            db_connection: str = defn.get("connection", DEFAULT_DB_CONNECTION)
+            configure_model(sdk, namespace, db_connection)
 
 
 @click.command(help=__doc__)
