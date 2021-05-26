@@ -23,6 +23,7 @@ HIDDEN_DIMENSIONS = {
     ("document_id",),
     ("client_id",),
     ("client_info", "client_id"),
+    ("context_id",),
 }
 
 MAP_LAYER_NAMES = {

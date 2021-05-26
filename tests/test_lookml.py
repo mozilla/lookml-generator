@@ -386,6 +386,10 @@ class MockClient:
                     SchemaField("client_id", "STRING"),
                 ],
             )
+        if table_ref == "mozdata.custom.context":
+            return bigquery.Table(
+                table_ref, schema=[SchemaField("context_id", "STRING")]
+            )
         raise ValueError(f"Table not found: {table_ref}")
 
 
@@ -1248,3 +1252,53 @@ def test_duplicate_client_id(runner, glean_apps, tmp_path):
         with patch("google.cloud.bigquery.Client", MockClient):
             with pytest.raises(ClickException):
                 _lookml(open(namespaces), glean_apps, "looker-hub/")
+
+
+def test_context_id(runner, glean_apps, tmp_path):
+    namespaces = tmp_path / "namespaces.yaml"
+    namespaces.write_text(
+        dedent(
+            """
+            custom:
+              pretty_name: Custom
+              glean_app: false
+              views:
+                context:
+                  type: ping_view
+                  tables:
+                  - channel: release
+                    table: mozdata.custom.context
+            """
+        )
+    )
+
+    with runner.isolated_filesystem():
+        with patch("google.cloud.bigquery.Client", MockClient):
+            _lookml(open(namespaces), glean_apps, "looker-hub/")
+        expected = {
+            "views": [
+                {
+                    "sql_table_name": "`mozdata.custom.context`",
+                    "name": "context",
+                    "dimensions": [
+                        {
+                            "name": "context_id",
+                            "hidden": "yes",
+                            "sql": "${TABLE}.context_id",
+                        }
+                    ],
+                    "measures": [
+                        {
+                            "name": "clients",
+                            "type": "count_distinct",
+                            "sql": "${context_id}",
+                        }
+                    ],
+                }
+            ],
+        }
+
+        print_and_test(
+            lkml.load(lkml_update.dump(expected)),
+            lkml.load(Path("looker-hub/custom/views/context.view.lkml").read_text()),
+        )
