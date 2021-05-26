@@ -31,6 +31,13 @@ class Explore:
         `_to_lookml` takes precedence over these fields.
         """
         base_lookml = {}
+        base_view_name = next(
+            (
+                view_name
+                for view_type, view_name in self.views.items()
+                if view_type == "base_view"
+            )
+        )
         for view_type, view in self.views.items():
             # We look at our dependent views to see if they have a
             # "submission" field. Dependent views are any that are:
@@ -48,7 +55,7 @@ class Explore:
             if self._get_view_has_submission(view):
                 base_lookml[
                     "sql_always_where"
-                ] = f"${{{self.name}.submission_date}} >= '2010-01-01'"
+                ] = f"${{{base_view_name}.submission_date}} >= '2010-01-01'"
 
         base_lookml.update(self._to_lookml())
         return base_lookml
@@ -58,6 +65,8 @@ class Explore:
 
     def get_dependent_views(self) -> List[str]:
         """Get views this explore is dependent on."""
+        print("Getting dependent views of " + self.name)
+        print(self.views)
         return [
             view
             for _type, view in self.views.items()
