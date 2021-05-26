@@ -15,3 +15,34 @@ duet:
       tables:
       - channel: release
         table: mozdata.telemetry.new_profile
+activity_stream:
+  glean_app: false
+  owners:
+  - najiang@mozilla.com
+  pretty_name: Activity Stream
+  views:
+    events:
+      type: ping_view
+      tables:
+      - table: mozdata.activity_stream.events
+    sessions:
+      type: ping_view
+      tables:
+      - table: mozdata.activity_stream.sessions
+    impression_stats_flat:
+      type: ping_view
+      tables:
+      - table: mozdata.activity_stream.impression_stats_flat
+  explores:
+    event_counts:
+      type: ping_explore
+      views:
+        base_view: events
+    session_counts:
+      type: ping_explore
+      views:
+        base_view: sessions
+    pocket_tile_impressions:
+      type: ping_explore
+      views:
+        base_view: impression_stats_flat
