@@ -32,6 +32,26 @@ def namespaces() -> dict:
     }
 
 
+@pytest.fixture
+def custom_namespaces():
+    return {
+        "custom": {
+            "glean_app": False,
+            "connection": "bigquery-oauth",
+            "owners": ["custom-owner@allizom.com", "custom-owner2@allizom.com"],
+            "pretty_name": "Custom",
+            "views": {
+                "baseline": {
+                    "tables": [
+                        {"channel": "release", "table": "mozdata.custom.baseline"}
+                    ],
+                    "type": "ping_view",
+                }
+            },
+        }
+    }
+
+
 @patch("generator.spoke.looker_sdk")
 @patch.dict(os.environ, {"LOOKER_INSTANCE_URI": "https://mozilladev.cloud.looker.com"})
 def test_generate_directories(looker_sdk, namespaces, tmp_path):
@@ -133,3 +153,36 @@ def test_generate_model(looker_sdk, namespaces, tmp_path):
 
     sdk.update_model_set.assert_any_call(1, write_model)
     sdk.update_model_set.assert_any_call(2, write_model)
+
+
+@patch("generator.spoke.looker_sdk")
+@patch.dict(os.environ, {"LOOKER_INSTANCE_URI": "https://mozilladev.cloud.looker.com"})
+def test_alternate_connection(looker_sdk, custom_namespaces, tmp_path):
+    sdk = looker_sdk.init31()
+    sdk.search_model_sets.return_value = [Mock(models=["model"], id=1)]
+    sdk.lookml_model.side_effect = _looker_sdk.error.SDKError
+    looker_sdk.error = Mock(SDKError=_looker_sdk.error.SDKError)
+
+    write_model = Mock()
+    looker_sdk.models.WriteLookmlModel.return_value = write_model
+
+    generate_directories(custom_namespaces, tmp_path, True)
+    dirs = list(tmp_path.iterdir())
+    assert dirs == [tmp_path / "custom"]
+
+    app_path = tmp_path / "custom/"
+    sub_dirs = set(app_path.iterdir())
+    assert sub_dirs == {
+        app_path / "views",
+        app_path / "explores",
+        app_path / "dashboards",
+        app_path / "custom.model.lkml",
+    }
+
+    looker_sdk.models.WriteLookmlModel.assert_called_with(
+        allowed_db_connection_names=["bigquery-oauth"],
+        name="custom",
+        project_name="spoke-default",
+    )
+    sdk.create_lookml_model.assert_called_with(write_model)
+    sdk.update_model_set.assert_called_once()
