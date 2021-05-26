@@ -65,8 +65,6 @@ class Explore:
 
     def get_dependent_views(self) -> List[str]:
         """Get views this explore is dependent on."""
-        print("Getting dependent views of " + self.name)
-        print(self.views)
         return [
             view
             for _type, view in self.views.items()
