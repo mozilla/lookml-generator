@@ -127,6 +127,13 @@ class GleanPingView(PingView):
             ],
         }
 
+        # remove some elements from the definition if we're handling a labeled
+        # counter, as an initial join dimension
+        if metric.type == "labeled_counter":
+            # this field is not used since labeled counters are maps
+            del lookml["type"]
+            lookml["hidden"] = "yes"
+
         if metric.description:
             lookml["description"] = metric.description
 
@@ -142,6 +149,8 @@ class GleanPingView(PingView):
             yield self._make_dimension(metric, "sum", sql_map)
         elif metric.type == "timespan":
             yield self._make_dimension(metric, "value", sql_map)
+        elif metric.type == "labeled_counter":
+            yield self._make_dimension(metric, "", sql_map)
         elif metric.type in ALLOWED_TYPES:
             yield self._make_dimension(metric, "", sql_map)
 
