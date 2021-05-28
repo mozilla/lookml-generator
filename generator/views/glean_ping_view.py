@@ -78,6 +78,8 @@ class GleanPingView(PingView):
                         },
                     ],
                 }
+                if metric.description:
+                    definition["description"] = metric.description
                 view_definitions += [definition]
 
         lookml["views"] += view_definitions
