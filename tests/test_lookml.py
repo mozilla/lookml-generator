@@ -154,6 +154,15 @@ class MockClient:
                                 ],
                             ),
                             SchemaField(
+                                "labeled_counter",
+                                "RECORD",
+                                "REPEATED",
+                                fields=[
+                                    SchemaField("key", "STRING"),
+                                    SchemaField("value", "INTEGER"),
+                                ],
+                            ),
+                            SchemaField(
                                 "custom_distribution",
                                 "RECORD",
                                 fields=[
@@ -444,6 +453,14 @@ def msg_glean_probes():
         GleanProbe(
             "test.counter",
             {"type": "counter", "history": history_with_descr, "name": "test.counter"},
+        ),
+        GleanProbe(
+            "test.labeled_counter",
+            {
+                "type": "labeled_counter",
+                "history": history_with_descr,
+                "name": "test.labeled_counter",
+            },
         ),
         GleanProbe(
             "no_category_counter",
@@ -1129,7 +1146,31 @@ def test_lookml_actual(
                             "type": "count_distinct",
                         },
                     ],
-                }
+                },
+                {
+                    "dimensions": [
+                        {
+                            "type": "string",
+                            "sql": "${TABLE}.key",
+                            "name": "key",
+                        },
+                        {
+                            "type": "number",
+                            "sql": "${TABLE}.value",
+                            "hidden": "yes",
+                            "name": "value",
+                        },
+                    ],
+                    "measures": [
+                        {"type": "sum", "sql": "${value}", "name": "count"},
+                        {
+                            "type": "count_distinct",
+                            "sql": "case when ${value} > 0 then ${metrics.client_info__client_id}",
+                            "name": "client_count",
+                        },
+                    ],
+                    "name": "metrics__metrics__labeled_counter__test_labeled_counter",
+                },
             ]
         }
         print_and_test(
