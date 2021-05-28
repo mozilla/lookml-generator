@@ -41,7 +41,7 @@ class GleanPingExplore(PingExplore):
             join = {
                 "name": view["name"],
                 "relationship": "one_to_many",
-                "sql": f"CROSS JOIN UNNEST(${{{base_name}.{metric}}}) AS {view_name} ;;",
+                "sql": f"CROSS JOIN UNNEST(${{{base_name}.{metric}}}) AS {view_name}",
             }
             joins.append(join)
 

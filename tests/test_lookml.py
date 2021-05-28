@@ -1209,7 +1209,6 @@ def test_lookml_actual_metrics_view(
                     ],
                 },
                 {
-                    "description": "test counter description",
                     "dimensions": [
                         {
                             "type": "string",

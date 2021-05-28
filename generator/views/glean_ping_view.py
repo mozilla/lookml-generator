@@ -70,7 +70,11 @@ class GleanPingView(PingView):
                         },
                     ],
                     "measures": [
-                        {"name": "count", "type": "sum", "sql": "${value}"},
+                        {
+                            "name": "count",
+                            "type": "sum",
+                            "sql": "${value}",
+                        },
                         {
                             "name": "client_count",
                             "type": "count_distinct",
@@ -78,8 +82,6 @@ class GleanPingView(PingView):
                         },
                     ],
                 }
-                if metric.description:
-                    definition["description"] = metric.description
                 view_definitions += [definition]
 
         lookml["views"] += view_definitions
