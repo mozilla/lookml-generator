@@ -7,7 +7,6 @@ import click
 from mozilla_schema_generator.glean_ping import GleanPing
 from mozilla_schema_generator.probes import GleanProbe
 
-from .glean_unnested_label_view import GleanUnnestedLabelView
 from .ping_view import PingView
 
 DISTRIBUTION_TYPES = {
@@ -47,14 +46,39 @@ class GleanPingView(PingView):
         # iterate over all of the glean metrics and generate views for unnested
         # fields as necessary. Append them to the list of existing view
         # definitions.
+        table = next(
+            (table for table in self.tables if table.get("channel") == "release"),
+            self.tables[0],
+        )["table"]
+        dimensions = self.get_dimensions(bq_client, table, v1_name)
+
+        client_id_field = self._get_client_id(dimensions, table)
+
         view_definitions = []
         metrics = self._get_glean_metrics(v1_name)
         for metric in metrics:
             if metric.type == "labeled_counter":
-                view = GleanUnnestedLabelView(
-                    self.namespace, self.name, self.tables, metric
-                )
-                view_definitions += view.to_lookml(bq_client, v1_name)["views"]
+                definition = {
+                    "name": f"{self.name}__{self._to_looker_name(metric)}",
+                    "dimensions": [
+                        {"name": "key", "type": "string", "sql": "${TABLE}.key"},
+                        {
+                            "name": "value",
+                            "type": "number",
+                            "sql": "${TABLE}.value",
+                            "hidden": "yes",
+                        },
+                    ],
+                    "measures": [
+                        {"name": "count", "type": "sum", "sql": "${value}"},
+                        {
+                            "name": "client_count",
+                            "type": "count_distinct",
+                            "sql": f"case when ${{value}} > 0 then ${{{self.name}.{client_id_field}}}",
+                        },
+                    ],
+                }
+                view_definitions += [definition]
 
         lookml["views"] += view_definitions
 
