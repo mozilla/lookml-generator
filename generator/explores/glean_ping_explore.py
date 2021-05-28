@@ -26,12 +26,34 @@ class GleanPingExplore(PingExplore):
         }
         # collapse whitespace in the description so the lookml looks a little better
         ping_description = " ".join(ping_descriptions[self.name].split())
-        # insert the description in
-        lookml = super()._to_lookml(v1_name)
-        lookml[0][
-            "description"
-        ] = f"Explore for the {self.name} ping. {ping_description}"
-        return lookml
+
+        views_lookml = self.get_view_lookml(self.views["base_view"])
+
+        # The first view, by convention, is always the base view with the
+        # majority of the dimensions from the top level.
+        base = views_lookml["views"][0]
+        base_name = base["name"]
+
+        joins = []
+        for view in views_lookml["views"][1:]:
+            view_name = view["name"]
+            metric = "__".join(view["name"].split("__")[1:])
+            join = {
+                "name": view["name"],
+                "relationship": "one_to_many",
+                "sql": f"CROSS JOIN UNNEST(${{{base_name}.{metric}}}) AS {view_name} ;;",
+            }
+            joins.append(join)
+
+        return {
+            "name": self.name,
+            "description": f"Explore for the {self.name} ping. {ping_description}",
+            "view_name": self.views["base_view"],
+            "always_filter": {
+                "filters": self.get_required_filters("base_view"),
+            },
+            "joins": joins,
+        }
 
     @staticmethod
     def from_views(views: List[View]) -> Iterator[PingExplore]:
