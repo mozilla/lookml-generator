@@ -9,11 +9,11 @@ Each entry in `namespaces.yaml` represents a namespace, and has the following pr
 `glean_app` (bool): Whether or not this namespace represents a Glean Application.
 `connection` (optional string): The database connection to use, as named in Looker. Defaults to `telemetry`.
 `views` (object): The LookML View files that will be generated. More detailed info below.
-`explores`: The LookML Explore files that will be generated. More detailed info below.
+`explores` (object): The LookML Explore files that will be generated. More detailed info below.
 
 ## `views`
 
-Each view is actuall a LookML view file that will be generated.
+Each View entry is actually a LookML view file that will be generated.
 Each LookML View file can contain multiple Looker Views; the idea here is that these views are related and used together.
 
 `type`: The type of the view, e.g. `glean_ping_view`.
@@ -29,14 +29,14 @@ tables:
 ```
 
 For `ClientCountView` and `GrowthAccountingView`, `tables` will have a single entry, with the name of the table the Looker View is based off of. Only a single Looker View will be created.
-```
+```yaml
 tables:
   - table: mozdata.org_mozilla_firefox.baseline_clients_last_seen
 ```
 
 For `FunnelAnalysisView`, only the first list entry is used; inside that entry, each value represents a Looker View that is created. The key is the name of the view, the value is the Looker View or BQ View it is derived from.
 In the following example, 4 views will be created in the view file: `funnel_analysis`, `event_types`, `event_type_1` and `event_type_2`. 
-```
+```yaml
 tables:
   - funnel_analysis: events_daily_table
     event_types: `mozdata.glean_app.event_types`
@@ -46,7 +46,7 @@ tables:
 
 ## `explores`
 
-Each Explore is a single file, sometimes containing multiple explores within it (mainly for things like changing suggestions).
+Each Explore entry is a single file, sometimes containing multiple explores within it (mainly for things like changing suggestions).
 
 `type` - The type of the explore, e.g. `growth_accounting_explore`.
 `views` - The views that this is based on. Generally, the allowed keys here are:
