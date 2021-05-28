@@ -45,15 +45,17 @@ class GleanPingExplore(PingExplore):
             }
             joins.append(join)
 
-        return {
-            "name": self.name,
-            "description": f"Explore for the {self.name} ping. {ping_description}",
-            "view_name": self.views["base_view"],
-            "always_filter": {
-                "filters": self.get_required_filters("base_view"),
-            },
-            "joins": joins,
-        }
+        return [
+            {
+                "name": self.name,
+                "description": f"Explore for the {self.name} ping. {ping_description}",
+                "view_name": self.views["base_view"],
+                "always_filter": {
+                    "filters": self.get_required_filters("base_view"),
+                },
+                "joins": joins,
+            }
+        ]
 
     @staticmethod
     def from_views(views: List[View]) -> Iterator[PingExplore]:
