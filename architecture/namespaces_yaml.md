@@ -1,0 +1,55 @@
+# Describing the formatting of `namespaces.yaml`
+
+We use [`namespaces.yaml`](https://github.com/mozilla/looker-hub/blob/main/namespaces.yaml) as the declarative listing of what we will generate.
+
+Each namespace in `namespaces.yaml` has the following:
+
+`owners` (string): The owners are the people who will have control over the associated Namespace folder in Looker. It is up to them to decide which dashboards to "promote" to their shared folder.
+`pretty_name` (string): The pretty name is used in most places where the namespace's name is seen, e.g. in the explore drop-down and folder name.
+`glean_app` (bool): Whether or not this namespace represents a Glean Application.
+`connection` (optional string): The database connection to use, as named in Looker. Defaults to `telemetry`.
+`views`: The LookML View files that will be generated. More detailed info below.
+`explores`: The LookML Explore files that will be generated. More detailed info below.
+
+## `views`
+
+Each view is actuall a LookML view file that will be generated.
+Each LookML View file can contain multiple Looker Views; the idea here is that these views are related and used together.
+
+`type` - The type of the view, e.g. `glean_ping_view`.
+`tables` - This field is used in a few ways, depending on the associated View type.
+
+For `GleanPingView` and `PingView`, `tables` represents all of the associated channels for that view. Each table will have a `channel` and `table` entry. Only a single view will be created in the LookML File.
+```
+tables:
+  - channel: release
+    table: mozdata.org_mozilla_firefox.metrics
+  - channel: nightly
+    table: mozdata.org_mozilla_fenix.metrics
+```
+
+For `ClientCountView` and `GrowthAccountingView`, `tables` will have a single entry, with the name of the table the Looker View is based off of. Only a single Looker View will be created.
+```
+tables:
+  - table: mozdata.org_mozilla_firefox.baseline_clients_last_seen
+```
+
+For `FunnelAnalysisView`, only the first list entry is used; inside that entry, each value represents a Looker View that is created. The key is the name of the view, the value is the Looker View or BQ View it is derived from.
+In the following example, 4 views will be created in the view file. 
+```
+tables:
+  - funnel_analysis: events_daily_table
+    event_types: `mozdata.glean_app.event_types`
+    event_type_1: event_types
+    event_type_2: event_types
+```
+
+## `explores`
+
+Each Explore is a single Explore file, sometimes containing multiple explores within it (mainly for things like changing suggestions).
+
+`type` - The type of the explore, e.g. `growth_accounting_explore`.
+`views` - The views that this is based on. Generally, the allowed keys here are:
+- `base_view`: The base view is the one we are basing this Explore on, using [`view_name`](https://docs.looker.com/reference/explore-params/view_name).
+- `extended_view*`: Any views we include in the `base_view` are added as these. It could be one (`extended_view`) or multiple (`extended_view_1`).
+- `joined_view*`: Any other view we are going to join to this one. _This is only required if the joined view is not defined in the same view file as `base_view`._
