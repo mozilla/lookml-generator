@@ -7,6 +7,7 @@ import click
 from mozilla_schema_generator.glean_ping import GleanPing
 from mozilla_schema_generator.probes import GleanProbe
 
+from .glean_unnested_label_view import GleanUnnestedLabelView
 from .ping_view import PingView
 
 DISTRIBUTION_TYPES = {
@@ -34,6 +35,30 @@ class GleanPingView(PingView):
 
     type: str = "glean_ping_view"
     allow_glean: bool = True
+
+    def to_lookml(self, bq_client, v1_name: Optional[str]) -> Dict[str, Any]:
+        """Generate LookML for this view.
+
+        The Glean views include a labeled metrics, which need to be joined
+        against the view in the explore.
+        """
+        lookml = super().to_lookml(bq_client, v1_name)
+
+        # iterate over all of the glean metrics and generate views for unnested
+        # fields as necessary. Append them to the list of existing view
+        # definitions.
+        view_definitions = []
+        metrics = self._get_glean_metrics(v1_name)
+        for metric in metrics:
+            if metric.type == "labeled_counter":
+                view = GleanUnnestedLabelView(
+                    self.namespace, self.name, self.tables, metric
+                )
+                view_definitions += view.to_lookml(bq_client, v1_name)["views"]
+
+        lookml["views"] += view_definitions
+
+        return lookml
 
     def _get_links(self, dimension: dict) -> List[Dict[str, str]]:
         """Get a link annotation given a metric name."""
@@ -83,20 +108,30 @@ class GleanPingView(PingView):
 
         return ping_probes
 
+    def _to_looker_name(self, metric: GleanProbe, suffix: str = "") -> str:
+        """Convert a glean probe into a looker name."""
+        *category, name = metric.id.split(".")
+        category = "_".join(category)
+
+        sep = "" if not category else "_"
+        label = name
+        looker_name = f"metrics__{metric.type}__{category}{sep}{label}"
+        if suffix:
+            looker_name = f"{looker_name}__{suffix}"
+        return looker_name
+
     def _make_dimension(
         self, metric: GleanProbe, suffix: str, sql_map: Dict[str, Dict[str, str]]
     ) -> Optional[Dict[str, Union[str, List[Dict[str, str]]]]]:
         *category, name = metric.id.split(".")
         category = "_".join(category)
 
+        sep = "" if not category else "_"
         label = name
-        sep = "_"
-        if not category:
-            sep = ""
         looker_name = f"metrics__{metric.type}__{category}{sep}{name}"
         if suffix:
             label = f"{name}_{suffix}"
-            looker_name = f"metrics__{metric.type}__{category}{sep}{name}__{suffix}"
+            looker_name = f"{looker_name}__{suffix}"
 
         if looker_name not in sql_map:
             return None
