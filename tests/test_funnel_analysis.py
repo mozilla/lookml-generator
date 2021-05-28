@@ -98,6 +98,7 @@ def test_view_lookml(funnel_analysis_view):
                 "dimensions": [
                     {
                         "name": "completed_event_1",
+                        "description": "Whether the user completed step 1 on the associated day.",
                         "type": "yesno",
                         "sql": (
                             "REGEXP_CONTAINS(${TABLE}.events, mozfun.event_analysis.create_funnel_regex(["
@@ -107,6 +108,7 @@ def test_view_lookml(funnel_analysis_view):
                     },
                     {
                         "name": "completed_event_2",
+                        "description": "Whether the user completed step 2 on the associated day.",
                         "type": "yesno",
                         "sql": (
                             "REGEXP_CONTAINS(${TABLE}.events, mozfun.event_analysis.create_funnel_regex(["
@@ -118,6 +120,10 @@ def test_view_lookml(funnel_analysis_view):
                 "measures": [
                     {
                         "name": "count_user_days_event_1",
+                        "description": (
+                            "The number of user-days that completed step 1. "
+                            "Grouping by day makes this is a count of users."
+                        ),
                         "type": "count",
                         "filters": [
                             {"completed_event_1": "yes"},
@@ -125,6 +131,10 @@ def test_view_lookml(funnel_analysis_view):
                     },
                     {
                         "name": "count_user_days_event_2",
+                        "description": (
+                            "The number of user-days that completed step 2. "
+                            "Grouping by day makes this is a count of users."
+                        ),
                         "type": "count",
                         "filters": [
                             {"completed_event_1": "yes"},
@@ -133,11 +143,13 @@ def test_view_lookml(funnel_analysis_view):
                     },
                     {
                         "name": "fraction_user_days_event_1",
+                        "description": "Of the user-days that completed Step 1, the fraction that completed step 1.",
                         "type": "number",
                         "sql": "SAFE_DIVIDE(${count_user_days_event_1}, ${count_user_days_event_1})",
                     },
                     {
                         "name": "fraction_user_days_event_2",
+                        "description": "Of the user-days that completed Step 1, the fraction that completed step 2.",
                         "type": "number",
                         "sql": "SAFE_DIVIDE(${count_user_days_event_2}, ${count_user_days_event_1})",
                     },
@@ -162,11 +174,13 @@ def test_view_lookml(funnel_analysis_view):
                     {
                         "name": "category",
                         "type": "string",
+                        "description": "The event category, as defined in metrics.yaml.",
                         "suggest_explore": "event_names",
                         "suggest_dimension": "event_names.category",
                     },
                     {
                         "name": "event",
+                        "description": "The event name.",
                         "type": "string",
                         "suggest_explore": "event_names",
                         "suggest_dimension": "event_names.event",
