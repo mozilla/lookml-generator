@@ -1,16 +1,37 @@
-"""Class to describe a Funnel Analysis View."""
+"""Class to describe a Funnel Analysis View.
+
+We create a single View file and a single Explore file.
+
+The View file has many Looker views defined within it:
+    funnel_analysis: Based on events_daily, has the `events` string and user dimensions (e.g. country)
+    event_names: The names of events. Used for suggestions.
+    event_N: For each possible funnel step, a single view. This is used to define what that funnel step is.
+
+The Explore's job is to take this generated file an link all those event_N's to the funnel_analysis.
+We join them via cross join, because event_N views only have 1 row and 1 column - the match_string
+to use for a regex_match on the `events` string in funnel_analysis.
+
+For example, say we filter event_1 on `event`: `WHERE event in ("session-start, "session-end")`
+Then we join that with funnel_analysis: `FROM funnel_analysis CROSS JOIN event_1`
+That lets us find out whether the user completed those funnel steps:
+    `SELECT REGEXP_CONTAINS(funnel_analysis.events, event_1.match_string) AS completed_event_1`
+
+The `funnel_analysis` view has some nice dimensions to hide these details from the end user,
+e.g. `completed_funnel_step_N`. We can then count those users across dimensions.
+"""
 from __future__ import annotations
 
 from typing import Any, Dict, Iterator, List, Optional
 
 from .view import View, ViewDict
 
+DEFAULT_NUM_FUNNEL_STEPS: int = 4
+
 
 class FunnelAnalysisView(View):
-    """A view for Client Counting measures."""
+    """A view for doing Funnel Analysis."""
 
     type: str = "funnel_analysis_view"
-    num_funnel_steps: int = 4
 
     def __init__(self, namespace: str, tables: List[Dict[str, str]]):
         """Get an instance of a FunnelAnalysisView."""
@@ -23,9 +44,14 @@ class FunnelAnalysisView(View):
         is_glean: bool,
         channels: List[Dict[str, str]],
         db_views: dict,
-        num_funnel_steps: int = num_funnel_steps,
+        num_funnel_steps: int = DEFAULT_NUM_FUNNEL_STEPS,
     ) -> Iterator[FunnelAnalysisView]:
-        """Get Client Count Views from db views and app variants."""
+        """Get Client Count Views from db views and app variants.
+
+        We only create a FunnelAnalysisView if we have the two necessary db tables:
+            - events_daily
+            - event_types
+        """
         # We can guarantee there will always be at least one channel,
         # because this comes from the associated _get_glean_repos in
         # namespaces.py
@@ -41,6 +67,7 @@ class FunnelAnalysisView(View):
                 actual_views[view_id] = f"`mozdata.{dataset}.{view_id}`"
 
         if len(actual_views) == 2:
+            # Only create an instance if we have the two necessary tables
             tables = {
                 "funnel_analysis": "events_daily_table",
                 "event_types": actual_views["event_types"],
@@ -79,6 +106,7 @@ class FunnelAnalysisView(View):
             {
                 "name": f"completed_event_{n}",
                 "type": "yesno",
+                "description": f"Whether the user completed step {n} on the associated day.",
                 "sql": (
                     "REGEXP_CONTAINS(${TABLE}.events, mozfun.event_analysis.create_funnel_regex(["
                     f"${{event_type_{n}.match_string}}],"
@@ -90,6 +118,10 @@ class FunnelAnalysisView(View):
         count_measures: List[Dict[str, Any]] = [
             {
                 "name": f"count_user_days_event_{n}",
+                "description": (
+                    f"The number of user-days that completed step {n}. "
+                    "Grouping by day makes this is a count of users."
+                ),
                 "type": "count",
                 "filters": [{f"completed_event_{ni}": "yes"} for ni in range(1, n + 1)],
             }
@@ -98,6 +130,7 @@ class FunnelAnalysisView(View):
         fractional_measures: List[Dict[str, Any]] = [
             {
                 "name": f"fraction_user_days_event_{n}",
+                "description": f"Of the user-days that completed Step 1, the fraction that completed step {n}.",
                 "type": "number",
                 "sql": f"SAFE_DIVIDE(${{count_user_days_event_{n}}}, ${{count_user_days_event_1}})",
             }
@@ -133,12 +166,14 @@ class FunnelAnalysisView(View):
                     "filters": [
                         {
                             "name": "category",
+                            "description": "The event category, as defined in metrics.yaml.",
                             "type": "string",
                             "suggest_explore": "event_names",
                             "suggest_dimension": "event_names.category",
                         },
                         {
                             "name": "event",
+                            "description": "The event name.",
                             "type": "string",
                             "suggest_explore": "event_names",
                             "suggest_dimension": "event_names.event",
