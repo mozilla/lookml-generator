@@ -19,6 +19,7 @@ DISTRIBUTION_TYPES = {
 ALLOWED_TYPES = DISTRIBUTION_TYPES | {
     "boolean",
     "counter",
+    "labeled_counter",
     "datetime",
     "jwe",
     "quantity",
@@ -58,8 +59,12 @@ class GleanPingView(PingView):
         metrics = self._get_glean_metrics(v1_name)
         for metric in metrics:
             if metric.type == "labeled_counter":
+                looker_name = self._to_looker_name(metric)
                 definition = {
-                    "name": f"{self.name}__{self._to_looker_name(metric)}",
+                    "name": f"{self.name}__{looker_name}",
+                    "label": (
+                        "_".join(looker_name.split("__")[1:]).replace("_", " ").title()
+                    ),
                     "dimensions": [
                         {"name": "key", "type": "string", "sql": "${TABLE}.key"},
                         {
@@ -78,11 +83,14 @@ class GleanPingView(PingView):
                         {
                             "name": "client_count",
                             "type": "count_distinct",
-                            "sql": f"case when ${{value}} > 0 then ${{{self.name}.{client_id_field}}}",
+                            "sql": f"case when ${{value}} > 0 then ${{{self.name}.{client_id_field}}} end",
                         },
                     ],
                 }
                 view_definitions += [definition]
+        # deduplicate view definitions, because somehow a few entries make it in
+        # twice e.g. metrics__metrics__labeled_counter__media_audio_init_failure
+        view_definitions = list({v["name"]: v for v in view_definitions}.values())
 
         lookml["views"] += view_definitions
 
@@ -212,8 +220,6 @@ class GleanPingView(PingView):
             yield self._make_dimension(metric, "sum", sql_map)
         elif metric.type == "timespan":
             yield self._make_dimension(metric, "value", sql_map)
-        elif metric.type == "labeled_counter":
-            yield self._make_dimension(metric, "", sql_map)
         elif metric.type in ALLOWED_TYPES:
             yield self._make_dimension(metric, "", sql_map)
 
@@ -246,11 +252,14 @@ class GleanPingView(PingView):
     ) -> List[Dict[str, Any]]:
         """Get the set of dimensions for this view."""
         all_fields = super().get_dimensions(bq_client, table, v1_name)
-        return self._get_glean_metric_dimensions(all_fields, v1_name) + [
+        fields = self._get_glean_metric_dimensions(all_fields, v1_name) + [
             self._add_link(d)
             for d in all_fields
             if not d["name"].startswith("metrics__")
         ]
+        # later entries will override earlier entries, if there are duplicates
+        field_dict = {f["name"]: f for f in fields}
+        return list(field_dict.values())
 
     def get_measures(
         self, dimensions: List[dict], table: str, v1_name: Optional[str]
