@@ -1,5 +1,6 @@
 [build]
 command = """
+    set -e
     ./bin/generator namespaces
     mkdir site
     cp namespaces.yaml site
