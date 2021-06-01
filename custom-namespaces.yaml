@@ -81,16 +81,40 @@ contextual_services:
       type: ping_view
       tables:
       - table: mozdata.contextual_services.event_aggregates
+    quicksuggest_click:
+      type: ping_view
+      tables:
+      - table: mozdata.contextual_services.quicksuggest_click
+    quicksuggest_impression:
+      type: ping_view
+      tables:
+      - table: mozdata.contextual_services.quicksuggest_impression
     topsites_click:
       type: ping_view
       tables:
       - table: mozdata.contextual_services.topsites_click
+    topsites_impression:
+      type: ping_view
+      tables:
+      - table: mozdata.contextual_services.topsites_impression
   explores:
     event_aggregates:
       type: ping_explore
       views:
         base_view: event_aggregates
+    quicksuggest_clicks:
+      type: ping_explore
+      views:
+        base_view: quicksuggest_click
+    quicksuggest_impressions:
+      type: ping_explore
+      views:
+        base_view: quicksuggest_impression
     topsites_clicks:
       type: ping_explore
       views:
         base_view: topsites_click
+    topsites_impressions:
+      type: ping_explore
+      views:
+        base_view: topsites_impression
