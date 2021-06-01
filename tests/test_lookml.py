@@ -111,6 +111,7 @@ class MockClient:
                     SchemaField("test_int64", "INTEGER"),
                     SchemaField("test_numeric", "NUMERIC"),
                     SchemaField("test_string", "STRING"),
+                    SchemaField("additional_properties", "STRING"),
                 ],
             )
         if table_ref == "mozdata.glean_app.metrics":
