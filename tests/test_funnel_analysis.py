@@ -31,6 +31,7 @@ def funnel_analysis_explore(tmp_path, funnel_analysis_view):
     )
     return FunnelAnalysisExplore(
         "funnel_analysis",
+        "glean_app",
         {"base_view": "funnel_analysis"},
         tmp_path,
     )
@@ -80,7 +81,7 @@ def test_view_from_dict(funnel_analysis_view):
 
 def test_explore_from_views(funnel_analysis_view):
     expected = FunnelAnalysisExplore(
-        "funnel_analysis", {"base_view": "funnel_analysis"}
+        "funnel_analysis", "glean_app", {"base_view": "funnel_analysis"}
     )
     views = [funnel_analysis_view]
     actual = next(FunnelAnalysisExplore.from_views(views))
@@ -277,5 +278,5 @@ def test_explore_lookml(funnel_analysis_explore):
         {"name": "event_names", "hidden": "yes"},
     ]
 
-    actual = funnel_analysis_explore.to_lookml()
+    actual = funnel_analysis_explore.to_lookml(None)
     print_and_test(expected=expected, actual=actual)

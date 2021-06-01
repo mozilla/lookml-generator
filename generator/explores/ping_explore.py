@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Dict, Iterator, List
+from typing import Any, Dict, Iterator, List, Optional
 
 from ..views import PingView, View
 from . import Explore
@@ -13,7 +13,7 @@ class PingExplore(Explore):
 
     type: str = "ping_explore"
 
-    def _to_lookml(self) -> List[Dict[str, Any]]:
+    def _to_lookml(self, v1_name: Optional[str]) -> List[Dict[str, Any]]:
         """Generate LookML to represent this explore."""
         return [
             {
@@ -30,9 +30,11 @@ class PingExplore(Explore):
         """Generate all possible PingExplores from the views."""
         for view in views:
             if view.view_type == PingView.type:
-                yield PingExplore(view.name, {"base_view": view.name})
+                yield PingExplore(view.name, view.namespace, {"base_view": view.name})
 
     @staticmethod
-    def from_dict(name: str, defn: dict, views_path: Path) -> PingExplore:
+    def from_dict(
+        name: str, namespace: str, defn: dict, views_path: Path
+    ) -> PingExplore:
         """Get an instance of this explore from a name and dictionary definition."""
-        return PingExplore(name, defn["views"], views_path)
+        return PingExplore(name, namespace, defn["views"], views_path)

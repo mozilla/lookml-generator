@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Dict, Iterator, List
+from typing import Any, Dict, Iterator, List, Optional
 
 from ..views import View
 from . import Explore
@@ -37,7 +37,7 @@ class ClientCountsExplore(Explore):
         },
     ]
 
-    def _to_lookml(self) -> List[Dict[str, Any]]:
+    def _to_lookml(self, v1_name: Optional[str]) -> List[Dict[str, Any]]:
         """Generate LookML to represent this explore."""
         return [
             {
@@ -61,7 +61,8 @@ class ClientCountsExplore(Explore):
         for view in views:
             if view.name == "client_counts":
                 yield ClientCountsExplore(
-                    "client_counts",
+                    view.name,
+                    view.namespace,
                     {
                         "base_view": "client_counts",
                         "extended_view": "baseline_clients_daily_table",
@@ -69,6 +70,8 @@ class ClientCountsExplore(Explore):
                 )
 
     @staticmethod
-    def from_dict(name: str, defn: dict, views_path: Path) -> ClientCountsExplore:
+    def from_dict(
+        name: str, namespace: str, defn: dict, views_path: Path
+    ) -> ClientCountsExplore:
         """Get an instance of this explore from a dictionary definition."""
-        return ClientCountsExplore(name, defn["views"], views_path)
+        return ClientCountsExplore(name, namespace, defn["views"], views_path)

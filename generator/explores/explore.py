@@ -15,6 +15,7 @@ class Explore:
     """A generic explore."""
 
     name: str
+    namespace: str
     views: Dict[str, str]
     views_path: Optional[Path] = None
     type: str = field(init=False)
@@ -23,7 +24,7 @@ class Explore:
         """Explore instance represented as a dict."""
         return {self.name: {"type": self.type, "views": self.views}}
 
-    def to_lookml(self) -> List[Dict[str, Any]]:
+    def to_lookml(self, v1_name: Optional[str]) -> List[Dict[str, Any]]:
         """
         Generate LookML for this explore.
 
@@ -58,13 +59,13 @@ class Explore:
                 ] = f"${{{base_view_name}.submission_date}} >= '2010-01-01'"
 
         # We only update the first returned explore
-        new_lookml = self._to_lookml()
+        new_lookml = self._to_lookml(v1_name)
         base_lookml.update(new_lookml[0])
         new_lookml[0] = base_lookml
 
         return new_lookml
 
-    def _to_lookml(self) -> List[Dict[str, Any]]:
+    def _to_lookml(self, v1_name: Optional[str]) -> List[Dict[str, Any]]:
         raise NotImplementedError("Only implemented in subclasses")
 
     def get_dependent_views(self) -> List[str]:
@@ -76,7 +77,7 @@ class Explore:
         ]
 
     @staticmethod
-    def from_dict(name: str, defn: dict, views_path: Path) -> Explore:
+    def from_dict(name: str, namespace: str, defn: dict, views_path: Path) -> Explore:
         """Get an instance of an explore from a namespace definition."""
         raise NotImplementedError("Only implemented in subclasses")
 

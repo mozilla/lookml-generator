@@ -23,6 +23,12 @@ def runner():
     return CliRunner()
 
 
+class MockGleanPing:
+    @staticmethod
+    def get_repos():
+        return [{"name": "glean-app-release"}]
+
+
 class MockClient:
     """Mock bigquery.Client."""
 
@@ -510,7 +516,15 @@ def msg_glean_probes():
 
 
 @patch("generator.views.glean_ping_view.GleanPing")
-def test_lookml_actual(mock_glean_ping, runner, glean_apps, tmp_path, msg_glean_probes):
+@patch("generator.explores.glean_ping_explore.GleanPing")
+def test_lookml_actual(
+    mock_glean_ping_view,
+    mock_glean_ping_explore,
+    runner,
+    glean_apps,
+    tmp_path,
+    msg_glean_probes,
+):
     namespaces = tmp_path / "namespaces.yaml"
     namespaces_text = dedent(
         """
@@ -571,10 +585,14 @@ def test_lookml_actual(mock_glean_ping, runner, glean_apps, tmp_path, msg_glean_
             """
     )
     namespaces.write_text(namespaces_text)
-    mock_glean_ping.get_repos.return_value = [{"name": "glean-app-release"}]
-    glean_app = Mock()
-    mock_glean_ping.return_value = glean_app
-    glean_app.get_probes.return_value = msg_glean_probes
+    for mock in [mock_glean_ping_view, mock_glean_ping_explore]:
+        mock.get_repos.return_value = [{"name": "glean-app-release"}]
+        glean_app = Mock()
+        glean_app.get_probes.return_value = msg_glean_probes
+        glean_app.get_ping_descriptions.return_value = {
+            "baseline": "The baseline ping is foo."
+        }
+        mock.return_value = glean_app
 
     with runner.isolated_filesystem():
         with patch("google.cloud.bigquery.Client", MockClient):
@@ -1156,6 +1174,7 @@ def test_lookml_actual(mock_glean_ping, runner, glean_apps, tmp_path, msg_glean_
             "explores": [
                 {
                     "name": "baseline",
+                    "description": "Explore for the baseline ping. The baseline ping is foo.",
                     "view_name": "baseline",
                     "always_filter": {
                         "filters": [
