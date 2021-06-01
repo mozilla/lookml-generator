@@ -36,7 +36,7 @@ class FunnelAnalysisExplore(Explore):
     def _to_lookml(self) -> List[Dict[str, Any]]:
         view_lookml = self.get_view_lookml("funnel_analysis")
         views = view_lookml["views"]
-        n_events = len([d for d in views if d["name"].startswith("event_type_")])
+        n_events = len([d for d in views if d["name"].startswith("step_")])
         defn: List[Dict[str, Any]] = [
             {
                 "name": "funnel_analysis",
@@ -48,7 +48,7 @@ class FunnelAnalysisExplore(Explore):
                 },
                 "joins": [
                     {
-                        "name": f"event_type_{n}",
+                        "name": f"step_{n}",
                         "relationship": "many_to_one",
                         "type": "cross",
                     }

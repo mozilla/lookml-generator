@@ -17,8 +17,8 @@ def funnel_analysis_view():
             {
                 "funnel_analysis": "events_daily_table",
                 "event_types": "`mozdata.glean_app.event_types`",
-                "event_type_1": "event_types",
-                "event_type_2": "event_types",
+                "step_1": "event_types",
+                "step_2": "event_types",
             }
         ],
     )
@@ -68,8 +68,8 @@ def test_view_from_dict(funnel_analysis_view):
                 {
                     "funnel_analysis": "events_daily_table",
                     "event_types": "`mozdata.glean_app.event_types`",
-                    "event_type_1": "event_types",
-                    "event_type_2": "event_types",
+                    "step_1": "event_types",
+                    "step_2": "event_types",
                 }
             ],
         },
@@ -97,61 +97,63 @@ def test_view_lookml(funnel_analysis_view):
                 "extends": ["events_daily_table"],
                 "dimensions": [
                     {
-                        "name": "completed_event_1",
+                        "name": "completed_step_1",
                         "description": "Whether the user completed step 1 on the associated day.",
                         "type": "yesno",
                         "sql": (
                             "REGEXP_CONTAINS(${TABLE}.events, mozfun.event_analysis.create_funnel_regex(["
-                            "${event_type_1.match_string}],"
+                            "${step_1.match_string}],"
                             "True))"
                         ),
                     },
                     {
-                        "name": "completed_event_2",
+                        "name": "completed_step_2",
                         "description": "Whether the user completed step 2 on the associated day.",
                         "type": "yesno",
                         "sql": (
                             "REGEXP_CONTAINS(${TABLE}.events, mozfun.event_analysis.create_funnel_regex(["
-                            "${event_type_2.match_string}],"
+                            "${step_2.match_string}],"
                             "True))"
                         ),
                     },
                 ],
                 "measures": [
                     {
-                        "name": "count_user_days_event_1",
+                        "name": "count_completed_step_1",
                         "description": (
-                            "The number of user-days that completed step 1. "
-                            "Grouping by day makes this is a count of users."
+                            "The number of times that step 1 was completed. "
+                            "Grouping by day makes this a count of users who completed "
+                            "step 1 on each day."
                         ),
                         "type": "count",
                         "filters": [
-                            {"completed_event_1": "yes"},
+                            {"completed_step_1": "yes"},
                         ],
                     },
                     {
-                        "name": "count_user_days_event_2",
+                        "name": "count_completed_step_2",
                         "description": (
-                            "The number of user-days that completed step 2. "
-                            "Grouping by day makes this is a count of users."
+                            "The number of times that step 2 was completed. "
+                            "Grouping by day makes this a count of users who completed "
+                            "step 2 on each day."
                         ),
                         "type": "count",
                         "filters": [
-                            {"completed_event_1": "yes"},
-                            {"completed_event_2": "yes"},
+                            {"completed_step_1": "yes"},
+                            {"completed_step_2": "yes"},
                         ],
                     },
                     {
-                        "name": "fraction_user_days_event_1",
+                        "name": "fraction_completed_step_1",
                         "description": "Of the user-days that completed Step 1, the fraction that completed step 1.",
                         "type": "number",
-                        "sql": "SAFE_DIVIDE(${count_user_days_event_1}, ${count_user_days_event_1})",
+                        "sql": "SAFE_DIVIDE(${count_completed_step_1}, ${count_completed_step_1})",
                     },
                     {
-                        "name": "fraction_user_days_event_2",
+                        "name": "fraction_completed_step_2",
                         "description": "Of the user-days that completed Step 1, the fraction that completed step 2.",
                         "type": "number",
-                        "sql": "SAFE_DIVIDE(${count_user_days_event_2}, ${count_user_days_event_1})",
+                        "sql": "SAFE_DIVIDE(${count_completed_step_2}, ${count_completed_step_1})",
                     },
                 ],
             },
@@ -195,11 +197,11 @@ def test_view_lookml(funnel_analysis_view):
                 ],
             },
             {
-                "name": "event_type_1",
+                "name": "step_1",
                 "extends": ["event_types"],
             },
             {
-                "name": "event_type_2",
+                "name": "step_2",
                 "extends": ["event_types"],
             },
             {
@@ -257,12 +259,12 @@ def test_explore_lookml(funnel_analysis_explore):
             },
             "joins": [
                 {
-                    "name": "event_type_1",
+                    "name": "step_1",
                     "relationship": "many_to_one",
                     "type": "cross",
                 },
                 {
-                    "name": "event_type_2",
+                    "name": "step_2",
                     "relationship": "many_to_one",
                     "type": "cross",
                 },

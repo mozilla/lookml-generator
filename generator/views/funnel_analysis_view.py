@@ -14,7 +14,7 @@ to use for a regex_match on the `events` string in funnel_analysis.
 For example, say we filter event_1 on `event`: `WHERE event in ("session-start, "session-end")`
 Then we join that with funnel_analysis: `FROM funnel_analysis CROSS JOIN event_1`
 That lets us find out whether the user completed those funnel steps:
-    `SELECT REGEXP_CONTAINS(funnel_analysis.events, event_1.match_string) AS completed_event_1`
+    `SELECT REGEXP_CONTAINS(funnel_analysis.events, event_1.match_string) AS completed_step_1`
 
 The `funnel_analysis` view has some nice dimensions to hide these details from the end user,
 e.g. `completed_funnel_step_N`. We can then count those users across dimensions.
@@ -73,10 +73,7 @@ class FunnelAnalysisView(View):
                 "event_types": actual_views["event_types"],
             }
             tables.update(
-                {
-                    f"event_type_{i}": "event_types"
-                    for i in range(1, num_funnel_steps + 1)
-                }
+                {f"step_{i}": "event_types" for i in range(1, num_funnel_steps + 1)}
             )
             yield FunnelAnalysisView(
                 namespace,
@@ -99,17 +96,17 @@ class FunnelAnalysisView(View):
 
     def n_events(self) -> int:
         """Get the number of events allowed in this funnel."""
-        return len([k for k in self.tables[0] if k.startswith("event_type_")])
+        return len([k for k in self.tables[0] if k.startswith("step_")])
 
     def _funnel_analysis_lookml(self) -> List[Dict[str, Any]]:
         dimensions = [
             {
-                "name": f"completed_event_{n}",
+                "name": f"completed_step_{n}",
                 "type": "yesno",
                 "description": f"Whether the user completed step {n} on the associated day.",
                 "sql": (
                     "REGEXP_CONTAINS(${TABLE}.events, mozfun.event_analysis.create_funnel_regex(["
-                    f"${{event_type_{n}.match_string}}],"
+                    f"${{step_{n}.match_string}}],"
                     "True))"
                 ),
             }
@@ -117,22 +114,23 @@ class FunnelAnalysisView(View):
         ]
         count_measures: List[Dict[str, Any]] = [
             {
-                "name": f"count_user_days_event_{n}",
+                "name": f"count_completed_step_{n}",
                 "description": (
-                    f"The number of user-days that completed step {n}. "
-                    "Grouping by day makes this is a count of users."
+                    f"The number of times that step {n} was completed. "
+                    "Grouping by day makes this a count of users who completed "
+                    f"step {n} on each day."
                 ),
                 "type": "count",
-                "filters": [{f"completed_event_{ni}": "yes"} for ni in range(1, n + 1)],
+                "filters": [{f"completed_step_{ni}": "yes"} for ni in range(1, n + 1)],
             }
             for n in range(1, self.n_events() + 1)
         ]
         fractional_measures: List[Dict[str, Any]] = [
             {
-                "name": f"fraction_user_days_event_{n}",
+                "name": f"fraction_completed_step_{n}",
                 "description": f"Of the user-days that completed Step 1, the fraction that completed step {n}.",
                 "type": "number",
-                "sql": f"SAFE_DIVIDE(${{count_user_days_event_{n}}}, ${{count_user_days_event_1}})",
+                "sql": f"SAFE_DIVIDE(${{count_completed_step_{n}}}, ${{count_completed_step_1}})",
             }
             for n in range(1, self.n_events() + 1)
         ]
@@ -190,7 +188,7 @@ class FunnelAnalysisView(View):
             ]
             + [
                 {
-                    "name": f"event_type_{n}",
+                    "name": f"step_{n}",
                     "extends": ["event_types"],
                 }
                 for n in range(1, self.n_events() + 1)
