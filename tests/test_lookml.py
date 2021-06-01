@@ -646,6 +646,11 @@ def test_lookml_actual(mock_glean_ping, runner, glean_apps, tmp_path, msg_glean_
                     "sql_table_name": "`{% parameter channel %}`",
                     "dimensions": [
                         {
+                            "name": "additional_properties",
+                            "hidden": "yes",
+                            "sql": "${TABLE}.additional_properties",
+                        },
+                        {
                             "name": "client_info__client_id",
                             "hidden": "yes",
                             "sql": "${TABLE}.client_info.client_id",
