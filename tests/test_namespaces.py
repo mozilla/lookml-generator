@@ -375,10 +375,10 @@ def test_get_funnel_view(glean_apps, tmp_path):
                 {
                     "funnel_analysis": "events_daily_table",
                     "event_types": "`mozdata.glean_app.event_types`",
-                    "event_type_1": "event_types",
-                    "event_type_2": "event_types",
-                    "event_type_3": "event_types",
-                    "event_type_4": "event_types",
+                    "step_1": "event_types",
+                    "step_2": "event_types",
+                    "step_3": "event_types",
+                    "step_4": "event_types",
                 }
             ],
         ),
