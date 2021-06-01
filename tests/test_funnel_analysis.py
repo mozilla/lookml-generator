@@ -251,6 +251,7 @@ def test_explore_lookml(funnel_analysis_explore):
     expected = [
         {
             "name": "funnel_analysis",
+            "description": "Count funnel completion over time. Funnels are limited to a single day.",
             "view_label": " User-Day Funnels",
             "always_filter": {
                 "filters": [
