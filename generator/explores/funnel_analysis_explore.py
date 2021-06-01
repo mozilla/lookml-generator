@@ -40,6 +40,7 @@ class FunnelAnalysisExplore(Explore):
         defn: List[Dict[str, Any]] = [
             {
                 "name": "funnel_analysis",
+                "description": "Count funnel completion over time. Funnels are limited to a single day.",
                 "view_label": " User-Day Funnels",
                 "always_filter": {
                     "filters": [
