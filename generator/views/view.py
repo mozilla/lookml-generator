@@ -64,19 +64,20 @@ class View(object):
 
     def __str__(self):
         """Stringify."""
-        return f"name: {self.name}, type: {self.type}, table: {self.tables}"
+        return f"name: {self.name}, type: {self.type}, table: {self.tables}, namespace: {self.namespace}"
 
     def __eq__(self, other) -> bool:
         """Check for equality with other View."""
 
         def comparable_dict(d):
-            return {tuple(sorted(t.items())) for t in self.tables}
+            return {tuple(sorted(t.items())) for t in d}
 
         if isinstance(other, View):
             return (
                 self.name == other.name
                 and self.view_type == other.view_type
                 and comparable_dict(self.tables) == comparable_dict(other.tables)
+                and self.namespace == other.namespace
             )
         return False
 
