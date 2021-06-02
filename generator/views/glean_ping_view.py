@@ -1,6 +1,7 @@
 """Class to describe a Glean Ping View."""
 import logging
 from collections import Counter
+from textwrap import dedent
 from typing import Any, Dict, Iterable, List, Optional, Union
 
 import click
@@ -60,13 +61,21 @@ class GleanPingView(PingView):
         for metric in metrics:
             if metric.type == "labeled_counter":
                 looker_name = self._to_looker_name(metric)
-                definition = {
-                    "name": f"{self.name}__{looker_name}",
+                view_name = f"{self.name}__{looker_name}"
+                suggest_name = f"suggest__{view_name}"
+                join_view = {
+                    "name": view_name,
                     "label": (
                         "_".join(looker_name.split("__")[1:]).replace("_", " ").title()
                     ),
                     "dimensions": [
-                        {"name": "key", "type": "string", "sql": "${TABLE}.key"},
+                        {
+                            "name": "key",
+                            "type": "string",
+                            "sql": "${TABLE}.key",
+                            "suggest_explore": suggest_name,
+                            "suggest_dimension": f"{suggest_name}.key",
+                        },
                         {
                             "name": "value",
                             "type": "number",
@@ -87,10 +96,32 @@ class GleanPingView(PingView):
                         },
                     ],
                 }
-                view_definitions += [definition]
+                suggest_view = {
+                    "name": suggest_name,
+                    "derived_table": {
+                        "sql": dedent(
+                            f"""
+                            select
+                                m.key,
+                                count(*) as n
+                            from {table} as t,
+                            unnest(metrics.{metric.type}.{metric.id.replace(".", "_")}) as m
+                            where date(submission_timestamp) > date_sub(current_date, interval 3 day)
+                            group by key
+                            order by n desc
+                            """
+                        )
+                    },
+                    "dimensions": [
+                        {"name": "key", "type": "string", "sql": "${TABLE}.key"}
+                    ],
+                }
+                view_definitions += [join_view, suggest_view]
         # deduplicate view definitions, because somehow a few entries make it in
         # twice e.g. metrics__metrics__labeled_counter__media_audio_init_failure
-        view_definitions = list({v["name"]: v for v in view_definitions}.values())
+        view_definitions = sorted(
+            {v["name"]: v for v in view_definitions}.values(), key=lambda x: x["name"]  # type: ignore
+        )
 
         lookml["views"] += view_definitions
 

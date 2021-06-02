@@ -36,14 +36,17 @@ class GleanPingExplore(PingExplore):
 
         joins = []
         for view in views_lookml["views"][1:]:
+            if view["name"].startswith("suggest__"):
+                continue
             view_name = view["name"]
             metric = "__".join(view["name"].split("__")[1:])
-            join = {
-                "name": view["name"],
-                "relationship": "one_to_many",
-                "sql": f"CROSS JOIN UNNEST(${{{base_name}.{metric}}}) AS {view_name}",
-            }
-            joins.append(join)
+            joins.append(
+                {
+                    "name": view_name,
+                    "relationship": "one_to_many",
+                    "sql": f"CROSS JOIN UNNEST(${{{base_name}.{metric}}}) AS {view_name}",
+                }
+            )
 
         base_explore = {
             "name": self.name,
@@ -54,7 +57,13 @@ class GleanPingExplore(PingExplore):
             "joins": joins,
         }
 
-        return [base_explore]
+        suggests = []
+        for view in views_lookml["views"][1:]:
+            if not view["name"].startswith("suggest__"):
+                continue
+            suggests.append({"name": view["name"], "hidden": "yes"})
+
+        return [base_explore] + suggests
 
     @staticmethod
     def from_views(views: List[View]) -> Iterator[PingExplore]:
