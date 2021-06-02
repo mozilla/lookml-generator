@@ -1211,26 +1211,46 @@ def test_lookml_actual_metrics_view(
                 {
                     "dimensions": [
                         {
-                            "type": "string",
-                            "sql": "${TABLE}.key",
                             "name": "key",
+                            "sql": "${TABLE}.key",
+                            "suggest_dimension": "suggest__metrics__metrics__labeled_counter__test_labeled_counter.key",
+                            "suggest_explore": "suggest__metrics__metrics__labeled_counter__test_labeled_counter",
+                            "type": "string",
                         },
                         {
-                            "type": "number",
-                            "sql": "${TABLE}.value",
                             "hidden": "yes",
                             "name": "value",
+                            "sql": "${TABLE}.value",
+                            "type": "number",
                         },
                     ],
+                    "label": "Labeled Counter Test Labeled Counter",
                     "measures": [
-                        {"type": "sum", "sql": "${value}", "name": "count"},
+                        {"name": "count", "sql": "${value}", "type": "sum"},
                         {
-                            "type": "count_distinct",
-                            "sql": "case when ${value} > 0 then ${metrics.client_info__client_id}",
                             "name": "client_count",
+                            "sql": "case when ${value} > 0 then "
+                            "${metrics.client_info__client_id} end",
+                            "type": "count_distinct",
                         },
                     ],
                     "name": "metrics__metrics__labeled_counter__test_labeled_counter",
+                },
+                {
+                    "derived_table": {
+                        "sql": "select\n"
+                        "    m.key,\n"
+                        "    count(*) as n\n"
+                        "from mozdata.glean_app.metrics as t,\n"
+                        "unnest(metrics.labeled_counter.test_labeled_counter) as m\n"
+                        "where date(submission_timestamp) > date_sub(current_date, interval 3 day)\n"
+                        "group by key\n"
+                        "order by n desc"
+                    },
+                    "dimensions": [
+                        {"name": "key", "sql": "${TABLE}.key", "type": "string"}
+                    ],
+                    "name": "suggest__metrics__metrics__labeled_counter__test_labeled_counter",
                 },
             ]
         }
