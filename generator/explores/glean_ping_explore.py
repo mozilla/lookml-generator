@@ -24,7 +24,9 @@ class GleanPingExplore(PingExplore):
         ping_descriptions = {
             k.replace("-", "_"): v for k, v in glean_app.get_ping_descriptions().items()
         }
+        # collapse whitespace in the description so the lookml looks a little better
         ping_description = " ".join(ping_descriptions[self.name].split())
+        # insert the description in
         lookml = super()._to_lookml(v1_name)
         lookml[0][
             "description"
