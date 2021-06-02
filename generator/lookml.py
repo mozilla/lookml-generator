@@ -32,7 +32,9 @@ def _generate_explores(
     namespace: str,
     explores: dict,
     views_dir: Path,
-    v1_name: Optional[str],
+    v1_name: Optional[
+        str
+    ],  # v1_name for Glean explores: see: https://mozilla.github.io/probe-scraper/#tag/library
 ) -> Iterable[Path]:
     for explore_name, defn in explores.items():
         logging.info(f"Generating lookml for explore {explore_name} in {namespace}")
