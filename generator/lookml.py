@@ -40,7 +40,7 @@ def _generate_explores(
                 f"/looker-hub/{namespace}/views/{view}.view.lkml"
                 for view in explore.get_dependent_views()
             ],
-            "explores": [explore.to_lookml()],
+            "explores": explore.to_lookml(),
         }
         path = out_dir / (explore_name + ".explore.lkml")
         path.write_text(lkml_update.dump(file_lookml))

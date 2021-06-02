@@ -391,6 +391,25 @@ class MockClient:
             return bigquery.Table(
                 table_ref, schema=[SchemaField("context_id", "STRING")]
             )
+        if table_ref == "mozdata.glean_app.events_daily":
+            return bigquery.Table(
+                table_ref,
+                schema=[
+                    SchemaField("client_id", "STRING"),
+                    SchemaField("submission_date", "DATE"),
+                    SchemaField("country", "STRING"),
+                    SchemaField("events", "STRING"),
+                ],
+            )
+        if table_ref == "mozdata.glean_app.event_types":
+            return bigquery.Table(
+                table_ref,
+                schema=[
+                    SchemaField("category", "STRING"),
+                    SchemaField("event", "STRING"),
+                    SchemaField("index", "STRING"),
+                ],
+            )
         raise ValueError(f"Table not found: {table_ref}")
 
 

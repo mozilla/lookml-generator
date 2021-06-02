@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from pathlib import Path
-from typing import Iterator, List
+from typing import Any, Dict, Iterator, List
 
 from ..views import View
 from . import Explore
@@ -37,17 +37,19 @@ class ClientCountsExplore(Explore):
         },
     ]
 
-    def _to_lookml(self) -> dict:
+    def _to_lookml(self) -> List[Dict[str, Any]]:
         """Generate LookML to represent this explore."""
-        return {
-            "name": self.name,
-            "view_name": self.views["base_view"],
-            "description": "Client counts across dimensions and cohorts.",
-            "always_filter": {
-                "filters": self.get_required_filters("extended_view"),
-            },
-            "queries": deepcopy(ClientCountsExplore.queries),
-        }
+        return [
+            {
+                "name": self.name,
+                "view_name": self.views["base_view"],
+                "description": "Client counts across dimensions and cohorts.",
+                "always_filter": {
+                    "filters": self.get_required_filters("extended_view"),
+                },
+                "queries": deepcopy(ClientCountsExplore.queries),
+            }
+        ]
 
     @staticmethod
     def from_views(views: List[View]) -> Iterator[ClientCountsExplore]:

@@ -3,6 +3,7 @@ import tarfile
 from io import BytesIO
 from pathlib import Path
 from textwrap import dedent
+from typing import Dict
 
 import pytest
 import yaml
@@ -10,12 +11,14 @@ from click.testing import CliRunner
 
 from generator.namespaces import (
     _get_db_views,
+    _get_explores,
     _get_glean_apps,
     _get_looker_views,
     namespaces,
 )
 from generator.views import (
     ClientCountsView,
+    FunnelAnalysisView,
     GleanPingView,
     GrowthAccountingView,
     TableView,
@@ -82,49 +85,57 @@ def namespace_allowlist(tmp_path):
     return dest.absolute()
 
 
+def add_to_tar(tar, path, content):
+    content = dedent(content).lstrip()
+    info = tarfile.TarInfo(path)
+    info.size = len(content)
+    tar.addfile(info, BytesIO(content.encode()))
+
+
+def paths_to_tar(dest_path: Path, paths: Dict[str, str]) -> str:
+    with tarfile.open(dest_path, "w:gz") as tar:
+        for path, content in paths.items():
+            add_to_tar(tar, path, content)
+
+    return dest_path.absolute().as_uri()
+
+
 @pytest.fixture
 def generated_sql_uri(tmp_path):
     dest = tmp_path / "bigquery_etl.tar.gz"
-    with tarfile.open(dest, "w:gz") as tar:
+    paths = {}
+    for dataset in ("glean_app", "glean_app_beta"):
+        content = f"""
+            references:
+              view.sql:
+              - moz-fx-data-shared-prod.{dataset}_derived.baseline_clients_daily_v1
+            """
+        path = (
+            f"sql/moz-fx-data-shared-prod/{dataset}/"
+            "baseline_clients_daily/metadata.yaml"
+        )
+        paths[path] = content
 
-        def add_to_tar(path, content):
-            content = dedent(content).lstrip()
-            info = tarfile.TarInfo(path)
-            info.size = len(content)
-            tar.addfile(info, BytesIO(content.encode()))
+        content = f"""
+            references:
+              view.sql:
+              - moz-fx-data-shared-prod.{dataset}_stable.baseline_v1
+            """
+        path = f"sql/moz-fx-data-shared-prod/{dataset}/baseline/metadata.yaml"
+        paths[path] = content
 
-        for dataset in ("glean_app", "glean_app_beta"):
-            content = f"""
-                references:
-                  view.sql:
-                  - moz-fx-data-shared-prod.{dataset}_derived.baseline_clients_daily_v1
-                """
-            path = (
-                f"sql/moz-fx-data-shared-prod/{dataset}/"
-                "baseline_clients_daily/metadata.yaml"
-            )
-            add_to_tar(path, content)
+        content = f"""
+            references:
+              view.sql:
+              - moz-fx-data-shared-prod.{dataset}_derived.baseline_clients_last_seen_v1
+            """
+        path = (
+            f"sql/moz-fx-data-shared-prod/{dataset}/"
+            "baseline_clients_last_seen/metadata.yaml"
+        )
+        paths[path] = content
 
-            content = f"""
-                references:
-                  view.sql:
-                  - moz-fx-data-shared-prod.{dataset}_stable.baseline_v1
-                """
-            path = f"sql/moz-fx-data-shared-prod/{dataset}/baseline/metadata.yaml"
-            add_to_tar(path, content)
-
-            content = f"""
-                references:
-                  view.sql:
-                  - moz-fx-data-shared-prod.{dataset}_derived.baseline_clients_last_seen_v1
-                """
-            path = (
-                f"sql/moz-fx-data-shared-prod/{dataset}/"
-                "baseline_clients_last_seen/metadata.yaml"
-            )
-            add_to_tar(path, content)
-
-    return dest.absolute().as_uri()
+    return paths_to_tar(dest, paths)
 
 
 def test_namespaces_full(
@@ -278,7 +289,6 @@ def test_get_looker_views(glean_apps, generated_sql_uri):
             namespace,
             [
                 {
-                    "channel": "release",
                     "table": "mozdata.glean_app.baseline_clients_daily",
                 }
             ],
@@ -295,7 +305,6 @@ def test_get_looker_views(glean_apps, generated_sql_uri):
             namespace,
             [
                 {
-                    "channel": "release",
                     "table": "mozdata.glean_app.baseline_clients_last_seen",
                 }
             ],
@@ -337,5 +346,92 @@ def test_get_looker_views(glean_apps, generated_sql_uri):
             ],
         ),
     ]
+
+    print_and_test(expected, actual)
+
+
+def test_get_funnel_view(glean_apps, tmp_path):
+    dest = tmp_path / "funnels.tar.gz"
+    paths = {
+        "sql/moz-fx-data-shared-prod/glean_app/events_daily/metadata.yaml": """
+                references:
+                  view.sql:
+                    - moz-fx-data-shared-prod.glean_app_derived.events_daily_v1""",
+        "sql/moz-fx-data-shared-prod/glean_app/event_types/metadata.yaml": """
+                references:
+                  view.sql:
+                    - moz-fx-data-shared-prod.glean_app_derived.event_types_v1""",
+    }
+
+    sql_uri = paths_to_tar(dest, paths)
+
+    db_views = _get_db_views(sql_uri)
+    actual = _get_looker_views(glean_apps[0], db_views)
+    namespace = glean_apps[0]["name"]
+    expected = [
+        FunnelAnalysisView(
+            namespace,
+            [
+                {
+                    "funnel_analysis": "events_daily_table",
+                    "event_types": "`mozdata.glean_app.event_types`",
+                    "step_1": "event_types",
+                    "step_2": "event_types",
+                    "step_3": "event_types",
+                    "step_4": "event_types",
+                }
+            ],
+        ),
+        TableView(
+            namespace,
+            "events_daily_table",
+            [
+                {
+                    "table": "mozdata.glean_app.events_daily",
+                    "channel": "release",
+                },
+            ],
+        ),
+        TableView(
+            namespace,
+            "event_types_table",
+            [
+                {
+                    "table": "mozdata.glean_app.event_types",
+                    "channel": "release",
+                },
+            ],
+        ),
+    ]
+
+    print_and_test(expected, actual)
+
+
+def test_get_funnel_explore(glean_apps, tmp_path):
+    dest = tmp_path / "funnels.tar.gz"
+    paths = {
+        "sql/moz-fx-data-shared-prod/glean_app/events_daily/metadata.yaml": """
+                references:
+                  view.sql:
+                    - moz-fx-data-shared-prod.glean_app_derived.events_daily_v1""",
+        "sql/moz-fx-data-shared-prod/glean_app/event_types/metadata.yaml": """
+                references:
+                  view.sql:
+                    - moz-fx-data-shared-prod.glean_app_derived.event_types_v1""",
+    }
+
+    sql_uri = paths_to_tar(dest, paths)
+
+    db_views = _get_db_views(sql_uri)
+    views = _get_looker_views(glean_apps[0], db_views)
+    actual = _get_explores(views)
+    expected = {
+        "funnel_analysis": {
+            "type": "funnel_analysis_explore",
+            "views": {
+                "base_view": "funnel_analysis",
+            },
+        }
+    }
 
     print_and_test(expected, actual)
