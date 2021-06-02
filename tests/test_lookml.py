@@ -657,6 +657,7 @@ def test_lookml_actual_baseline_view(
                             "name": "document_id",
                             "hidden": "yes",
                             "sql": "${TABLE}.document_id",
+                            "primary_key": "yes",
                         },
                     ],
                     "measures": [
@@ -1211,6 +1212,13 @@ def test_lookml_actual_metrics_view(
                 {
                     "dimensions": [
                         {
+                            "hidden": "yes",
+                            "name": "document_id",
+                            "primary_key": "yes",
+                            "sql": "${metrics.document_id}",
+                            "type": "string",
+                        },
+                        {
                             "name": "key",
                             "sql": "${TABLE}.key",
                             "suggest_dimension": "suggest__metrics__metrics__labeled_counter__test_labeled_counter.key",
@@ -1241,9 +1249,13 @@ def test_lookml_actual_metrics_view(
                         "sql": "select\n"
                         "    m.key,\n"
                         "    count(*) as n\n"
-                        "from mozdata.glean_app.metrics as t,\n"
-                        "unnest(metrics.labeled_counter.test_labeled_counter) as m\n"
-                        "where date(submission_timestamp) > date_sub(current_date, interval 3 day)\n"
+                        "from mozdata.glean_app.metrics as "
+                        "t,\n"
+                        "unnest(metrics.labeled_counter.test_labeled_counter) "
+                        "as m\n"
+                        "where date(submission_timestamp) > "
+                        "date_sub(current_date, interval 3 "
+                        "day)\n"
                         "group by key\n"
                         "order by n desc"
                     },

@@ -70,14 +70,12 @@ class PingView(View):
 
         dimensions = self.get_dimensions(bq_client, table, v1_name)
 
-        # set client id field as a primary key for joins
-        client_id_field = self._get_client_id(dimensions, table)
-
+        # set document id field as a primary key for joins
         view_defn["dimensions"] = list(
             filterfalse(
                 lookml_utils._is_dimension_group,
                 [
-                    d if d["name"] != client_id_field else dict(**d, primary_key="yes")
+                    d if d["name"] != "document_id" else dict(**d, primary_key="yes")
                     for d in dimensions
                 ],
             )
