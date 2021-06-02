@@ -53,6 +53,7 @@ class GleanPingExplore(PingExplore):
 
         base_explore = {
             "name": self.name,
+            "description": f"Explore for the {self.name} ping. {ping_description}",
             "view_name": self.views["base_view"],
             "always_filter": {
                 "filters": self.get_required_filters("base_view"),
