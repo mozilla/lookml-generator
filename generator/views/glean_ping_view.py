@@ -70,9 +70,9 @@ class GleanPingView(PingView):
                     ),
                     "dimensions": [
                         {
-                            "name": "client_id",
+                            "name": "document_id",
                             "type": "string",
-                            "sql": f"${{{self.name}.{client_id_field}}}",
+                            "sql": f"${{{self.name}.document_id}}",
                             "primary_key": "yes",
                             "hidden": "yes",
                         },

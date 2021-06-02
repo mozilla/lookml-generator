@@ -46,7 +46,7 @@ class GleanPingExplore(PingExplore):
                     "relationship": "one_to_many",
                     "sql": (
                         f"LEFT JOIN UNNEST(${{{base_name}.{metric}}}) AS {view_name} "
-                        f"ON ${{{base_name}.client_info__client_id}} = ${{{view_name}.client_id}}"
+                        f"ON ${{{base_name}.document_id}} = ${{{view_name}.document_id}}"
                     ),
                 }
             )
