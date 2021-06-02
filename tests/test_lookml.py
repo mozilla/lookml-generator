@@ -590,7 +590,7 @@ def test_lookml_actual(
         glean_app = Mock()
         glean_app.get_probes.return_value = msg_glean_probes
         glean_app.get_ping_descriptions.return_value = {
-            "baseline": "The baseline ping is foo."
+            "baseline": "The baseline ping\n    is foo."
         }
         mock.return_value = glean_app
 
