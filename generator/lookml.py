@@ -27,7 +27,14 @@ def _generate_views(
 
 
 def _generate_explores(
-    client, out_dir: Path, namespace: str, explores: dict, views_dir: Path
+    client,
+    out_dir: Path,
+    namespace: str,
+    explores: dict,
+    views_dir: Path,
+    v1_name: Optional[
+        str
+    ],  # v1_name for Glean explores: see: https://mozilla.github.io/probe-scraper/#tag/library
 ) -> Iterable[Path]:
     for explore_name, defn in explores.items():
         logging.info(f"Generating lookml for explore {explore_name} in {namespace}")
@@ -40,7 +47,7 @@ def _generate_explores(
                 f"/looker-hub/{namespace}/views/{view}.view.lkml"
                 for view in explore.get_dependent_views()
             ],
-            "explores": explore.to_lookml(),
+            "explores": explore.to_lookml(v1_name),
         }
         path = out_dir / (explore_name + ".explore.lkml")
         path.write_text(lkml_update.dump(file_lookml))
@@ -89,7 +96,7 @@ def _lookml(namespaces, glean_apps, target_dir):
         explores = lookml_objects.get("explores", {})
         logging.info("  Generating explores")
         for explore_path in _generate_explores(
-            client, explore_dir, namespace, explores, view_dir
+            client, explore_dir, namespace, explores, view_dir, v1_name
         ):
             logging.info(f"    ...Generating {explore_path}")
 
