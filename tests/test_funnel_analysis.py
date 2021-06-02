@@ -112,7 +112,9 @@ def test_view_lookml(funnel_analysis_view):
                         "type": "yesno",
                         "sql": (
                             "REGEXP_CONTAINS(${TABLE}.events, mozfun.event_analysis.create_funnel_regex(["
-                            "${step_2.match_string}],"
+                            "${step_1.match_string},"
+                            "${step_2.match_string}"
+                            "],"
                             "True))"
                         ),
                     },
