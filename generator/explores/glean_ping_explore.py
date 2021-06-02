@@ -19,7 +19,12 @@ class GleanPingExplore(PingExplore):
         """Generate LookML to represent this explore."""
         repo = next((r for r in GleanPing.get_repos() if r["name"] == v1_name))
         glean_app = GleanPing(repo)
-        ping_description = glean_app.get_ping_descriptions()[self.name]
+        # convert ping description indexes to snake case, as we already have
+        # for the explore name
+        ping_descriptions = {
+            k.replace("-", "_"): v for k, v in glean_app.get_ping_descriptions().items()
+        }
+        ping_description = ping_descriptions[self.name]
         lookml = super()._to_lookml(v1_name)
         lookml[0][
             "description"
