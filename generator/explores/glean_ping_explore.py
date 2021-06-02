@@ -44,7 +44,10 @@ class GleanPingExplore(PingExplore):
                 {
                     "name": view_name,
                     "relationship": "one_to_many",
-                    "sql": f"CROSS JOIN UNNEST(${{{base_name}.{metric}}}) AS {view_name}",
+                    "sql": (
+                        f"LEFT JOIN UNNEST(${{{base_name}.{metric}}}) AS {view_name} "
+                        f"ON ${{{base_name}.client_info__client_id}} = ${{{view_name}.client_id}}"
+                    ),
                 }
             )
 
