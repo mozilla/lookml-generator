@@ -104,10 +104,15 @@ class FunnelAnalysisView(View):
                 "name": f"completed_step_{n}",
                 "type": "yesno",
                 "description": f"Whether the user completed step {n} on the associated day.",
-                "sql": (
-                    "REGEXP_CONTAINS(${TABLE}.events, mozfun.event_analysis.create_funnel_regex(["
-                    f"${{step_{n}.match_string}}],"
-                    "True))"
+                "sql": "".join(
+                    (
+                        "REGEXP_CONTAINS(${TABLE}.events, mozfun.event_analysis.create_funnel_regex([",
+                        ",".join(
+                            [f"${{step_{ni}.match_string}}" for ni in range(1, n + 1)]
+                        ),
+                        "],",
+                        "True))",
+                    )
                 ),
             }
             for n in range(1, self.n_events() + 1)
