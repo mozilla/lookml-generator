@@ -38,9 +38,7 @@ def _generate_explores(
 ) -> Iterable[Path]:
     for explore_name, defn in explores.items():
         logging.info(f"Generating lookml for explore {explore_name} in {namespace}")
-        explore = EXPLORE_TYPES[defn["type"]].from_dict(
-            explore_name, namespace, defn, views_dir
-        )
+        explore = EXPLORE_TYPES[defn["type"]].from_dict(explore_name, defn, views_dir)
         file_lookml = {
             # Looker validates all included files,
             # so if we're not explicit about files here, validation takes

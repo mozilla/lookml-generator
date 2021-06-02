@@ -38,13 +38,9 @@ class GleanPingExplore(PingExplore):
         """Generate all possible GleanPingExplores from the views."""
         for view in views:
             if view.view_type == GleanPingView.type:
-                yield GleanPingExplore(
-                    view.name, view.namespace, {"base_view": view.name}
-                )
+                yield GleanPingExplore(view.name, {"base_view": view.name})
 
     @staticmethod
-    def from_dict(
-        name: str, namespace: str, defn: dict, views_path: Path
-    ) -> GleanPingExplore:
+    def from_dict(name: str, defn: dict, views_path: Path) -> GleanPingExplore:
         """Get an instance of this explore from a name and dictionary definition."""
-        return GleanPingExplore(name, namespace, defn["views"], views_path)
+        return GleanPingExplore(name, defn["views"], views_path)

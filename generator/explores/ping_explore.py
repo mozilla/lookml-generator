@@ -30,11 +30,9 @@ class PingExplore(Explore):
         """Generate all possible PingExplores from the views."""
         for view in views:
             if view.view_type == PingView.type:
-                yield PingExplore(view.name, view.namespace, {"base_view": view.name})
+                yield PingExplore(view.name, {"base_view": view.name})
 
     @staticmethod
-    def from_dict(
-        name: str, namespace: str, defn: dict, views_path: Path
-    ) -> PingExplore:
+    def from_dict(name: str, defn: dict, views_path: Path) -> PingExplore:
         """Get an instance of this explore from a name and dictionary definition."""
-        return PingExplore(name, namespace, defn["views"], views_path)
+        return PingExplore(name, defn["views"], views_path)

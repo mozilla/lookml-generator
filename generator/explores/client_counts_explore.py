@@ -62,7 +62,6 @@ class ClientCountsExplore(Explore):
             if view.name == "client_counts":
                 yield ClientCountsExplore(
                     view.name,
-                    view.namespace,
                     {
                         "base_view": "client_counts",
                         "extended_view": "baseline_clients_daily_table",
@@ -70,8 +69,6 @@ class ClientCountsExplore(Explore):
                 )
 
     @staticmethod
-    def from_dict(
-        name: str, namespace: str, defn: dict, views_path: Path
-    ) -> ClientCountsExplore:
+    def from_dict(name: str, defn: dict, views_path: Path) -> ClientCountsExplore:
         """Get an instance of this explore from a dictionary definition."""
-        return ClientCountsExplore(name, namespace, defn["views"], views_path)
+        return ClientCountsExplore(name, defn["views"], views_path)

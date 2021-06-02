@@ -33,13 +33,10 @@ class GrowthAccountingExplore(Explore):
             if view.name == "growth_accounting":
                 yield GrowthAccountingExplore(
                     view.name,
-                    view.namespace,
                     {"base_view": "growth_accounting"},
                 )
 
     @staticmethod
-    def from_dict(
-        name: str, namespace: str, defn: dict, views_path: Path
-    ) -> GrowthAccountingExplore:
+    def from_dict(name: str, defn: dict, views_path: Path) -> GrowthAccountingExplore:
         """Get an instance of this explore from a dictionary definition."""
-        return GrowthAccountingExplore(name, namespace, defn["views"], views_path)
+        return GrowthAccountingExplore(name, defn["views"], views_path)

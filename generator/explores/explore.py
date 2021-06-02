@@ -15,7 +15,6 @@ class Explore:
     """A generic explore."""
 
     name: str
-    namespace: str
     views: Dict[str, str]
     views_path: Optional[Path] = None
     type: str = field(init=False)
@@ -77,7 +76,7 @@ class Explore:
         ]
 
     @staticmethod
-    def from_dict(name: str, namespace: str, defn: dict, views_path: Path) -> Explore:
+    def from_dict(name: str, defn: dict, views_path: Path) -> Explore:
         """Get an instance of an explore from a namespace definition."""
         raise NotImplementedError("Only implemented in subclasses")
 

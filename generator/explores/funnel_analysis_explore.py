@@ -25,16 +25,13 @@ class FunnelAnalysisExplore(Explore):
             if view.name == "funnel_analysis":
                 yield FunnelAnalysisExplore(
                     "funnel_analysis",
-                    view.namespace,
                     {"base_view": view.name},
                 )
 
     @staticmethod
-    def from_dict(
-        name: str, namespace: str, defn: dict, views_path: Path
-    ) -> FunnelAnalysisExplore:
+    def from_dict(name: str, defn: dict, views_path: Path) -> FunnelAnalysisExplore:
         """Get an instance of this explore from a dictionary definition."""
-        return FunnelAnalysisExplore(name, namespace, defn["views"], views_path)
+        return FunnelAnalysisExplore(name, defn["views"], views_path)
 
     def _to_lookml(self, v1_name: Optional[str]) -> List[Dict[str, Any]]:
         view_lookml = self.get_view_lookml("funnel_analysis")
