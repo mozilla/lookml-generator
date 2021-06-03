@@ -16,7 +16,7 @@ from .lookml import ViewDict
 MODEL_SETS_BY_INSTANCE: Dict[str, List[str]] = {
     "https://mozilladev.cloud.looker.com": ["mozilla_confidential"],
     "https://mozillastaging.cloud.looker.com": ["mozilla_confidential"],
-    "https://mozilla.cloud.looker.com": ["user-spokes", "spokes"],
+    "https://mozilla.cloud.looker.com": ["mozilla_confidential"],
 }
 
 DEFAULT_DB_CONNECTION = "telemetry"
