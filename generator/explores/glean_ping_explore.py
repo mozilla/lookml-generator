@@ -53,6 +53,8 @@ class GleanPingExplore(PingExplore):
 
         base_explore = {
             "name": self.name,
+            # list the base explore first by prefixing with a space
+            "view_label": f" {self.name.title()}",
             "description": f"Explore for the {self.name} ping. {ping_description}",
             "view_name": self.views["base_view"],
             "always_filter": {

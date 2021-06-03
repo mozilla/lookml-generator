@@ -1353,6 +1353,7 @@ def test_lookml_actual_baseline_explore(
                     "name": "baseline",
                     "description": "Explore for the baseline ping. The baseline ping is foo.",
                     "view_name": "baseline",
+                    "view_label": " Baseline",
                     "always_filter": {
                         "filters": [
                             {"channel": "mozdata.glean^_app.baseline"},
