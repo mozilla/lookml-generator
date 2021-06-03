@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from itertools import filterfalse
 from typing import Any, Dict, Iterator, List, Optional, Union
 
 import click
@@ -71,18 +70,14 @@ class PingView(View):
         dimensions = self.get_dimensions(bq_client, table, v1_name)
 
         # set document id field as a primary key for joins
-        view_defn["dimensions"] = list(
-            filterfalse(
-                lookml_utils._is_dimension_group,
-                [
-                    d if d["name"] != "document_id" else dict(**d, primary_key="yes")
-                    for d in dimensions
-                ],
-            )
-        )
-        view_defn["dimension_groups"] = list(
-            filter(lookml_utils._is_dimension_group, dimensions)
-        )
+        view_defn["dimensions"] = [
+            d if d["name"] != "document_id" else dict(**d, primary_key="yes")
+            for d in dimensions
+            if not lookml_utils._is_dimension_group(d)
+        ]
+        view_defn["dimension_groups"] = [
+            d for d in dimensions if lookml_utils._is_dimension_group(d)
+        ]
 
         # add measures
         view_defn["measures"] = self.get_measures(dimensions, table, v1_name)
