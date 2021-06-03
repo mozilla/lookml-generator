@@ -164,7 +164,7 @@ workflows:
             - integration-tests
           filters:
             branches:
-              only: main
+              only: docs
 
 <<<<<<< HEAD
     - gcp-gcr/build-and-push-image:
