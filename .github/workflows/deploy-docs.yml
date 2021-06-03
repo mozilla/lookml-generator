@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - main
+      - docs
 jobs:
   push-to-gh-pages:
     runs-on: ubuntu-latest
