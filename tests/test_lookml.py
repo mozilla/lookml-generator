@@ -1252,7 +1252,7 @@ def test_lookml_actual_metrics_view(
                         "from mozdata.glean_app.metrics as "
                         "t,\n"
                         "unnest(metrics.labeled_counter.test_labeled_counter) as m\n"
-                        "where date(submission_timestamp) > date_sub(current_date, interval 90 day)\n"
+                        "where date(submission_timestamp) > date_sub(current_date, interval 30 day)\n"
                         "    and sample_id = 0\n"
                         "group by key\n"
                         "order by n desc"

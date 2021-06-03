@@ -113,7 +113,7 @@ class GleanPingView(PingView):
                                 count(*) as n
                             from {table} as t,
                             unnest(metrics.{metric.type}.{metric.id.replace(".", "_")}) as m
-                            where date(submission_timestamp) > date_sub(current_date, interval 90 day)
+                            where date(submission_timestamp) > date_sub(current_date, interval 30 day)
                                 and sample_id = 0
                             group by key
                             order by n desc
