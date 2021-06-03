@@ -277,5 +277,5 @@ def test_explore_lookml(funnel_analysis_explore):
         {"name": "event_names", "hidden": "yes"},
     ]
 
-    actual = funnel_analysis_explore.to_lookml()
+    actual = funnel_analysis_explore.to_lookml(None)
     print_and_test(expected=expected, actual=actual)

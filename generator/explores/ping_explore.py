@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Dict, Iterator, List
+from typing import Any, Dict, Iterator, List, Optional
 
 from ..views import PingView, View
 from . import Explore
@@ -13,7 +13,7 @@ class PingExplore(Explore):
 
     type: str = "ping_explore"
 
-    def _to_lookml(self) -> List[Dict[str, Any]]:
+    def _to_lookml(self, v1_name: Optional[str]) -> List[Dict[str, Any]]:
         """Generate LookML to represent this explore."""
         return [
             {
