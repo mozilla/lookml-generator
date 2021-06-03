@@ -4,12 +4,12 @@ We use [`namespaces.yaml`](https://github.com/mozilla/looker-hub/blob/main/names
 
 Each entry in `namespaces.yaml` represents a namespace, and has the following properties:
 
-`owners` (string): The owners are the people who will have control over the associated Namespace folder in Looker. It is up to them to decide which dashboards to "promote" to their shared folder.
-`pretty_name` (string): The pretty name is used in most places where the namespace's name is seen, e.g. in the explore drop-down and folder name.
-`glean_app` (bool): Whether or not this namespace represents a Glean Application.
-`connection` (optional string): The database connection to use, as named in Looker. Defaults to `telemetry`.
-`views` (object): The LookML View files that will be generated. More detailed info below.
-`explores` (object): The LookML Explore files that will be generated. More detailed info below.
+- `owners` (string): The owners are the people who will have control over the associated Namespace folder in Looker. It is up to them to decide which dashboards to "promote" to their shared folder.
+- `pretty_name` (string): The pretty name is used in most places where the namespace's name is seen, e.g. in the explore drop-down and folder name.
+- `glean_app` (bool): Whether or not this namespace represents a Glean Application.
+- `connection` (optional string): The database connection to use, as named in Looker. Defaults to `telemetry`.
+- `views` (object): The LookML View files that will be generated. More detailed info below.
+- `explores` (object): The LookML Explore files that will be generated. More detailed info below.
 
 ## `views`
 
@@ -20,6 +20,7 @@ Each LookML View file can contain multiple Looker Views; the idea here is that t
 `tables`: This field is used in a few ways, depending on the associated View type.
 
 For `GleanPingView` and `PingView`, `tables` represents all of the associated channels for that view. Each table will have a `channel` and `table` entry. Only a single view will be created in the LookML File.
+
 ```yaml
 tables:
   - channel: release
@@ -29,13 +30,15 @@ tables:
 ```
 
 For `ClientCountView` and `GrowthAccountingView`, `tables` will have a single entry, with the name of the table the Looker View is based off of. Only a single Looker View will be created.
+
 ```yaml
 tables:
   - table: mozdata.org_mozilla_firefox.baseline_clients_last_seen
 ```
 
 For `FunnelAnalysisView`, only the first list entry is used; inside that entry, each value represents a Looker View that is created. The key is the name of the view, the value is the Looker View or BQ View it is derived from.
-In the following example, 4 views will be created in the view file: `funnel_analysis`, `event_types`, `event_type_1` and `event_type_2`. 
+In the following example, 4 views will be created in the view file: `funnel_analysis`, `event_types`, `event_type_1` and `event_type_2`.
+
 ```yaml
 tables:
   - funnel_analysis: events_daily_table
@@ -48,8 +51,8 @@ tables:
 
 Each Explore entry is a single file, sometimes containing multiple explores within it (mainly for things like changing suggestions).
 
-`type` - The type of the explore, e.g. `growth_accounting_explore`.
-`views` - The views that this is based on. Generally, the allowed keys here are:
-- `base_view`: The base view is the one we are basing this Explore on, using [`view_name`](https://docs.looker.com/reference/explore-params/view_name).
-- `extended_view*`: Any views we include in the `base_view` are added as these. It could be one (`extended_view`) or multiple (`extended_view_1`).
-- `joined_view*`: Any other view we are going to join to this one. _This is only required if the joined view is not defined in the same view file as `base_view`._
+- `type` - The type of the explore, e.g. `growth_accounting_explore`.
+- `views` - The views that this is based on. Generally, the allowed keys here are:
+  - `base_view`: The base view is the one we are basing this Explore on, using [`view_name`](https://docs.looker.com/reference/explore-params/view_name).
+  - `extended_view*`: Any views we include in the `base_view` are added as these. It could be one (`extended_view`) or multiple (`extended_view_1`).
+  - `joined_view*`: Any other view we are going to join to this one. _This is only required if the joined view is not defined in the same view file as `base_view`._
