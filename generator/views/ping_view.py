@@ -71,7 +71,9 @@ class PingView(View):
 
         # set document id field as a primary key for joins
         view_defn["dimensions"] = [
-            d for d in dimensions if not lookml_utils._is_dimension_group(d)
+            d if d["name"] != "document_id" else dict(**d, primary_key="yes")
+            for d in dimensions
+            if not lookml_utils._is_dimension_group(d)
         ]
         view_defn["dimension_groups"] = [
             d for d in dimensions if lookml_utils._is_dimension_group(d)
