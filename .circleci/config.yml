@@ -84,6 +84,39 @@ jobs:
         name: Test build namespaces.yaml
         command: |
           ./bin/generator namespaces
+  docs-build:
+    docker: *doocker
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command:
+            pip install -r requirements.txt
+            pip install pdoc
+      - run:
+          name: Build docs
+          command: pdoc -o _html generator
+      - persist_to_workspace:
+          root: docs/_build
+        paths: _html
+
+  docs-deploy:
+    docker:
+      - image: node:14
+    steps:
+      - checkout
+      - attach_workspace:
+          at: docs/_build
+      - run:
+          name: Install and configure dependencies
+          command: |
+            npm install -g --silent gh-pages
+            git config user.email "ci-build-docs@mozilla.com"
+            git config user.name "ci-build-docs"
+      - run:
+          name: Deploy docs to gh-pages branch
+          command: gh-pages --dist docs/_build
+
   build-container:
     docker:
       - image: docker:20.10.2
@@ -118,6 +151,20 @@ workflows:
         filters:
           tags:
             only: /.*/
+
+    - docs-build:
+        filters:
+          tags:
+            only: /.*/
+
+    - docs-deploy:
+        requires:
+          - unit-tests
+          - verify-requirements
+          - integration-tests
+        filters:
+          branches:
+            only: main
 
     - gcp-gcr/build-and-push-image:
         name: Build and push lookml-generator
