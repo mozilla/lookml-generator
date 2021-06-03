@@ -117,6 +117,7 @@ class MockClient:
                     SchemaField("test_int64", "INTEGER"),
                     SchemaField("test_numeric", "NUMERIC"),
                     SchemaField("test_string", "STRING"),
+                    SchemaField("additional_properties", "STRING"),
                 ],
             )
         if table_ref == "mozdata.glean_app.metrics":
@@ -662,6 +663,11 @@ def test_lookml_actual(
                     ],
                     "sql_table_name": "`{% parameter channel %}`",
                     "dimensions": [
+                        {
+                            "name": "additional_properties",
+                            "hidden": "yes",
+                            "sql": "${TABLE}.additional_properties",
+                        },
                         {
                             "name": "client_info__client_id",
                             "hidden": "yes",
