@@ -126,7 +126,6 @@ workflows:
           - unit-tests
           - verify-requirements
           - integration-tests
-          - build-container
         image: lookml-generator
         tag: ${CIRCLE_TAG:-latest}
         filters:
