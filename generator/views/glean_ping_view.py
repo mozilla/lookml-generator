@@ -64,7 +64,10 @@ class GleanPingView(PingView):
                 view_name = f"{self.name}__{looker_name}"
                 suggest_name = f"suggest__{view_name}"
 
-                category, name = [v.replace('_', ' ').title() for v in self._get_category_and_name(metric)]
+                category, name = [
+                    v.replace("_", " ").title()
+                    for v in self._get_category_and_name(metric)
+                ]
                 view_label = f"{category} - {name}"
 
                 join_view = {
