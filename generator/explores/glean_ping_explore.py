@@ -26,12 +26,50 @@ class GleanPingExplore(PingExplore):
         }
         # collapse whitespace in the description so the lookml looks a little better
         ping_description = " ".join(ping_descriptions[self.name].split())
-        # insert the description in
-        lookml = super()._to_lookml(v1_name)
-        lookml[0][
-            "description"
-        ] = f"Explore for the {self.name} ping. {ping_description}"
-        return lookml
+
+        views_lookml = self.get_view_lookml(self.views["base_view"])
+
+        # The first view, by convention, is always the base view with the
+        # majority of the dimensions from the top level.
+        base = views_lookml["views"][0]
+        base_name = base["name"]
+
+        joins = []
+        for view in views_lookml["views"][1:]:
+            if view["name"].startswith("suggest__"):
+                continue
+            view_name = view["name"]
+            metric = "__".join(view["name"].split("__")[1:])
+            joins.append(
+                {
+                    "name": view_name,
+                    "relationship": "one_to_many",
+                    "sql": (
+                        f"LEFT JOIN UNNEST(${{{base_name}.{metric}}}) AS {view_name} "
+                        f"ON ${{{base_name}.document_id}} = ${{{view_name}.document_id}}"
+                    ),
+                }
+            )
+
+        base_explore = {
+            "name": self.name,
+            # list the base explore first by prefixing with a space
+            "view_label": f" {self.name.title()}",
+            "description": f"Explore for the {self.name} ping. {ping_description}",
+            "view_name": self.views["base_view"],
+            "always_filter": {
+                "filters": self.get_required_filters("base_view"),
+            },
+            "joins": joins,
+        }
+
+        suggests = []
+        for view in views_lookml["views"][1:]:
+            if not view["name"].startswith("suggest__"):
+                continue
+            suggests.append({"name": view["name"], "hidden": "yes"})
+
+        return [base_explore] + suggests
 
     @staticmethod
     def from_views(views: List[View]) -> Iterator[PingExplore]:

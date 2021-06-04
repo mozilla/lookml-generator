@@ -1,3 +1,4 @@
+import contextlib
 from pathlib import Path
 from textwrap import dedent
 from unittest.mock import Mock, patch
@@ -151,6 +152,15 @@ class MockClient:
                                         "glean_validation_metrics_ping_count", "INTEGER"
                                     ),
                                     SchemaField("no_category_counter", "INTEGER"),
+                                ],
+                            ),
+                            SchemaField(
+                                "labeled_counter",
+                                "RECORD",
+                                "REPEATED",
+                                fields=[
+                                    SchemaField("key", "STRING"),
+                                    SchemaField("value", "INTEGER"),
                                 ],
                             ),
                             SchemaField(
@@ -446,6 +456,14 @@ def msg_glean_probes():
             {"type": "counter", "history": history_with_descr, "name": "test.counter"},
         ),
         GleanProbe(
+            "test.labeled_counter",
+            {
+                "type": "labeled_counter",
+                "history": history_with_descr,
+                "name": "test.labeled_counter",
+            },
+        ),
+        GleanProbe(
             "no_category_counter",
             {"type": "counter", "history": history, "name": "no_category_counter"},
         ),
@@ -516,9 +534,8 @@ def msg_glean_probes():
     ]
 
 
-@patch("generator.views.glean_ping_view.GleanPing")
-@patch("generator.explores.glean_ping_explore.GleanPing")
-def test_lookml_actual(
+@contextlib.contextmanager
+def _prepare_lookml_actual_test(
     mock_glean_ping_view,
     mock_glean_ping_explore,
     runner,
@@ -598,6 +615,27 @@ def test_lookml_actual(
     with runner.isolated_filesystem():
         with patch("google.cloud.bigquery.Client", MockClient):
             _lookml(open(namespaces), glean_apps, "looker-hub/")
+            yield namespaces_text
+
+
+@patch("generator.views.glean_ping_view.GleanPing")
+@patch("generator.explores.glean_ping_explore.GleanPing")
+def test_lookml_actual_baseline_view(
+    mock_glean_ping_view,
+    mock_glean_ping_explore,
+    runner,
+    glean_apps,
+    tmp_path,
+    msg_glean_probes,
+):
+    with _prepare_lookml_actual_test(
+        mock_glean_ping_view,
+        mock_glean_ping_explore,
+        runner,
+        glean_apps,
+        tmp_path,
+        msg_glean_probes,
+    ) as namespaces_text:
         expected = {
             "views": [
                 {
@@ -619,6 +657,7 @@ def test_lookml_actual(
                             "name": "document_id",
                             "hidden": "yes",
                             "sql": "${TABLE}.document_id",
+                            "primary_key": "yes",
                         },
                     ],
                     "measures": [
@@ -640,6 +679,26 @@ def test_lookml_actual(
             lkml.load(Path("looker-hub/custom/views/baseline.view.lkml").read_text()),
         )
         print_and_test(namespaces_text, open(Path("looker-hub/namespaces.yaml")).read())
+
+
+@patch("generator.views.glean_ping_view.GleanPing")
+@patch("generator.explores.glean_ping_explore.GleanPing")
+def test_lookml_actual_baseline_view_parameterized(
+    mock_glean_ping_view,
+    mock_glean_ping_explore,
+    runner,
+    glean_apps,
+    tmp_path,
+    msg_glean_probes,
+):
+    with _prepare_lookml_actual_test(
+        mock_glean_ping_view,
+        mock_glean_ping_explore,
+        runner,
+        glean_apps,
+        tmp_path,
+        msg_glean_probes,
+    ):
         expected = {
             "views": [
                 {
@@ -802,6 +861,26 @@ def test_lookml_actual(
                 Path("looker-hub/glean-app/views/baseline.view.lkml").read_text()
             ),
         )
+
+
+@patch("generator.views.glean_ping_view.GleanPing")
+@patch("generator.explores.glean_ping_explore.GleanPing")
+def test_lookml_actual_metrics_view(
+    mock_glean_ping_view,
+    mock_glean_ping_explore,
+    runner,
+    glean_apps,
+    tmp_path,
+    msg_glean_probes,
+):
+    with _prepare_lookml_actual_test(
+        mock_glean_ping_view,
+        mock_glean_ping_explore,
+        runner,
+        glean_apps,
+        tmp_path,
+        msg_glean_probes,
+    ):
         expected = {
             "views": [
                 {
@@ -1129,13 +1208,86 @@ def test_lookml_actual(
                             "type": "count_distinct",
                         },
                     ],
-                }
+                },
+                {
+                    "dimensions": [
+                        {
+                            "hidden": "yes",
+                            "name": "document_id",
+                            "primary_key": "yes",
+                            "sql": "${metrics.document_id}",
+                            "type": "string",
+                        },
+                        {
+                            "name": "key",
+                            "sql": "${TABLE}.key",
+                            "suggest_dimension": "suggest__metrics__metrics__labeled_counter__test_labeled_counter.key",
+                            "suggest_explore": "suggest__metrics__metrics__labeled_counter__test_labeled_counter",
+                            "type": "string",
+                        },
+                        {
+                            "hidden": "yes",
+                            "name": "value",
+                            "sql": "${TABLE}.value",
+                            "type": "number",
+                        },
+                    ],
+                    "label": "Labeled Counter Test Labeled Counter",
+                    "measures": [
+                        {"name": "count", "sql": "${value}", "type": "sum"},
+                        {
+                            "name": "client_count",
+                            "sql": "case when ${value} > 0 then "
+                            "${metrics.client_info__client_id} end",
+                            "type": "count_distinct",
+                        },
+                    ],
+                    "name": "metrics__metrics__labeled_counter__test_labeled_counter",
+                },
+                {
+                    "derived_table": {
+                        "sql": "select\n"
+                        "    m.key,\n"
+                        "    count(*) as n\n"
+                        "from mozdata.glean_app.metrics as "
+                        "t,\n"
+                        "unnest(metrics.labeled_counter.test_labeled_counter) as m\n"
+                        "where date(submission_timestamp) > date_sub(current_date, interval 30 day)\n"
+                        "    and sample_id = 0\n"
+                        "group by key\n"
+                        "order by n desc"
+                    },
+                    "dimensions": [
+                        {"name": "key", "sql": "${TABLE}.key", "type": "string"}
+                    ],
+                    "name": "suggest__metrics__metrics__labeled_counter__test_labeled_counter",
+                },
             ]
         }
         print_and_test(
             expected,
             lkml.load(Path("looker-hub/glean-app/views/metrics.view.lkml").read_text()),
         )
+
+
+@patch("generator.views.glean_ping_view.GleanPing")
+@patch("generator.explores.glean_ping_explore.GleanPing")
+def test_lookml_actual_growth_accounting_view(
+    mock_glean_ping_view,
+    mock_glean_ping_explore,
+    runner,
+    glean_apps,
+    tmp_path,
+    msg_glean_probes,
+):
+    with _prepare_lookml_actual_test(
+        mock_glean_ping_view,
+        mock_glean_ping_explore,
+        runner,
+        glean_apps,
+        tmp_path,
+        msg_glean_probes,
+    ):
         expected = {
             "views": [
                 {
@@ -1175,6 +1327,25 @@ def test_lookml_actual(
             ),
         )
 
+
+@patch("generator.views.glean_ping_view.GleanPing")
+@patch("generator.explores.glean_ping_explore.GleanPing")
+def test_lookml_actual_baseline_explore(
+    mock_glean_ping_view,
+    mock_glean_ping_explore,
+    runner,
+    glean_apps,
+    tmp_path,
+    msg_glean_probes,
+):
+    with _prepare_lookml_actual_test(
+        mock_glean_ping_view,
+        mock_glean_ping_explore,
+        runner,
+        glean_apps,
+        tmp_path,
+        msg_glean_probes,
+    ):
         expected = {
             "includes": ["/looker-hub/glean-app/views/baseline.view.lkml"],
             "explores": [
@@ -1182,6 +1353,7 @@ def test_lookml_actual(
                     "name": "baseline",
                     "description": "Explore for the baseline ping. The baseline ping is foo.",
                     "view_name": "baseline",
+                    "view_label": " Baseline",
                     "always_filter": {
                         "filters": [
                             {"channel": "mozdata.glean^_app.baseline"},
@@ -1199,6 +1371,25 @@ def test_lookml_actual(
             ),
         )
 
+
+@patch("generator.views.glean_ping_view.GleanPing")
+@patch("generator.explores.glean_ping_explore.GleanPing")
+def test_lookml_actual_client_counts(
+    mock_glean_ping_view,
+    mock_glean_ping_explore,
+    runner,
+    glean_apps,
+    tmp_path,
+    msg_glean_probes,
+):
+    with _prepare_lookml_actual_test(
+        mock_glean_ping_view,
+        mock_glean_ping_explore,
+        runner,
+        glean_apps,
+        tmp_path,
+        msg_glean_probes,
+    ):
         expected = {
             "includes": ["baseline_clients_daily_table.view.lkml"],
             "views": [
