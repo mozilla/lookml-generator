@@ -1219,7 +1219,7 @@ def test_lookml_actual_metrics_view(
                             "type": "string",
                         },
                         {
-                            "name": "key",
+                            "name": "label",
                             "sql": "${TABLE}.key",
                             "suggest_dimension": "suggest__metrics__metrics__labeled_counter__test_labeled_counter.key",
                             "suggest_explore": "suggest__metrics__metrics__labeled_counter__test_labeled_counter",
@@ -1232,7 +1232,7 @@ def test_lookml_actual_metrics_view(
                             "type": "number",
                         },
                     ],
-                    "label": "Labeled Counter Test Labeled Counter",
+                    "label": "Test - Labeled Counter",
                     "measures": [
                         {"name": "count", "sql": "${value}", "type": "sum"},
                         {
