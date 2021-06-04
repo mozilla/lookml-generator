@@ -2,7 +2,7 @@
 import logging
 from collections import Counter
 from textwrap import dedent
-from typing import Any, Dict, Iterable, List, Optional, Union
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 import click
 from mozilla_schema_generator.glean_ping import GleanPing
@@ -63,11 +63,13 @@ class GleanPingView(PingView):
                 looker_name = self._to_looker_name(metric)
                 view_name = f"{self.name}__{looker_name}"
                 suggest_name = f"suggest__{view_name}"
+
+                category, name = self._get_category_and_name(metric)
+                view_label = f"{category.replace('_', ' ').title()} - {name.replace('_', ' ').title()}"
+
                 join_view = {
                     "name": view_name,
-                    "label": (
-                        "_".join(looker_name.split("__")[1:]).replace("_", " ").title()
-                    ),
+                    "label": view_label,
                     "dimensions": [
                         {
                             "name": "document_id",
@@ -77,7 +79,7 @@ class GleanPingView(PingView):
                             "hidden": "yes",
                         },
                         {
-                            "name": "key",
+                            "name": "label",
                             "type": "string",
                             "sql": "${TABLE}.key",
                             "suggest_explore": suggest_name,
@@ -183,10 +185,15 @@ class GleanPingView(PingView):
 
         return ping_probes
 
-    def _to_looker_name(self, metric: GleanProbe, suffix: str = "") -> str:
-        """Convert a glean probe into a looker name."""
+    def _get_category_and_name(self, metric: GleanProbe) -> Tuple[str, str]:
         *category, name = metric.id.split(".")
         category = "_".join(category)
+
+        return category, name
+
+    def _to_looker_name(self, metric: GleanProbe, suffix: str = "") -> str:
+        """Convert a glean probe into a looker name."""
+        category, name = self._get_category_and_name(metric)
 
         sep = "" if not category else "_"
         label = name
