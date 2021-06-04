@@ -271,7 +271,7 @@ def test_namespaces_full(
                 },
             },
         }
-        actual = yaml.load(Path("namespaces.yaml").read_text())
+        actual = yaml.load(Path("namespaces.yaml").read_text(), Loader=yaml.FullLoader)
 
         print_and_test(expected, actual)
 
