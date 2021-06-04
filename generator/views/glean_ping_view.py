@@ -1,6 +1,7 @@
 """Class to describe a Glean Ping View."""
 import logging
 from collections import Counter
+from textwrap import dedent
 from typing import Any, Dict, Iterable, List, Optional, Union
 
 import click
@@ -19,6 +20,7 @@ DISTRIBUTION_TYPES = {
 ALLOWED_TYPES = DISTRIBUTION_TYPES | {
     "boolean",
     "counter",
+    "labeled_counter",
     "datetime",
     "jwe",
     "quantity",
@@ -34,6 +36,104 @@ class GleanPingView(PingView):
 
     type: str = "glean_ping_view"
     allow_glean: bool = True
+
+    def to_lookml(self, bq_client, v1_name: Optional[str]) -> Dict[str, Any]:
+        """Generate LookML for this view.
+
+        The Glean views include a labeled metrics, which need to be joined
+        against the view in the explore.
+        """
+        lookml = super().to_lookml(bq_client, v1_name)
+
+        # iterate over all of the glean metrics and generate views for unnested
+        # fields as necessary. Append them to the list of existing view
+        # definitions.
+        table = next(
+            (table for table in self.tables if table.get("channel") == "release"),
+            self.tables[0],
+        )["table"]
+        dimensions = self.get_dimensions(bq_client, table, v1_name)
+
+        client_id_field = self._get_client_id(dimensions, table)
+
+        view_definitions = []
+        metrics = self._get_glean_metrics(v1_name)
+        for metric in metrics:
+            if metric.type == "labeled_counter":
+                looker_name = self._to_looker_name(metric)
+                view_name = f"{self.name}__{looker_name}"
+                suggest_name = f"suggest__{view_name}"
+                join_view = {
+                    "name": view_name,
+                    "label": (
+                        "_".join(looker_name.split("__")[1:]).replace("_", " ").title()
+                    ),
+                    "dimensions": [
+                        {
+                            "name": "document_id",
+                            "type": "string",
+                            "sql": f"${{{self.name}.document_id}}",
+                            "primary_key": "yes",
+                            "hidden": "yes",
+                        },
+                        {
+                            "name": "key",
+                            "type": "string",
+                            "sql": "${TABLE}.key",
+                            "suggest_explore": suggest_name,
+                            "suggest_dimension": f"{suggest_name}.key",
+                        },
+                        {
+                            "name": "value",
+                            "type": "number",
+                            "sql": "${TABLE}.value",
+                            "hidden": "yes",
+                        },
+                    ],
+                    "measures": [
+                        {
+                            "name": "count",
+                            "type": "sum",
+                            "sql": "${value}",
+                        },
+                        {
+                            "name": "client_count",
+                            "type": "count_distinct",
+                            "sql": f"case when ${{value}} > 0 then ${{{self.name}.{client_id_field}}} end",
+                        },
+                    ],
+                }
+                suggest_view = {
+                    "name": suggest_name,
+                    "derived_table": {
+                        "sql": dedent(
+                            f"""
+                            select
+                                m.key,
+                                count(*) as n
+                            from {table} as t,
+                            unnest(metrics.{metric.type}.{metric.id.replace(".", "_")}) as m
+                            where date(submission_timestamp) > date_sub(current_date, interval 30 day)
+                                and sample_id = 0
+                            group by key
+                            order by n desc
+                            """
+                        )
+                    },
+                    "dimensions": [
+                        {"name": "key", "type": "string", "sql": "${TABLE}.key"}
+                    ],
+                }
+                view_definitions += [join_view, suggest_view]
+        # deduplicate view definitions, because somehow a few entries make it in
+        # twice e.g. metrics__metrics__labeled_counter__media_audio_init_failure
+        view_definitions = sorted(
+            {v["name"]: v for v in view_definitions}.values(), key=lambda x: x["name"]  # type: ignore
+        )
+
+        lookml["views"] += view_definitions
+
+        return lookml
 
     def _get_links(self, dimension: dict) -> List[Dict[str, str]]:
         """Get a link annotation given a metric name."""
@@ -83,20 +183,30 @@ class GleanPingView(PingView):
 
         return ping_probes
 
+    def _to_looker_name(self, metric: GleanProbe, suffix: str = "") -> str:
+        """Convert a glean probe into a looker name."""
+        *category, name = metric.id.split(".")
+        category = "_".join(category)
+
+        sep = "" if not category else "_"
+        label = name
+        looker_name = f"metrics__{metric.type}__{category}{sep}{label}"
+        if suffix:
+            looker_name = f"{looker_name}__{suffix}"
+        return looker_name
+
     def _make_dimension(
         self, metric: GleanProbe, suffix: str, sql_map: Dict[str, Dict[str, str]]
     ) -> Optional[Dict[str, Union[str, List[Dict[str, str]]]]]:
         *category, name = metric.id.split(".")
         category = "_".join(category)
 
+        sep = "" if not category else "_"
         label = name
-        sep = "_"
-        if not category:
-            sep = ""
         looker_name = f"metrics__{metric.type}__{category}{sep}{name}"
         if suffix:
             label = f"{name}_{suffix}"
-            looker_name = f"metrics__{metric.type}__{category}{sep}{name}__{suffix}"
+            looker_name = f"{looker_name}__{suffix}"
 
         if looker_name not in sql_map:
             return None
@@ -126,6 +236,13 @@ class GleanPingView(PingView):
                 },
             ],
         }
+
+        # remove some elements from the definition if we're handling a labeled
+        # counter, as an initial join dimension
+        if metric.type == "labeled_counter":
+            # this field is not used since labeled counters are maps
+            del lookml["type"]
+            lookml["hidden"] = "yes"
 
         if metric.description:
             lookml["description"] = metric.description
@@ -174,11 +291,14 @@ class GleanPingView(PingView):
     ) -> List[Dict[str, Any]]:
         """Get the set of dimensions for this view."""
         all_fields = super().get_dimensions(bq_client, table, v1_name)
-        return self._get_glean_metric_dimensions(all_fields, v1_name) + [
+        fields = self._get_glean_metric_dimensions(all_fields, v1_name) + [
             self._add_link(d)
             for d in all_fields
             if not d["name"].startswith("metrics__")
         ]
+        # later entries will override earlier entries, if there are duplicates
+        field_dict = {f["name"]: f for f in fields}
+        return list(field_dict.values())
 
     def get_measures(
         self, dimensions: List[dict], table: str, v1_name: Optional[str]
