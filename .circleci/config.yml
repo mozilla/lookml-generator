@@ -165,7 +165,7 @@ workflows:
             - integration-tests
           filters:
             branches:
-              only: docs
+              only: main
 
       - gcp-gcr/build-and-push-image:
           name: Build and push lookml-generator
