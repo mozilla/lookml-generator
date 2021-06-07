@@ -164,24 +164,8 @@ workflows:
             - integration-tests
           filters:
             branches:
-              only: docs
+              only: main
 
-<<<<<<< HEAD
-    - gcp-gcr/build-and-push-image:
-        name: Build and push lookml-generator
-        context: data-eng-airflow-gcr
-        requires:
-          - unit-tests
-          - verify-requirements
-          - integration-tests
-        image: lookml-generator
-        tag: ${CIRCLE_TAG:-latest}
-        filters:
-          tags:
-            only: /.*/
-          branches:
-            only: main
-=======
       - gcp-gcr/build-and-push-image:
           name: Build and push lookml-generator
           context: data-eng-airflow-gcr
@@ -197,4 +181,3 @@ workflows:
               only: /.*/
             branches:
               only: main
->>>>>>> 4caaf56 (!fixup circleci config)
