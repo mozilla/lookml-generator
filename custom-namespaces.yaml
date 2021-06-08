@@ -2,37 +2,37 @@
 duet:
   glean_app: false
   owners:
-  - ascholtz@mozilla.com
+    - ascholtz@mozilla.com
   pretty_name: DUET
   views:
     install:
       type: ping_view
       tables:
-      - channel: release
-        table: mozdata.firefox_installer.install
+        - channel: release
+          table: mozdata.firefox_installer.install
     new_profile:
       type: ping_view
       tables:
-      - channel: release
-        table: mozdata.telemetry.new_profile
+        - channel: release
+          table: mozdata.telemetry.new_profile
 activity_stream:
   glean_app: false
   owners:
-  - najiang@mozilla.com
+    - najiang@mozilla.com
   pretty_name: Activity Stream
   views:
     events:
       type: ping_view
       tables:
-      - table: mozdata.activity_stream.events
+        - table: mozdata.activity_stream.events
     sessions:
       type: ping_view
       tables:
-      - table: mozdata.activity_stream.sessions
+        - table: mozdata.activity_stream.sessions
     impression_stats_flat:
       type: ping_view
       tables:
-      - table: mozdata.activity_stream.impression_stats_flat
+        - table: mozdata.activity_stream.impression_stats_flat
   explores:
     event_counts:
       type: ping_explore
@@ -49,18 +49,18 @@ activity_stream:
 search:
   glean_app: false
   owners:
-  - mmccorquodale@mozilla.com
-  - xluo@mozilla.com
+    - mmccorquodale@mozilla.com
+    - xluo@mozilla.com
   pretty_name: Search
   views:
     search_clients_engines_sources_daily:
       type: ping_view
       tables:
-      - table: mozdata.search.search_clients_engines_sources_daily
+        - table: mozdata.search.search_clients_engines_sources_daily
     mobile_search_clients_engines_sources_daily:
       type: ping_view
       tables:
-      - table: mozdata.search.mobile_search_clients_engines_sources_daily
+        - table: mozdata.search.mobile_search_clients_engines_sources_daily
   explores:
     desktop_search_counts:
       type: ping_explore
@@ -80,23 +80,23 @@ contextual_services:
     event_aggregates:
       type: ping_view
       tables:
-      - table: mozdata.contextual_services.event_aggregates
+        - table: mozdata.contextual_services.event_aggregates
     quicksuggest_click:
       type: ping_view
       tables:
-      - table: mozdata.contextual_services.quicksuggest_click
+        - table: mozdata.contextual_services.quicksuggest_click
     quicksuggest_impression:
       type: ping_view
       tables:
-      - table: mozdata.contextual_services.quicksuggest_impression
+        - table: mozdata.contextual_services.quicksuggest_impression
     topsites_click:
       type: ping_view
       tables:
-      - table: mozdata.contextual_services.topsites_click
+        - table: mozdata.contextual_services.topsites_click
     topsites_impression:
       type: ping_view
       tables:
-      - table: mozdata.contextual_services.topsites_impression
+        - table: mozdata.contextual_services.topsites_impression
   explores:
     event_aggregates:
       type: ping_explore
