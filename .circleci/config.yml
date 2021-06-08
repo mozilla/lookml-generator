@@ -8,82 +8,115 @@ orbs:
 jobs:
   unit-tests:
     docker: &docker
-    - image: python:3.8
+      - image: python:3.8
     steps:
-    - checkout
-    - &restore_cache
-      restore_cache:
-        keys:
-        # when lock files change, use increasingly general
-        # patterns to restore cache
-        - &cache_key
-          # yamllint disable-line rule:line-length
-          python-3.8-packages-v1-{{ .Branch }}-{{ checksum "requirements.in" }}-{{ checksum "requirements.txt" }}
-          # yamllint disable-line rule:line-length
-        - python-3.8-packages-v1-{{ .Branch }}-{{ checksum "requirements.in" }}-
-        - python-3.8-packages-v1-{{ .Branch }}-
-        - python-3.8-packages-v1-master-
-        - python-3.8-packages-v1-
-    - &build
-      run:
-        name: Build
-        command: |
-          python3.8 -m venv venv/
-          venv/bin/pip install pip-tools --constraint requirements.in
-          venv/bin/pip-sync
-    - run:
-        name: PyTest with linters
-        command: venv/bin/pytest
-    - run:
-        name: Lint YAML
-        command: venv/bin/yamllint -c .yamllint.yaml .
-    - save_cache:
-        paths:
-        - venv/
-        key: *cache_key
+      - checkout
+      - &restore_cache
+        restore_cache:
+          keys:
+            # when lock files change, use increasingly general
+            # patterns to restore cache
+            - &cache_key # yamllint disable-line rule:line-length
+              python-3.8-packages-v1-{{ .Branch }}-{{ checksum "requirements.in" }}-{{ checksum "requirements.txt" }}
+              # yamllint disable-line rule:line-length
+            - python-3.8-packages-v1-{{ .Branch }}-{{ checksum "requirements.in" }}-
+            - python-3.8-packages-v1-{{ .Branch }}-
+            - python-3.8-packages-v1-master-
+            - python-3.8-packages-v1-
+      - &build
+        run:
+          name: Build
+          command: |
+            python3.8 -m venv venv/
+            venv/bin/pip install pip-tools --constraint requirements.in
+            venv/bin/pip-sync
+      - run:
+          name: PyTest with linters
+          command: venv/bin/pytest
+      - run:
+          name: Lint YAML
+          command: venv/bin/yamllint -c .yamllint.yaml .
+      - save_cache:
+          paths:
+            - venv/
+          key: *cache_key
   verify-requirements:
     docker: *docker
     steps:
-    - checkout
-    - run:
-        name: Verify that requirements.txt contains the right dependencies for
-          this python version
-        # use `--constraint` with `requirements.in` not `requirements.txt`
-        # because for pip>=20.3 "Constraints are only allowed to take the form
-        # of a package name and a version specifier"
-        command: |
-          pip install pip-tools --constraint requirements.in
-          pip-compile --quiet --allow-unsafe --generate-hashes
-          git diff --exit-code requirements.txt
+      - checkout
+      - run:
+          name: Verify that requirements.txt contains the right dependencies for
+            this python version
+          # use `--constraint` with `requirements.in` not `requirements.txt`
+          # because for pip>=20.3 "Constraints are only allowed to take the form
+          # of a package name and a version specifier"
+          command: |
+            pip install pip-tools --constraint requirements.in
+            pip-compile --quiet --allow-unsafe --generate-hashes
+            git diff --exit-code requirements.txt
   integration-tests:
     docker: *docker
     steps:
-    - checkout
-    - &skip_forked_pr
-      run:
-        name: Early return if this build is from a forked PR
-        command: |
-          if [ -n "$CIRCLE_PR_NUMBER" ]; then
-            echo "Cannot pass creds to forked PRs," \
-              "so marking this step successful"
-            circleci step halt
-          fi
-    - *restore_cache
-    - *build
-    - run:
-        name: PyTest Integration Test
-        # Google's client libraries will check for
-        # GOOGLE_APPLICATION_CREDENTIALS
-        # and use a file in that location for credentials if present;
-        # See https://cloud.google.com/docs/authentication/production
-        command: |
-          export GOOGLE_APPLICATION_CREDENTIALS="/tmp/gcp.json"
-          echo "$GCLOUD_SERVICE_KEY" > "$GOOGLE_APPLICATION_CREDENTIALS"
-          venv/bin/pytest -m integration
-    - run:
-        name: Test build namespaces.yaml
-        command: |
-          ./bin/generator namespaces
+      - checkout
+      - &skip_forked_pr
+        run:
+          name: Early return if this build is from a forked PR
+          command: |
+            if [ -n "$CIRCLE_PR_NUMBER" ]; then
+              echo "Cannot pass creds to forked PRs," \
+                "so marking this step successful"
+              circleci step halt
+            fi
+      - *restore_cache
+      - *build
+      - run:
+          name: PyTest Integration Test
+          # Google's client libraries will check for
+          # GOOGLE_APPLICATION_CREDENTIALS
+          # and use a file in that location for credentials if present;
+          # See https://cloud.google.com/docs/authentication/production
+          command: |
+            export GOOGLE_APPLICATION_CREDENTIALS="/tmp/gcp.json"
+            echo "$GCLOUD_SERVICE_KEY" > "$GOOGLE_APPLICATION_CREDENTIALS"
+            venv/bin/pytest -m integration
+      - run:
+          name: Test build namespaces.yaml
+          command: |
+            ./bin/generator namespaces
+  docs-build:
+    docker: *docker
+    steps:
+      - checkout
+      - *build
+      - run:
+          name: Build docs
+          command: |
+            venv/bin/pip install pdoc
+            venv/bin/pdoc -o /tmp/_html generator
+      - persist_to_workspace:
+          root: /tmp
+          paths: _html
+
+  docs-deploy:
+    docker:
+      - image: node:14
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /tmp
+      - run:
+          name: Install and configure dependencies
+          command: |
+            npm install -g --silent gh-pages@3.0.0
+            git config user.email "ci-build-docs@mozilla.com"
+            git config user.name "ci-build-docs"
+      - add_ssh_keys:
+          fingerprints:
+            - "0d:4a:6d:ec:a7:b9:cd:9e:be:39:9f:e2:06:34:13:73"
+      - run:
+          name: Deploy docs to gh-pages branch
+          command: gh-pages --message "[skip ci] updates" --dist /tmp/_html
+
   build-container:
     docker:
       - image: docker:20.10.2
@@ -98,38 +131,54 @@ workflows:
   version: 2
   build-and-deploy:
     jobs:
-    - unit-tests:
-        filters:
-          tags:
-            only: /.*/
+      - unit-tests:
+          filters:
+            tags:
+              only: /.*/
 
-    - integration-tests:
-        context: data-eng-circleci-tests
-        filters:
-          tags:
-            only: /.*/
+      - integration-tests:
+          context: data-eng-circleci-tests
+          filters:
+            tags:
+              only: /.*/
 
-    - verify-requirements:
-        filters:
-          tags:
-            only: /.*/
+      - verify-requirements:
+          filters:
+            tags:
+              only: /.*/
 
-    - build-container:
-        filters:
-          tags:
-            only: /.*/
+      - build-container:
+          filters:
+            tags:
+              only: /.*/
 
-    - gcp-gcr/build-and-push-image:
-        name: Build and push lookml-generator
-        context: data-eng-airflow-gcr
-        requires:
-          - unit-tests
-          - verify-requirements
-          - integration-tests
-        image: lookml-generator
-        tag: ${CIRCLE_TAG:-latest}
-        filters:
-          tags:
-            only: /.*/
-          branches:
-            only: main
+      - docs-build:
+          filters:
+            tags:
+              only: /.*/
+
+      - docs-deploy:
+          requires:
+            - docs-build
+            - unit-tests
+            - verify-requirements
+            - integration-tests
+          filters:
+            branches:
+              only: main
+
+      - gcp-gcr/build-and-push-image:
+          name: Build and push lookml-generator
+          context: data-eng-airflow-gcr
+          requires:
+            - unit-tests
+            - verify-requirements
+            - integration-tests
+            - build-container
+          image: lookml-generator
+          tag: ${CIRCLE_TAG:-latest}
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              only: main
