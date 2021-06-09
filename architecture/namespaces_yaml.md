@@ -14,10 +14,10 @@ Each entry in `namespaces.yaml` represents a namespace, and has the following pr
 ## `views`
 
 Each View entry is actually a LookML view file that will be generated.
-Each LookML View file can contain multiple Looker Views; the idea here is that these views are related and used together.
+Each LookML View file can contain multiple Looker Views; the idea here is that these views are related and used together. By convention, the first view in the file is the base view (i.e. associated join views folllow after the explore containing the base dimension and metrics).
 
-`type`: The type of the view, e.g. `glean_ping_view`.
-`tables`: This field is used in a few ways, depending on the associated View type.
+- `type`: The type of the view, e.g. `glean_ping_view`.
+- `tables`: This field is used in a few ways, depending on the associated View type.
 
 For `GleanPingView` and `PingView`, `tables` represents all of the associated channels for that view. Each table will have a `channel` and `table` entry. Only a single view will be created in the LookML File.
 
@@ -56,3 +56,5 @@ Each Explore entry is a single file, sometimes containing multiple explores with
   - `base_view`: The base view is the one we are basing this Explore on, using [`view_name`](https://docs.looker.com/reference/explore-params/view_name).
   - `extended_view*`: Any views we include in the `base_view` are added as these. It could be one (`extended_view`) or multiple (`extended_view_1`).
   - `joined_view*`: Any other view we are going to join to this one. _This is only required if the joined view is not defined in the same view file as `base_view`._
+
+It may not necessarily be desirable to list all of the views and explores in the `namespace.yaml` (e.g. suggest explores specific to a view). In these cases, it is useful to adopt the convention where the first view is the primary view for the explore.
