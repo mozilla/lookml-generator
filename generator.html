@@ -190,10 +190,12 @@ should take effect.</li>
 <h2 id="views"><code>views</code></h2>
 
 <p>Each View entry is actually a LookML view file that will be generated.
-Each LookML View file can contain multiple Looker Views; the idea here is that these views are related and used together.</p>
+Each LookML View file can contain multiple Looker Views; the idea here is that these views are related and used together. By convention, the first view in the file is the base view (i.e. associated join views folllow after the explore containing the base dimension and metrics).</p>
 
-<p><code>type</code>: The type of the view, e.g. <code>glean_ping_view</code>.
-<code>tables</code>: This field is used in a few ways, depending on the associated View type.</p>
+<ul>
+<li><code>type</code>: The type of the view, e.g. <code>glean_ping_view</code>.</li>
+<li><code>tables</code>: This field is used in a few ways, depending on the associated View type.</li>
+</ul>
 
 <p>For <code>GleanPingView</code> and <code>PingView</code>, <code>tables</code> represents all of the associated channels for that view. Each table will have a <code>channel</code> and <code>table</code> entry. Only a single view will be created in the LookML File.</p>
 
@@ -233,6 +235,8 @@ In the following example, 4 views will be created in the view file: <code>funnel
 <li><code>joined_view*</code>: Any other view we are going to join to this one. _This is only required if the joined view is not defined in the same view file as <code>base_view</code>._</li>
 </ul></li>
 </ul>
+
+<p>It may not necessarily be desirable to list all of the views and explores in the <code>namespace.yaml</code> (e.g. suggest explores specific to a view). In these cases, it is useful to adopt the convention where the first view is the primary view for the explore.</p>
 </div>
 
                         <details>
