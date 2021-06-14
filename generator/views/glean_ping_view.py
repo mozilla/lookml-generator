@@ -177,7 +177,10 @@ class GleanPingView(PingView):
         ping_probes = []
         probe_ids = set()
         for probe in glean_app.get_probes():
-            if self.name not in probe.definition["send_in_pings"]:
+            send_in_pings_snakecase = [
+                ping.replace("-", "_") for ping in probe.definition["send_in_pings"]
+            ]
+            if self.name not in send_in_pings_snakecase:
                 continue
             if probe.id in probe_ids:
                 # Some ids are duplicated, ignore them
