@@ -250,7 +250,10 @@
         <span class="n">ping_probes</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">probe_ids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">probe</span> <span class="ow">in</span> <span class="n">glean_app</span><span class="o">.</span><span class="n">get_probes</span><span class="p">():</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">probe</span><span class="o">.</span><span class="n">definition</span><span class="p">[</span><span class="s2">&quot;send_in_pings&quot;</span><span class="p">]:</span>
+            <span class="n">send_in_pings_snakecase</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">ping</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">ping</span> <span class="ow">in</span> <span class="n">probe</span><span class="o">.</span><span class="n">definition</span><span class="p">[</span><span class="s2">&quot;send_in_pings&quot;</span><span class="p">]</span>
+            <span class="p">]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">send_in_pings_snakecase</span><span class="p">:</span>
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="n">probe</span><span class="o">.</span><span class="n">id</span> <span class="ow">in</span> <span class="n">probe_ids</span><span class="p">:</span>
                 <span class="c1"># Some ids are duplicated, ignore them</span>
@@ -590,7 +593,10 @@
         <span class="n">ping_probes</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">probe_ids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">probe</span> <span class="ow">in</span> <span class="n">glean_app</span><span class="o">.</span><span class="n">get_probes</span><span class="p">():</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">probe</span><span class="o">.</span><span class="n">definition</span><span class="p">[</span><span class="s2">&quot;send_in_pings&quot;</span><span class="p">]:</span>
+            <span class="n">send_in_pings_snakecase</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">ping</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">ping</span> <span class="ow">in</span> <span class="n">probe</span><span class="o">.</span><span class="n">definition</span><span class="p">[</span><span class="s2">&quot;send_in_pings&quot;</span><span class="p">]</span>
+            <span class="p">]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">send_in_pings_snakecase</span><span class="p">:</span>
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="n">probe</span><span class="o">.</span><span class="n">id</span> <span class="ow">in</span> <span class="n">probe_ids</span><span class="p">:</span>
                 <span class="c1"># Some ids are duplicated, ignore them</span>
