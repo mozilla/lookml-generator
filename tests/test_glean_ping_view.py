@@ -67,4 +67,9 @@ def test_kebab_case(mock_glean_ping):
         [{"channel": "release", "table": "mozdata.glean_app.dash_name"}],
     )
     lookml = view.to_lookml(mock_bq_client, "glean-app")
-    assert "metrics.string.fun_string_metric" in str(lookml)
+    assert len(lookml["views"]) == 1
+    assert len(lookml["views"][0]["dimensions"]) == 1
+    assert (
+        lookml["views"][0]["dimensions"][0]["name"]
+        == "metrics__string__fun_string_metric"
+    )
