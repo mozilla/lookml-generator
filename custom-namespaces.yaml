@@ -118,3 +118,39 @@ contextual_services:
       type: ping_explore
       views:
         base_view: topsites_impression
+mozilla_vpn:
+  glean_app: false
+  owners:
+    - dthorn@mozilla.com
+  pretty_name: Mozilla VPN
+  views:
+    devices:
+      type: table_view
+      tables:
+        - channel: release
+          table: mozdata.mozilla_vpn.devices
+    funnel_fxa_login_to_protected:
+      type: table_view
+      tables:
+        - channel: release
+          table: mozdata.mozilla_vpn.funnel_fxa_login_to_protected
+    funnel_ga_to_subscriptions:
+      type: table_view
+      tables:
+        - channel: release
+          table: mozdata.mozilla_vpn.funnel_ga_to_subscriptions
+    retention_by_subscription:
+      type: table_view
+      tables:
+        - channel: release
+          table: mozdata.mozilla_vpn.retention_by_subscription
+    site_metrics_summary:
+      type: table_view
+      tables:
+        - channel: release
+          table: mozdata.mozilla_vpn.site_metrics_summary
+    subscriptions:
+      type: table_view
+      tables:
+        - channel: release
+          table: mozdata.mozilla_vpn.all_subscriptions
