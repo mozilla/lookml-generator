@@ -37,6 +37,7 @@ class NamespaceDict(TypedDict):
     pretty_name: str
     glean_app: bool
     connection: str
+    spoke: str
 
 
 def generate_model(
@@ -72,7 +73,10 @@ def generate_model(
 
 
 def configure_model(
-    sdk: looker_sdk.methods.Looker31SDK, model_name: str, db_connection: str
+    sdk: looker_sdk.methods.Looker31SDK,
+    model_name: str,
+    db_connection: str,
+    spoke_project: str,
 ):
     """Configure a Looker model by name."""
     instance = os.environ["LOOKER_INSTANCE_URI"]
@@ -89,7 +93,7 @@ def configure_model(
         looker_sdk.models.WriteLookmlModel(
             allowed_db_connection_names=[db_connection],
             name=model_name,
-            project_name="spoke-default",
+            project_name=spoke_project,
         )
     )
 
@@ -109,14 +113,19 @@ def configure_model(
 
 
 def generate_directories(
-    namespaces: Dict[str, NamespaceDict], spoke_dir: Path, sdk_setup=False
+    namespaces: Dict[str, NamespaceDict], base_dir: Path, sdk_setup=False
 ):
     """Generate directories and model for a namespace, if it doesn't exist."""
     sdk = looker_sdk.init31()
     logging.info("Looker SDK 3.1 initialized successfully.")
 
-    existing_dirs = {p.name for p in spoke_dir.iterdir()}
     for namespace, defn in namespaces.items():
+        spoke = defn["spoke"]
+        spoke_dir = base_dir / spoke
+        spoke_dir.mkdir(parents=True, exist_ok=True)
+        print(f"Writing {namespace} to {spoke_dir}")
+        existing_dirs = {p.name for p in spoke_dir.iterdir()}
+
         if namespace in existing_dirs:
             continue
 
@@ -129,7 +138,8 @@ def generate_directories(
         generate_model(spoke_dir, namespace, defn, db_connection)
 
         if sdk_setup:
-            configure_model(sdk, namespace, db_connection)
+            spoke_project = spoke.lstrip("looker-")
+            configure_model(sdk, namespace, db_connection, spoke_project)
 
 
 @click.command(help=__doc__)
@@ -141,7 +151,7 @@ def generate_directories(
 )
 @click.option(
     "--spoke-dir",
-    default="looker-spoke-default",
+    default=".",
     type=click.Path(file_okay=False, dir_okay=True, writable=True),
     help="Directory containing the Looker spoke.",
 )

@@ -16,6 +16,7 @@ def namespaces() -> dict:
         "glean-app": {
             "pretty_name": "Glean App",
             "glean_app": True,
+            "spoke": "looker-spoke-default",
             "views": {
                 "baseline": {
                     "type": "ping_view",
@@ -39,6 +40,7 @@ def custom_namespaces():
     return {
         "custom": {
             "glean_app": False,
+            "spoke": "looker-spoke-private",
             "connection": "bigquery-oauth",
             "owners": ["custom-owner@allizom.com", "custom-owner2@allizom.com"],
             "pretty_name": "Custom",
@@ -63,10 +65,10 @@ def test_generate_directories(looker_sdk, namespaces, tmp_path):
     looker_sdk.error = Mock(SDKError=_looker_sdk.error.SDKError)
 
     generate_directories(namespaces, tmp_path, True)
-    dirs = list(tmp_path.iterdir())
-    assert dirs == [tmp_path / "glean-app"]
+    dirs = list((tmp_path / "looker-spoke-default").iterdir())
+    assert dirs == [tmp_path / "looker-spoke-default" / "glean-app"]
 
-    app_path = tmp_path / "glean-app/"
+    app_path = tmp_path / "looker-spoke-default" / "glean-app/"
     sub_dirs = set(app_path.iterdir())
     assert sub_dirs == {
         app_path / "views",
@@ -85,10 +87,10 @@ def test_generate_directories_no_sdk(looker_sdk, namespaces, tmp_path):
     sdk.search_model_sets.return_value = [Mock(models=["model"], id=1)]
 
     generate_directories(namespaces, tmp_path, False)
-    dirs = list(tmp_path.iterdir())
-    assert dirs == [tmp_path / "glean-app"]
+    dirs = list((tmp_path / "looker-spoke-default").iterdir())
+    assert dirs == [tmp_path / "looker-spoke-default" / "glean-app"]
 
-    app_path = tmp_path / "glean-app/"
+    app_path = tmp_path / "looker-spoke-default" / "glean-app"
     sub_dirs = set(app_path.iterdir())
     assert sub_dirs == {
         app_path / "views",
@@ -109,7 +111,7 @@ def test_existing_dir(looker_sdk, namespaces, tmp_path):
     sdk.search_model_sets.return_value = [Mock(models=["model"], id=1)]
 
     generate_directories(namespaces, tmp_path, True)
-    tmp_file = tmp_path / "glean-app" / "tmp-file"
+    tmp_file = tmp_path / "looker-spoke-default" / "glean-app" / "tmp-file"
     tmp_file.write_text("hello, world")
 
     generate_directories(namespaces, tmp_path)
@@ -141,7 +143,11 @@ def test_generate_model(looker_sdk, namespaces, tmp_path):
             "dashboards/*",
         ],
     }
-    actual = lkml.load((tmp_path / "glean-app" / "glean-app.model.lkml").read_text())
+    actual = lkml.load(
+        (
+            tmp_path / "looker-spoke-default" / "glean-app" / "glean-app.model.lkml"
+        ).read_text()
+    )
     assert expected == actual
 
     looker_sdk.models.WriteModelSet.assert_any_call(models=["model", "glean-app"])
@@ -162,10 +168,10 @@ def test_alternate_connection(looker_sdk, custom_namespaces, tmp_path):
     looker_sdk.models.WriteLookmlModel.return_value = write_model
 
     generate_directories(custom_namespaces, tmp_path, True)
-    dirs = list(tmp_path.iterdir())
-    assert dirs == [tmp_path / "custom"]
+    dirs = list((tmp_path / "looker-spoke-private").iterdir())
+    assert dirs == [tmp_path / "looker-spoke-private" / "custom"]
 
-    app_path = tmp_path / "custom/"
+    app_path = tmp_path / "looker-spoke-private" / "custom"
     sub_dirs = set(app_path.iterdir())
     assert sub_dirs == {
         app_path / "views",
@@ -185,13 +191,15 @@ def test_alternate_connection(looker_sdk, custom_namespaces, tmp_path):
             "dashboards/*",
         ],
     }
-    actual = lkml.load((tmp_path / "custom" / "custom.model.lkml").read_text())
+    actual = lkml.load(
+        (tmp_path / "looker-spoke-private" / "custom" / "custom.model.lkml").read_text()
+    )
     print_and_test(expected, actual)
 
     looker_sdk.models.WriteLookmlModel.assert_called_with(
         allowed_db_connection_names=["bigquery-oauth"],
         name="custom",
-        project_name="spoke-default",
+        project_name="spoke-private",
     )
     sdk.create_lookml_model.assert_called_with(write_model)
     sdk.update_model_set.assert_called_once()
