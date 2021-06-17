@@ -19,6 +19,7 @@ from .explores import EXPLORE_TYPES
 from .views import VIEW_TYPES, View
 
 PROBE_INFO_BASE_URI = "https://probeinfo.telemetry.mozilla.org"
+DEFAULT_SPOKE = "looker-spoke-default"
 
 
 def _get_first(tuple_):
@@ -185,6 +186,10 @@ def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri, allowlist
     for namespace, updated in allowed_namespaces.items():
         if isinstance(updated, dict) and "owners" in updated:
             namespaces[namespace]["owners"] += updated["owners"]
+        if "spoke" not in namespaces[namespace]:
+            namespaces[namespace]["spoke"] = DEFAULT_SPOKE
+        if "glean_app" not in namespaces[namespace]:
+            namespaces[namespace]["glean_app"] = False
         updated_namespaces[namespace] = namespaces[namespace]
 
     Path("namespaces.yaml").write_text(yaml.safe_dump(updated_namespaces))
