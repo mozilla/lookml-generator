@@ -76,6 +76,8 @@ contextual_services:
   pretty_name: Contextual Services
   owners:
     - mmccorquodale@mozilla.com
+    - rburwei@mozilla.com
+  spoke: looker-spoke-private
   views:
     event_aggregates:
       type: ping_view
