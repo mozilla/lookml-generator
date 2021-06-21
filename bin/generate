@@ -19,7 +19,9 @@
 #                             Defaults to 'test-lookml-generation'. If the
 #                             branch doesn't exist, creates it from source.
 #   SPOKE_REPO_URL:           The URL to the looker-spoke-default repository.
-#                             Requires the SSH format, w.g. git@github.com:user/repo.git.
+#                             Requires the SSH format, e.g. git@github.com:user/repo.git.
+#   PRIVATE_SPOKE_REPO_URL:   The URL to the looker-spoke-private repository.
+#                             Requires the SSH format, e.g. git@github.com:user/repo.git.
 #   SPOKE_BRANCH_WORKING:     The working branch for the spoke project.
 #                             This is the branch that changes will be
 #                             published to, and a PR opened to merge
@@ -46,6 +48,7 @@ HUB_BRANCH_SOURCE=${HUB_BRANCH_SOURCE:-"base"}
 HUB_BRANCH_PUBLISH=${HUB_BRANCH_PUBLISH:-"main-nonprod"}
 
 SPOKE_REPO_URL=${SPOKE_REPO_URL:-"git@github.com:mozilla/looker-spoke-default.git"}
+PRIVATE_SPOKE_REPO_URL=${PRIVATE_SPOKE_REPO_URL:-"git@github.com:mozilla/looker-spoke-private.git"}
 SPOKE_BRANCH_PUBLISH=${SPOKE_BRANCH_PUBLISH:-"main-nonprod"}
 SPOKE_BRANCH_WORKING=${SPOKE_BRANCH_WORKING:-"${SPOKE_BRANCH_PUBLISH}-working"}
 
@@ -108,17 +111,24 @@ function setup_spoke() {
     # Checkout looker-spoke-default and changes directory to prepare for
     # LookML generation. Create publish branch if non-existent.
     pushd .
+    spoke="$1"
+    spoke_url="$2"
 
     cd /app
-    [[ -d looker-spoke-default ]] && rm -rf looker-spoke-default
-    git clone "$SPOKE_REPO_URL"
-    cd looker-spoke-default
+    [[ -d $spoke ]] && rm -rf $spoke
+    git clone "$spoke_url"
+    cd $spoke
     git fetch --all
     git checkout $SPOKE_BRANCH_PUBLISH || git checkout main && git checkout -b $SPOKE_BRANCH_PUBLISH
     git branch -D $SPOKE_BRANCH_WORKING
     git checkout -b $SPOKE_BRANCH_WORKING
 
     popd
+}
+
+function setup_spokes() {
+  setup_spoke "looker-spoke-default" $SPOKE_REPO_URL
+  setup_spoke "looker-spoke-private" $PRIVATE_SPOKE_REPO_URL
 }
 
 function check_files_and_commit() {
@@ -180,21 +190,21 @@ function generate_hub_commit() {
   popd
 }
 
-function generate_spoke_commit() {
+function generate_spoke_commits() {
   # Generate commit on spoke publish branch
   # with generated LookML.
 
   pushd .
   cd /app
 
-  SPOKE_DIR="looker-spoke-default"
-
   lookml-generator update-spoke \
     --namespaces "namespaces.yaml" \
-    --spoke-dir $SPOKE_DIR
+    --spoke-dir "/app"
 
-  cd $SPOKE_DIR
+  cd "/app/looker-spoke-default"
+  check_files_and_commit
 
+  cd "/app/looker-spoke-private"
   check_files_and_commit
 
   popd
@@ -219,11 +229,15 @@ function hit_looker_webhooks() {
   # See https://help.looker.com/hc/en-us/articles/360001288268-Deploy-Webhook-Pulling-From-Remote-Git-Repository
   curl "$LOOKER_INSTANCE_URI/webhooks/projects/looker-hub/deploy"
   curl "$LOOKER_INSTANCE_URI/webhooks/projects/spoke-default/deploy"
+  curl "$LOOKER_INSTANCE_URI/webhooks/projects/spoke-private/deploy"
 }
 
-function open_spoke_pull_request() {
+function push_and_open_spoke_pull_request() {
   # Open a PR to merge the changes from working branch
   # in to the publish branch.
+
+  git push -f || git push -f --set-upstream origin "$SPOKE_BRANCH_WORKING"
+
   gh pr create \
     --title "Auto-push from LookML Generator" \
     --reviewer mozilla/data-looker \
@@ -249,14 +263,16 @@ function main() {
   cd /app/looker-hub
   git push || git push --set-upstream origin "$HUB_BRANCH_PUBLISH"
 
-  # Set up spoke and commit
-  setup_spoke
-  generate_spoke_commit
+  # Set up spokes and commit
+  setup_spokes
+  generate_spoke_commits
 
   # Publish spoke - force push to working branch
   cd /app/looker-spoke-default
-  git push -f || git push -f --set-upstream origin "$SPOKE_BRANCH_WORKING"
-  open_spoke_pull_request
+  push_and_open_spoke_pull_request
+
+  cd /app/looker-spoke-private
+  push_and_open_spoke_pull_request
 
   # Update Looker content
   generate_looker_content

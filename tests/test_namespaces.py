@@ -60,6 +60,16 @@ def custom_namespaces(tmp_path):
                   tables:
                   - channel: release
                     table: mozdata.disallowed.baseline
+            private:
+              pretty_name: Private
+              spoke: looker-spoke-private
+              owners:
+              - private-owner@allizom.com
+              views:
+                events:
+                  type: ping_view
+                  tables:
+                  - table: mozdata.private.events
             """
         ).lstrip()
     )
@@ -79,6 +89,7 @@ def namespace_allowlist(tmp_path):
             glean-app:
               owners:
                 - glean-app-owner2@allizom.com
+            private: null
             """
         )
     )
@@ -170,6 +181,7 @@ def test_namespaces_full(
                 "connection": "bigquery-oauth",
                 "owners": ["custom-owner@allizom.com", "custom-owner2@allizom.com"],
                 "pretty_name": "Custom",
+                "spoke": "looker-spoke-default",
                 "views": {
                     "baseline": {
                         "tables": [
@@ -203,6 +215,7 @@ def test_namespaces_full(
                     "glean-app-owner2@allizom.com",
                 ],
                 "pretty_name": "Glean App",
+                "spoke": "looker-spoke-default",
                 "views": {
                     "baseline_clients_daily_table": {
                         "tables": [
@@ -268,6 +281,18 @@ def test_namespaces_full(
                         ],
                         "type": "growth_accounting_view",
                     },
+                },
+            },
+            "private": {
+                "glean_app": False,
+                "spoke": "looker-spoke-private",
+                "owners": ["private-owner@allizom.com"],
+                "pretty_name": "Private",
+                "views": {
+                    "events": {
+                        "type": "ping_view",
+                        "tables": [{"table": "mozdata.private.events"}],
+                    }
                 },
             },
         }
