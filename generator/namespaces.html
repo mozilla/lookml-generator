@@ -71,6 +71,7 @@
 <span class="kn">from</span> <span class="nn">.views</span> <span class="kn">import</span> <span class="n">VIEW_TYPES</span><span class="p">,</span> <span class="n">View</span>
 
 <span class="n">PROBE_INFO_BASE_URI</span> <span class="o">=</span> <span class="s2">&quot;https://probeinfo.telemetry.mozilla.org&quot;</span>
+<span class="n">DEFAULT_SPOKE</span> <span class="o">=</span> <span class="s2">&quot;looker-spoke-default&quot;</span>
 
 
 <span class="k">def</span> <span class="nf">_get_first</span><span class="p">(</span><span class="n">tuple_</span><span class="p">):</span>
@@ -237,6 +238,10 @@
     <span class="k">for</span> <span class="n">namespace</span><span class="p">,</span> <span class="n">updated</span> <span class="ow">in</span> <span class="n">allowed_namespaces</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">updated</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;owners&quot;</span> <span class="ow">in</span> <span class="n">updated</span><span class="p">:</span>
             <span class="n">namespaces</span><span class="p">[</span><span class="n">namespace</span><span class="p">][</span><span class="s2">&quot;owners&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">updated</span><span class="p">[</span><span class="s2">&quot;owners&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s2">&quot;spoke&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">namespaces</span><span class="p">[</span><span class="n">namespace</span><span class="p">]:</span>
+            <span class="n">namespaces</span><span class="p">[</span><span class="n">namespace</span><span class="p">][</span><span class="s2">&quot;spoke&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEFAULT_SPOKE</span>
+        <span class="k">if</span> <span class="s2">&quot;glean_app&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">namespaces</span><span class="p">[</span><span class="n">namespace</span><span class="p">]:</span>
+            <span class="n">namespaces</span><span class="p">[</span><span class="n">namespace</span><span class="p">][</span><span class="s2">&quot;glean_app&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">updated_namespaces</span><span class="p">[</span><span class="n">namespace</span><span class="p">]</span> <span class="o">=</span> <span class="n">namespaces</span><span class="p">[</span><span class="n">namespace</span><span class="p">]</span>
 
     <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;namespaces.yaml&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">safe_dump</span><span class="p">(</span><span class="n">updated_namespaces</span><span class="p">))</span>
