@@ -4,6 +4,7 @@ from io import BytesIO
 from pathlib import Path
 from textwrap import dedent
 from typing import Dict
+from unittest.mock import patch
 
 import pytest
 import yaml
@@ -38,6 +39,10 @@ def custom_namespaces(tmp_path):
     dest.write_text(
         dedent(
             """
+            operational_monitoring:
+                owners:
+                - opmon-owner@allizom.com
+                pretty_name: Operational Monitoring
             custom:
               connection: bigquery-oauth
               glean_app: false
@@ -92,6 +97,37 @@ def namespace_disallowlist(tmp_path):
         )
     )
     return dest.absolute()
+
+
+class MockBlob:
+    """Mock Blob."""
+
+    def __init__(self, name):
+        self.name = name
+        self.updated = "2021-05-01"
+
+    def download_as_string(self):
+        return '{"slug": "test", "name": "op_mon"}'
+
+
+class MockBucket:
+    """Mock Bucket."""
+
+    def list_blobs(self, prefix):
+        return [MockBlob("test")]
+
+    def get_blob(self, filename):
+        return MockBlob("test")
+
+
+class MockStorageClient:
+    """Mock storage.Client."""
+
+    def __init__(self, project_name):
+        pass
+
+    def get_bucket(self, bucket_name):
+        return MockBucket()
 
 
 def add_to_tar(tar, path, content):
@@ -157,153 +193,250 @@ def test_namespaces_full(
     app_listings_uri,
     namespace_disallowlist,
 ):
-    with runner.isolated_filesystem():
-        result = runner.invoke(
-            namespaces,
-            [
-                "--custom-namespaces",
-                custom_namespaces,
-                "--generated-sql-uri",
-                generated_sql_uri,
-                "--app-listings-uri",
-                app_listings_uri,
-                "--disallowlist",
-                namespace_disallowlist,
-            ],
-        )
-        sys.stdout.write(result.stdout)
-        if result.stderr_bytes is not None:
-            sys.stderr.write(result.stderr)
-        try:
-            assert result.exit_code == 0
-        except Exception as e:
-            # use exception chaining to expose original traceback
-            raise e from result.exception
+    with patch("google.cloud.storage.Client", MockStorageClient):
+        with runner.isolated_filesystem():
+            result = runner.invoke(
+                namespaces,
+                [
+                    "--custom-namespaces",
+                    custom_namespaces,
+                    "--generated-sql-uri",
+                    generated_sql_uri,
+                    "--app-listings-uri",
+                    app_listings_uri,
+                    "--disallowlist",
+                    namespace_disallowlist,
+                ],
+            )
+            sys.stdout.write(result.stdout)
+            if result.stderr_bytes is not None:
+                sys.stderr.write(result.stderr)
+            try:
+                assert result.exit_code == 0
+            except Exception as e:
+                # use exception chaining to expose original traceback
+                raise e from result.exception
 
-        expected = {
-            "custom": {
-                "glean_app": False,
-                "connection": "bigquery-oauth",
-                "owners": ["custom-owner@allizom.com", "custom-owner2@allizom.com"],
-                "pretty_name": "Custom",
-                "spoke": "looker-spoke-default",
-                "views": {
-                    "baseline": {
-                        "tables": [
-                            {"channel": "release", "table": "mozdata.custom.baseline"}
-                        ],
-                        "type": "ping_view",
-                    }
-                },
-            },
-            "glean-app": {
-                "explores": {
-                    "baseline": {
-                        "type": "glean_ping_explore",
-                        "views": {"base_view": "baseline"},
+            expected = {
+                "custom": {
+                    "glean_app": False,
+                    "connection": "bigquery-oauth",
+                    "owners": ["custom-owner@allizom.com", "custom-owner2@allizom.com"],
+                    "pretty_name": "Custom",
+                    "spoke": "looker-spoke-default",
+                    "views": {
+                        "baseline": {
+                            "tables": [
+                                {
+                                    "channel": "release",
+                                    "table": "mozdata.custom.baseline",
+                                }
+                            ],
+                            "type": "ping_view",
+                        }
                     },
-                    "client_counts": {
-                        "type": "client_counts_explore",
-                        "views": {
-                            "base_view": "client_counts",
-                            "extended_view": "baseline_clients_daily_table",
+                },
+                "glean-app": {
+                    "explores": {
+                        "baseline": {
+                            "type": "glean_ping_explore",
+                            "views": {"base_view": "baseline"},
+                        },
+                        "client_counts": {
+                            "type": "client_counts_explore",
+                            "views": {
+                                "base_view": "client_counts",
+                                "extended_view": "baseline_clients_daily_table",
+                            },
+                        },
+                        "growth_accounting": {
+                            "type": "growth_accounting_explore",
+                            "views": {"base_view": "growth_accounting"},
                         },
                     },
-                    "growth_accounting": {
-                        "type": "growth_accounting_explore",
-                        "views": {"base_view": "growth_accounting"},
-                    },
+                    "glean_app": True,
+                    "owners": [
+                        "glean-app-owner@allizom.com",
+                        "glean-app-owner2@allizom.com",
+                    ],
                 },
-                "glean_app": True,
-                "owners": [
-                    "glean-app-owner@allizom.com",
-                    "glean-app-owner2@allizom.com",
-                ],
-                "pretty_name": "Glean App",
-                "spoke": "looker-spoke-default",
-                "views": {
-                    "baseline_clients_daily_table": {
-                        "tables": [
-                            {
-                                "channel": "release",
-                                "table": "mozdata.glean_app.baseline_clients_daily",
-                            },
-                            {
-                                "channel": "beta",
-                                "table": "mozdata.glean_app_beta.baseline_clients_daily",
-                            },
-                        ],
-                        "type": "table_view",
-                    },
-                    "baseline_clients_last_seen_table": {
-                        "tables": [
-                            {
-                                "channel": "release",
-                                "table": "mozdata.glean_app.baseline_clients_last_seen",
-                            },
-                            {
-                                "channel": "beta",
-                                "table": "mozdata.glean_app_beta.baseline_clients_last_seen",  # noqa: E501
-                            },
-                        ],
-                        "type": "table_view",
-                    },
-                    "baseline_table": {
-                        "tables": [
-                            {
-                                "channel": "release",
-                                "table": "mozdata.glean_app.baseline",
-                            },
-                            {
-                                "channel": "beta",
-                                "table": "mozdata.glean_app_beta.baseline",
-                            },
-                        ],
-                        "type": "table_view",
-                    },
-                    "baseline": {
-                        "tables": [
-                            {
-                                "channel": "release",
-                                "table": "mozdata.glean_app.baseline",
-                            },
-                            {
-                                "channel": "beta",
-                                "table": "mozdata.glean_app_beta.baseline",
-                            },
-                        ],
-                        "type": "glean_ping_view",
-                    },
-                    "client_counts": {
-                        "tables": [
-                            {"table": "mozdata.glean_app.baseline_clients_daily"}
-                        ],
-                        "type": "client_counts_view",
-                    },
-                    "growth_accounting": {
-                        "tables": [
-                            {"table": "mozdata.glean_app.baseline_clients_last_seen"}
-                        ],
-                        "type": "growth_accounting_view",
-                    },
-                },
-            },
-            "private": {
-                "glean_app": False,
-                "spoke": "looker-spoke-private",
-                "owners": ["private-owner@allizom.com"],
-                "pretty_name": "Private",
-                "views": {
-                    "events": {
-                        "type": "ping_view",
-                        "tables": [{"table": "mozdata.private.events"}],
-                    }
-                },
-            },
-        }
-        actual = yaml.load(Path("namespaces.yaml").read_text(), Loader=yaml.FullLoader)
+            }
+            sys.stdout.write(result.stdout)
+            if result.stderr_bytes is not None:
+                sys.stderr.write(result.stderr)
+            try:
+                assert result.exit_code == 0
+            except Exception as e:
+                # use exception chaining to expose original traceback
+                raise e from result.exception
 
-        print_and_test(expected, actual)
+            expected = {
+                "custom": {
+                    "glean_app": False,
+                    "connection": "bigquery-oauth",
+                    "owners": ["custom-owner@allizom.com", "custom-owner2@allizom.com"],
+                    "pretty_name": "Custom",
+                    "spoke": "looker-spoke-default",
+                    "views": {
+                        "baseline": {
+                            "tables": [
+                                {
+                                    "channel": "release",
+                                    "table": "mozdata.custom.baseline",
+                                }
+                            ],
+                            "type": "ping_view",
+                        }
+                    },
+                },
+                "glean-app": {
+                    "explores": {
+                        "baseline": {
+                            "type": "glean_ping_explore",
+                            "views": {"base_view": "baseline"},
+                        },
+                        "client_counts": {
+                            "type": "client_counts_explore",
+                            "views": {
+                                "base_view": "client_counts",
+                                "extended_view": "baseline_clients_daily_table",
+                            },
+                        },
+                        "growth_accounting": {
+                            "type": "growth_accounting_explore",
+                            "views": {"base_view": "growth_accounting"},
+                        },
+                    },
+                    "glean_app": True,
+                    "owners": [
+                        "glean-app-owner@allizom.com",
+                        "glean-app-owner2@allizom.com",
+                    ],
+                    "pretty_name": "Glean App",
+                    "spoke": "looker-spoke-default",
+                    "views": {
+                        "baseline_clients_daily_table": {
+                            "tables": [
+                                {
+                                    "channel": "release",
+                                    "table": "mozdata.glean_app.baseline_clients_daily",
+                                },
+                                {
+                                    "channel": "beta",
+                                    "table": "mozdata.glean_app_beta.baseline_clients_daily",
+                                },
+                            ],
+                            "type": "table_view",
+                        },
+                        "baseline_clients_last_seen_table": {
+                            "tables": [
+                                {
+                                    "channel": "release",
+                                    "table": "mozdata.glean_app.baseline_clients_last_seen",
+                                },
+                                {
+                                    "channel": "beta",
+                                    "table": "mozdata.glean_app_beta.baseline_clients_last_seen",  # noqa: E501
+                                },
+                            ],
+                            "type": "table_view",
+                        },
+                        "baseline_table": {
+                            "tables": [
+                                {
+                                    "channel": "release",
+                                    "table": "mozdata.glean_app.baseline",
+                                },
+                                {
+                                    "channel": "beta",
+                                    "table": "mozdata.glean_app_beta.baseline",
+                                },
+                            ],
+                            "type": "table_view",
+                        },
+                        "baseline": {
+                            "tables": [
+                                {
+                                    "channel": "release",
+                                    "table": "mozdata.glean_app.baseline",
+                                },
+                                {
+                                    "channel": "beta",
+                                    "table": "mozdata.glean_app_beta.baseline",
+                                },
+                            ],
+                            "type": "glean_ping_view",
+                        },
+                        "client_counts": {
+                            "tables": [
+                                {"table": "mozdata.glean_app.baseline_clients_daily"}
+                            ],
+                            "type": "client_counts_view",
+                        },
+                        "growth_accounting": {
+                            "tables": [
+                                {
+                                    "table": "mozdata.glean_app.baseline_clients_last_seen"
+                                }
+                            ],
+                            "type": "growth_accounting_view",
+                        },
+                    },
+                },
+                "operational_monitoring": {
+                    "explores": {
+                        "op_mon_histogram": {
+                            "branches": ["enabled", "disabled"],
+                            "type": "operational_monitoring_explore",
+                            "views": {"base_view": "op_mon_histogram"},
+                        },
+                        "op_mon_scalar": {
+                            "branches": ["enabled", "disabled"],
+                            "type": "operational_monitoring_explore",
+                            "views": {"base_view": "op_mon_scalar"},
+                        },
+                    },
+                    "glean_app": False,
+                    "owners": ["opmon-owner@allizom.com"],
+                    "pretty_name": "Operational Monitoring",
+                    "spoke": "looker-spoke-default",
+                    "views": {
+                        "op_mon_histogram": {
+                            "tables": [
+                                {
+                                    "table": "moz-fx-data-shared-prod.operational_monitoring.test_histogram"
+                                }
+                            ],
+                            "type": "operational_monitoring_histogram_view",
+                        },
+                        "op_mon_scalar": {
+                            "tables": [
+                                {
+                                    "table": "moz-fx-data-shared-prod.operational_monitoring.test_scalar"
+                                }
+                            ],
+                            "type": "operational_monitoring_scalar_view",
+                        },
+                    },
+                },
+                "private": {
+                    "glean_app": False,
+                    "spoke": "looker-spoke-private",
+                    "owners": ["private-owner@allizom.com"],
+                    "pretty_name": "Private",
+                    "views": {
+                        "events": {
+                            "type": "ping_view",
+                            "tables": [{"table": "mozdata.private.events"}],
+                        }
+                    },
+                },
+            }
+            actual = yaml.load(
+                Path("namespaces.yaml").read_text(), Loader=yaml.FullLoader
+            )
+
+            print_and_test(expected, actual)
 
 
 def test_get_glean_apps(app_listings_uri, glean_apps):
