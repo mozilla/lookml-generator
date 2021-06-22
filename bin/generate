@@ -156,7 +156,6 @@ function generate_hub_commit() {
   cd /app
 
   HUB_DIR="looker-hub"
-  GENERATION_DISALLOW_LIST="/app/lookml-generator/GENERATION_DISALLOW_LIST"
   NAMESPACE_ALLOWLIST="/app/lookml-generator/namespaces-allowlist.yaml"
   CUSTOM_NAMESPACES_FILENAME="/app/lookml-generator/custom-namespaces.yaml"
   GENERATED_SQL_URI="https://github.com/mozilla/bigquery-etl/archive/generated-sql.tar.gz"
@@ -173,9 +172,6 @@ function generate_hub_commit() {
     --target-dir $HUB_DIR
 
   cd $HUB_DIR
-
-  # Keep files in GENERATION_DISALLOW_LIST unchanged.
-  cat $GENERATION_DISALLOW_LIST | xargs -I % sh -c "git checkout % || rm %"
 
   check_files_and_commit
 
