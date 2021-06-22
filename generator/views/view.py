@@ -3,6 +3,8 @@ from __future__ import annotations
 
 from typing import Any, Dict, Iterator, List, Optional, TypedDict
 
+import click
+
 OMIT_VIEWS = {"deletion_request"}
 
 
@@ -96,3 +98,17 @@ class View(object):
         a list.
         """
         raise NotImplementedError("Only implemented in subclass.")
+
+    def get_client_id(self, dimensions: List[dict], table: str) -> Optional[str]:
+        """Return the first field that looks like a client identifier."""
+        client_id_fields = [
+            d["name"]
+            for d in dimensions
+            if d["name"] in {"client_id", "client_info__client_id", "context_id"}
+        ]
+        if not client_id_fields:
+            # Some pings purposely disinclude client_ids, e.g. firefox installer
+            return None
+        if len(client_id_fields) > 1:
+            raise click.ClickException(f"Duplicate client_id dimension in {table!r}")
+        return client_id_fields[0]

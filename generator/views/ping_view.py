@@ -4,8 +4,6 @@ from __future__ import annotations
 from collections import defaultdict
 from typing import Any, Dict, Iterator, List, Optional, Union
 
-import click
-
 from . import lookml_utils
 from .view import OMIT_VIEWS, View, ViewDict
 
@@ -111,20 +109,6 @@ class PingView(View):
         # add dimensions and dimension groups
         return lookml_utils._generate_dimensions(bq_client, table)
 
-    def _get_client_id(self, dimensions: List[dict], table: str) -> Optional[str]:
-        """Return the first field that looks like a client identifier."""
-        client_id_fields = [
-            d["name"]
-            for d in dimensions
-            if d["name"] in {"client_id", "client_info__client_id", "context_id"}
-        ]
-        if not client_id_fields:
-            # Some pings purposely disinclude client_ids, e.g. firefox installer
-            return None
-        if len(client_id_fields) > 1:
-            raise click.ClickException(f"Duplicate client_id dimension in {table!r}")
-        return client_id_fields[0]
-
     def get_measures(
         self, dimensions: List[dict], table: str, v1_name: Optional[str]
     ) -> List[Dict[str, Union[str, List[Dict[str, str]]]]]:
@@ -139,7 +123,7 @@ class PingView(View):
         # since we'll use it to calculate per-measure client counts.
         measures: List[Dict[str, Union[str, List[Dict[str, str]]]]] = []
 
-        client_id_field = self._get_client_id(dimensions, table)
+        client_id_field = self.get_client_id(dimensions, table)
         if client_id_field is not None:
             measures.append(
                 {
