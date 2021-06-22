@@ -54,7 +54,7 @@ class GleanPingView(PingView):
         )["table"]
         dimensions = self.get_dimensions(bq_client, table, v1_name)
 
-        client_id_field = self._get_client_id(dimensions, table)
+        client_id_field = self.get_client_id(dimensions, table)
 
         view_definitions = []
         metrics = self._get_glean_metrics(v1_name)
@@ -323,7 +323,7 @@ class GleanPingView(PingView):
         Raise ClickException if dimensions result in duplicate measures.
         """
         measures = super().get_measures(dimensions, table, v1_name)
-        client_id_field = self._get_client_id(dimensions, table)
+        client_id_field = self.get_client_id(dimensions, table)
 
         for dimension in dimensions:
             if (

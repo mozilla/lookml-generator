@@ -1,5 +1,9 @@
 """Utility functions for tests."""
 import pprint
+from typing import List
+
+from google.cloud import bigquery
+from google.cloud.bigquery.schema import SchemaField
 
 
 def get_differences(expected, result, path="", sep="."):
@@ -74,3 +78,16 @@ def print_and_test(expected, result=None, actual=None):
     print("\n".join([" - ".join(v) for v in get_differences(expected, result)]))
 
     assert result == expected
+
+
+def get_mock_bq_client(schema: List[SchemaField]):
+    """Get a mock BQ client that will return a specified schema."""
+
+    class MockClient:
+        """Mock bigquery.Client."""
+
+        def get_table(self, table_ref):
+            """Mock bigquery.Client.get_table."""
+            return bigquery.Table(table_ref, schema=schema)
+
+    return MockClient()

@@ -132,3 +132,17 @@ class Explore:
             filters.append({"submission_date": "28 days"})
 
         return filters
+
+    def __eq__(self, other) -> bool:
+        """Check for equality with other View."""
+
+        def comparable_dict(d):
+            return tuple(sorted(d.items()))
+
+        if isinstance(other, Explore):
+            return (
+                self.name == other.name
+                and comparable_dict(self.views) == comparable_dict(other.views)
+                and self.type == other.type
+            )
+        return False
