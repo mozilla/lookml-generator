@@ -1,6 +1,7 @@
 """Generate namespaces.yaml."""
 import gzip
 import json
+import re
 import tarfile
 import urllib.request
 import warnings
@@ -14,12 +15,26 @@ from typing import Dict, List, Union
 
 import click
 import yaml
+from google.cloud import storage
 
 from .explores import EXPLORE_TYPES
 from .views import VIEW_TYPES, View
 
 PROBE_INFO_BASE_URI = "https://probeinfo.telemetry.mozilla.org"
 DEFAULT_SPOKE = "looker-spoke-default"
+OPMON_BUCKET_NAME = "operational_monitoring"
+PROD_PROJECT = "moz-fx-data-shared-prod"
+PROJECTS_FOLDER = "projects/"
+DATA_TYPES = {"histogram", "scalar"}
+
+
+def _normalize_slug(name):
+    return re.sub(r"[^a-zA-Z0-9_]", "_", name)
+
+
+def _download_json_file(project, bucket, filename):
+    blob = bucket.get_blob(filename)
+    return json.loads(blob.download_as_string()), blob.updated
 
 
 def _get_first(tuple_):
@@ -60,6 +75,52 @@ def _get_db_views(uri):
                         ref.split(".") for ref in references["view.sql"]
                     ]
     return views
+
+
+def _append_view_and_explore_for_data_type(
+    om_views_and_explores, project_name, table_prefix, data_type, branches
+):
+    project_data_type_id = f"{project_name}_{data_type}"
+
+    om_views_and_explores["views"][project_data_type_id] = {
+        "type": f"operational_monitoring_{data_type}_view",
+        "tables": [
+            {
+                "table": f"{PROD_PROJECT}.operational_monitoring.{table_prefix}_{data_type}"
+            }
+        ],
+    }
+    om_views_and_explores["explores"][project_data_type_id] = {
+        "type": "operational_monitoring_explore",
+        "views": {"base_view": f"{project_name}_{data_type}"},
+        "branches": branches,
+    }
+
+
+def _get_opmon_views_and_explores():
+    client = storage.Client(PROD_PROJECT)
+    bucket = client.get_bucket(OPMON_BUCKET_NAME)
+    om_views_and_explores = {"views": {}, "explores": {}}
+
+    # Iterating over all defined operational monitoring projects
+    for blob in bucket.list_blobs(prefix=PROJECTS_FOLDER):
+        # The folder itself is not a project file
+        if blob.name == PROJECTS_FOLDER:
+            continue
+
+        om_project, project_last_modified = _download_json_file(
+            PROD_PROJECT, bucket, blob.name
+        )
+        table_prefix = _normalize_slug(om_project["slug"])
+        project_name = om_project["name"].lower()
+        branches = om_project.get("branches", ["enabled", "disabled"])
+
+        for data_type in DATA_TYPES:
+            _append_view_and_explore_for_data_type(
+                om_views_and_explores, project_name, table_prefix, data_type, branches
+            )
+
+        return om_views_and_explores
 
 
 def _get_glean_apps(
@@ -207,6 +268,8 @@ def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri, disallowl
 
     if custom_namespaces is not None:
         custom_namespaces = yaml.safe_load(custom_namespaces.read()) or {}
+        views_and_explores = _get_opmon_views_and_explores()
+        custom_namespaces["operational_monitoring"].update(views_and_explores)
         _merge_namespaces(namespaces, custom_namespaces)
 
     disallowed_namespaces = yaml.safe_load(disallowlist.read()) or {}

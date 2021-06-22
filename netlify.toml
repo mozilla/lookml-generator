@@ -1,6 +1,8 @@
 [build]
 command = """
     set -e
+    export GOOGLE_APPLICATION_CREDENTIALS="/tmp/gcp.json"
+    echo "$GCLOUD_SERVICE_KEY" > "$GOOGLE_APPLICATION_CREDENTIALS"
     ./bin/generator namespaces
     mkdir site
     cp namespaces.yaml site

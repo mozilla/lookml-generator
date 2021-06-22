@@ -17,6 +17,7 @@ class Explore:
     name: str
     views: Dict[str, str]
     views_path: Optional[Path] = None
+    defn: Optional[Dict[str, str]] = None
     type: str = field(init=False)
 
     def to_dict(self) -> dict:

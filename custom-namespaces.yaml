@@ -1,4 +1,9 @@
 ---
+operational_monitoring:
+  glean_app: false
+  owners:
+    - msamuel@mozilla.com
+  pretty_name: Operational Monitoring
 duet:
   glean_app: false
   owners:
