@@ -110,5 +110,5 @@ class View(object):
             # Some pings purposely disinclude client_ids, e.g. firefox installer
             return None
         if len(client_id_fields) > 1:
-            raise click.ClickException(f"Duplicate client_id dimension in {table!r}")
+            raise ClickException(f"Duplicate client_id dimension in {table!r}")
         return client_id_fields[0]
