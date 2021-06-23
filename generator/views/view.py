@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, Iterator, List, Optional, TypedDict
 
-import click
+from click import ClickException
 
 OMIT_VIEWS = {"deletion_request"}
 
