@@ -120,6 +120,15 @@ def test_explore_from_views(events_view, events_explore):
     assert actual == events_explore
 
 
+def test_explore_from_dict(events_explore, tmp_path):
+    actual = EventsExplore.from_dict(
+        "events",
+        {"views": {"base_view": "events", "extended_view": "events_unnested_table"}},
+        tmp_path,
+    )
+    assert actual == events_explore
+
+
 def test_view_lookml(events_view):
     expected = {
         "includes": ["events_unnested_table.view.lkml"],

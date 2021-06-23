@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional
 
 from ..views import EventsView, View
@@ -37,6 +38,11 @@ class EventsExplore(Explore):
                         "extended_view": view.tables[0]["events_table_view"],
                     },
                 )
+
+    @staticmethod
+    def from_dict(name: str, defn: dict, views_path: Path) -> EventsExplore:
+        """Get an instance of this explore from a dictionary definition."""
+        return EventsExplore(name, defn["views"], views_path)
 
     def _to_lookml(self, v1_name: Optional[str]) -> List[Dict[str, Any]]:
         return [
