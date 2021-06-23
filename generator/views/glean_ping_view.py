@@ -31,11 +31,21 @@ ALLOWED_TYPES = DISTRIBUTION_TYPES | {
 }
 
 
+DISALLOWED_PINGS = {"events"}
+
+
 class GleanPingView(PingView):
     """A view on a ping table for an application using the Glean SDK."""
 
     type: str = "glean_ping_view"
     allow_glean: bool = True
+
+    @classmethod
+    def from_db_views(klass, *args, **kwargs):
+        """Generate GleanPingViews from db views."""
+        for view in super().from_db_views(*args, **kwargs):
+            if view.name not in DISALLOWED_PINGS:
+                yield view
 
     def to_lookml(self, bq_client, v1_name: Optional[str]) -> Dict[str, Any]:
         """Generate LookML for this view.
