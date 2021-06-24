@@ -40,6 +40,9 @@
                                 <a class="variable" href="#GleanPingView.allow_glean">allow_glean</a>
                         </li>
                         <li>
+                                <a class="function" href="#GleanPingView.from_db_views">from_db_views</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#GleanPingView.to_lookml">to_lookml</a>
                         </li>
                         <li>
@@ -104,11 +107,21 @@
 <span class="p">}</span>
 
 
+<span class="n">DISALLOWED_PINGS</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;events&quot;</span><span class="p">}</span>
+
+
 <span class="k">class</span> <span class="nc">GleanPingView</span><span class="p">(</span><span class="n">PingView</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;A view on a ping table for an application using the Glean SDK.&quot;&quot;&quot;</span>
 
     <span class="nb">type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;glean_ping_view&quot;</span>
     <span class="n">allow_glean</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_db_views</span><span class="p">(</span><span class="n">klass</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generate GleanPingViews from db views.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">view</span> <span class="ow">in</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">from_db_views</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">view</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">DISALLOWED_PINGS</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">view</span>
 
     <span class="k">def</span> <span class="nf">to_lookml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bq_client</span><span class="p">,</span> <span class="n">v1_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Generate LookML for this view.</span>
@@ -127,7 +140,7 @@
         <span class="p">)[</span><span class="s2">&quot;table&quot;</span><span class="p">]</span>
         <span class="n">dimensions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dimensions</span><span class="p">(</span><span class="n">bq_client</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span> <span class="n">v1_name</span><span class="p">)</span>
 
-        <span class="n">client_id_field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_client_id</span><span class="p">(</span><span class="n">dimensions</span><span class="p">,</span> <span class="n">table</span><span class="p">)</span>
+        <span class="n">client_id_field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_client_id</span><span class="p">(</span><span class="n">dimensions</span><span class="p">,</span> <span class="n">table</span><span class="p">)</span>
 
         <span class="n">view_definitions</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_glean_metrics</span><span class="p">(</span><span class="n">v1_name</span><span class="p">)</span>
@@ -396,7 +409,7 @@
 <span class="sd">        Raise ClickException if dimensions result in duplicate measures.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">measures</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_measures</span><span class="p">(</span><span class="n">dimensions</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span> <span class="n">v1_name</span><span class="p">)</span>
-        <span class="n">client_id_field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_client_id</span><span class="p">(</span><span class="n">dimensions</span><span class="p">,</span> <span class="n">table</span><span class="p">)</span>
+        <span class="n">client_id_field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_client_id</span><span class="p">(</span><span class="n">dimensions</span><span class="p">,</span> <span class="n">table</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">dimension</span> <span class="ow">in</span> <span class="n">dimensions</span><span class="p">:</span>
             <span class="k">if</span> <span class="p">(</span>
@@ -453,6 +466,13 @@
     <span class="nb">type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;glean_ping_view&quot;</span>
     <span class="n">allow_glean</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
 
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_db_views</span><span class="p">(</span><span class="n">klass</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generate GleanPingViews from db views.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">view</span> <span class="ow">in</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">from_db_views</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">view</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">DISALLOWED_PINGS</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">view</span>
+
     <span class="k">def</span> <span class="nf">to_lookml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bq_client</span><span class="p">,</span> <span class="n">v1_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Generate LookML for this view.</span>
 
@@ -470,7 +490,7 @@
         <span class="p">)[</span><span class="s2">&quot;table&quot;</span><span class="p">]</span>
         <span class="n">dimensions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dimensions</span><span class="p">(</span><span class="n">bq_client</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span> <span class="n">v1_name</span><span class="p">)</span>
 
-        <span class="n">client_id_field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_client_id</span><span class="p">(</span><span class="n">dimensions</span><span class="p">,</span> <span class="n">table</span><span class="p">)</span>
+        <span class="n">client_id_field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_client_id</span><span class="p">(</span><span class="n">dimensions</span><span class="p">,</span> <span class="n">table</span><span class="p">)</span>
 
         <span class="n">view_definitions</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_glean_metrics</span><span class="p">(</span><span class="n">v1_name</span><span class="p">)</span>
@@ -739,7 +759,7 @@
 <span class="sd">        Raise ClickException if dimensions result in duplicate measures.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">measures</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_measures</span><span class="p">(</span><span class="n">dimensions</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span> <span class="n">v1_name</span><span class="p">)</span>
-        <span class="n">client_id_field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_client_id</span><span class="p">(</span><span class="n">dimensions</span><span class="p">,</span> <span class="n">table</span><span class="p">)</span>
+        <span class="n">client_id_field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_client_id</span><span class="p">(</span><span class="n">dimensions</span><span class="p">,</span> <span class="n">table</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">dimension</span> <span class="ow">in</span> <span class="n">dimensions</span><span class="p">:</span>
             <span class="k">if</span> <span class="p">(</span>
@@ -800,6 +820,32 @@
     
 
                             </div>
+                            <div id="GleanPingView.from_db_views" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#GleanPingView.from_db_views">#&nbsp;&nbsp</a>
+
+                <div class="decorator">@classmethod</div>
+
+            <span class="def">def</span>
+            <span class="name">from_db_views</span><span class="signature">(klass, *args, **kwargs)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_db_views</span><span class="p">(</span><span class="n">klass</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generate GleanPingViews from db views.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">view</span> <span class="ow">in</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">from_db_views</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">view</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">DISALLOWED_PINGS</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">view</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Generate GleanPingViews from db views.</p>
+</div>
+
+
+                            </div>
                             <div id="GleanPingView.to_lookml" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#GleanPingView.to_lookml">#&nbsp;&nbsp</a>
 
@@ -827,7 +873,7 @@
         <span class="p">)[</span><span class="s2">&quot;table&quot;</span><span class="p">]</span>
         <span class="n">dimensions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dimensions</span><span class="p">(</span><span class="n">bq_client</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span> <span class="n">v1_name</span><span class="p">)</span>
 
-        <span class="n">client_id_field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_client_id</span><span class="p">(</span><span class="n">dimensions</span><span class="p">,</span> <span class="n">table</span><span class="p">)</span>
+        <span class="n">client_id_field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_client_id</span><span class="p">(</span><span class="n">dimensions</span><span class="p">,</span> <span class="n">table</span><span class="p">)</span>
 
         <span class="n">view_definitions</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_glean_metrics</span><span class="p">(</span><span class="n">v1_name</span><span class="p">)</span>
@@ -986,7 +1032,7 @@ against the view in the explore.</p>
 <span class="sd">        Raise ClickException if dimensions result in duplicate measures.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">measures</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_measures</span><span class="p">(</span><span class="n">dimensions</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span> <span class="n">v1_name</span><span class="p">)</span>
-        <span class="n">client_id_field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_client_id</span><span class="p">(</span><span class="n">dimensions</span><span class="p">,</span> <span class="n">table</span><span class="p">)</span>
+        <span class="n">client_id_field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_client_id</span><span class="p">(</span><span class="n">dimensions</span><span class="p">,</span> <span class="n">table</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">dimension</span> <span class="ow">in</span> <span class="n">dimensions</span><span class="p">:</span>
             <span class="k">if</span> <span class="p">(</span>
@@ -1039,7 +1085,6 @@ against the view in the explore.</p>
                                 <dl>
                                     <div><dt><a href="ping_view.html#PingView">generator.views.ping_view.PingView</a></dt>
                                 <dd id="GleanPingView.__init__" class="function"><a href="ping_view.html#PingView.__init__">PingView</a></dd>
-                <dd id="GleanPingView.from_db_views" class="function"><a href="ping_view.html#PingView.from_db_views">from_db_views</a></dd>
                 <dd id="GleanPingView.from_dict" class="function"><a href="ping_view.html#PingView.from_dict">from_dict</a></dd>
 
             </div>
@@ -1050,6 +1095,7 @@ against the view in the explore.</p>
                 <dd id="GleanPingView.namespace" class="variable"><a href="view.html#View.namespace">namespace</a></dd>
                 <dd id="GleanPingView.get_type" class="function"><a href="view.html#View.get_type">get_type</a></dd>
                 <dd id="GleanPingView.as_dict" class="function"><a href="view.html#View.as_dict">as_dict</a></dd>
+                <dd id="GleanPingView.get_client_id" class="function"><a href="view.html#View.get_client_id">get_client_id</a></dd>
 
             </div>
                                 </dl>

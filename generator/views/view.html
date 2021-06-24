@@ -78,6 +78,9 @@
                         <li>
                                 <a class="function" href="#View.to_lookml">to_lookml</a>
                         </li>
+                        <li>
+                                <a class="function" href="#View.get_client_id">get_client_id</a>
+                        </li>
                 </ul>
 
             </li>
@@ -105,6 +108,8 @@
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">TypedDict</span>
+
+<span class="kn">from</span> <span class="nn">click</span> <span class="kn">import</span> <span class="n">ClickException</span>
 
 <span class="n">OMIT_VIEWS</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;deletion_request&quot;</span><span class="p">}</span>
 
@@ -199,6 +204,20 @@
 <span class="sd">        a list.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Only implemented in subclass.&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_client_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span> <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Return the first field that looks like a client identifier.&quot;&quot;&quot;</span>
+        <span class="n">client_id_fields</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dimensions</span>
+            <span class="k">if</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;client_id&quot;</span><span class="p">,</span> <span class="s2">&quot;client_info__client_id&quot;</span><span class="p">,</span> <span class="s2">&quot;context_id&quot;</span><span class="p">}</span>
+        <span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">client_id_fields</span><span class="p">:</span>
+            <span class="c1"># Some pings purposely disinclude client_ids, e.g. firefox installer</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">client_id_fields</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ClickException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Duplicate client_id dimension in </span><span class="si">{</span><span class="n">table</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">client_id_fields</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 </pre></div>
 
         </details>
@@ -361,6 +380,20 @@
 <span class="sd">        a list.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Only implemented in subclass.&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_client_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span> <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Return the first field that looks like a client identifier.&quot;&quot;&quot;</span>
+        <span class="n">client_id_fields</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dimensions</span>
+            <span class="k">if</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;client_id&quot;</span><span class="p">,</span> <span class="s2">&quot;client_info__client_id&quot;</span><span class="p">,</span> <span class="s2">&quot;context_id&quot;</span><span class="p">}</span>
+        <span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">client_id_fields</span><span class="p">:</span>
+            <span class="c1"># Some pings purposely disinclude client_ids, e.g. firefox installer</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">client_id_fields</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ClickException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Duplicate client_id dimension in </span><span class="si">{</span><span class="n">table</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">client_id_fields</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 </pre></div>
 
         </details>
@@ -611,6 +644,38 @@
 <p>View instances can generate more than one Looker view,
 for e.g. nested fields and joins, so this returns
 a list.</p>
+</div>
+
+
+                            </div>
+                            <div id="View.get_client_id" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#View.get_client_id">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">get_client_id</span><span class="signature">(self, dimensions: List[dict], table: str) -&gt; Union[str, NoneType]</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_client_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span> <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Return the first field that looks like a client identifier.&quot;&quot;&quot;</span>
+        <span class="n">client_id_fields</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dimensions</span>
+            <span class="k">if</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;client_id&quot;</span><span class="p">,</span> <span class="s2">&quot;client_info__client_id&quot;</span><span class="p">,</span> <span class="s2">&quot;context_id&quot;</span><span class="p">}</span>
+        <span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">client_id_fields</span><span class="p">:</span>
+            <span class="c1"># Some pings purposely disinclude client_ids, e.g. firefox installer</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">client_id_fields</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ClickException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Duplicate client_id dimension in </span><span class="si">{</span><span class="n">table</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">client_id_fields</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Return the first field that looks like a client identifier.</p>
 </div>
 
 
