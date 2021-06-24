@@ -45,14 +45,13 @@ class EventsExplore(Explore):
         return EventsExplore(name, defn["views"], views_path)
 
     def _to_lookml(self, v1_name: Optional[str]) -> List[Dict[str, Any]]:
-        return [
-            {
-                "name": "event_counts",
-                "view_name": self.views["base_view"],
-                "description": "Event counts over time.",
-                "always_filter": {
-                    "filters": self.get_required_filters("extended_view"),
-                },
-                "queries": deepcopy(EventsExplore.queries),
-            },
-        ]
+        lookml = {
+            "name": "event_counts",
+            "view_name": self.views["base_view"],
+            "description": "Event counts over time.",
+            "queries": deepcopy(EventsExplore.queries),
+        }
+        required_filters = self.get_required_filters("extended_view")
+        if required_filters:
+            lookml["always_filter"] = {"filters": required_filters}
+        return [lookml]

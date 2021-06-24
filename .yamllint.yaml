@@ -12,3 +12,5 @@ ignore: |
   .git/
   venv/
   .circleci/
+  namespaces.yaml
+  looker-hub/namespaces.yaml

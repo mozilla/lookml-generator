@@ -156,3 +156,43 @@ mozilla_vpn:
       tables:
         - channel: release
           table: mozdata.mozilla_vpn.all_subscriptions
+firefox_accounts:
+  glean_app: false
+  owners:
+    - loines@mozilla.com
+  pretty_name: Firefox Accounts
+  views:
+    events:
+      type: events_view
+      tables:
+        - events_table_view: fxa_events_table
+          base_table: mozdata.firefox_accounts.fxa_content_auth_oauth_events
+    fxa_events_table:
+      type: table_view
+      tables:
+        - channel: release
+          table: mozdata.firefox_accounts.fxa_content_auth_oauth_events
+    funnel_analysis:
+      type: funnel_analysis_view
+      tables:
+        - funnel_analysis: events_daily_table
+          event_types: mozdata.firefox_accounts.event_types
+          step_1: event_types
+          step_2: event_types
+          step_3: event_types
+          step_4: event_types
+    events_daily_table:
+      type: table_view
+      tables:
+        - channel: release
+          table: mozdata.firefox_accounts.events_daily
+  explores:
+    event_counts:
+      type: events_explore
+      views:
+        base_view: events
+        extended_view: fxa_events_table
+    funnel_analysis:
+      type: funnel_analysis_explore
+      views:
+        base_view: funnel_analysis
