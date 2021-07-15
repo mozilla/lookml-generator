@@ -124,9 +124,9 @@ gitpython==3.1.17 \
     --hash=sha256:29fe82050709760081f588dd50ce83504feddbebdc4da6956d02351552b1c135 \
     --hash=sha256:ee24bdc93dce357630764db659edaf6b8d664d4ff5447ccfeedd2dc5c253f41e
     # via mozilla-schema-generator
-google-api-core[grpc]==1.30.0 \
-    --hash=sha256:0724d354d394b3d763bc10dfee05807813c5210f0bd9b8e2ddf6b6925603411c \
-    --hash=sha256:92cd9e9f366e84bfcf2524e34d2dc244906c645e731962617ba620da1620a1e0
+google-api-core[grpc]==1.31.0 \
+    --hash=sha256:7c8ba88e2b893ef4f67d67e229aade51a2db5053023b73b1394a5ee3dcdb561c \
+    --hash=sha256:a9f979b5c6a9cad31a4120ca6be712df76adc32336a7bf4bc2f4331a1b527fe7
     # via
     #   -r requirements.in
     #   google-cloud-bigquery
@@ -263,9 +263,9 @@ lkml==1.1.0 \
     --hash=sha256:0c09f19dd43a49cff4c0deff1f090320cf2ccb90293fb3d376a6b540f6ffca07 \
     --hash=sha256:8c1b090a85469db2b318a73ea4fc8e5605aedc24d64d384189656720f58b58c8
     # via -r requirements.in
-looker-sdk==21.8.0 \
-    --hash=sha256:cf22bebc19034790195188f23728e90a231f0f971d0472901e4fdb9d4f521f33 \
-    --hash=sha256:f1e4a0fa163523d8c972a792865f5491b666eb66933534f106b6e9ef98d62350
+looker-sdk==21.10.0 \
+    --hash=sha256:e436a6f645bffbd2cc3dbbaf446c5fe3430f51dee71bd246cc8dd3cc8b9a3613 \
+    --hash=sha256:ef7647007a0f6c40905ad4bd4f559ef4ea97ef5830c76d76f14ba6b66f1a81b7
     # via -r requirements.in
 mccabe==0.6.1 \
     --hash=sha256:ab8a6258860da4b6677da4bd2fe5dc2c659cff31b3ee4f7f5d64e79735b80d42 \
