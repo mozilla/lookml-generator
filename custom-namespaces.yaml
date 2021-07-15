@@ -186,6 +186,10 @@ firefox_accounts:
       tables:
         - channel: release
           table: mozdata.firefox_accounts.events_daily
+    growth_accounting:
+      tables:
+        - table: mozdata.firefox_accounts.fxa_users_last_seen
+      type: growth_accounting_view
   explores:
     event_counts:
       type: events_explore
@@ -196,3 +200,7 @@ firefox_accounts:
       type: funnel_analysis_explore
       views:
         base_view: funnel_analysis
+    growth_accounting:
+      type: growth_accounting_explore
+      view:
+        base_view: growth_accounting
