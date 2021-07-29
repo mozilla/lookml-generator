@@ -190,6 +190,11 @@ firefox_accounts:
       type: growth_accounting_view
       tables:
         - table: mozdata.firefox_accounts.fxa_users_last_seen
+    fxa_first_seen_table:
+      type: table_view
+      tables:
+        - channel: release
+          table: mozdata.firefox_accounts.fxa_users_first_seen
   explores:
     event_counts:
       type: events_explore
