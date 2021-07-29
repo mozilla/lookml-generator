@@ -1,7 +1,7 @@
 PyYAML==5.4.1
 click==8.0.1
-google-api-core==1.31.0  # transitive dep that needs dependabot updates
-google-cloud-bigquery==2.23.0
+google-api-core==1.31.1  # transitive dep that needs dependabot updates
+google-cloud-bigquery==2.23.2
 googleapis-common-protos==1.53.0  # transitive dep that needs dependabot updates
 lkml==1.1.0
 looker-sdk==21.10.0
@@ -14,4 +14,5 @@ pytest-isort==2.0.0
 pytest-mypy==0.8.1
 pytest-pydocstyle==2.2.0
 pytest==6.2.4
+types-PyYaml==5.4.3
 yamllint==1.26.1
