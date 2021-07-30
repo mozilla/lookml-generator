@@ -38,6 +38,8 @@
 #                             not run `generator content`.
 #   GITHUB_ACCESS_TOKEN:      Access token for Github. Needs read and write
 #                             access to repos. Not required in dev.
+#   UPDATE_DEV_BRANCHES:      Whether or not the dev branches should be updated.
+#                             This should only happen in production.
 #
 # Example usage:
 #   export GIT_SSH_KEY_BASE64=$(cat ~/.ssh/id_rsa | base64)
@@ -53,6 +55,7 @@ SPOKE_BRANCH_PUBLISH=${SPOKE_BRANCH_PUBLISH:-"main-nonprod"}
 SPOKE_BRANCH_WORKING=${SPOKE_BRANCH_WORKING:-"${SPOKE_BRANCH_PUBLISH}-working"}
 
 LOOKER_INSTANCE_URI=${LOOKER_INSTANCE_URI:-"https://mozilladev.cloud.looker.com"}
+UPDATE_DEV_BRANCHES=${UPDATE_DEV_BRANCHES:-"false"}
 
 function setup_git_auth() {
     # Configure the container for pushing to github.
@@ -186,6 +189,22 @@ function generate_hub_commit() {
   popd
 }
 
+function update_dev_branches() {
+  # Reset all dev branches to main
+
+  pushd .
+  cd /app/looker-hub
+
+  dev_branches_file="/app/lookml-generator/bin/dev_branches"
+  while read branch; do
+    git checkout $branch
+    git reset --hard main
+    git push -f origin $branch
+  done < $dev_branches_file
+
+  popd
+}
+
 function generate_spoke_commits() {
   # Generate commit on spoke publish branch
   # with generated LookML.
@@ -258,6 +277,11 @@ function main() {
   # Publish hub
   cd /app/looker-hub
   git push || git push --set-upstream origin "$HUB_BRANCH_PUBLISH"
+
+  # Update dev branche
+  if [ "$UPDATE_DEV_BRANCHES" = "true" ] ; then
+    update_dev_branches
+  fi
 
   # Set up spokes and commit
   setup_spokes
