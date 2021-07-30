@@ -24,6 +24,16 @@ Once we know which tables are associated with which namespaces, we can generate 
 Lookml-generator generates LookML based on both the BigQuery schema and manual changes. For example, we would want to add `city` drill-downs for all `country` fields.
 ![alt text](https://github.com/mozilla/lookml-generator/blob/main/architecture/lookml.jpg?raw=true)
 
+
+### Pushing Changes to Dev Branches
+In addition to pushing new lookml to the [main branch](https://github.com/mozilla/looker-hub), we reset the dev branches to also
+point to the commit at `main`. This only happens during production deployment runs.
+
+To automate this process for your dev branch, add it to [this file](https://github.com/mozilla/lookml-generator/tree/main/bin/dev_branches).
+You can edit that file in your browser. Open a PR and tag [data-looker](https://github.com/orgs/mozilla/teams/data-looker) for review.
+You can find your dev branch by going to [Looker](https://mozilla.cloud.looker.com), entering development mode, opening the [`looker-hub`](https://mozilla.cloud.looker.com/projects/looker-hub)
+project, clicking the "Git Actions" icon, and finding your personal branch in the "Current Branch" dropdown.
+
 ## Setup
 
 Ensure Python 3.8+ is available on your machine (see [this guide](https://docs.python-guide.org/starting/install3/osx/) for instructions if you're on a mac and haven't installed anything other than the default system Python.)
