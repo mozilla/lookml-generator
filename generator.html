@@ -33,7 +33,10 @@
   <li><a href="#lookml-generator">lookml-generator</a>
   <ul>
     <li><a href="#generating-namespace-listings">Generating Namespace Listings</a></li>
-    <li><a href="#generating-lookml">Generating LookML</a></li>
+    <li><a href="#generating-lookml">Generating LookML</a>
+    <ul>
+      <li><a href="#pushing-changes-to-dev-branches">Pushing Changes to Dev Branches</a></li>
+    </ul></li>
     <li><a href="#setup">Setup</a></li>
     <li><a href="#container-development">Container Development</a></li>
     <li><a href="#deploying-new-lookml-generator-changes">Deploying new <code>lookml-generator</code> changes</a></li>
@@ -111,6 +114,16 @@ We also support custom namespaces, which can use wildcards to denote their BigQu
 
 <p>Lookml-generator generates LookML based on both the BigQuery schema and manual changes. For example, we would want to add <code>city</code> drill-downs for all <code>country</code> fields.
 <img src="https://github.com/mozilla/lookml-generator/blob/main/architecture/lookml.jpg?raw=true" alt="alt text" /></p>
+
+<h3 id="pushing-changes-to-dev-branches">Pushing Changes to Dev Branches</h3>
+
+<p>In addition to pushing new lookml to the <a href="https://github.com/mozilla/looker-hub">main branch</a>, we reset the dev branches to also
+point to the commit at <code>main</code>. This only happens during production deployment runs.</p>
+
+<p>To automate this process for your dev branch, add it to <a href="https://github.com/mozilla/lookml-generator/tree/main/bin/dev_branches">this file</a>.
+You can edit that file in your browser. Open a PR and tag <a href="https://github.com/orgs/mozilla/teams/data-looker">data-looker</a> for review.
+You can find your dev branch by going to <a href="https://mozilla.cloud.looker.com">Looker</a>, entering development mode, opening the <a href="https://mozilla.cloud.looker.com/projects/looker-hub"><code>looker-hub</code></a>
+project, clicking the "Git Actions" icon, and finding your personal branch in the "Current Branch" dropdown.</p>
 
 <h2 id="setup">Setup</h2>
 
