@@ -209,3 +209,10 @@ firefox_accounts:
       type: growth_accounting_explore
       views:
         base_view: growth_accounting
+revenue:
+  glean_app: false
+  connection: bigquery-oauth
+  pretty_name: Revenue
+  owners:
+    - akomarzewski@mozilla.com
+  spoke: looker-spoke-private
