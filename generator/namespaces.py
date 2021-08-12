@@ -96,7 +96,9 @@ def _get_glean_apps(
         channels = [
             {
                 "channel": channel.get("app_channel"),
-                "dataset": channel.get("bq_dataset_family"),
+                "dataset": channel.get("app_name").replace("-", "_")
+                if channel.get("app_channel") == "release"
+                else channel.get("bq_dataset_family"),
             }
             for channel in variants
             if not channel.get("deprecated")
