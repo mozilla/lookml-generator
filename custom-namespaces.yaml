@@ -244,3 +244,69 @@ awesome_bar:
       type: ping_view
       tables:
         - table: mozdata.telemetry.urlbar_clients_daily
+experimentation:
+  glean_app: false
+  owners:
+    - ascholtz@mozilla.com
+  pretty_name: Experimentation
+  views:
+    logs:
+      type: table_view
+      tables:
+        - channel: release
+          table: moz-fx-data-experiments.monitoring.logs
+    query_cost:
+      type: table_view
+      tables:
+        - channel: release
+          table: moz-fx-data-experiments.monitoring.query_cost_v1
+    task_monitoring_logs:
+      type: table_view
+      tables:
+        - channel: release
+          table: moz-fx-data-experiments.monitoring.task_monitoring_logs
+    task_profiling_logs:
+      type: table_view
+      tables:
+        - channel: release
+          table: moz-fx-data-experiments.monitoring.task_profiling_logs
+    experiment_enrollment_daily_active_population:
+      type: table_view
+      tables:
+        - channel: release
+          table: mozdata.telemetry.experiment_enrollment_daily_active_population
+    experiment_enrollment_cumulative_population_estimate:
+      type: table_view
+      tables:
+        - channel: release
+          table: mozdata.telemetry.experiment_enrollment_cumulative_population_estimate
+    experiment_enrollment_overall:
+      type: table_view
+      tables:
+        - channel: release
+          table: mozdata.telemetry.experiment_enrollment_overall
+    experiment_unenrollment_overall:
+      type: table_view
+      tables:
+        - channel: release
+          table: mozdata.telemetry.experiment_unenrollment_overall
+    experiment_enrollment_other_events_overall:
+      type: table_view
+      tables:
+        - channel: release
+          table: mozdata.telemetry.experiment_enrollment_other_events_overall
+    experiment_cumulative_search_with_ads_count:
+      type: table_view
+      tables:
+        - channel: release
+          table: mozdata.telemetry.experiment_cumulative_search_with_ads_count
+    experiment_cumulative_search_count:
+      type: table_view
+      tables:
+        - channel: release
+          table: mozdata.telemetry.experiment_cumulative_search_count
+    experiment_cumulative_ad_clicks:
+      type: table_view
+      tables:
+        - channel: release
+          table: mozdata.telemetry.experiment_cumulative_ad_clicks
