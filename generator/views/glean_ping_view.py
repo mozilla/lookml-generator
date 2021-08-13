@@ -87,6 +87,15 @@ class GleanPingView(PingView):
                         {
                             "name": "document_id",
                             "type": "string",
+                            "sql": f"${{{self.name}.document_id}}",
+                            "hidden": "yes",
+                        },
+                        # labeled counters need a primary key that incorporates
+                        # their labels, otherwise we get jumbled results:
+                        # https://github.com/mozilla/lookml-generator/issues/171
+                        {
+                            "name": "document_label_id",
+                            "type": "string",
                             "sql": f"${{{self.name}.document_id}}-${{label}}",
                             "primary_key": "yes",
                             "hidden": "yes",

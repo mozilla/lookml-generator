@@ -1214,6 +1214,12 @@ def test_lookml_actual_metrics_view(
                         {
                             "hidden": "yes",
                             "name": "document_id",
+                            "sql": "${metrics.document_id}",
+                            "type": "string",
+                        },
+                        {
+                            "hidden": "yes",
+                            "name": "document_label_id",
                             "primary_key": "yes",
                             "sql": "${metrics.document_id}-${label}",
                             "type": "string",
