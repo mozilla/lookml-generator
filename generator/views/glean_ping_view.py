@@ -87,7 +87,7 @@ class GleanPingView(PingView):
                         {
                             "name": "document_id",
                             "type": "string",
-                            "sql": f"${{{self.name}.document_id}}",
+                            "sql": f"${{{self.name}.document_id}}-${{label}}",
                             "primary_key": "yes",
                             "hidden": "yes",
                         },
