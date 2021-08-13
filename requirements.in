@@ -1,10 +1,10 @@
 PyYAML==5.4.1
 click==8.0.1
 google-api-core==1.31.1  # transitive dep that needs dependabot updates
-google-cloud-bigquery==2.23.2
+google-cloud-bigquery==2.24.0
 googleapis-common-protos==1.53.0  # transitive dep that needs dependabot updates
 lkml==1.1.0
-looker-sdk==21.12.1
+looker-sdk==21.12.2
 mozilla-schema-generator==0.4.0
 pip-tools==6.2.0
 pre-commit==2.14.0

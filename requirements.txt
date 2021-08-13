@@ -135,9 +135,9 @@ google-auth==1.34.0 \
     # via
     #   google-api-core
     #   google-cloud-core
-google-cloud-bigquery==2.23.2 \
-    --hash=sha256:38ec0bf0f120f5aacb1620c197367904e35f824e7aa40a08c4d65aa70516e550 \
-    --hash=sha256:b0d2304bf4e85b2823da3f5ce648b0ab68a5ea909e213c4bed9ee05ea49d00a0
+google-cloud-bigquery==2.24.0 \
+    --hash=sha256:1d5a48933556b511d13793d626d955812c38184f56342e7e910845bccc4899a9 \
+    --hash=sha256:44a3ae2732d820ea4295e8b1c1bde50206ca078de2016cec2059f00362b6826b
     # via -r requirements.in
 google-cloud-core==1.7.2 \
     --hash=sha256:5b77935f3d9573e27007749a3b522f08d764c5b5930ff1527b2ab2743e9f0c15 \
@@ -263,9 +263,9 @@ lkml==1.1.0 \
     --hash=sha256:0c09f19dd43a49cff4c0deff1f090320cf2ccb90293fb3d376a6b540f6ffca07 \
     --hash=sha256:8c1b090a85469db2b318a73ea4fc8e5605aedc24d64d384189656720f58b58c8
     # via -r requirements.in
-looker-sdk==21.12.1 \
-    --hash=sha256:03022dc90fc2f69363048a8d934930de7d882f906d9b014060efcfeae1a01047 \
-    --hash=sha256:80a632f11c6f03b06bb03ea5e86e3b00ba5db774fd64c0ba8e3ac801ece2cc28
+looker-sdk==21.12.2 \
+    --hash=sha256:1ebf2ca69226edf3c6d90f5b1b246f1ecb99523055239f6243e33368f91a2d3d \
+    --hash=sha256:b6868ac4aa037ed5d8872d3ea43c9a5e6af3bddf67bb05ea4251265a7e94c2f4
     # via -r requirements.in
 mccabe==0.6.1 \
     --hash=sha256:ab8a6258860da4b6677da4bd2fe5dc2c659cff31b3ee4f7f5d64e79735b80d42 \
