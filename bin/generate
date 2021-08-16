@@ -123,7 +123,7 @@ function setup_spoke() {
     cd $spoke
     git fetch --all
     git checkout $SPOKE_BRANCH_PUBLISH || (git checkout main && git checkout -b $SPOKE_BRANCH_PUBLISH)
-    git branch -D $SPOKE_BRANCH_WORKING
+    git branch -D $SPOKE_BRANCH_WORKING || true # delete working branch if it exists
     git checkout -b $SPOKE_BRANCH_WORKING
 
     popd
@@ -253,7 +253,8 @@ function push_and_open_spoke_pull_request() {
 
   git push -f || git push -f --set-upstream origin "$SPOKE_BRANCH_WORKING"
 
-  gh pr create \
+  git diff --quiet $SPOKE_BRANCH_PUBLISH...$SPOKE_BRANCH_WORKING ||
+    gh pr create \
     --title "Auto-push from LookML Generator" \
     --reviewer mozilla/data-looker \
     --base $SPOKE_BRANCH_PUBLISH \

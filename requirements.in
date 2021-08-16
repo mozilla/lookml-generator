@@ -1,6 +1,6 @@
 PyYAML==5.4.1
 click==8.0.1
-google-api-core==1.31.1  # transitive dep that needs dependabot updates
+google-api-core==1.31.2  # transitive dep that needs dependabot updates
 google-cloud-bigquery==2.24.0
 googleapis-common-protos==1.53.0  # transitive dep that needs dependabot updates
 lkml==1.1.0
