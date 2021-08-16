@@ -165,6 +165,15 @@
                             <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;document_id&quot;</span><span class="p">,</span>
                             <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
                             <span class="s2">&quot;sql&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;$</span><span class="se">{{</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.document_id</span><span class="se">}}</span><span class="s2">&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;hidden&quot;</span><span class="p">:</span> <span class="s2">&quot;yes&quot;</span><span class="p">,</span>
+                        <span class="p">},</span>
+                        <span class="c1"># labeled counters need a primary key that incorporates</span>
+                        <span class="c1"># their labels, otherwise we get jumbled results:</span>
+                        <span class="c1"># https://github.com/mozilla/lookml-generator/issues/171</span>
+                        <span class="p">{</span>
+                            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;document_label_id&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;sql&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;$</span><span class="se">{{</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.document_id</span><span class="se">}}</span><span class="s2">-$</span><span class="se">{{</span><span class="s2">label</span><span class="se">}}</span><span class="s2">&quot;</span><span class="p">,</span>
                             <span class="s2">&quot;primary_key&quot;</span><span class="p">:</span> <span class="s2">&quot;yes&quot;</span><span class="p">,</span>
                             <span class="s2">&quot;hidden&quot;</span><span class="p">:</span> <span class="s2">&quot;yes&quot;</span><span class="p">,</span>
                         <span class="p">},</span>
@@ -515,6 +524,15 @@
                             <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;document_id&quot;</span><span class="p">,</span>
                             <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
                             <span class="s2">&quot;sql&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;$</span><span class="se">{{</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.document_id</span><span class="se">}}</span><span class="s2">&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;hidden&quot;</span><span class="p">:</span> <span class="s2">&quot;yes&quot;</span><span class="p">,</span>
+                        <span class="p">},</span>
+                        <span class="c1"># labeled counters need a primary key that incorporates</span>
+                        <span class="c1"># their labels, otherwise we get jumbled results:</span>
+                        <span class="c1"># https://github.com/mozilla/lookml-generator/issues/171</span>
+                        <span class="p">{</span>
+                            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;document_label_id&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;sql&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;$</span><span class="se">{{</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.document_id</span><span class="se">}}</span><span class="s2">-$</span><span class="se">{{</span><span class="s2">label</span><span class="se">}}</span><span class="s2">&quot;</span><span class="p">,</span>
                             <span class="s2">&quot;primary_key&quot;</span><span class="p">:</span> <span class="s2">&quot;yes&quot;</span><span class="p">,</span>
                             <span class="s2">&quot;hidden&quot;</span><span class="p">:</span> <span class="s2">&quot;yes&quot;</span><span class="p">,</span>
                         <span class="p">},</span>
@@ -898,6 +916,15 @@
                             <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;document_id&quot;</span><span class="p">,</span>
                             <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
                             <span class="s2">&quot;sql&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;$</span><span class="se">{{</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.document_id</span><span class="se">}}</span><span class="s2">&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;hidden&quot;</span><span class="p">:</span> <span class="s2">&quot;yes&quot;</span><span class="p">,</span>
+                        <span class="p">},</span>
+                        <span class="c1"># labeled counters need a primary key that incorporates</span>
+                        <span class="c1"># their labels, otherwise we get jumbled results:</span>
+                        <span class="c1"># https://github.com/mozilla/lookml-generator/issues/171</span>
+                        <span class="p">{</span>
+                            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;document_label_id&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;sql&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;$</span><span class="se">{{</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.document_id</span><span class="se">}}</span><span class="s2">-$</span><span class="se">{{</span><span class="s2">label</span><span class="se">}}</span><span class="s2">&quot;</span><span class="p">,</span>
                             <span class="s2">&quot;primary_key&quot;</span><span class="p">:</span> <span class="s2">&quot;yes&quot;</span><span class="p">,</span>
                             <span class="s2">&quot;hidden&quot;</span><span class="p">:</span> <span class="s2">&quot;yes&quot;</span><span class="p">,</span>
                         <span class="p">},</span>
