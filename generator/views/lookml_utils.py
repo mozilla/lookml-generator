@@ -39,7 +39,11 @@ def _get_dimension(
     result: Dict[str, Any] = {}
     result["sql"] = "${TABLE}." + ".".join(path)
     name = path
-    if mode == "REPEATED" or path in HIDDEN_DIMENSIONS:
+    if (
+        mode == "REPEATED"
+        or path in HIDDEN_DIMENSIONS
+        or field_type not in BIGQUERY_TYPE_TO_DIMENSION_TYPE
+    ):
         result["hidden"] = "yes"
     else:
         result["type"] = BIGQUERY_TYPE_TO_DIMENSION_TYPE[field_type]
