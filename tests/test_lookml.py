@@ -42,7 +42,11 @@ class MockClient:
                 schema=[
                     SchemaField("client_id", "STRING"),
                     SchemaField("country", "STRING"),
-                    SchemaField("document_id", "STRING"),
+                    SchemaField(
+                        "document_id",
+                        "STRING",
+                        description="The document ID specified in the URI when the client sent this message",
+                    ),
                 ],
             )
         if table_ref == "mozdata.glean_app.baseline_clients_daily":
@@ -658,6 +662,7 @@ def test_lookml_actual_baseline_view(
                             "hidden": "yes",
                             "sql": "${TABLE}.document_id",
                             "primary_key": "yes",
+                            "description": "The document ID specified in the URI when the client sent this message",
                         },
                     ],
                     "measures": [
