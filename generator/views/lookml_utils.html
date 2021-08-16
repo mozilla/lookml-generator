@@ -95,7 +95,11 @@
     <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">result</span><span class="p">[</span><span class="s2">&quot;sql&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;$</span><span class="si">{TABLE}</span><span class="s2">.&quot;</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
     <span class="n">name</span> <span class="o">=</span> <span class="n">path</span>
-    <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;REPEATED&quot;</span> <span class="ow">or</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">HIDDEN_DIMENSIONS</span><span class="p">:</span>
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;REPEATED&quot;</span>
+        <span class="ow">or</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">HIDDEN_DIMENSIONS</span>
+        <span class="ow">or</span> <span class="n">field_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">BIGQUERY_TYPE_TO_DIMENSION_TYPE</span>
+    <span class="p">):</span>
         <span class="n">result</span><span class="p">[</span><span class="s2">&quot;hidden&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;yes&quot;</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">result</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">BIGQUERY_TYPE_TO_DIMENSION_TYPE</span><span class="p">[</span><span class="n">field_type</span><span class="p">]</span>
