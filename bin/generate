@@ -262,6 +262,7 @@ function push_and_open_spoke_pull_request() {
 }
 
 function main() {
+  set -e  # stop if any statement returns a non-zero exit code
   pushd .
   cd /app
 
