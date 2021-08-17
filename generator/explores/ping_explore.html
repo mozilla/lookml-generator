@@ -37,6 +37,9 @@
                                 <a class="variable" href="#PingExplore.type">type</a>
                         </li>
                         <li>
+                                <a class="variable" href="#PingExplore.queries">queries</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#PingExplore.from_views">from_views</a>
                         </li>
                         <li>
@@ -69,6 +72,7 @@
             <div class="codehilite"><pre><span></span><span class="sd">&quot;&quot;&quot;Ping explore type.&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
 
@@ -80,6 +84,24 @@
     <span class="sd">&quot;&quot;&quot;A Ping Table explore.&quot;&quot;&quot;</span>
 
     <span class="nb">type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ping_explore&quot;</span>
+    <span class="n">queries</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Ping count over the past 28 days&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;dimensions&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;submission_date&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;measures&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;ping_count&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;filters&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;submission_date&quot;</span><span class="p">:</span> <span class="s2">&quot;28 days&quot;</span><span class="p">}],</span>
+            <span class="s2">&quot;sorts&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;submission_date&quot;</span><span class="p">:</span> <span class="s2">&quot;desc&quot;</span><span class="p">}],</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;ping_count&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Ping count per version in the past 6 months&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;dimensions&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;submission_date&quot;</span><span class="p">,</span> <span class="s2">&quot;version&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;measures&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;ping_count&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;filters&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;submission_date&quot;</span><span class="p">:</span> <span class="s2">&quot;6 months&quot;</span><span class="p">}],</span>
+            <span class="s2">&quot;sorts&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;submission_date&quot;</span><span class="p">:</span> <span class="s2">&quot;desc&quot;</span><span class="p">}],</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;ping_count_per_version&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">_to_lookml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v1_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
         <span class="sd">&quot;&quot;&quot;Generate LookML to represent this explore.&quot;&quot;&quot;</span>
@@ -90,6 +112,7 @@
                 <span class="s2">&quot;always_filter&quot;</span><span class="p">:</span> <span class="p">{</span>
                     <span class="s2">&quot;filters&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_required_filters</span><span class="p">(</span><span class="s2">&quot;base_view&quot;</span><span class="p">),</span>
                 <span class="p">},</span>
+                <span class="s2">&quot;queries&quot;</span><span class="p">:</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">PingExplore</span><span class="o">.</span><span class="n">queries</span><span class="p">),</span>
             <span class="p">}</span>
         <span class="p">]</span>
 
@@ -124,6 +147,24 @@
     <span class="sd">&quot;&quot;&quot;A Ping Table explore.&quot;&quot;&quot;</span>
 
     <span class="nb">type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ping_explore&quot;</span>
+    <span class="n">queries</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Ping count over the past 28 days&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;dimensions&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;submission_date&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;measures&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;ping_count&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;filters&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;submission_date&quot;</span><span class="p">:</span> <span class="s2">&quot;28 days&quot;</span><span class="p">}],</span>
+            <span class="s2">&quot;sorts&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;submission_date&quot;</span><span class="p">:</span> <span class="s2">&quot;desc&quot;</span><span class="p">}],</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;ping_count&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Ping count per version in the past 6 months&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;dimensions&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;submission_date&quot;</span><span class="p">,</span> <span class="s2">&quot;version&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;measures&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;ping_count&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;filters&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;submission_date&quot;</span><span class="p">:</span> <span class="s2">&quot;6 months&quot;</span><span class="p">}],</span>
+            <span class="s2">&quot;sorts&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;submission_date&quot;</span><span class="p">:</span> <span class="s2">&quot;desc&quot;</span><span class="p">}],</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;ping_count_per_version&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">_to_lookml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v1_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
         <span class="sd">&quot;&quot;&quot;Generate LookML to represent this explore.&quot;&quot;&quot;</span>
@@ -134,6 +175,7 @@
                 <span class="s2">&quot;always_filter&quot;</span><span class="p">:</span> <span class="p">{</span>
                     <span class="s2">&quot;filters&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_required_filters</span><span class="p">(</span><span class="s2">&quot;base_view&quot;</span><span class="p">),</span>
                 <span class="p">},</span>
+                <span class="s2">&quot;queries&quot;</span><span class="p">:</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">PingExplore</span><span class="o">.</span><span class="n">queries</span><span class="p">),</span>
             <span class="p">}</span>
         <span class="p">]</span>
 
@@ -160,6 +202,15 @@
                                             <div class="attr variable"><a class="headerlink" href="#PingExplore.type">#&nbsp;&nbsp</a>
 
         <span class="name">type</span><span class="annotation">: str</span><span class="default_value"> = &#39;ping_explore&#39;</span>
+    </div>
+
+    
+
+                            </div>
+                            <div id="PingExplore.queries" class="classattr">
+                                            <div class="attr variable"><a class="headerlink" href="#PingExplore.queries">#&nbsp;&nbsp</a>
+
+        <span class="name">queries</span><span class="annotation">: List[dict]</span><span class="default_value"> = [{&#39;description&#39;: &#39;Ping count over the past 28 days&#39;, &#39;dimensions&#39;: [&#39;submission_date&#39;], &#39;measures&#39;: [&#39;ping_count&#39;], &#39;filters&#39;: [{&#39;submission_date&#39;: &#39;28 days&#39;}], &#39;sorts&#39;: [{&#39;submission_date&#39;: &#39;desc&#39;}], &#39;name&#39;: &#39;ping_count&#39;}, {&#39;description&#39;: &#39;Ping count per version in the past 6 months&#39;, &#39;dimensions&#39;: [&#39;submission_date&#39;, &#39;version&#39;], &#39;measures&#39;: [&#39;ping_count&#39;], &#39;filters&#39;: [{&#39;submission_date&#39;: &#39;6 months&#39;}], &#39;sorts&#39;: [{&#39;submission_date&#39;: &#39;desc&#39;}], &#39;name&#39;: &#39;ping_count_per_version&#39;}]</span>
     </div>
 
     
