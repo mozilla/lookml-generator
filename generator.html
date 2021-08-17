@@ -156,6 +156,9 @@ venv/bin/pip install -r requirements.txt
 <div class="codehilite"><pre><span></span><code>venv/bin/pytest -m integration
 </code></pre></div>
 
+<p>Note that the integration tests require a valid login to BigQuery to succeed.
+After setting up the Google Cloud SDK, run <code>gcloud auth application-default login</code>.</p>
+
 <h2 id="container-development">Container Development</h2>
 
 <p>Most code changes will not require changes to the generation script or container.
