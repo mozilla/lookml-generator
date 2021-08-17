@@ -1,6 +1,6 @@
 """Utils for generating lookml."""
 import re
-from typing import Any, Dict, Iterable, List, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 import click
 from google.cloud import bigquery
@@ -33,11 +33,17 @@ MAP_LAYER_NAMES = {
 }
 
 
-def _get_dimension(path: Tuple[str, ...], field_type: str, mode: str) -> Dict[str, Any]:
+def _get_dimension(
+    path: Tuple[str, ...], field_type: str, mode: str, description: Optional[str]
+) -> Dict[str, Any]:
     result: Dict[str, Any] = {}
     result["sql"] = "${TABLE}." + ".".join(path)
     name = path
-    if mode == "REPEATED" or path in HIDDEN_DIMENSIONS:
+    if (
+        mode == "REPEATED"
+        or path in HIDDEN_DIMENSIONS
+        or field_type not in BIGQUERY_TYPE_TO_DIMENSION_TYPE
+    ):
         result["hidden"] = "yes"
     else:
         result["type"] = BIGQUERY_TYPE_TO_DIMENSION_TYPE[field_type]
@@ -75,6 +81,10 @@ def _get_dimension(path: Tuple[str, ...], field_type: str, mode: str) -> Dict[st
         if path in MAP_LAYER_NAMES:
             result["map_layer_name"] = MAP_LAYER_NAMES[path]
     result["name"] = "__".join(name)
+
+    if description:
+        result["description"] = description
+
     return result
 
 
@@ -85,7 +95,9 @@ def _generate_dimensions_helper(
         if field.field_type == "RECORD" and not field.mode == "REPEATED":
             yield from _generate_dimensions_helper(field.fields, *prefix, field.name)
         else:
-            yield _get_dimension((*prefix, field.name), field.field_type, field.mode)
+            yield _get_dimension(
+                (*prefix, field.name), field.field_type, field.mode, field.description
+            )
 
 
 def _generate_dimensions(client: bigquery.Client, table: str) -> List[Dict[str, Any]]:

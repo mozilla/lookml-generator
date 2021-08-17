@@ -104,7 +104,7 @@ function setup_hub() {
     cd looker-hub
     git fetch --all
     # If publish branch doesn't exist, create it from source
-    git checkout "$HUB_BRANCH_PUBLISH" || git checkout "$HUB_BRANCH_SOURCE" && git checkout -b "$HUB_BRANCH_PUBLISH"
+    git checkout "$HUB_BRANCH_PUBLISH" || (git checkout "$HUB_BRANCH_SOURCE" && git checkout -b "$HUB_BRANCH_PUBLISH")
     git checkout "$HUB_BRANCH_SOURCE"
 
     popd
@@ -122,8 +122,8 @@ function setup_spoke() {
     git clone "$spoke_url"
     cd $spoke
     git fetch --all
-    git checkout $SPOKE_BRANCH_PUBLISH || git checkout main && git checkout -b $SPOKE_BRANCH_PUBLISH
-    git branch -D $SPOKE_BRANCH_WORKING
+    git checkout $SPOKE_BRANCH_PUBLISH || (git checkout main && git checkout -b $SPOKE_BRANCH_PUBLISH)
+    git branch -D $SPOKE_BRANCH_WORKING || true # delete working branch if it exists
     git checkout -b $SPOKE_BRANCH_WORKING
 
     popd
@@ -253,7 +253,8 @@ function push_and_open_spoke_pull_request() {
 
   git push -f || git push -f --set-upstream origin "$SPOKE_BRANCH_WORKING"
 
-  gh pr create \
+  git diff --quiet $SPOKE_BRANCH_PUBLISH...$SPOKE_BRANCH_WORKING ||
+    gh pr create \
     --title "Auto-push from LookML Generator" \
     --reviewer mozilla/data-looker \
     --base $SPOKE_BRANCH_PUBLISH \
@@ -262,6 +263,7 @@ function push_and_open_spoke_pull_request() {
 }
 
 function main() {
+  set -e  # stop if any statement returns a non-zero exit code
   pushd .
   cd /app
 
