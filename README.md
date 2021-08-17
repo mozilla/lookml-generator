@@ -64,6 +64,9 @@ Run integration tests
 venv/bin/pytest -m integration
 ```
 
+Note that the integration tests require a valid login to BigQuery to succeed.
+After setting up the Google Cloud SDK, run `gcloud auth application-default login`.
+
 ## Container Development
 
 Most code changes will not require changes to the generation script or container.
