@@ -13,6 +13,7 @@ from mozilla_schema_generator.probes import GleanProbe
 
 from generator import lkml_update
 from generator.explores import ClientCountsExplore
+from generator.explores.glean_ping_explore import GleanPingExplore
 from generator.lookml import _lookml
 from generator.views import ClientCountsView, GrowthAccountingView
 
@@ -1372,6 +1373,7 @@ def test_lookml_actual_baseline_explore(
                         ]
                     },
                     "sql_always_where": "${baseline.submission_date} >= '2010-01-01'",
+                    "queries": GleanPingExplore.queries,
                 }
             ],
         }

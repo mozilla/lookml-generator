@@ -1,6 +1,7 @@
 """Ping explore type."""
 from __future__ import annotations
 
+from copy import deepcopy
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional
 
@@ -12,6 +13,24 @@ class PingExplore(Explore):
     """A Ping Table explore."""
 
     type: str = "ping_explore"
+    queries: List[dict] = [
+        {
+            "description": "Ping count over the past 28 days",
+            "dimensions": ["submission_date"],
+            "measures": ["ping_count"],
+            "filters": [{"submission_date": "28 days"}],
+            "sorts": [{"submission_date": "desc"}],
+            "name": "ping_count",
+        },
+        {
+            "description": "Ping count per version in the past 6 months",
+            "dimensions": ["submission_date", "version"],
+            "measures": ["ping_count"],
+            "filters": [{"submission_date": "6 months"}],
+            "sorts": [{"submission_date": "desc"}],
+            "name": "ping_count_per_version",
+        },
+    ]
 
     def _to_lookml(self, v1_name: Optional[str]) -> List[Dict[str, Any]]:
         """Generate LookML to represent this explore."""
@@ -22,6 +41,7 @@ class PingExplore(Explore):
                 "always_filter": {
                     "filters": self.get_required_filters("base_view"),
                 },
+                "queries": deepcopy(PingExplore.queries),
             }
         ]
 
