@@ -249,17 +249,18 @@ class GleanPingView(PingView):
         if not group_label:
             group_label = "Glean"
 
+        friendly_name = f"{group_label} {group_item_label}"
+
         lookml = {
             "name": looker_name,
+            "label": friendly_name,
             "sql": sql_map[looker_name]["sql"],
             "type": sql_map[looker_name]["type"],
             "group_label": group_label,
             "group_item_label": group_item_label,
             "links": [
                 {
-                    "label": (
-                        f"Glean Dictionary reference for {group_label} {group_item_label}"
-                    ),
+                    "label": (f"Glean Dictionary reference for {friendly_name}"),
                     "url": (
                         f"https://dictionary.telemetry.mozilla.org"
                         f"/apps/{self.namespace}/metrics/{category}{sep}{name}"

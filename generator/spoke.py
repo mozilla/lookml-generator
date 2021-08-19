@@ -116,9 +116,6 @@ def generate_directories(
     namespaces: Dict[str, NamespaceDict], base_dir: Path, sdk_setup=False
 ):
     """Generate directories and model for a namespace, if it doesn't exist."""
-    sdk = looker_sdk.init31()
-    logging.info("Looker SDK 3.1 initialized successfully.")
-
     for namespace, defn in namespaces.items():
         spoke = defn["spoke"]
         spoke_dir = base_dir / spoke
@@ -139,6 +136,8 @@ def generate_directories(
 
         if sdk_setup:
             spoke_project = spoke.lstrip("looker-")
+            sdk = looker_sdk.init31()
+            logging.info("Looker SDK 3.1 initialized successfully.")
             configure_model(sdk, namespace, db_connection, spoke_project)
 
 

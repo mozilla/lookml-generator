@@ -13,6 +13,7 @@ from mozilla_schema_generator.probes import GleanProbe
 
 from generator import lkml_update
 from generator.explores import ClientCountsExplore
+from generator.explores.glean_ping_explore import GleanPingExplore
 from generator.lookml import _lookml
 from generator.views import ClientCountsView, GrowthAccountingView
 
@@ -896,6 +897,7 @@ def test_lookml_actual_metrics_view(
                             "group_item_label": "Boolean",
                             "group_label": "Test",
                             "name": "metrics__boolean__test_boolean",
+                            "label": "Test Boolean",
                             "sql": "${TABLE}.metrics.boolean.test_boolean",
                             "type": "yesno",
                             "links": [
@@ -910,6 +912,7 @@ def test_lookml_actual_metrics_view(
                             "group_item_label": "Counter",
                             "group_label": "Test",
                             "name": "metrics__counter__test_counter",
+                            "label": "Test Counter",
                             "description": "test counter description",
                             "sql": "${TABLE}.metrics.counter.test_counter",
                             "type": "number",
@@ -934,6 +937,7 @@ def test_lookml_actual_metrics_view(
                                 }
                             ],
                             "name": "metrics__counter__no_category_counter",
+                            "label": "Glean No Category Counter",
                             "sql": "${TABLE}.metrics.counter.no_category_counter",
                             "type": "number",
                         },
@@ -941,6 +945,7 @@ def test_lookml_actual_metrics_view(
                             "group_item_label": "Metrics Ping Count",
                             "group_label": "Glean Validation",
                             "name": "metrics__counter__glean_validation_metrics_ping_count",
+                            "label": "Glean Validation Metrics Ping Count",
                             "sql": "${TABLE}.metrics.counter.glean_validation_metrics_ping_count",  # noqa: E501
                             "type": "number",
                             "links": [
@@ -955,6 +960,7 @@ def test_lookml_actual_metrics_view(
                             "group_item_label": "Custom Distribution Sum",
                             "group_label": "Test",
                             "name": "metrics__custom_distribution__test_custom_distribution__sum",
+                            "label": "Test Custom Distribution Sum",
                             "sql": "${TABLE}.metrics.custom_distribution.test_custom_distribution.sum",
                             "type": "number",
                             "links": [
@@ -969,6 +975,7 @@ def test_lookml_actual_metrics_view(
                             "group_item_label": "Datetime",
                             "group_label": "Test",
                             "name": "metrics__datetime__test_datetime",
+                            "label": "Test Datetime",
                             "sql": "${TABLE}.metrics.datetime.test_datetime",
                             "type": "string",
                             "links": [
@@ -983,6 +990,7 @@ def test_lookml_actual_metrics_view(
                             "group_item_label": "Jwe",
                             "group_label": "Test",
                             "name": "metrics__jwe__test_jwe",
+                            "label": "Test Jwe",
                             "sql": "${TABLE}.metrics.jwe.test_jwe",
                             "type": "string",
                             "links": [
@@ -997,6 +1005,7 @@ def test_lookml_actual_metrics_view(
                             "group_item_label": "Memory Distribution Sum",
                             "group_label": "Test",
                             "name": "metrics__memory_distribution__test_memory_distribution__sum",
+                            "label": "Test Memory Distribution Sum",
                             "sql": "${TABLE}.metrics.memory_distribution.test_memory_distribution.sum",
                             "type": "number",
                             "links": [
@@ -1011,6 +1020,7 @@ def test_lookml_actual_metrics_view(
                             "group_item_label": "Quantity",
                             "group_label": "Test",
                             "name": "metrics__quantity__test_quantity",
+                            "label": "Test Quantity",
                             "sql": "${TABLE}.metrics.quantity.test_quantity",
                             "type": "number",
                             "links": [
@@ -1025,6 +1035,7 @@ def test_lookml_actual_metrics_view(
                             "group_item_label": "String",
                             "group_label": "Test",
                             "name": "metrics__string__test_string",
+                            "label": "Test String",
                             "sql": "${TABLE}.metrics.string.test_string",
                             "type": "string",
                             "links": [
@@ -1039,6 +1050,7 @@ def test_lookml_actual_metrics_view(
                             "group_item_label": "Timing Distribution Sum",
                             "group_label": "Test",
                             "name": "metrics__timing_distribution__test_timing_distribution__sum",
+                            "label": "Test Timing Distribution Sum",
                             "sql": "${TABLE}.metrics.timing_distribution.test_timing_distribution.sum",
                             "type": "number",
                             "links": [
@@ -1053,6 +1065,7 @@ def test_lookml_actual_metrics_view(
                             "group_item_label": "Rate Numerator",
                             "group_label": "Test",
                             "name": "metrics__rate__test_rate__numerator",
+                            "label": "Test Rate Numerator",
                             "sql": "${TABLE}.metrics.rate.test_rate.numerator",
                             "type": "number",
                             "links": [
@@ -1067,6 +1080,7 @@ def test_lookml_actual_metrics_view(
                             "group_item_label": "Rate Denominator",
                             "group_label": "Test",
                             "name": "metrics__rate__test_rate__denominator",
+                            "label": "Test Rate Denominator",
                             "sql": "${TABLE}.metrics.rate.test_rate.denominator",
                             "type": "number",
                             "links": [
@@ -1081,6 +1095,7 @@ def test_lookml_actual_metrics_view(
                             "group_item_label": "Timespan Value",
                             "group_label": "Test",
                             "name": "metrics__timespan__test_timespan__value",
+                            "label": "Test Timespan Value",
                             "sql": "${TABLE}.metrics.timespan.test_timespan.value",
                             "type": "number",
                             "links": [
@@ -1095,6 +1110,7 @@ def test_lookml_actual_metrics_view(
                             "group_item_label": "Uuid",
                             "group_label": "Test",
                             "name": "metrics__uuid__test_uuid",
+                            "label": "Test Uuid",
                             "sql": "${TABLE}.metrics.uuid.test_uuid",
                             "type": "string",
                             "links": [
@@ -1372,6 +1388,7 @@ def test_lookml_actual_baseline_explore(
                         ]
                     },
                     "sql_always_where": "${baseline.submission_date} >= '2010-01-01'",
+                    "queries": GleanPingExplore.queries,
                 }
             ],
         }

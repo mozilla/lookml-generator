@@ -1,6 +1,7 @@
 """Glean Ping explore type."""
 from __future__ import annotations
 
+from copy import deepcopy
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional
 
@@ -14,6 +15,27 @@ class GleanPingExplore(PingExplore):
     """A Glean Ping Table explore."""
 
     type: str = "glean_ping_explore"
+    queries: List[dict] = [
+        {
+            "description": "Number of clients over the past 28 days",
+            "dimensions": ["submission_date"],
+            "measures": ["clients"],
+            "filters": [{"submission_date": "28 days"}],
+            "sorts": [{"submission_date": "desc"}],
+            "name": "client_count",
+        },
+        {
+            "description": "Number of clients over the past 28 days for tier-1 countries",
+            "dimensions": ["submission_date"],
+            "measures": ["clients"],
+            "filters": [
+                {"submission_date": "28 days"},
+                {"country": "United States,France,Germany,United Kingdom,Canada"},
+            ],
+            "sorts": [{"submission_date": "desc"}],
+            "name": "client_count_tier_1",
+        },
+    ]
 
     def _to_lookml(self, v1_name: Optional[str]) -> List[Dict[str, Any]]:
         """Generate LookML to represent this explore."""
@@ -61,6 +83,7 @@ class GleanPingExplore(PingExplore):
                 "filters": self.get_required_filters("base_view"),
             },
             "joins": joins,
+            "queries": deepcopy(GleanPingExplore.queries),
         }
 
         suggests = []
