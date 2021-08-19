@@ -1,5 +1,6 @@
 # lookml-generator
 [![mozilla](https://circleci.com/gh/mozilla/lookml-generator.svg?style=svg)](https://circleci.com/gh/mozilla/lookml-generator/?branch=main)
+
 *Under Active Development*
 
 LookML Generator for Glean and Mozilla Data.
