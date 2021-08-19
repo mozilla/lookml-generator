@@ -1,5 +1,6 @@
 # lookml-generator
 [![mozilla](https://circleci.com/gh/mozilla/lookml-generator.svg?style=svg)](https://circleci.com/gh/mozilla/lookml-generator/?branch=main)
+
 *Under Active Development*
 
 LookML Generator for Glean and Mozilla Data.
@@ -17,6 +18,13 @@ We also support custom namespaces, which can use wildcards to denote their BigQu
 ![alt text](https://github.com/mozilla/lookml-generator/blob/main/architecture/namespaces.jpg?raw=true)
 
 > \*  Though namespaces are not limited to a single model, we advise it for clarity's sake.
+
+## Adding Custom Namespaces
+Custom namespaces need to be defined explicitly in `custom-namespaces.yaml`. For each namespace views and explores to be generated need to be specified.
+
+The custom namespace also needs to be added to `namespaces-allowlist.yaml`.
+
+Once changes have been approved and merged, the [lookml-generator changes can get deployed](#deploying-new-lookml-generator-changes).
 
 ## Generating LookML
 Once we know which tables are associated with which namespaces, we can generate LookML files and update our Looker instance.
