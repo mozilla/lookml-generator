@@ -4,7 +4,7 @@ import json
 import tarfile
 import urllib.request
 import warnings
-from collections import defaultdict
+from collections import Mapping, defaultdict
 from datetime import datetime
 from io import BytesIO
 from itertools import groupby
@@ -24,6 +24,23 @@ DEFAULT_SPOKE = "looker-spoke-default"
 
 def _get_first(tuple_):
     return tuple_[0]
+
+
+def _merge_namespaces(dct, merge_dct):
+    """Recursively merge namespaces."""
+    for k, _ in merge_dct.items():
+        if k in dct and isinstance(dct[k], dict) and isinstance(merge_dct[k], Mapping):
+            if "glean_app" in merge_dct[k] and merge_dct[k]["glean_app"] is False:
+                # if glean_app gets set to False, Glean views and explores should not be generated
+                dct[k] = merge_dct[k]
+            else:
+                _merge_namespaces(dct[k], merge_dct[k])
+        else:
+            if k == "owners" and "owners" in dct:
+                # combine owners
+                dct[k] += merge_dct[k]
+            else:
+                dct[k] = merge_dct[k]
 
 
 def _get_db_views(uri):
@@ -152,12 +169,12 @@ def _get_explores(views: List[View]) -> dict:
     help="URI for probeinfo service v2 glean app listings",
 )
 @click.option(
-    "--allowlist",
+    "--disallowlist",
     type=click.File(),
-    default="namespaces-allowlist.yaml",
-    help="Path to namespace allow list",
+    default="namespaces-disallowlist.yaml",
+    help="Path to namespace disallow list",
 )
-def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri, allowlist):
+def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri, disallowlist):
     """Generate namespaces.yaml."""
     warnings.filterwarnings("ignore", module="google.auth._default")
     glean_apps = _get_glean_apps(app_listings_uri)
@@ -178,18 +195,18 @@ def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri, allowlist
         }
 
     if custom_namespaces is not None:
-        namespaces.update(yaml.safe_load(custom_namespaces.read()) or {})
+        custom_namespaces = yaml.safe_load(custom_namespaces.read()) or {}
+        _merge_namespaces(namespaces, custom_namespaces)
 
-    allowed_namespaces = yaml.safe_load(allowlist.read())
+    disallowed_namespaces = yaml.safe_load(disallowlist.read()) or {}
 
     updated_namespaces = {}
-    for namespace, updated in allowed_namespaces.items():
-        if isinstance(updated, dict) and "owners" in updated:
-            namespaces[namespace]["owners"] += updated["owners"]
-        if "spoke" not in namespaces[namespace]:
-            namespaces[namespace]["spoke"] = DEFAULT_SPOKE
-        if "glean_app" not in namespaces[namespace]:
-            namespaces[namespace]["glean_app"] = False
-        updated_namespaces[namespace] = namespaces[namespace]
+    for namespace, _ in namespaces.items():
+        if namespace not in disallowed_namespaces:
+            if "spoke" not in namespaces[namespace]:
+                namespaces[namespace]["spoke"] = DEFAULT_SPOKE
+            if "glean_app" not in namespaces[namespace]:
+                namespaces[namespace]["glean_app"] = False
+            updated_namespaces[namespace] = namespaces[namespace]
 
     Path("namespaces.yaml").write_text(yaml.safe_dump(updated_namespaces))

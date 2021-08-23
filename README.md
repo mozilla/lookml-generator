@@ -22,7 +22,7 @@ We also support custom namespaces, which can use wildcards to denote their BigQu
 ## Adding Custom Namespaces
 Custom namespaces need to be defined explicitly in `custom-namespaces.yaml`. For each namespace views and explores to be generated need to be specified.
 
-The custom namespace also needs to be added to `namespaces-allowlist.yaml`.
+Make sure the custom namespaces is _not_ listed in `namespaces-disallowlist.yaml`.
 
 Once changes have been approved and merged, the [lookml-generator changes can get deployed](#deploying-new-lookml-generator-changes).
 

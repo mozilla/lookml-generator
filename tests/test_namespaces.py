@@ -44,6 +44,7 @@ def custom_namespaces(tmp_path):
               pretty_name: Custom
               owners:
               - custom-owner@allizom.com
+              - custom-owner2@allizom.com
               views:
                 baseline:
                   type: ping_view
@@ -70,6 +71,9 @@ def custom_namespaces(tmp_path):
                   type: ping_view
                   tables:
                   - table: mozdata.private.events
+            glean-app:
+              owners:
+              - glean-app-owner2@allizom.com
             """
         ).lstrip()
     )
@@ -77,19 +81,13 @@ def custom_namespaces(tmp_path):
 
 
 @pytest.fixture
-def namespace_allowlist(tmp_path):
-    dest = tmp_path / "namespaces-allowlist.yaml"
+def namespace_disallowlist(tmp_path):
+    dest = tmp_path / "namespaces-disallowlist.yaml"
     dest.write_text(
         dedent(
             """
             ---
-            custom:
-              owners:
-                - custom-owner2@allizom.com
-            glean-app:
-              owners:
-                - glean-app-owner2@allizom.com
-            private: null
+            disallowed
             """
         )
     )
@@ -150,7 +148,11 @@ def generated_sql_uri(tmp_path):
 
 
 def test_namespaces_full(
-    runner, custom_namespaces, generated_sql_uri, app_listings_uri, namespace_allowlist
+    runner,
+    custom_namespaces,
+    generated_sql_uri,
+    app_listings_uri,
+    namespace_disallowlist,
 ):
     with runner.isolated_filesystem():
         result = runner.invoke(
@@ -162,8 +164,8 @@ def test_namespaces_full(
                 generated_sql_uri,
                 "--app-listings-uri",
                 app_listings_uri,
-                "--allowlist",
-                namespace_allowlist,
+                "--disallowlist",
+                namespace_disallowlist,
             ],
         )
         sys.stdout.write(result.stdout)

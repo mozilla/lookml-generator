@@ -216,3 +216,9 @@ revenue:
   owners:
     - akomarzewski@mozilla.com
   spoke: looker-spoke-private
+firefox_ios:
+  owners:
+    - athomas@mozilla.com
+fenix:
+  owners:
+    - vzare@mozilla.com
