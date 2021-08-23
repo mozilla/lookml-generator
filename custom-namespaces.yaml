@@ -315,3 +315,34 @@ experimentation:
       tables:
         - channel: release
           table: moz-fx-data-experiments.monitoring.experimenter_experiments_v1
+firefox_desktop:
+  glean_app: true
+  views:
+    feature_usage:
+      type: table_view
+      tables:
+        - table: mozdata.telemetry.feature_usage
+    clients_last_seen:
+      type: table_view
+      tables:
+        - table: mozdata.telemetry.clients_last_seen
+    clients_daily:
+      type: table_view
+      tables:
+        - table: mozdata.telemetry.clients_daily
+    event_types:
+      type: table_view
+      tables:
+        - table: mozdata.telemetry.event_types
+    events_daily:
+      type: table_view
+      tables:
+        - table: mozdata.telemetry.events_daily
+    events:
+      type: table_view
+      tables:
+        - table: mozdata.telemetry.events
+    growth_accounting:
+      tables:
+      - table: mozdata.telemetry.clients_last_seen
+      type: growth_accounting_view
