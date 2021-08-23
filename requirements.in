@@ -15,4 +15,4 @@ pytest-mypy==0.8.1
 pytest-pydocstyle==2.2.0
 pytest==6.2.4
 types-PyYaml==5.4.6
-yamllint==1.26.2
+yamllint==1.26.3
