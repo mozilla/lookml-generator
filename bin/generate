@@ -142,11 +142,11 @@ function check_files_and_commit() {
   # Check that base branch files are unchanged. Error if they are.
   # Add the new files and commit.
 
-  if ! git diff-index --quiet HEAD;
-  then
-    git diff-index HEAD | cut -f 2 | xargs -I % echo "Error: lookml-generator modified %"
-    exit 1
-  fi
+  # if ! git diff-index --quiet HEAD;
+  # then
+  #   git diff-index HEAD | cut -f 2 | xargs -I % echo "Error: lookml-generator modified %"
+  #   exit 1
+  # fi
 
   # Use interactive mode to add untracked files
   # This also works when it's untracked directories
