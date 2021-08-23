@@ -159,7 +159,7 @@ function generate_hub_commit() {
   cd /app
 
   HUB_DIR="looker-hub"
-  NAMESPACE_ALLOWLIST="/app/lookml-generator/namespaces-allowlist.yaml"
+  NAMESPACE_DISALLOWLIST="/app/lookml-generator/namespaces-disallowlist.yaml"
   CUSTOM_NAMESPACES_FILENAME="/app/lookml-generator/custom-namespaces.yaml"
   GENERATED_SQL_URI="https://github.com/mozilla/bigquery-etl/archive/generated-sql.tar.gz"
   APP_LISTINGS_URI="https://probeinfo.telemetry.mozilla.org/v2/glean/app-listings"
@@ -169,7 +169,7 @@ function generate_hub_commit() {
     --custom-namespaces $CUSTOM_NAMESPACES_FILENAME \
     --generated-sql-uri $GENERATED_SQL_URI \
     --app-listings-uri $APP_LISTINGS_URI \
-    --allowlist $NAMESPACE_ALLOWLIST
+    --disallowlist $NAMESPACE_DISALLOWLIST
   lookml-generator lookml \
     --namespaces "namespaces.yaml" \
     --target-dir $HUB_DIR
