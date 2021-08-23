@@ -36,7 +36,7 @@ def app_listings_uri(tmp_path):
                         "app_name": "glean-app",
                         "app_channel": "release",
                         "canonical_app_name": "Glean App",
-                        "bq_dataset_family": "glean_app",
+                        "bq_dataset_family": "glean_app_release",
                         "notification_emails": ["glean-app-owner@allizom.com"],
                         "v1_name": "glean-app-release",
                     },
@@ -91,10 +91,12 @@ def glean_apps():
                 {
                     "channel": "release",
                     "dataset": "glean_app",
+                    "source_dataset": "glean_app_release",
                 },
                 {
                     "channel": "beta",
                     "dataset": "glean_app_beta",
+                    "source_dataset": "glean_app_beta_stable",
                 },
             ],
             "v1_name": "glean-app-release",
