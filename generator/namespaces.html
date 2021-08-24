@@ -57,7 +57,7 @@
 <span class="kn">import</span> <span class="nn">tarfile</span>
 <span class="kn">import</span> <span class="nn">urllib.request</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">defaultdict</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
 <span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">BytesIO</span>
 <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">groupby</span>
@@ -77,6 +77,23 @@
 
 <span class="k">def</span> <span class="nf">_get_first</span><span class="p">(</span><span class="n">tuple_</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">tuple_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">_merge_namespaces</span><span class="p">(</span><span class="n">dct</span><span class="p">,</span> <span class="n">merge_dct</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Recursively merge namespaces.&quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">merge_dct</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">dct</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dct</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">merge_dct</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">Mapping</span><span class="p">):</span>
+            <span class="k">if</span> <span class="s2">&quot;glean_app&quot;</span> <span class="ow">in</span> <span class="n">merge_dct</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="ow">and</span> <span class="n">merge_dct</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s2">&quot;glean_app&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                <span class="c1"># if glean_app gets set to False, Glean views and explores should not be generated</span>
+                <span class="n">dct</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">merge_dct</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">_merge_namespaces</span><span class="p">(</span><span class="n">dct</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">merge_dct</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s2">&quot;owners&quot;</span> <span class="ow">and</span> <span class="s2">&quot;owners&quot;</span> <span class="ow">in</span> <span class="n">dct</span><span class="p">:</span>
+                <span class="c1"># combine owners</span>
+                <span class="n">dct</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">+=</span> <span class="n">merge_dct</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dct</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">merge_dct</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
 
 
 <span class="k">def</span> <span class="nf">_get_db_views</span><span class="p">(</span><span class="n">uri</span><span class="p">):</span>
@@ -205,12 +222,12 @@
     <span class="n">help</span><span class="o">=</span><span class="s2">&quot;URI for probeinfo service v2 glean app listings&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span>
-    <span class="s2">&quot;--allowlist&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;--disallowlist&quot;</span><span class="p">,</span>
     <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">File</span><span class="p">(),</span>
-    <span class="n">default</span><span class="o">=</span><span class="s2">&quot;namespaces-allowlist.yaml&quot;</span><span class="p">,</span>
-    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to namespace allow list&quot;</span><span class="p">,</span>
+    <span class="n">default</span><span class="o">=</span><span class="s2">&quot;namespaces-disallowlist.yaml&quot;</span><span class="p">,</span>
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to namespace disallow list&quot;</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="k">def</span> <span class="nf">namespaces</span><span class="p">(</span><span class="n">custom_namespaces</span><span class="p">,</span> <span class="n">generated_sql_uri</span><span class="p">,</span> <span class="n">app_listings_uri</span><span class="p">,</span> <span class="n">allowlist</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">namespaces</span><span class="p">(</span><span class="n">custom_namespaces</span><span class="p">,</span> <span class="n">generated_sql_uri</span><span class="p">,</span> <span class="n">app_listings_uri</span><span class="p">,</span> <span class="n">disallowlist</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Generate namespaces.yaml.&quot;&quot;&quot;</span>
     <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">module</span><span class="o">=</span><span class="s2">&quot;google.auth._default&quot;</span><span class="p">)</span>
     <span class="n">glean_apps</span> <span class="o">=</span> <span class="n">_get_glean_apps</span><span class="p">(</span><span class="n">app_listings_uri</span><span class="p">)</span>
@@ -231,19 +248,19 @@
         <span class="p">}</span>
 
     <span class="k">if</span> <span class="n">custom_namespaces</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">namespaces</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">custom_namespaces</span><span class="o">.</span><span class="n">read</span><span class="p">())</span> <span class="ow">or</span> <span class="p">{})</span>
+        <span class="n">custom_namespaces</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">custom_namespaces</span><span class="o">.</span><span class="n">read</span><span class="p">())</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="n">_merge_namespaces</span><span class="p">(</span><span class="n">namespaces</span><span class="p">,</span> <span class="n">custom_namespaces</span><span class="p">)</span>
 
-    <span class="n">allowed_namespaces</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">allowlist</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+    <span class="n">disallowed_namespaces</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">disallowlist</span><span class="o">.</span><span class="n">read</span><span class="p">())</span> <span class="ow">or</span> <span class="p">{}</span>
 
     <span class="n">updated_namespaces</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">for</span> <span class="n">namespace</span><span class="p">,</span> <span class="n">updated</span> <span class="ow">in</span> <span class="n">allowed_namespaces</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">updated</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;owners&quot;</span> <span class="ow">in</span> <span class="n">updated</span><span class="p">:</span>
-            <span class="n">namespaces</span><span class="p">[</span><span class="n">namespace</span><span class="p">][</span><span class="s2">&quot;owners&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">updated</span><span class="p">[</span><span class="s2">&quot;owners&quot;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="s2">&quot;spoke&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">namespaces</span><span class="p">[</span><span class="n">namespace</span><span class="p">]:</span>
-            <span class="n">namespaces</span><span class="p">[</span><span class="n">namespace</span><span class="p">][</span><span class="s2">&quot;spoke&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEFAULT_SPOKE</span>
-        <span class="k">if</span> <span class="s2">&quot;glean_app&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">namespaces</span><span class="p">[</span><span class="n">namespace</span><span class="p">]:</span>
-            <span class="n">namespaces</span><span class="p">[</span><span class="n">namespace</span><span class="p">][</span><span class="s2">&quot;glean_app&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="n">updated_namespaces</span><span class="p">[</span><span class="n">namespace</span><span class="p">]</span> <span class="o">=</span> <span class="n">namespaces</span><span class="p">[</span><span class="n">namespace</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">namespace</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">namespaces</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">namespace</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">disallowed_namespaces</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;spoke&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">namespaces</span><span class="p">[</span><span class="n">namespace</span><span class="p">]:</span>
+                <span class="n">namespaces</span><span class="p">[</span><span class="n">namespace</span><span class="p">][</span><span class="s2">&quot;spoke&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEFAULT_SPOKE</span>
+            <span class="k">if</span> <span class="s2">&quot;glean_app&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">namespaces</span><span class="p">[</span><span class="n">namespace</span><span class="p">]:</span>
+                <span class="n">namespaces</span><span class="p">[</span><span class="n">namespace</span><span class="p">][</span><span class="s2">&quot;glean_app&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">updated_namespaces</span><span class="p">[</span><span class="n">namespace</span><span class="p">]</span> <span class="o">=</span> <span class="n">namespaces</span><span class="p">[</span><span class="n">namespace</span><span class="p">]</span>
 
     <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;namespaces.yaml&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">safe_dump</span><span class="p">(</span><span class="n">updated_namespaces</span><span class="p">))</span>
 </pre></div>
