@@ -592,9 +592,9 @@ tomli==1.1.0 \
     # via
     #   black
     #   pep517
-types-pyyaml==5.4.6 \
-    --hash=sha256:745dcb4b1522423026bcc83abb9925fba747f1e8602d902f71a4058f9e7fb662 \
-    --hash=sha256:96f8d3d96aa1a18a465e8f6a220e02cff2f52632314845a364ecbacb0aea6e30
+types-pyyaml==5.4.8 \
+    --hash=sha256:e084cfc878c8c8b1d4e89011ae5d65ea962fc5745c3d08b931df2aaaa665de96 \
+    --hash=sha256:f00ad122a78a7d41b0ad4e3fa481751c2b9bc3f34b8f71ea35232211057dd50f
     # via -r requirements.in
 typing-extensions==3.10.0.0 \
     --hash=sha256:0ac0f89795dd19de6b97debb0c6af1c70987fd80a2d62d1958f7e56fcc31b497 \
