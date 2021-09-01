@@ -113,7 +113,10 @@ def paths_to_tar(dest_path: Path, paths: Dict[str, str]) -> str:
 def generated_sql_uri(tmp_path):
     dest = tmp_path / "bigquery_etl.tar.gz"
     paths = {}
-    for dataset in ("glean_app", "glean_app_beta"):
+    for (dataset, source_dataset) in (
+        ("glean_app", "glean_app_release"),
+        ("glean_app_beta", "glean_app_beta_stable"),
+    ):
         content = f"""
             references:
               view.sql:
@@ -128,7 +131,7 @@ def generated_sql_uri(tmp_path):
         content = f"""
             references:
               view.sql:
-              - moz-fx-data-shared-prod.{dataset}_stable.baseline_v1
+              - moz-fx-data-shared-prod.{source_dataset}.baseline_v1
             """
         path = f"sql/moz-fx-data-shared-prod/{dataset}/baseline/metadata.yaml"
         paths[path] = content

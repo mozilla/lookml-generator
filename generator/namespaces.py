@@ -93,10 +93,21 @@ def _get_glean_apps(
         v1_name = release_variant["v1_name"]
         emails = release_variant["notification_emails"]
 
+        # we use the `source_dataset` concept to figure out what reference
+        # we should be looking for inside bigquery-etl
+        # For release we are currently using an app-level dataset which
+        # references the app id specific one (so we look for that view as
+        # a reference).
+        # For other channels, we refer to the stable tables
         channels = [
             {
                 "channel": channel.get("app_channel"),
-                "dataset": channel.get("bq_dataset_family"),
+                "dataset": channel.get("app_name").replace("-", "_")
+                if channel.get("app_channel") == "release"
+                else channel.get("bq_dataset_family"),
+                "source_dataset": channel.get("bq_dataset_family")
+                if channel.get("app_channel") == "release"
+                else channel.get("bq_dataset_family") + "_stable",
             }
             for channel in variants
             if not channel.get("deprecated")
