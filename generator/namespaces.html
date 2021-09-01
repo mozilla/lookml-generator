@@ -146,10 +146,21 @@
         <span class="n">v1_name</span> <span class="o">=</span> <span class="n">release_variant</span><span class="p">[</span><span class="s2">&quot;v1_name&quot;</span><span class="p">]</span>
         <span class="n">emails</span> <span class="o">=</span> <span class="n">release_variant</span><span class="p">[</span><span class="s2">&quot;notification_emails&quot;</span><span class="p">]</span>
 
+        <span class="c1"># we use the `source_dataset` concept to figure out what reference</span>
+        <span class="c1"># we should be looking for inside bigquery-etl</span>
+        <span class="c1"># For release we are currently using an app-level dataset which</span>
+        <span class="c1"># references the app id specific one (so we look for that view as</span>
+        <span class="c1"># a reference).</span>
+        <span class="c1"># For other channels, we refer to the stable tables</span>
         <span class="n">channels</span> <span class="o">=</span> <span class="p">[</span>
             <span class="p">{</span>
                 <span class="s2">&quot;channel&quot;</span><span class="p">:</span> <span class="n">channel</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;app_channel&quot;</span><span class="p">),</span>
-                <span class="s2">&quot;dataset&quot;</span><span class="p">:</span> <span class="n">channel</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;bq_dataset_family&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;dataset&quot;</span><span class="p">:</span> <span class="n">channel</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;app_name&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">channel</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;app_channel&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;release&quot;</span>
+                <span class="k">else</span> <span class="n">channel</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;bq_dataset_family&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;source_dataset&quot;</span><span class="p">:</span> <span class="n">channel</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;bq_dataset_family&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">channel</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;app_channel&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;release&quot;</span>
+                <span class="k">else</span> <span class="n">channel</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;bq_dataset_family&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_stable&quot;</span><span class="p">,</span>
             <span class="p">}</span>
             <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">variants</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">channel</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;deprecated&quot;</span><span class="p">)</span>
