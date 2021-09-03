@@ -254,6 +254,8 @@ class GleanPingView(PingView):
         lookml = {
             "name": looker_name,
             "label": friendly_name,
+            # metrics that are no longer in the source are hidden by default
+            "hidden": "no" if metric.is_in_source() else "yes",
             "sql": sql_map[looker_name]["sql"],
             "type": sql_map[looker_name]["type"],
             "group_label": group_label,

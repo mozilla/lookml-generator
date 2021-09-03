@@ -899,6 +899,7 @@ def test_lookml_actual_metrics_view(
                             "label": "Test Boolean",
                             "sql": "${TABLE}.metrics.boolean.test_boolean",
                             "type": "yesno",
+                            "hidden": "no",
                             "links": [
                                 {
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
@@ -915,6 +916,7 @@ def test_lookml_actual_metrics_view(
                             "description": "test counter description",
                             "sql": "${TABLE}.metrics.counter.test_counter",
                             "type": "number",
+                            "hidden": "no",
                             "links": [
                                 {
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
@@ -926,6 +928,7 @@ def test_lookml_actual_metrics_view(
                         {
                             "group_item_label": "No Category Counter",
                             "group_label": "Glean",
+                            "hidden": "no",
                             "links": [
                                 {
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",
@@ -947,6 +950,7 @@ def test_lookml_actual_metrics_view(
                             "label": "Glean Validation Metrics Ping Count",
                             "sql": "${TABLE}.metrics.counter.glean_validation_metrics_ping_count",  # noqa: E501
                             "type": "number",
+                            "hidden": "no",
                             "links": [
                                 {
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
@@ -962,6 +966,7 @@ def test_lookml_actual_metrics_view(
                             "label": "Test Custom Distribution Sum",
                             "sql": "${TABLE}.metrics.custom_distribution.test_custom_distribution.sum",
                             "type": "number",
+                            "hidden": "no",
                             "links": [
                                 {
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
@@ -977,6 +982,7 @@ def test_lookml_actual_metrics_view(
                             "label": "Test Datetime",
                             "sql": "${TABLE}.metrics.datetime.test_datetime",
                             "type": "string",
+                            "hidden": "no",
                             "links": [
                                 {
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
@@ -992,6 +998,7 @@ def test_lookml_actual_metrics_view(
                             "label": "Test Jwe",
                             "sql": "${TABLE}.metrics.jwe.test_jwe",
                             "type": "string",
+                            "hidden": "no",
                             "links": [
                                 {
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
@@ -1007,6 +1014,7 @@ def test_lookml_actual_metrics_view(
                             "label": "Test Memory Distribution Sum",
                             "sql": "${TABLE}.metrics.memory_distribution.test_memory_distribution.sum",
                             "type": "number",
+                            "hidden": "no",
                             "links": [
                                 {
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
@@ -1022,6 +1030,7 @@ def test_lookml_actual_metrics_view(
                             "label": "Test Quantity",
                             "sql": "${TABLE}.metrics.quantity.test_quantity",
                             "type": "number",
+                            "hidden": "no",
                             "links": [
                                 {
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
@@ -1037,6 +1046,7 @@ def test_lookml_actual_metrics_view(
                             "label": "Test String",
                             "sql": "${TABLE}.metrics.string.test_string",
                             "type": "string",
+                            "hidden": "no",
                             "links": [
                                 {
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
@@ -1052,6 +1062,7 @@ def test_lookml_actual_metrics_view(
                             "label": "Test Timing Distribution Sum",
                             "sql": "${TABLE}.metrics.timing_distribution.test_timing_distribution.sum",
                             "type": "number",
+                            "hidden": "no",
                             "links": [
                                 {
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
@@ -1067,6 +1078,7 @@ def test_lookml_actual_metrics_view(
                             "label": "Test Rate Numerator",
                             "sql": "${TABLE}.metrics.rate.test_rate.numerator",
                             "type": "number",
+                            "hidden": "no",
                             "links": [
                                 {
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
@@ -1082,6 +1094,7 @@ def test_lookml_actual_metrics_view(
                             "label": "Test Rate Denominator",
                             "sql": "${TABLE}.metrics.rate.test_rate.denominator",
                             "type": "number",
+                            "hidden": "no",
                             "links": [
                                 {
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
@@ -1097,6 +1110,7 @@ def test_lookml_actual_metrics_view(
                             "label": "Test Timespan Value",
                             "sql": "${TABLE}.metrics.timespan.test_timespan.value",
                             "type": "number",
+                            "hidden": "no",
                             "links": [
                                 {
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
@@ -1112,6 +1126,7 @@ def test_lookml_actual_metrics_view(
                             "label": "Test Uuid",
                             "sql": "${TABLE}.metrics.uuid.test_uuid",
                             "type": "string",
+                            "hidden": "no",
                             "links": [
                                 {
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
