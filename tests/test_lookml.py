@@ -148,6 +148,15 @@ class MockClient:
                                 ],
                             ),
                             SchemaField(
+                                "boolean",
+                                "RECORD",
+                                fields=[
+                                    SchemaField(
+                                        "test_boolean_not_in_source", "BOOLEAN"
+                                    ),
+                                ],
+                            ),
+                            SchemaField(
                                 "counter",
                                 "RECORD",
                                 fields=[
@@ -160,6 +169,15 @@ class MockClient:
                             ),
                             SchemaField(
                                 "labeled_counter",
+                                "RECORD",
+                                "REPEATED",
+                                fields=[
+                                    SchemaField("key", "STRING"),
+                                    SchemaField("value", "INTEGER"),
+                                ],
+                            ),
+                            SchemaField(
+                                "labeled_counter_not_in_source",
                                 "RECORD",
                                 "REPEATED",
                                 fields=[
@@ -449,15 +467,39 @@ def msg_glean_probes():
     return [
         GleanProbe(
             "test.boolean",
-            {"type": "boolean", "history": history, "name": "test.boolean"},
+            {
+                "type": "boolean",
+                "history": history,
+                "name": "test.boolean",
+                "in-source": True,
+            },
         ),
         GleanProbe(  # This probe should be ignored as a dupe
             "test.boolean",
-            {"type": "boolean", "history": history, "name": "test.boolean"},
+            {
+                "type": "boolean",
+                "history": history,
+                "name": "test.boolean",
+                "in-source": True,
+            },
+        ),
+        GleanProbe(
+            "test.boolean_not_in_source",
+            {
+                "type": "boolean",
+                "history": history,
+                "name": "test.boolean_not_in_source",
+                "in-source": False,
+            },
         ),
         GleanProbe(
             "test.counter",
-            {"type": "counter", "history": history_with_descr, "name": "test.counter"},
+            {
+                "type": "counter",
+                "history": history_with_descr,
+                "name": "test.counter",
+                "in-source": True,
+            },
         ),
         GleanProbe(
             "test.labeled_counter",
@@ -465,11 +507,26 @@ def msg_glean_probes():
                 "type": "labeled_counter",
                 "history": history_with_descr,
                 "name": "test.labeled_counter",
+                "in-source": True,
+            },
+        ),
+        GleanProbe(
+            "test.labeled_counter_not_in_source",
+            {
+                "type": "labeled_counter",
+                "history": history_with_descr,
+                "name": "test.labeled_counter_not_in_source",
+                "in-source": False,
             },
         ),
         GleanProbe(
             "no_category_counter",
-            {"type": "counter", "history": history, "name": "no_category_counter"},
+            {
+                "type": "counter",
+                "history": history,
+                "name": "no_category_counter",
+                "in-source": True,
+            },
         ),
         GleanProbe(
             "glean.validation.metrics_ping_count",
@@ -477,6 +534,7 @@ def msg_glean_probes():
                 "type": "counter",
                 "history": history,
                 "name": "glean.validation.metrics_ping_count",
+                "in-source": True,
             },
         ),
         GleanProbe(
@@ -485,15 +543,21 @@ def msg_glean_probes():
                 "type": "custom_distribution",
                 "history": history,
                 "name": "test.custom_distribution",
+                "in-source": True,
             },
         ),
         GleanProbe(
             "test.datetime",
-            {"type": "datetime", "history": history, "name": "test.datetime"},
+            {
+                "type": "datetime",
+                "history": history,
+                "name": "test.datetime",
+                "in-source": True,
+            },
         ),
         GleanProbe(
             "test.jwe",
-            {"type": "jwe", "history": history, "name": "test.jwe"},
+            {"type": "jwe", "history": history, "name": "test.jwe", "in-source": True},
         ),
         GleanProbe(
             "test.memory_distribution",
@@ -501,15 +565,26 @@ def msg_glean_probes():
                 "type": "memory_distribution",
                 "history": history,
                 "name": "test.memory_distribution",
+                "in-source": True,
             },
         ),
         GleanProbe(
             "test.quantity",
-            {"type": "quantity", "history": history, "name": "test.quantity"},
+            {
+                "type": "quantity",
+                "history": history,
+                "name": "test.quantity",
+                "in-source": True,
+            },
         ),
         GleanProbe(
             "test.string",
-            {"type": "string", "history": history, "name": "test.string"},
+            {
+                "type": "string",
+                "history": history,
+                "name": "test.string",
+                "in-source": True,
+            },
         ),
         GleanProbe(
             "test.timing_distribution",
@@ -517,23 +592,44 @@ def msg_glean_probes():
                 "type": "timing_distribution",
                 "history": history,
                 "name": "test.timing_distribution",
+                "in-source": True,
             },
         ),
         GleanProbe(
             "test.rate",
-            {"type": "rate", "history": history, "name": "test.rate"},
+            {
+                "type": "rate",
+                "history": history,
+                "name": "test.rate",
+                "in-source": True,
+            },
         ),
         GleanProbe(
             "test.timespan",
-            {"type": "timespan", "history": history, "name": "test.timespan"},
+            {
+                "type": "timespan",
+                "history": history,
+                "name": "test.timespan",
+                "in-source": True,
+            },
         ),
         GleanProbe(
             "test.uuid",
-            {"type": "uuid", "history": history, "name": "test.uuid"},
+            {
+                "type": "uuid",
+                "history": history,
+                "name": "test.uuid",
+                "in-source": True,
+            },
         ),
         GleanProbe(
             "test.missing_from_bq",
-            {"type": "counter", "history": history, "name": "test.missing_from_bq"},
+            {
+                "type": "counter",
+                "history": history,
+                "name": "test.missing_from_bq",
+                "in-source": True,
+            },
         ),
     ]
 
@@ -909,6 +1005,22 @@ def test_lookml_actual_metrics_view(
                             ],
                         },
                         {
+                            "group_item_label": "Boolean Not In Source",
+                            "group_label": "Test",
+                            "name": "metrics__boolean__test_boolean_not_in_source",
+                            "label": "Test Boolean Not In Source",
+                            "sql": "${TABLE}.metrics.boolean.test_boolean_not_in_source",
+                            "type": "yesno",
+                            "hidden": "yes",
+                            "links": [
+                                {
+                                    "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
+                                    "label": "Glean Dictionary reference for Test Boolean Not In Source",
+                                    "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/test_boolean_not_in_source",  # noqa: E501
+                                }
+                            ],
+                        },
+                        {
                             "group_item_label": "Counter",
                             "group_label": "Test",
                             "name": "metrics__counter__test_counter",
@@ -1261,6 +1373,7 @@ def test_lookml_actual_metrics_view(
                         },
                         {
                             "name": "label",
+                            "hidden": "no",
                             "sql": "${TABLE}.key",
                             "suggest_dimension": "suggest__metrics__metrics__labeled_counter__test_labeled_counter.key",
                             "suggest_explore": "suggest__metrics__metrics__labeled_counter__test_labeled_counter",
@@ -1275,15 +1388,69 @@ def test_lookml_actual_metrics_view(
                     ],
                     "label": "Test - Labeled Counter",
                     "measures": [
-                        {"name": "count", "sql": "${value}", "type": "sum"},
+                        {
+                            "name": "count",
+                            "sql": "${value}",
+                            "type": "sum",
+                            "hidden": "no",
+                        },
                         {
                             "name": "client_count",
                             "sql": "case when ${value} > 0 then "
                             "${metrics.client_info__client_id} end",
                             "type": "count_distinct",
+                            "hidden": "no",
                         },
                     ],
                     "name": "metrics__metrics__labeled_counter__test_labeled_counter",
+                },
+                {
+                    "dimensions": [
+                        {
+                            "hidden": "yes",
+                            "name": "document_id",
+                            "sql": "${metrics.document_id}",
+                            "type": "string",
+                        },
+                        {
+                            "hidden": "yes",
+                            "name": "document_label_id",
+                            "primary_key": "yes",
+                            "sql": "${metrics.document_id}-${label}",
+                            "type": "string",
+                        },
+                        {
+                            "name": "label",
+                            "hidden": "yes",
+                            "sql": "${TABLE}.key",
+                            "suggest_dimension": "suggest__metrics__metrics__labeled_counter__test_labeled_counter_not_in_source.key",  # noqa: E501
+                            "suggest_explore": "suggest__metrics__metrics__labeled_counter__test_labeled_counter_not_in_source",  # noqa: E501
+                            "type": "string",
+                        },
+                        {
+                            "hidden": "yes",
+                            "name": "value",
+                            "sql": "${TABLE}.value",
+                            "type": "number",
+                        },
+                    ],
+                    "label": "Test - Labeled Counter Not In Source",
+                    "measures": [
+                        {
+                            "name": "count",
+                            "sql": "${value}",
+                            "type": "sum",
+                            "hidden": "yes",
+                        },
+                        {
+                            "name": "client_count",
+                            "sql": "case when ${value} > 0 then "
+                            "${metrics.client_info__client_id} end",
+                            "type": "count_distinct",
+                            "hidden": "yes",
+                        },
+                    ],
+                    "name": "metrics__metrics__labeled_counter__test_labeled_counter_not_in_source",
                 },
                 {
                     "derived_table": {
@@ -1302,6 +1469,24 @@ def test_lookml_actual_metrics_view(
                         {"name": "key", "sql": "${TABLE}.key", "type": "string"}
                     ],
                     "name": "suggest__metrics__metrics__labeled_counter__test_labeled_counter",
+                },
+                {
+                    "derived_table": {
+                        "sql": "select\n"
+                        "    m.key,\n"
+                        "    count(*) as n\n"
+                        "from mozdata.glean_app.metrics as "
+                        "t,\n"
+                        "unnest(metrics.labeled_counter.test_labeled_counter_not_in_source) as m\n"
+                        "where date(submission_timestamp) > date_sub(current_date, interval 30 day)\n"
+                        "    and sample_id = 0\n"
+                        "group by key\n"
+                        "order by n desc"
+                    },
+                    "dimensions": [
+                        {"name": "key", "sql": "${TABLE}.key", "type": "string"}
+                    ],
+                    "name": "suggest__metrics__metrics__labeled_counter__test_labeled_counter_not_in_source",
                 },
             ]
         }
