@@ -156,6 +156,7 @@
                     <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_category_and_name</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span>
                 <span class="p">]</span>
                 <span class="n">view_label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">category</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">metric_hidden</span> <span class="o">=</span> <span class="s2">&quot;no&quot;</span> <span class="k">if</span> <span class="n">metric</span><span class="o">.</span><span class="n">is_in_source</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;yes&quot;</span>
 
                 <span class="n">join_view</span> <span class="o">=</span> <span class="p">{</span>
                     <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">view_name</span><span class="p">,</span>
@@ -183,6 +184,7 @@
                             <span class="s2">&quot;sql&quot;</span><span class="p">:</span> <span class="s2">&quot;$</span><span class="si">{TABLE}</span><span class="s2">.key&quot;</span><span class="p">,</span>
                             <span class="s2">&quot;suggest_explore&quot;</span><span class="p">:</span> <span class="n">suggest_name</span><span class="p">,</span>
                             <span class="s2">&quot;suggest_dimension&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">suggest_name</span><span class="si">}</span><span class="s2">.key&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;hidden&quot;</span><span class="p">:</span> <span class="n">metric_hidden</span><span class="p">,</span>
                         <span class="p">},</span>
                         <span class="p">{</span>
                             <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;value&quot;</span><span class="p">,</span>
@@ -196,11 +198,13 @@
                             <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;count&quot;</span><span class="p">,</span>
                             <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;sum&quot;</span><span class="p">,</span>
                             <span class="s2">&quot;sql&quot;</span><span class="p">:</span> <span class="s2">&quot;$</span><span class="si">{value}</span><span class="s2">&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;hidden&quot;</span><span class="p">:</span> <span class="n">metric_hidden</span><span class="p">,</span>
                         <span class="p">},</span>
                         <span class="p">{</span>
                             <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;client_count&quot;</span><span class="p">,</span>
                             <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;count_distinct&quot;</span><span class="p">,</span>
                             <span class="s2">&quot;sql&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;case when $</span><span class="se">{{</span><span class="s2">value</span><span class="se">}}</span><span class="s2"> &gt; 0 then $</span><span class="se">{{</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">client_id_field</span><span class="si">}</span><span class="se">}}</span><span class="s2"> end&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;hidden&quot;</span><span class="p">:</span> <span class="n">metric_hidden</span><span class="p">,</span>
                         <span class="p">},</span>
                     <span class="p">],</span>
                 <span class="p">}</span>
@@ -331,6 +335,8 @@
         <span class="n">lookml</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">looker_name</span><span class="p">,</span>
             <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="n">friendly_name</span><span class="p">,</span>
+            <span class="c1"># metrics that are no longer in the source are hidden by default</span>
+            <span class="s2">&quot;hidden&quot;</span><span class="p">:</span> <span class="s2">&quot;no&quot;</span> <span class="k">if</span> <span class="n">metric</span><span class="o">.</span><span class="n">is_in_source</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;yes&quot;</span><span class="p">,</span>
             <span class="s2">&quot;sql&quot;</span><span class="p">:</span> <span class="n">sql_map</span><span class="p">[</span><span class="n">looker_name</span><span class="p">][</span><span class="s2">&quot;sql&quot;</span><span class="p">],</span>
             <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">sql_map</span><span class="p">[</span><span class="n">looker_name</span><span class="p">][</span><span class="s2">&quot;type&quot;</span><span class="p">],</span>
             <span class="s2">&quot;group_label&quot;</span><span class="p">:</span> <span class="n">group_label</span><span class="p">,</span>
@@ -516,6 +522,7 @@
                     <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_category_and_name</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span>
                 <span class="p">]</span>
                 <span class="n">view_label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">category</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">metric_hidden</span> <span class="o">=</span> <span class="s2">&quot;no&quot;</span> <span class="k">if</span> <span class="n">metric</span><span class="o">.</span><span class="n">is_in_source</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;yes&quot;</span>
 
                 <span class="n">join_view</span> <span class="o">=</span> <span class="p">{</span>
                     <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">view_name</span><span class="p">,</span>
@@ -543,6 +550,7 @@
                             <span class="s2">&quot;sql&quot;</span><span class="p">:</span> <span class="s2">&quot;$</span><span class="si">{TABLE}</span><span class="s2">.key&quot;</span><span class="p">,</span>
                             <span class="s2">&quot;suggest_explore&quot;</span><span class="p">:</span> <span class="n">suggest_name</span><span class="p">,</span>
                             <span class="s2">&quot;suggest_dimension&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">suggest_name</span><span class="si">}</span><span class="s2">.key&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;hidden&quot;</span><span class="p">:</span> <span class="n">metric_hidden</span><span class="p">,</span>
                         <span class="p">},</span>
                         <span class="p">{</span>
                             <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;value&quot;</span><span class="p">,</span>
@@ -556,11 +564,13 @@
                             <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;count&quot;</span><span class="p">,</span>
                             <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;sum&quot;</span><span class="p">,</span>
                             <span class="s2">&quot;sql&quot;</span><span class="p">:</span> <span class="s2">&quot;$</span><span class="si">{value}</span><span class="s2">&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;hidden&quot;</span><span class="p">:</span> <span class="n">metric_hidden</span><span class="p">,</span>
                         <span class="p">},</span>
                         <span class="p">{</span>
                             <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;client_count&quot;</span><span class="p">,</span>
                             <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;count_distinct&quot;</span><span class="p">,</span>
                             <span class="s2">&quot;sql&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;case when $</span><span class="se">{{</span><span class="s2">value</span><span class="se">}}</span><span class="s2"> &gt; 0 then $</span><span class="se">{{</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">client_id_field</span><span class="si">}</span><span class="se">}}</span><span class="s2"> end&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;hidden&quot;</span><span class="p">:</span> <span class="n">metric_hidden</span><span class="p">,</span>
                         <span class="p">},</span>
                     <span class="p">],</span>
                 <span class="p">}</span>
@@ -691,6 +701,8 @@
         <span class="n">lookml</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">looker_name</span><span class="p">,</span>
             <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="n">friendly_name</span><span class="p">,</span>
+            <span class="c1"># metrics that are no longer in the source are hidden by default</span>
+            <span class="s2">&quot;hidden&quot;</span><span class="p">:</span> <span class="s2">&quot;no&quot;</span> <span class="k">if</span> <span class="n">metric</span><span class="o">.</span><span class="n">is_in_source</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;yes&quot;</span><span class="p">,</span>
             <span class="s2">&quot;sql&quot;</span><span class="p">:</span> <span class="n">sql_map</span><span class="p">[</span><span class="n">looker_name</span><span class="p">][</span><span class="s2">&quot;sql&quot;</span><span class="p">],</span>
             <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">sql_map</span><span class="p">[</span><span class="n">looker_name</span><span class="p">][</span><span class="s2">&quot;type&quot;</span><span class="p">],</span>
             <span class="s2">&quot;group_label&quot;</span><span class="p">:</span> <span class="n">group_label</span><span class="p">,</span>
@@ -909,6 +921,7 @@
                     <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_category_and_name</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span>
                 <span class="p">]</span>
                 <span class="n">view_label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">category</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">metric_hidden</span> <span class="o">=</span> <span class="s2">&quot;no&quot;</span> <span class="k">if</span> <span class="n">metric</span><span class="o">.</span><span class="n">is_in_source</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;yes&quot;</span>
 
                 <span class="n">join_view</span> <span class="o">=</span> <span class="p">{</span>
                     <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">view_name</span><span class="p">,</span>
@@ -936,6 +949,7 @@
                             <span class="s2">&quot;sql&quot;</span><span class="p">:</span> <span class="s2">&quot;$</span><span class="si">{TABLE}</span><span class="s2">.key&quot;</span><span class="p">,</span>
                             <span class="s2">&quot;suggest_explore&quot;</span><span class="p">:</span> <span class="n">suggest_name</span><span class="p">,</span>
                             <span class="s2">&quot;suggest_dimension&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">suggest_name</span><span class="si">}</span><span class="s2">.key&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;hidden&quot;</span><span class="p">:</span> <span class="n">metric_hidden</span><span class="p">,</span>
                         <span class="p">},</span>
                         <span class="p">{</span>
                             <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;value&quot;</span><span class="p">,</span>
@@ -949,11 +963,13 @@
                             <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;count&quot;</span><span class="p">,</span>
                             <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;sum&quot;</span><span class="p">,</span>
                             <span class="s2">&quot;sql&quot;</span><span class="p">:</span> <span class="s2">&quot;$</span><span class="si">{value}</span><span class="s2">&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;hidden&quot;</span><span class="p">:</span> <span class="n">metric_hidden</span><span class="p">,</span>
                         <span class="p">},</span>
                         <span class="p">{</span>
                             <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;client_count&quot;</span><span class="p">,</span>
                             <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;count_distinct&quot;</span><span class="p">,</span>
                             <span class="s2">&quot;sql&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;case when $</span><span class="se">{{</span><span class="s2">value</span><span class="se">}}</span><span class="s2"> &gt; 0 then $</span><span class="se">{{</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">client_id_field</span><span class="si">}</span><span class="se">}}</span><span class="s2"> end&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;hidden&quot;</span><span class="p">:</span> <span class="n">metric_hidden</span><span class="p">,</span>
                         <span class="p">},</span>
                     <span class="p">],</span>
                 <span class="p">}</span>
