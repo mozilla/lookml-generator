@@ -79,6 +79,7 @@ class GleanPingView(PingView):
                     for v in self._get_category_and_name(metric)
                 ]
                 view_label = f"{category} - {name}"
+                metric_hidden = "no" if metric.is_in_source() else "yes"
 
                 join_view = {
                     "name": view_name,
@@ -106,6 +107,7 @@ class GleanPingView(PingView):
                             "sql": "${TABLE}.key",
                             "suggest_explore": suggest_name,
                             "suggest_dimension": f"{suggest_name}.key",
+                            "hidden": metric_hidden,
                         },
                         {
                             "name": "value",
@@ -119,11 +121,13 @@ class GleanPingView(PingView):
                             "name": "count",
                             "type": "sum",
                             "sql": "${value}",
+                            "hidden": metric_hidden,
                         },
                         {
                             "name": "client_count",
                             "type": "count_distinct",
                             "sql": f"case when ${{value}} > 0 then ${{{self.name}.{client_id_field}}} end",
+                            "hidden": metric_hidden,
                         },
                     ],
                 }
@@ -254,6 +258,8 @@ class GleanPingView(PingView):
         lookml = {
             "name": looker_name,
             "label": friendly_name,
+            # metrics that are no longer in the source are hidden by default
+            "hidden": "no" if metric.is_in_source() else "yes",
             "sql": sql_map[looker_name]["sql"],
             "type": sql_map[looker_name]["type"],
             "group_label": group_label,
