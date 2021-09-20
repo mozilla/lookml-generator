@@ -222,3 +222,10 @@ firefox_ios:
 fenix:
   owners:
     - vzare@mozilla.com
+newtab:
+  glean_app: false
+  connection: bigquery-oauth
+  pretty_name: New Tab
+  owners:
+    - mmccorquodale@mozilla.com
+  spoke: looker-spoke-private
