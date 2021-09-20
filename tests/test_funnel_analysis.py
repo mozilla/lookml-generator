@@ -1,8 +1,8 @@
 from unittest.mock import Mock
 
+import lkml
 import pytest
 
-from generator import lkml_update
 from generator.explores import FunnelAnalysisExplore
 from generator.views import FunnelAnalysisView
 
@@ -27,7 +27,7 @@ def funnel_analysis_view():
 @pytest.fixture()
 def funnel_analysis_explore(tmp_path, funnel_analysis_view):
     (tmp_path / "funnel_analysis.view.lkml").write_text(
-        lkml_update.dump(funnel_analysis_view.to_lookml(Mock(), None))
+        lkml.dump(funnel_analysis_view.to_lookml(Mock(), None))
     )
     return FunnelAnalysisExplore(
         "funnel_analysis",

@@ -1,9 +1,9 @@
 from copy import deepcopy
 
+import lkml
 import pytest
 from google.cloud.bigquery.schema import SchemaField
 
-from generator import lkml_update
 from generator.explores import EventsExplore
 from generator.views import EventsView
 
@@ -26,7 +26,7 @@ def events_view():
 @pytest.fixture()
 def events_explore(events_view, tmp_path):
     (tmp_path / "events_unnested_table.view.lkml").write_text(
-        lkml_update.dump(
+        lkml.dump(
             {
                 "views": [
                     {
@@ -54,7 +54,7 @@ def events_explore(events_view, tmp_path):
         )
     )
     (tmp_path / "events.view.lkml").write_text(
-        lkml_update.dump(
+        lkml.dump(
             {
                 "views": [
                     {

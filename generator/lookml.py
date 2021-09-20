@@ -4,10 +4,10 @@ from pathlib import Path
 from typing import Dict, Iterable, Optional
 
 import click
+import lkml
 import yaml
 from google.cloud import bigquery
 
-from . import lkml_update
 from .explores import EXPLORE_TYPES
 from .namespaces import _get_glean_apps
 from .views import VIEW_TYPES, View, ViewDict
@@ -22,7 +22,7 @@ def _generate_views(
         )
         path = out_dir / f"{view.name}.view.lkml"
         lookml = view.to_lookml(client, v1_name)
-        path.write_text(lkml_update.dump(lookml))
+        path.write_text(lkml.dump(lookml))
         yield path
 
 
@@ -50,7 +50,7 @@ def _generate_explores(
             "explores": explore.to_lookml(v1_name),
         }
         path = out_dir / (explore_name + ".explore.lkml")
-        path.write_text(lkml_update.dump(file_lookml))
+        path.write_text(lkml.dump(file_lookml))
         yield path
 
 
