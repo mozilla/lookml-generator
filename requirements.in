@@ -3,7 +3,7 @@ click==8.0.1
 google-api-core==1.31.2  # transitive dep that needs dependabot updates
 google-cloud-bigquery==2.26.0
 googleapis-common-protos==1.53.0  # transitive dep that needs dependabot updates
-lkml==1.1.0
+lkml==1.1.1
 looker-sdk==21.14.0
 mozilla-schema-generator==0.5.0
 pip-tools==6.2.0
