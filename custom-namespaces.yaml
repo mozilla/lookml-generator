@@ -330,19 +330,49 @@ firefox_desktop:
       type: table_view
       tables:
         - table: mozdata.telemetry.clients_daily
-    event_types:
-      type: table_view
+    client_counts:
+      type: client_counts_view
       tables:
-        - table: mozdata.telemetry.event_types
+        - table: mozdata.telemetry.clients_daily
+    funnel_analysis:
+      type: funnel_analysis_view
+      tables:
+        - funnel_analysis: events_daily
+          event_types: mozdata.telemetry.event_types
+          step_1: event_types
+          step_2: event_types
+          step_3: event_types
+          step_4: event_types
     events_daily:
       type: table_view
       tables:
-        - table: mozdata.telemetry.events_daily
+        - channel: release
+          table: mozdata.telemetry.events_daily
+    growth_accounting:
+      type: growth_accounting_view
+      tables:
+        - table: mozdata.telemetry.clients_last_seen
     events:
+      type: events_view
+      tables:
+        - events_table_view: desktop_events_table
+          base_table: mozdata.telemetry.events
+    desktop_events_table:
       type: table_view
       tables:
-        - table: mozdata.telemetry.events
+        - channel: release
+          table: mozdata.telemetry.events
+  explores:
+    client_counts:
+      type: client_counts_explore
+      views:
+        base_view: client_counts
+        extended_view: clients_daily
+    funnel_analysis:
+      type: funnel_analysis_explore
+      views:
+        base_view: funnel_analysis
     growth_accounting:
-      tables:
-      - table: mozdata.telemetry.clients_last_seen
-      type: growth_accounting_view
+      type: growth_accounting_explore
+      views:
+        base_view: growth_accounting
