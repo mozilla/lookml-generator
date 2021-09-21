@@ -229,3 +229,13 @@ newtab:
   owners:
     - mmccorquodale@mozilla.com
   spoke: looker-spoke-private
+awesome_bar:
+  glean_app: false
+  owners:
+    - tbrooks@mozilla.com
+  pretty_name: Awesome Bar
+  views:
+    urlbar_clients_daily:
+      type: ping_view
+      tables:
+        - table: mozdata.telemetry.urlbar_clients_daily
