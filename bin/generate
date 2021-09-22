@@ -42,6 +42,7 @@
 #                             This should only happen in production.
 #   UPDATE_SPOKE_BRANCHES:    Whether or not pull-requests should be opened against
 #                             branches in spoke projects.
+#                             This should only happen in production.
 #
 # Example usage:
 #   export GIT_SSH_KEY_BASE64=$(cat ~/.ssh/id_rsa | base64)
