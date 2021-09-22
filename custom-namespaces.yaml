@@ -156,6 +156,11 @@ mozilla_vpn:
       tables:
         - channel: release
           table: mozdata.mozilla_vpn.all_subscriptions
+    vat_rates:
+      type: table_view
+      tables:
+        - channel: release
+          table: mozdata.mozilla_vpn.vat_rates
 firefox_accounts:
   glean_app: false
   owners:

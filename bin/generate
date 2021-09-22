@@ -40,6 +40,9 @@
 #                             access to repos. Not required in dev.
 #   UPDATE_DEV_BRANCHES:      Whether or not the dev branches should be updated.
 #                             This should only happen in production.
+#   UPDATE_SPOKE_BRANCHES:    Whether or not pull-requests should be opened against
+#                             branches in spoke projects.
+#                             This should only happen in production.
 #
 # Example usage:
 #   export GIT_SSH_KEY_BASE64=$(cat ~/.ssh/id_rsa | base64)
@@ -56,6 +59,7 @@ SPOKE_BRANCH_WORKING=${SPOKE_BRANCH_WORKING:-"${SPOKE_BRANCH_PUBLISH}-working"}
 
 LOOKER_INSTANCE_URI=${LOOKER_INSTANCE_URI:-"https://mozilladev.cloud.looker.com"}
 UPDATE_DEV_BRANCHES=${UPDATE_DEV_BRANCHES:-"false"}
+UPDATE_SPOKE_BRANCHES=${UPDATE_SPOKE_BRANCHES:-"false"}
 
 function setup_git_auth() {
     # Configure the container for pushing to github.
@@ -280,25 +284,28 @@ function main() {
   cd /app/looker-hub
   git push || git push --set-upstream origin "$HUB_BRANCH_PUBLISH"
 
-  # Update dev branche
+  # Update dev branches
   if [ "$UPDATE_DEV_BRANCHES" = "true" ] ; then
     update_dev_branches
   fi
 
-  # Set up spokes and commit
-  setup_spokes
-  generate_spoke_commits
+  # Update branches on spoke-default and spoke-private
+  if [ "$UPDATE_SPOKE_BRANCHES" = "true" ] ; then
+    # Set up spokes and commit
+    setup_spokes
+    generate_spoke_commits
 
-  # Publish spoke - force push to working branch
-  cd /app/looker-spoke-default
-  push_and_open_spoke_pull_request
+    # Publish spoke - force push to working branch
+    cd /app/looker-spoke-default
+    push_and_open_spoke_pull_request
 
-  cd /app/looker-spoke-private
-  push_and_open_spoke_pull_request
+    cd /app/looker-spoke-private
+    push_and_open_spoke_pull_request
 
-  # Update Looker content
-  generate_looker_content
-  hit_looker_webhooks
+    # Update Looker content
+    generate_looker_content
+    hit_looker_webhooks
+  fi
 
   popd
 }
