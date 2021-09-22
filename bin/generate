@@ -58,7 +58,7 @@ SPOKE_BRANCH_WORKING=${SPOKE_BRANCH_WORKING:-"${SPOKE_BRANCH_PUBLISH}-working"}
 
 LOOKER_INSTANCE_URI=${LOOKER_INSTANCE_URI:-"https://mozilladev.cloud.looker.com"}
 UPDATE_DEV_BRANCHES=${UPDATE_DEV_BRANCHES:-"false"}
-UPDATE_SPOKE_BRANCHES=${UPDATE_SPOKE_BRANCHES:-"true"}
+UPDATE_SPOKE_BRANCHES=${UPDATE_SPOKE_BRANCHES:-"false"}
 
 function setup_git_auth() {
     # Configure the container for pushing to github.

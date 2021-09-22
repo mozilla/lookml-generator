@@ -84,13 +84,8 @@ a new branch to the `looker-hub` repository:
 ```
 export HUB_BRANCH_PUBLISH="yourname-generation-test-1"
 export GIT_SSH_KEY_BASE64=$(cat ~/.ssh/id_rsa | base64)
-export UPDATE_SPOKE_BRANCHES=false
-
 make build && make run
 ```
-
-To prevent PRs from automatically getting opened against spoke-default and spoke-private,
-while testing local changes, `UPDATE_SPOKE_BRANCHES` can be set to `false`.
 
 ## Deploying new `lookml-generator` changes
 
