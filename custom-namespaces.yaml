@@ -318,15 +318,15 @@ experimentation:
 firefox_desktop:
   glean_app: true
   views:
-    feature_usage:
+    feature_usage_table:
       type: table_view
       tables:
         - table: mozdata.telemetry.feature_usage
-    clients_last_seen:
+    clients_last_seen_table:
       type: table_view
       tables:
         - table: mozdata.telemetry.clients_last_seen
-    clients_daily:
+    clients_daily_table:
       type: table_view
       tables:
         - table: mozdata.telemetry.clients_daily
@@ -337,13 +337,13 @@ firefox_desktop:
     funnel_analysis:
       type: funnel_analysis_view
       tables:
-        - funnel_analysis: events_daily
+        - funnel_analysis: events_daily_table
           event_types: mozdata.telemetry.event_types
           step_1: event_types
           step_2: event_types
           step_3: event_types
           step_4: event_types
-    events_daily:
+    events_daily_table:
       type: table_view
       tables:
         - channel: release
@@ -367,7 +367,7 @@ firefox_desktop:
       type: client_counts_explore
       views:
         base_view: client_counts
-        extended_view: clients_daily
+        extended_view: clients_daily_table
     funnel_analysis:
       type: funnel_analysis_explore
       views:

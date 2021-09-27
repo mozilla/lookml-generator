@@ -97,7 +97,7 @@ class ClientCountsView(View):
         )["dataset"]
 
         for view_id, references in db_views[dataset].items():
-            if view_id == "baseline_clients_daily":
+            if view_id == "baseline_clients_daily" or view_id == "clients_daily":
                 yield ClientCountsView(
                     namespace, [{"table": f"mozdata.{dataset}.{view_id}"}]
                 )
@@ -111,8 +111,14 @@ class ClientCountsView(View):
 
     def to_lookml(self, bq_client, v1_name: Optional[str]) -> Dict[str, Any]:
         """Generate LookML for this view."""
+        table = self.tables[0]["table"]
+
+        base_view = "baseline_clients_daily_table"
+        if table is not None:
+            base_view = table.split(".")[-1] + "_table"
+
         view_defn: Dict[str, Any] = {
-            "extends": ["baseline_clients_daily_table"],
+            "extends": [base_view],
             "name": self.name,
         }
 
@@ -126,7 +132,7 @@ class ClientCountsView(View):
         view_defn["measures"] = self.get_measures()
 
         return {
-            "includes": ["baseline_clients_daily_table.view.lkml"],
+            "includes": [base_view + ".view.lkml"],
             "views": [view_defn],
         }
 
