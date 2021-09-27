@@ -209,7 +209,7 @@ def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri, disallowl
         custom_namespaces = yaml.safe_load(custom_namespaces.read()) or {}
         _merge_namespaces(namespaces, custom_namespaces)
 
-    disallowed_namespaces = yaml.safe_load(disallowlist.read()) or {}
+    disallowed_namespaces = yaml.safe_load(disallowlist.read()).split(" ") or {}
 
     updated_namespaces = {}
     for namespace, _ in namespaces.items():
