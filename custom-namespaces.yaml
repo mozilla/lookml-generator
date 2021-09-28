@@ -250,6 +250,26 @@ experimentation:
     - ascholtz@mozilla.com
   pretty_name: Experimentation
   views:
+    logs:
+      type: table_view
+      tables:
+        - channel: release
+          table: moz-fx-data-experiments.monitoring.logs
+    query_cost:
+      type: table_view
+      tables:
+        - channel: release
+          table: moz-fx-data-experiments.monitoring.query_cost_v1
+    task_monitoring_logs:
+      type: table_view
+      tables:
+        - channel: release
+          table: moz-fx-data-experiments.monitoring.task_monitoring_logs
+    task_profiling_logs:
+      type: table_view
+      tables:
+        - channel: release
+          table: moz-fx-data-experiments.monitoring.task_profiling_logs
     experiment_enrollment_daily_active_population:
       type: table_view
       tables:
