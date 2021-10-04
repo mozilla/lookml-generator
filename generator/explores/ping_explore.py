@@ -15,6 +15,23 @@ class PingExplore(Explore):
 
     def _to_lookml(self, v1_name: Optional[str]) -> List[Dict[str, Any]]:
         """Generate LookML to represent this explore."""
+        views_lookml = self.get_view_lookml(self.views["base_view"])
+
+        joins = []
+        for view in views_lookml["views"][1:]:
+            view_name = view["name"]
+            metric = view["name"].split("__")[-1]
+            base_view = "__".join(view["name"].split("__")[:-1])
+            joins.append(
+                {
+                    "name": view_name,
+                    "relationship": "one_to_many",
+                    "sql": (
+                        f"LEFT JOIN UNNEST(${{{base_view}.{metric}}}) AS {view_name} "
+                    ),
+                }
+            )
+
         return [
             {
                 "name": self.name,
@@ -22,6 +39,7 @@ class PingExplore(Explore):
                 "always_filter": {
                     "filters": self.get_required_filters("base_view"),
                 },
+                "joins": joins,
             }
         ]
 

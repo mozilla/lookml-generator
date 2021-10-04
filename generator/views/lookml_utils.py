@@ -129,6 +129,7 @@ def _generate_nested_dimension_views(
 
     Nested fields are handled as view, with dimensions and optionally measures.
     """
+    views: List[Dict[str, Any]] = []
     for field in sorted(schema, key=lambda f: f.name):
         if field.field_type == "RECORD":
             view_name = f"{view_name}__{field.name}"
@@ -141,13 +142,17 @@ def _generate_nested_dimension_views(
                 nested_field_view["dimension_groups"] = [
                     d for d in dimensions if _is_dimension_group(d)
                 ]
-                return [nested_field_view] + _generate_nested_dimension_views(
-                    field.fields, view_name
+                views = (
+                    views
+                    + [nested_field_view]
+                    + _generate_nested_dimension_views(field.fields, view_name)
                 )
             else:
-                return _generate_nested_dimension_views(field.fields, view_name)
+                views = views + _generate_nested_dimension_views(
+                    field.fields, view_name
+                )
 
-    return []
+    return views
 
 
 def _is_dimension_group(dimension: dict):
