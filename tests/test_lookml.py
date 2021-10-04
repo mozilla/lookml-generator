@@ -426,7 +426,19 @@ class MockClient:
             )
         if table_ref == "mozdata.custom.context":
             return bigquery.Table(
-                table_ref, schema=[SchemaField("context_id", "STRING")]
+                table_ref,
+                schema=[
+                    SchemaField("context_id", "STRING"),
+                    SchemaField(
+                        "contexts",
+                        "RECORD",
+                        "REPEATED",
+                        fields=[
+                            SchemaField("key", "STRING"),
+                            SchemaField("value", "INTEGER"),
+                        ],
+                    ),
+                ],
             )
         if table_ref == "mozdata.glean_app.events_daily":
             return bigquery.Table(
@@ -1745,7 +1757,12 @@ def test_context_id(runner, glean_apps, tmp_path):
                             "name": "context_id",
                             "hidden": "yes",
                             "sql": "${TABLE}.context_id",
-                        }
+                        },
+                        {
+                            "sql": "${TABLE}.contexts",
+                            "hidden": "yes",
+                            "name": "contexts",
+                        },
                     ],
                     "measures": [
                         {
@@ -1754,7 +1771,14 @@ def test_context_id(runner, glean_apps, tmp_path):
                             "sql": "${context_id}",
                         }
                     ],
-                }
+                },
+                {
+                    "dimensions": [
+                        {"name": "key", "sql": "${TABLE}.key", "type": "string"},
+                        {"name": "value", "sql": "${TABLE}.value", "type": "number"},
+                    ],
+                    "name": "context__contexts",
+                },
             ],
         }
 

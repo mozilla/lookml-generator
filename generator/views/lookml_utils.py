@@ -121,6 +121,35 @@ def _generate_dimensions(client: bigquery.Client, table: str) -> List[Dict[str, 
     return list(dimensions.values())
 
 
+def _generate_nested_dimension_views(
+    schema: List[bigquery.SchemaField], view_name: str
+) -> List[Dict[str, Any]]:
+    """
+    Recursively generate views for nested fields.
+
+    Nested fields are handled as view, with dimensions and optionally measures.
+    """
+    for field in sorted(schema, key=lambda f: f.name):
+        if field.field_type == "RECORD":
+            view_name = f"{view_name}__{field.name}"
+            if field.mode == "REPEATED":
+                nested_field_view: Dict[str, Any] = {"name": view_name}
+                dimensions = _generate_dimensions_helper(schema=field.fields)
+                nested_field_view["dimensions"] = [
+                    d for d in dimensions if not _is_dimension_group(d)
+                ]
+                nested_field_view["dimension_groups"] = [
+                    d for d in dimensions if _is_dimension_group(d)
+                ]
+                return [nested_field_view] + _generate_nested_dimension_views(
+                    field.fields, view_name
+                )
+            else:
+                return _generate_nested_dimension_views(field.fields, view_name)
+
+    return []
+
+
 def _is_dimension_group(dimension: dict):
     """Determine if a dimension is actually a dimension group."""
     return "timeframes" in dimension or "intervals" in dimension
@@ -129,3 +158,12 @@ def _is_dimension_group(dimension: dict):
 def escape_filter_expr(expr: str) -> str:
     """Escape filter expression for special Looker chars."""
     return re.sub(r'((?:^-)|["_%,^])', r"^\1", expr, count=0)
+
+
+def _is_nested_dimension(dimension: dict):
+    return (
+        "hidden" in dimension
+        and dimension["hidden"]
+        and "nested" in dimension
+        and dimension["nested"]
+    )

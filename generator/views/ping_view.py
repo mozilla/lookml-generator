@@ -83,6 +83,10 @@ class PingView(View):
         # add measures
         view_defn["measures"] = self.get_measures(dimensions, table, v1_name)
 
+        nested_views = lookml_utils._generate_nested_dimension_views(
+            bq_client.get_table(table).schema, self.name
+        )
+
         # parameterize table name
         if len(self.tables) > 1:
             view_defn["parameters"] = [
@@ -103,7 +107,7 @@ class PingView(View):
         else:
             view_defn["sql_table_name"] = f"`{table}`"
 
-        return {"views": [view_defn]}
+        return {"views": [view_defn] + nested_views}
 
     def get_dimensions(
         self, bq_client, table, v1_name: Optional[str]

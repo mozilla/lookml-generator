@@ -69,6 +69,11 @@ class TableView(View):
             filter(lookml_utils._is_dimension_group, dimensions)
         )
 
+        # print("---- nested ----")
+        # nested_dimensions = list(filter(lookml_utils._is_nested_dimension, dimensions))
+
+        # print(nested_dimensions)
+
         # Table views have no measures
 
         # parameterize table name
