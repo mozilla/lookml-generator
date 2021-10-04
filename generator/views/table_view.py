@@ -69,10 +69,9 @@ class TableView(View):
             filter(lookml_utils._is_dimension_group, dimensions)
         )
 
-        # print("---- nested ----")
-        # nested_dimensions = list(filter(lookml_utils._is_nested_dimension, dimensions))
-
-        # print(nested_dimensions)
+        nested_views = lookml_utils._generate_nested_dimension_views(
+            bq_client.get_table(table).schema, self.name
+        )
 
         # Table views have no measures
 
@@ -96,4 +95,4 @@ class TableView(View):
         else:
             view_defn["sql_table_name"] = f"`{table}`"
 
-        return {"views": [view_defn]}
+        return {"views": [view_defn] + nested_views}

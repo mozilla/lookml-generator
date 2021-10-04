@@ -436,6 +436,15 @@ class MockClient:
                         fields=[
                             SchemaField("key", "STRING"),
                             SchemaField("value", "INTEGER"),
+                            SchemaField(
+                                "position",
+                                "RECORD",
+                                "REPEATED",
+                                fields=[
+                                    SchemaField("key", "STRING"),
+                                    SchemaField("value", "INTEGER"),
+                                ],
+                            ),
                         ],
                     ),
                 ],
@@ -1775,9 +1784,21 @@ def test_context_id(runner, glean_apps, tmp_path):
                 {
                     "dimensions": [
                         {"name": "key", "sql": "${TABLE}.key", "type": "string"},
+                        {
+                            "hidden": "yes",
+                            "name": "position",
+                            "sql": "${TABLE}.position",
+                        },
                         {"name": "value", "sql": "${TABLE}.value", "type": "number"},
                     ],
                     "name": "context__contexts",
+                },
+                {
+                    "dimensions": [
+                        {"name": "key", "sql": "${TABLE}.key", "type": "string"},
+                        {"name": "value", "sql": "${TABLE}.value", "type": "number"},
+                    ],
+                    "name": "context__contexts__position",
                 },
             ],
         }
