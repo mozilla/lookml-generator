@@ -54,6 +54,7 @@
             <div class="codehilite"><pre><span></span><span class="sd">&quot;&quot;&quot;Generate namespaces.yaml.&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">gzip</span>
 <span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">tarfile</span>
 <span class="kn">import</span> <span class="nn">urllib.request</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
@@ -67,12 +68,26 @@
 
 <span class="kn">import</span> <span class="nn">click</span>
 <span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">from</span> <span class="nn">google.cloud</span> <span class="kn">import</span> <span class="n">storage</span>
 
 <span class="kn">from</span> <span class="nn">.explores</span> <span class="kn">import</span> <span class="n">EXPLORE_TYPES</span>
 <span class="kn">from</span> <span class="nn">.views</span> <span class="kn">import</span> <span class="n">VIEW_TYPES</span><span class="p">,</span> <span class="n">View</span>
 
 <span class="n">PROBE_INFO_BASE_URI</span> <span class="o">=</span> <span class="s2">&quot;https://probeinfo.telemetry.mozilla.org&quot;</span>
 <span class="n">DEFAULT_SPOKE</span> <span class="o">=</span> <span class="s2">&quot;looker-spoke-default&quot;</span>
+<span class="n">OPMON_BUCKET_NAME</span> <span class="o">=</span> <span class="s2">&quot;operational_monitoring&quot;</span>
+<span class="n">PROD_PROJECT</span> <span class="o">=</span> <span class="s2">&quot;moz-fx-data-shared-prod&quot;</span>
+<span class="n">PROJECTS_FOLDER</span> <span class="o">=</span> <span class="s2">&quot;projects/&quot;</span>
+<span class="n">DATA_TYPES</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;histogram&quot;</span><span class="p">,</span> <span class="s2">&quot;scalar&quot;</span><span class="p">}</span>
+
+
+<span class="k">def</span> <span class="nf">_normalize_slug</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[^a-zA-Z0-9_]&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_download_json_file</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">bucket</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+    <span class="n">blob</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">get_blob</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">blob</span><span class="o">.</span><span class="n">download_as_string</span><span class="p">()),</span> <span class="n">blob</span><span class="o">.</span><span class="n">updated</span>
 
 
 <span class="k">def</span> <span class="nf">_get_first</span><span class="p">(</span><span class="n">tuple_</span><span class="p">):</span>
@@ -113,6 +128,52 @@
                         <span class="n">ref</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">ref</span> <span class="ow">in</span> <span class="n">references</span><span class="p">[</span><span class="s2">&quot;view.sql&quot;</span><span class="p">]</span>
                     <span class="p">]</span>
     <span class="k">return</span> <span class="n">views</span>
+
+
+<span class="k">def</span> <span class="nf">_append_view_and_explore_for_data_type</span><span class="p">(</span>
+    <span class="n">om_views_and_explores</span><span class="p">,</span> <span class="n">project_name</span><span class="p">,</span> <span class="n">table_prefix</span><span class="p">,</span> <span class="n">data_type</span><span class="p">,</span> <span class="n">branches</span>
+<span class="p">):</span>
+    <span class="n">project_data_type_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">project_name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">data_type</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="n">om_views_and_explores</span><span class="p">[</span><span class="s2">&quot;views&quot;</span><span class="p">][</span><span class="n">project_data_type_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;operational_monitoring_</span><span class="si">{</span><span class="n">data_type</span><span class="si">}</span><span class="s2">_view&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;tables&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;table&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PROD_PROJECT</span><span class="si">}</span><span class="s2">.operational_monitoring.</span><span class="si">{</span><span class="n">table_prefix</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">data_type</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">}</span>
+        <span class="p">],</span>
+    <span class="p">}</span>
+    <span class="n">om_views_and_explores</span><span class="p">[</span><span class="s2">&quot;explores&quot;</span><span class="p">][</span><span class="n">project_data_type_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;operational_monitoring_explore&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;views&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;base_view&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">project_name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">data_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;branches&quot;</span><span class="p">:</span> <span class="n">branches</span><span class="p">,</span>
+    <span class="p">}</span>
+
+
+<span class="k">def</span> <span class="nf">_get_opmon_views_and_explores</span><span class="p">():</span>
+    <span class="n">client</span> <span class="o">=</span> <span class="n">storage</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span><span class="n">PROD_PROJECT</span><span class="p">)</span>
+    <span class="n">bucket</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_bucket</span><span class="p">(</span><span class="n">OPMON_BUCKET_NAME</span><span class="p">)</span>
+    <span class="n">om_views_and_explores</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;views&quot;</span><span class="p">:</span> <span class="p">{},</span> <span class="s2">&quot;explores&quot;</span><span class="p">:</span> <span class="p">{}}</span>
+
+    <span class="c1"># Iterating over all defined operational monitoring projects</span>
+    <span class="k">for</span> <span class="n">blob</span> <span class="ow">in</span> <span class="n">bucket</span><span class="o">.</span><span class="n">list_blobs</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">PROJECTS_FOLDER</span><span class="p">):</span>
+        <span class="c1"># The folder itself is not a project file</span>
+        <span class="k">if</span> <span class="n">blob</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">PROJECTS_FOLDER</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="n">om_project</span><span class="p">,</span> <span class="n">project_last_modified</span> <span class="o">=</span> <span class="n">_download_json_file</span><span class="p">(</span>
+            <span class="n">PROD_PROJECT</span><span class="p">,</span> <span class="n">bucket</span><span class="p">,</span> <span class="n">blob</span><span class="o">.</span><span class="n">name</span>
+        <span class="p">)</span>
+        <span class="n">table_prefix</span> <span class="o">=</span> <span class="n">_normalize_slug</span><span class="p">(</span><span class="n">om_project</span><span class="p">[</span><span class="s2">&quot;slug&quot;</span><span class="p">])</span>
+        <span class="n">project_name</span> <span class="o">=</span> <span class="n">om_project</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">branches</span> <span class="o">=</span> <span class="n">om_project</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;branches&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;enabled&quot;</span><span class="p">,</span> <span class="s2">&quot;disabled&quot;</span><span class="p">])</span>
+
+        <span class="k">for</span> <span class="n">data_type</span> <span class="ow">in</span> <span class="n">DATA_TYPES</span><span class="p">:</span>
+            <span class="n">_append_view_and_explore_for_data_type</span><span class="p">(</span>
+                <span class="n">om_views_and_explores</span><span class="p">,</span> <span class="n">project_name</span><span class="p">,</span> <span class="n">table_prefix</span><span class="p">,</span> <span class="n">data_type</span><span class="p">,</span> <span class="n">branches</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">om_views_and_explores</span>
 
 
 <span class="k">def</span> <span class="nf">_get_glean_apps</span><span class="p">(</span>
@@ -260,6 +321,8 @@
 
     <span class="k">if</span> <span class="n">custom_namespaces</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">custom_namespaces</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">custom_namespaces</span><span class="o">.</span><span class="n">read</span><span class="p">())</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="n">views_and_explores</span> <span class="o">=</span> <span class="n">_get_opmon_views_and_explores</span><span class="p">()</span>
+        <span class="n">custom_namespaces</span><span class="p">[</span><span class="s2">&quot;operational_monitoring&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">views_and_explores</span><span class="p">)</span>
         <span class="n">_merge_namespaces</span><span class="p">(</span><span class="n">namespaces</span><span class="p">,</span> <span class="n">custom_namespaces</span><span class="p">)</span>
 
     <span class="n">disallowed_namespaces</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">disallowlist</span><span class="o">.</span><span class="n">read</span><span class="p">())</span> <span class="ow">or</span> <span class="p">{}</span>
