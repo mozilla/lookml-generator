@@ -40,16 +40,27 @@ class GleanPingExplore(PingExplore):
                 continue
             view_name = view["name"]
             metric = "__".join(view["name"].split("__")[1:])
-            joins.append(
-                {
-                    "name": view_name,
-                    "relationship": "one_to_many",
-                    "sql": (
-                        f"LEFT JOIN UNNEST(${{{base_name}.{metric}}}) AS {view_name} "
-                        f"ON ${{{base_name}.document_id}} = ${{{view_name}.document_id}}"
-                    ),
-                }
-            )
+            if "labeled_counter" in metric:
+                joins.append(
+                    {
+                        "name": view_name,
+                        "relationship": "one_to_many",
+                        "sql": (
+                            f"LEFT JOIN UNNEST(${{{base_name}.{metric}}}) AS {view_name} "
+                            f"ON ${{{base_name}.document_id}} = ${{{view_name}.document_id}}"
+                        ),
+                    }
+                )
+            else:
+                joins.append(
+                    {
+                        "name": view_name,
+                        "relationship": "one_to_many",
+                        "sql": (
+                            f"LEFT JOIN UNNEST(${{{base_name}.{metric}}}) AS {view_name} "
+                        ),
+                    }
+                )
 
         base_explore = {
             "name": self.name,
