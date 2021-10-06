@@ -401,3 +401,18 @@ pocket:
     - kenny@getpocket.com
     - kirill@getpocket.com
   pretty_name: Pocket
+sync:
+  glean_app: false
+  owners:
+    - ascholtz@mozilla.com
+  pretty_name: Sync
+  views:
+    sync:
+      type: ping_view
+      tables:
+        - table: mozdata.telemetry.sync
+  explores:
+    sync:
+      type: ping_explore
+      views:
+        base_view: sync
