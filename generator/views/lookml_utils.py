@@ -131,10 +131,12 @@ def _generate_nested_dimension_views(
     """
     views: List[Dict[str, Any]] = []
     for field in sorted(schema, key=lambda f: f.name):
-        if field.field_type == "RECORD":
-            view_name = f"{view_name}__{field.name}"
+        if field.field_type == "RECORD" and field.name != "labeled_counter":
+            # labeled_counter is handled explicitly in glean ping views; hidden for other views
             if field.mode == "REPEATED":
-                nested_field_view: Dict[str, Any] = {"name": view_name}
+                nested_field_view: Dict[str, Any] = {
+                    "name": f"{view_name}__{field.name}"
+                }
                 dimensions = _generate_dimensions_helper(schema=field.fields)
                 nested_field_view["dimensions"] = [
                     d for d in dimensions if not _is_dimension_group(d)
@@ -145,11 +147,13 @@ def _generate_nested_dimension_views(
                 views = (
                     views
                     + [nested_field_view]
-                    + _generate_nested_dimension_views(field.fields, view_name)
+                    + _generate_nested_dimension_views(
+                        field.fields, f"{view_name}__{field.name}"
+                    )
                 )
             else:
                 views = views + _generate_nested_dimension_views(
-                    field.fields, view_name
+                    field.fields, f"{view_name}__{field.name}"
                 )
 
     return views
