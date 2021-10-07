@@ -387,3 +387,9 @@ firefox_desktop:
       type: growth_accounting_explore
       views:
         base_view: growth_accounting
+pocket:
+  glean_app: false
+  owners:
+    - kenny@getpocket.com
+    - kirill@getpocket.com
+  pretty_name: Pocket
