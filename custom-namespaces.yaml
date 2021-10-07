@@ -225,6 +225,7 @@ revenue:
   pretty_name: Revenue
   owners:
     - akomarzewski@mozilla.com
+    - skahmann@mozilla.com
   spoke: looker-spoke-private
 firefox_ios:
   owners:
