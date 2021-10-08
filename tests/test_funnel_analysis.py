@@ -189,6 +189,20 @@ def test_view_lookml(funnel_analysis_view):
                         "suggest_explore": "event_names",
                         "suggest_dimension": "event_names.event",
                     },
+                    {
+                        "name": "property_name",
+                        "description": "The event property name.",
+                        "type": "string",
+                        "suggest_explore": "event_names",
+                        "suggest_dimension": "event_names.property_name",
+                    },
+                    {
+                        "name": "property_value",
+                        "description": "The event property value.",
+                        "type": "string",
+                        "suggest_explore": "event_names",
+                        "suggest_dimension": "event_names.property_value",
+                    },
                 ],
                 "dimensions": [
                     {
