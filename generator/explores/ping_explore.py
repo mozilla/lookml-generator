@@ -16,18 +16,20 @@ class PingExplore(Explore):
     def _to_lookml(self, v1_name: Optional[str]) -> List[Dict[str, Any]]:
         """Generate LookML to represent this explore."""
         views_lookml = self.get_view_lookml(self.views["base_view"])
+        views = [view["name"] for view in views_lookml["views"]]
 
         joins = []
         for view in views_lookml["views"][1:]:
             view_name = view["name"]
-            metric = view["name"].split("__")[-1]
-            base_view = "__".join(view["name"].split("__")[:-1])
+            base_name, metric = self._get_base_name_and_metric(
+                view_name=view_name, views=views
+            )
             joins.append(
                 {
                     "name": view_name,
                     "relationship": "one_to_many",
                     "sql": (
-                        f"LEFT JOIN UNNEST(${{{base_view}.{metric}}}) AS {view_name} "
+                        f"LEFT JOIN UNNEST(${{{base_name}.{metric}}}) AS {view_name} "
                     ),
                 }
             )
