@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import lkml
 
@@ -104,6 +104,23 @@ class Explore:
 
             return escape_filter_expr(default_value)
         return None
+
+    def _get_base_name_and_metric(
+        self, view_name: str, views: List[str]
+    ) -> Tuple[str, str]:
+        """
+        Get base view and metric names.
+
+        Returns the the name of the base view and the metric based on the
+        passed `view_name` and existing views.
+        """
+        split = view_name.split("__")
+        for index in range(len(split) - 1, 0, -1):
+            base_view = "__".join(split[:index])
+            metric = "__".join(split[index:])
+            if base_view in views:
+                return (base_view, metric)
+        raise Exception(f"Cannot get base name and metric from view {view_name}")
 
     def _get_view_has_submission(self, view: str) -> bool:
         return (

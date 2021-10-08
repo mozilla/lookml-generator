@@ -54,6 +54,8 @@ class GleanPingView(PingView):
         against the view in the explore.
         """
         lookml = super().to_lookml(bq_client, v1_name)
+        # ignore nexted join views
+        lookml["views"] = [lookml["views"][0]]
 
         # iterate over all of the glean metrics and generate views for unnested
         # fields as necessary. Append them to the list of existing view
