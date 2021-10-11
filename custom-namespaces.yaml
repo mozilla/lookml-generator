@@ -66,6 +66,10 @@ search:
       type: ping_view
       tables:
         - table: mozdata.search.mobile_search_clients_engines_sources_daily
+    desktop_search_alert_records:
+      type: ping_view
+      tables:
+        - table: mozdata.analysis.desktop_search_alert_records
   explores:
     desktop_search_counts:
       type: ping_explore
