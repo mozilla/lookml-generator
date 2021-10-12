@@ -127,7 +127,7 @@ def _generate_nested_dimension_views(
     """
     Recursively generate views for nested fields.
 
-    Nested fields are handled as view, with dimensions and optionally measures.
+    Nested fields are created as views, with dimensions and optionally measures.
     """
     views: List[Dict[str, Any]] = []
     for field in sorted(schema, key=lambda f: f.name):
