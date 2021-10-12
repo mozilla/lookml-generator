@@ -177,6 +177,44 @@
     <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">dimensions</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
 
 
+<span class="k">def</span> <span class="nf">_generate_nested_dimension_views</span><span class="p">(</span>
+    <span class="n">schema</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">bigquery</span><span class="o">.</span><span class="n">SchemaField</span><span class="p">],</span> <span class="n">view_name</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Recursively generate views for nested fields.</span>
+
+<span class="sd">    Nested fields are created as views, with dimensions and optionally measures.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">views</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">f</span><span class="p">:</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">field</span><span class="o">.</span><span class="n">field_type</span> <span class="o">==</span> <span class="s2">&quot;RECORD&quot;</span> <span class="ow">and</span> <span class="n">field</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;labeled_counter&quot;</span><span class="p">:</span>
+            <span class="c1"># labeled_counter is handled explicitly in glean ping views; hidden for other views</span>
+            <span class="k">if</span> <span class="n">field</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;REPEATED&quot;</span><span class="p">:</span>
+                <span class="n">nested_field_view</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">view_name</span><span class="si">}</span><span class="s2">__</span><span class="si">{</span><span class="n">field</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">}</span>
+                <span class="n">dimensions</span> <span class="o">=</span> <span class="n">_generate_dimensions_helper</span><span class="p">(</span><span class="n">schema</span><span class="o">=</span><span class="n">field</span><span class="o">.</span><span class="n">fields</span><span class="p">)</span>
+                <span class="n">nested_field_view</span><span class="p">[</span><span class="s2">&quot;dimensions&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dimensions</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_dimension_group</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+                <span class="p">]</span>
+                <span class="n">nested_field_view</span><span class="p">[</span><span class="s2">&quot;dimension_groups&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dimensions</span> <span class="k">if</span> <span class="n">_is_dimension_group</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+                <span class="p">]</span>
+                <span class="n">views</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">views</span>
+                    <span class="o">+</span> <span class="p">[</span><span class="n">nested_field_view</span><span class="p">]</span>
+                    <span class="o">+</span> <span class="n">_generate_nested_dimension_views</span><span class="p">(</span>
+                        <span class="n">field</span><span class="o">.</span><span class="n">fields</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">view_name</span><span class="si">}</span><span class="s2">__</span><span class="si">{</span><span class="n">field</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">views</span> <span class="o">=</span> <span class="n">views</span> <span class="o">+</span> <span class="n">_generate_nested_dimension_views</span><span class="p">(</span>
+                    <span class="n">field</span><span class="o">.</span><span class="n">fields</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">view_name</span><span class="si">}</span><span class="s2">__</span><span class="si">{</span><span class="n">field</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">views</span>
+
+
 <span class="k">def</span> <span class="nf">_is_dimension_group</span><span class="p">(</span><span class="n">dimension</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Determine if a dimension is actually a dimension group.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="s2">&quot;timeframes&quot;</span> <span class="ow">in</span> <span class="n">dimension</span> <span class="ow">or</span> <span class="s2">&quot;intervals&quot;</span> <span class="ow">in</span> <span class="n">dimension</span>
@@ -185,6 +223,15 @@
 <span class="k">def</span> <span class="nf">escape_filter_expr</span><span class="p">(</span><span class="n">expr</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Escape filter expression for special Looker chars.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;((?:^-)|[&quot;_%,^])&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;^\1&quot;</span><span class="p">,</span> <span class="n">expr</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_is_nested_dimension</span><span class="p">(</span><span class="n">dimension</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="s2">&quot;hidden&quot;</span> <span class="ow">in</span> <span class="n">dimension</span>
+        <span class="ow">and</span> <span class="n">dimension</span><span class="p">[</span><span class="s2">&quot;hidden&quot;</span><span class="p">]</span>
+        <span class="ow">and</span> <span class="s2">&quot;nested&quot;</span> <span class="ow">in</span> <span class="n">dimension</span>
+        <span class="ow">and</span> <span class="n">dimension</span><span class="p">[</span><span class="s2">&quot;nested&quot;</span><span class="p">]</span>
+    <span class="p">)</span>
 </pre></div>
 
         </details>

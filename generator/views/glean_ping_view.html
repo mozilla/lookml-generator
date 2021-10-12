@@ -131,6 +131,8 @@
 <span class="sd">        against the view in the explore.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">lookml</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">to_lookml</span><span class="p">(</span><span class="n">bq_client</span><span class="p">,</span> <span class="n">v1_name</span><span class="p">)</span>
+        <span class="c1"># ignore nested join views</span>
+        <span class="n">lookml</span><span class="p">[</span><span class="s2">&quot;views&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">lookml</span><span class="p">[</span><span class="s2">&quot;views&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span>
 
         <span class="c1"># iterate over all of the glean metrics and generate views for unnested</span>
         <span class="c1"># fields as necessary. Append them to the list of existing view</span>
@@ -497,6 +499,8 @@
 <span class="sd">        against the view in the explore.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">lookml</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">to_lookml</span><span class="p">(</span><span class="n">bq_client</span><span class="p">,</span> <span class="n">v1_name</span><span class="p">)</span>
+        <span class="c1"># ignore nested join views</span>
+        <span class="n">lookml</span><span class="p">[</span><span class="s2">&quot;views&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">lookml</span><span class="p">[</span><span class="s2">&quot;views&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span>
 
         <span class="c1"># iterate over all of the glean metrics and generate views for unnested</span>
         <span class="c1"># fields as necessary. Append them to the list of existing view</span>
@@ -896,6 +900,8 @@
 <span class="sd">        against the view in the explore.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">lookml</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">to_lookml</span><span class="p">(</span><span class="n">bq_client</span><span class="p">,</span> <span class="n">v1_name</span><span class="p">)</span>
+        <span class="c1"># ignore nested join views</span>
+        <span class="n">lookml</span><span class="p">[</span><span class="s2">&quot;views&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">lookml</span><span class="p">[</span><span class="s2">&quot;views&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span>
 
         <span class="c1"># iterate over all of the glean metrics and generate views for unnested</span>
         <span class="c1"># fields as necessary. Append them to the list of existing view</span>

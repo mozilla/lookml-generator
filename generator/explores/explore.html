@@ -89,7 +89,7 @@
 
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 
 <span class="kn">import</span> <span class="nn">lkml</span>
 
@@ -190,6 +190,58 @@
 
             <span class="k">return</span> <span class="n">escape_filter_expr</span><span class="p">(</span><span class="n">default_value</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">_get_base_name_and_metric</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">view_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">views</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get base view and metric names.</span>
+
+<span class="sd">        Returns the the name of the base view and the metric based on the</span>
+<span class="sd">        passed `view_name` and existing views.</span>
+
+<span class="sd">        The names are resolved in a backwards fashion to account for</span>
+<span class="sd">        repeated nested fields that might contain other nested fields.</span>
+<span class="sd">        For example:</span>
+
+<span class="sd">        view: sync {</span>
+<span class="sd">            [...]</span>
+<span class="sd">            dimension: payload__events {</span>
+<span class="sd">                sql: ${TABLE}.payload.events ;;</span>
+<span class="sd">            }</span>
+<span class="sd">        }</span>
+
+<span class="sd">        view: sync__payload__events {</span>
+<span class="sd">            [...]</span>
+<span class="sd">            dimension: f5_ {</span>
+<span class="sd">                sql: ${TABLE}.f5_ ;;</span>
+<span class="sd">            }</span>
+<span class="sd">        }</span>
+
+<span class="sd">        view: sync__payload__events__f5_ {</span>
+<span class="sd">            [...]</span>
+<span class="sd">        }</span>
+
+<span class="sd">        For these nested views to get translated to the following joins, the names</span>
+<span class="sd">        need to be resolved backwards:</span>
+
+<span class="sd">        join: sync__payload__events {</span>
+<span class="sd">            relationship: one_to_many</span>
+<span class="sd">            sql: LEFT JOIN UNNEST(${sync.payload__events}) AS sync__payload__events ;;</span>
+<span class="sd">        }</span>
+
+<span class="sd">        join: sync__payload__events__f5_ {</span>
+<span class="sd">            relationship: one_to_many</span>
+<span class="sd">            sql: LEFT JOIN UNNEST(${sync__payload__events.f5_}) AS sync__payload__events__f5_ ;;</span>
+<span class="sd">        }</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">split</span> <span class="o">=</span> <span class="n">view_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;__&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">split</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">base_view</span> <span class="o">=</span> <span class="s2">&quot;__&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">split</span><span class="p">[:</span><span class="n">index</span><span class="p">])</span>
+            <span class="n">metric</span> <span class="o">=</span> <span class="s2">&quot;__&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">split</span><span class="p">[</span><span class="n">index</span><span class="p">:])</span>
+            <span class="k">if</span> <span class="n">base_view</span> <span class="ow">in</span> <span class="n">views</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">(</span><span class="n">base_view</span><span class="p">,</span> <span class="n">metric</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot get base name and metric from view </span><span class="si">{</span><span class="n">view_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_get_view_has_submission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">(</span>
@@ -342,6 +394,58 @@
 
             <span class="k">return</span> <span class="n">escape_filter_expr</span><span class="p">(</span><span class="n">default_value</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">_get_base_name_and_metric</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">view_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">views</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get base view and metric names.</span>
+
+<span class="sd">        Returns the the name of the base view and the metric based on the</span>
+<span class="sd">        passed `view_name` and existing views.</span>
+
+<span class="sd">        The names are resolved in a backwards fashion to account for</span>
+<span class="sd">        repeated nested fields that might contain other nested fields.</span>
+<span class="sd">        For example:</span>
+
+<span class="sd">        view: sync {</span>
+<span class="sd">            [...]</span>
+<span class="sd">            dimension: payload__events {</span>
+<span class="sd">                sql: ${TABLE}.payload.events ;;</span>
+<span class="sd">            }</span>
+<span class="sd">        }</span>
+
+<span class="sd">        view: sync__payload__events {</span>
+<span class="sd">            [...]</span>
+<span class="sd">            dimension: f5_ {</span>
+<span class="sd">                sql: ${TABLE}.f5_ ;;</span>
+<span class="sd">            }</span>
+<span class="sd">        }</span>
+
+<span class="sd">        view: sync__payload__events__f5_ {</span>
+<span class="sd">            [...]</span>
+<span class="sd">        }</span>
+
+<span class="sd">        For these nested views to get translated to the following joins, the names</span>
+<span class="sd">        need to be resolved backwards:</span>
+
+<span class="sd">        join: sync__payload__events {</span>
+<span class="sd">            relationship: one_to_many</span>
+<span class="sd">            sql: LEFT JOIN UNNEST(${sync.payload__events}) AS sync__payload__events ;;</span>
+<span class="sd">        }</span>
+
+<span class="sd">        join: sync__payload__events__f5_ {</span>
+<span class="sd">            relationship: one_to_many</span>
+<span class="sd">            sql: LEFT JOIN UNNEST(${sync__payload__events.f5_}) AS sync__payload__events__f5_ ;;</span>
+<span class="sd">        }</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">split</span> <span class="o">=</span> <span class="n">view_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;__&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">split</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">base_view</span> <span class="o">=</span> <span class="s2">&quot;__&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">split</span><span class="p">[:</span><span class="n">index</span><span class="p">])</span>
+            <span class="n">metric</span> <span class="o">=</span> <span class="s2">&quot;__&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">split</span><span class="p">[</span><span class="n">index</span><span class="p">:])</span>
+            <span class="k">if</span> <span class="n">base_view</span> <span class="ow">in</span> <span class="n">views</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">(</span><span class="n">base_view</span><span class="p">,</span> <span class="n">metric</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot get base name and metric from view </span><span class="si">{</span><span class="n">view_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_get_view_has_submission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">(</span>

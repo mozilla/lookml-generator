@@ -143,6 +143,10 @@
             <span class="nb">filter</span><span class="p">(</span><span class="n">lookml_utils</span><span class="o">.</span><span class="n">_is_dimension_group</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">)</span>
         <span class="p">)</span>
 
+        <span class="n">nested_views</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">_generate_nested_dimension_views</span><span class="p">(</span>
+            <span class="n">bq_client</span><span class="o">.</span><span class="n">get_table</span><span class="p">(</span><span class="n">table</span><span class="p">)</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+        <span class="p">)</span>
+
         <span class="c1"># Table views have no measures</span>
 
         <span class="c1"># parameterize table name</span>
@@ -165,7 +169,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">view_defn</span><span class="p">[</span><span class="s2">&quot;sql_table_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">`&quot;</span>
 
-        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;views&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">view_defn</span><span class="p">]}</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;views&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">view_defn</span><span class="p">]</span> <span class="o">+</span> <span class="n">nested_views</span><span class="p">}</span>
 </pre></div>
 
         </details>
@@ -242,6 +246,10 @@
             <span class="nb">filter</span><span class="p">(</span><span class="n">lookml_utils</span><span class="o">.</span><span class="n">_is_dimension_group</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">)</span>
         <span class="p">)</span>
 
+        <span class="n">nested_views</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">_generate_nested_dimension_views</span><span class="p">(</span>
+            <span class="n">bq_client</span><span class="o">.</span><span class="n">get_table</span><span class="p">(</span><span class="n">table</span><span class="p">)</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+        <span class="p">)</span>
+
         <span class="c1"># Table views have no measures</span>
 
         <span class="c1"># parameterize table name</span>
@@ -264,7 +272,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">view_defn</span><span class="p">[</span><span class="s2">&quot;sql_table_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">`&quot;</span>
 
-        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;views&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">view_defn</span><span class="p">]}</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;views&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">view_defn</span><span class="p">]</span> <span class="o">+</span> <span class="n">nested_views</span><span class="p">}</span>
 </pre></div>
 
         </details>
@@ -413,6 +421,10 @@
             <span class="nb">filter</span><span class="p">(</span><span class="n">lookml_utils</span><span class="o">.</span><span class="n">_is_dimension_group</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">)</span>
         <span class="p">)</span>
 
+        <span class="n">nested_views</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">_generate_nested_dimension_views</span><span class="p">(</span>
+            <span class="n">bq_client</span><span class="o">.</span><span class="n">get_table</span><span class="p">(</span><span class="n">table</span><span class="p">)</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+        <span class="p">)</span>
+
         <span class="c1"># Table views have no measures</span>
 
         <span class="c1"># parameterize table name</span>
@@ -435,7 +447,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">view_defn</span><span class="p">[</span><span class="s2">&quot;sql_table_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">`&quot;</span>
 
-        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;views&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">view_defn</span><span class="p">]}</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;views&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">view_defn</span><span class="p">]</span> <span class="o">+</span> <span class="n">nested_views</span><span class="p">}</span>
 </pre></div>
 
         </details>
