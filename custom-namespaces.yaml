@@ -79,6 +79,10 @@ search:
       type: ping_explore
       views:
         base_view: mobile_search_clients_engines_sources_daily
+    desktop_search_alert_records:
+      type: ping_explore
+      views:
+        base_view: desktop_search_alert_records
 contextual_services:
   glean_app: false
   connection: bigquery-oauth
