@@ -428,6 +428,7 @@ class MockClient:
             return bigquery.Table(
                 table_ref,
                 schema=[
+                    SchemaField("submission_date", "DATE"),
                     SchemaField("context_id", "STRING"),
                     SchemaField(
                         "contexts",
@@ -1749,6 +1750,11 @@ def test_context_id(runner, glean_apps, tmp_path):
                   tables:
                   - channel: release
                     table: mozdata.custom.context
+              explores:
+                context:
+                  type: ping_explore
+                  views:
+                    base_view: context
             """
         )
     )
@@ -1761,6 +1767,23 @@ def test_context_id(runner, glean_apps, tmp_path):
                 {
                     "sql_table_name": "`mozdata.custom.context`",
                     "name": "context",
+                    "dimension_groups": [
+                        {
+                            "convert_tz": "no",
+                            "datatype": "date",
+                            "name": "submission",
+                            "sql": "${TABLE}.submission_date",
+                            "timeframes": [
+                                "raw",
+                                "date",
+                                "week",
+                                "month",
+                                "quarter",
+                                "year",
+                            ],
+                            "type": "time",
+                        }
+                    ],
                     "dimensions": [
                         {
                             "name": "context_id",
@@ -1806,4 +1829,37 @@ def test_context_id(runner, glean_apps, tmp_path):
         print_and_test(
             lkml.load(lkml.dump(expected)),
             lkml.load(Path("looker-hub/custom/views/context.view.lkml").read_text()),
+        )
+
+        expected_explore = {
+            "includes": ["/looker-hub/custom/views/context.view.lkml"],
+            "explores": [
+                {
+                    "sql_always_where": "${context.submission_date} >= '2010-01-01'",
+                    "view_name": "context",
+                    "always_filter": {
+                        "filters__all": [[{"submission_date": "28 days"}]]
+                    },
+                    "joins": [
+                        {
+                            "relationship": "one_to_many",
+                            "sql": "LEFT JOIN UNNEST(${context.contexts}) AS context__contexts",
+                            "name": "context__contexts",
+                        },
+                        {
+                            "relationship": "one_to_many",
+                            "sql": "LEFT JOIN UNNEST(${context__contexts.position}) AS context__contexts__position",
+                            "name": "context__contexts__position",
+                        },
+                    ],
+                    "name": "context",
+                }
+            ],
+        }
+
+        print_and_test(
+            lkml.load(lkml.dump(expected_explore)),
+            lkml.load(
+                Path("looker-hub/custom/explores/context.explore.lkml").read_text()
+            ),
         )
