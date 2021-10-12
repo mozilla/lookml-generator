@@ -16,7 +16,7 @@ class PingExplore(Explore):
     def _to_lookml(self, v1_name: Optional[str]) -> List[Dict[str, Any]]:
         """Generate LookML to represent this explore."""
         views_lookml = self.get_view_lookml(self.views["base_view"])
-        views = [view["name"] for view in views_lookml["views"]]
+        views: List[str] = [view["name"] for view in views_lookml["views"]]
 
         joins = []
         for view in views_lookml["views"][1:]:

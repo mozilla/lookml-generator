@@ -113,6 +113,41 @@ class Explore:
 
         Returns the the name of the base view and the metric based on the
         passed `view_name` and existing views.
+
+        The names are resolved in a backwards fashion to account for
+        repeated nested fields that might contain other nested fields.
+        For example:
+
+        view: sync {
+            [...]
+            dimension: payload__events {
+                sql: ${TABLE}.payload.events ;;
+            }
+        }
+
+        view: sync__payload__events {
+            [...]
+            dimension: f5_ {
+                sql: ${TABLE}.f5_ ;;
+            }
+        }
+
+        view: sync__payload__events__f5_ {
+            [...]
+        }
+
+        For these nested views to get translated to the following joins, the names
+        need to be resolved backwards:
+
+        join: sync__payload__events {
+            relationship: one_to_many
+            sql: LEFT JOIN UNNEST(${sync.payload__events}) AS sync__payload__events ;;
+        }
+
+        join: sync__payload__events__f5_ {
+            relationship: one_to_many
+            sql: LEFT JOIN UNNEST(${sync__payload__events.f5_}) AS sync__payload__events__f5_ ;;
+        }
         """
         split = view_name.split("__")
         for index in range(len(split) - 1, 0, -1):
