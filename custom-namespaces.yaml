@@ -134,7 +134,7 @@ contextual_services:
       views:
         base_view: topsites_impression
 mozilla_vpn:
-  glean_app: false
+  glean_app: true
   owners:
     - dthorn@mozilla.com
   pretty_name: Mozilla VPN
