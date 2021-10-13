@@ -25,8 +25,7 @@ class GleanPingExplore(PingExplore):
             k.replace("-", "_"): v for k, v in glean_app.get_ping_descriptions().items()
         }
         # collapse whitespace in the description so the lookml looks a little better
-        ping_description = " ".join(ping_descriptions[self.name].split())
-
+        ping_description = " ".join(ping_descriptions.get(self.name, "").split())
         views_lookml = self.get_view_lookml(self.views["base_view"])
 
         # The first view, by convention, is always the base view with the

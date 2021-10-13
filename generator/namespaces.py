@@ -78,11 +78,11 @@ def _get_db_views(uri):
 
 
 def _append_view_and_explore_for_data_type(
-    om_views_and_explores, project_name, table_prefix, data_type, branches
+    om_content, project_name, table_prefix, data_type, branches
 ):
     project_data_type_id = f"{project_name}_{data_type}"
 
-    om_views_and_explores["views"][project_data_type_id] = {
+    om_content["views"][project_data_type_id] = {
         "type": f"operational_monitoring_{data_type}_view",
         "tables": [
             {
@@ -90,17 +90,17 @@ def _append_view_and_explore_for_data_type(
             }
         ],
     }
-    om_views_and_explores["explores"][project_data_type_id] = {
+    om_content["explores"][project_data_type_id] = {
         "type": "operational_monitoring_explore",
         "views": {"base_view": f"{project_name}_{data_type}"},
         "branches": branches,
     }
 
 
-def _get_opmon_views_and_explores():
+def _get_opmon_views_explores_dashboards():
     client = storage.Client(PROD_PROJECT)
     bucket = client.get_bucket(OPMON_BUCKET_NAME)
-    om_views_and_explores = {"views": {}, "explores": {}}
+    om_content = {"views": {}, "explores": {}, "dashboards": {}}
 
     # Iterating over all defined operational monitoring projects
     for blob in bucket.list_blobs(prefix=PROJECTS_FOLDER):
@@ -117,10 +117,20 @@ def _get_opmon_views_and_explores():
 
         for data_type in DATA_TYPES:
             _append_view_and_explore_for_data_type(
-                om_views_and_explores, project_name, table_prefix, data_type, branches
+                om_content, project_name, table_prefix, data_type, branches
             )
 
-        return om_views_and_explores
+        om_content["dashboards"][project_name] = {
+            "type": "operational_monitoring_dashboard",
+            "tables": [
+                {
+                    "explore": f"{project_name}_{data_type}",
+                    "table": f"{PROD_PROJECT}.operational_monitoring.{table_prefix}_{data_type}",
+                }
+                for data_type in DATA_TYPES
+            ],
+        }
+        return om_content
 
 
 def _get_glean_apps(
@@ -268,8 +278,8 @@ def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri, disallowl
 
     if custom_namespaces is not None:
         custom_namespaces = yaml.safe_load(custom_namespaces.read()) or {}
-        views_and_explores = _get_opmon_views_and_explores()
-        custom_namespaces["operational_monitoring"].update(views_and_explores)
+        views_explores_dashboards = _get_opmon_views_explores_dashboards()
+        custom_namespaces["operational_monitoring"].update(views_explores_dashboards)
         _merge_namespaces(namespaces, custom_namespaces)
 
     disallowed_namespaces = yaml.safe_load(disallowlist.read()) or {}

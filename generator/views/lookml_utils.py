@@ -4,6 +4,7 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 import click
 from google.cloud import bigquery
+from jinja2 import Environment, PackageLoader
 
 BIGQUERY_TYPE_TO_DIMENSION_TYPE = {
     "BIGNUMERIC": "string",
@@ -176,3 +177,11 @@ def _is_nested_dimension(dimension: dict):
         and "nested" in dimension
         and dimension["nested"]
     )
+
+
+def render_template(filename, template_folder, **kwargs) -> str:
+    """Render a given template using Jinja."""
+    env = Environment(loader=PackageLoader("generator", f"{template_folder}/templates"))
+    template = env.get_template(filename)
+    rendered = template.render(**kwargs)
+    return rendered
