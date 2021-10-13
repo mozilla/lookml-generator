@@ -213,6 +213,11 @@ firefox_accounts:
       tables:
         - channel: release
           table: mozdata.firefox_accounts.fxa_users_first_seen
+    fxa_log_device_command_events:
+      type: ping_view
+      tables:
+        - channel: release
+          table: mozdata.firefox_accounts.fxa_log_device_command_events
   explores:
     event_counts:
       type: events_explore
@@ -227,6 +232,9 @@ firefox_accounts:
       type: growth_accounting_explore
       views:
         base_view: growth_accounting
+    fxa_log_device_command_events:
+      type: ping_explore
+      views: fxa_log_device_command_events
 revenue:
   glean_app: false
   connection: bigquery-oauth
