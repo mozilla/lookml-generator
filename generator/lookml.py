@@ -8,6 +8,7 @@ import lkml
 import yaml
 from google.cloud import bigquery
 
+from .dashboards import DASHBOARD_TYPES
 from .explores import EXPLORE_TYPES
 from .namespaces import _get_glean_apps
 from .views import VIEW_TYPES, View, ViewDict
@@ -52,6 +53,26 @@ def _generate_explores(
         path = out_dir / (explore_name + ".explore.lkml")
         path.write_text(lkml.dump(file_lookml))
         yield path
+
+
+def _generate_dashboards(
+    client, dash_dir: Path, model_dir: Path, namespace: str, dashboards: dict
+):
+    for dashboard_name, dashboard_info in dashboards.items():
+        logging.info(f"Generating lookml for dashboard {dashboard_name} in {namespace}")
+        dashboard = DASHBOARD_TYPES[dashboard_info["type"]].from_dict(
+            namespace, dashboard_name, dashboard_info
+        )
+
+        # A dashboard needs an associated model to render
+        dashboard_lookml, model_lookml = dashboard.to_lookml(client)
+
+        dash_path = dash_dir / f"{dashboard_name}.dashboard.lookml"
+        model_path = model_dir / f"{dashboard_name}_data.model.lkml"
+
+        dash_path.write_text(dashboard_lookml)
+        model_path.write_text(model_lookml)
+        yield dash_path
 
 
 def _get_views_from_dict(views: Dict[str, ViewDict], namespace: str) -> Iterable[View]:
@@ -99,6 +120,16 @@ def _lookml(namespaces, glean_apps, target_dir):
             client, explore_dir, namespace, explores, view_dir, v1_name
         ):
             logging.info(f"    ...Generating {explore_path}")
+
+        logging.info("  Generating dashboards")
+        namespace_dir = target / namespace
+        dashboard_dir = namespace_dir / "dashboards"
+        dashboard_dir.mkdir(parents=True, exist_ok=True)
+        dashboards = lookml_objects.get("dashboards", {})
+        for dashboard_path in _generate_dashboards(
+            client, dashboard_dir, namespace_dir, namespace, dashboards
+        ):
+            logging.info(f"    ...Generating {dashboard_path}")
 
 
 @click.command(help=__doc__)
