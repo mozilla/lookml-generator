@@ -15,5 +15,5 @@ pytest-isort==2.0.0
 pytest-mypy==0.8.1
 pytest-pydocstyle==2.2.0
 pytest==6.2.5
-types-PyYaml==5.4.10
+types-PyYaml==5.4.11
 yamllint==1.26.3
