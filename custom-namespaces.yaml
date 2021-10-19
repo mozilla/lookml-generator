@@ -426,3 +426,92 @@ sync:
       type: ping_explore
       views:
         base_view: sync
+monitoring:
+  glean_app: false
+  owners:
+    - jklukas@mozilla.com
+    - ascholtz@mozilla.com
+    - wlach@mozilla.com
+  pretty_name: Monitoring
+  views:
+    average_ping_sizes:
+      type: ping_view
+      tables:
+        - table: mozdata.monitoring.average_ping_sizes
+    column_size:
+      type: ping_view
+      tables:
+        - table: mozdata.monitoring.column_size
+    payload_bytes_decoded_all:
+      type: ping_view
+      tables:
+        - table: mozdata.monitoring.payload_bytes_decoded_all
+    payload_bytes_error_all:
+      type: ping_view
+      tables:
+        - table: mozdata.monitoring.payload_bytes_error_all
+    schema_error_counts:
+      type: ping_view
+      tables:
+        - table: mozdata.monitoring.schema_error_counts
+    stable_table_sizes:
+      type: ping_view
+      tables:
+        - table: mozdata.monitoring.stable_table_sizes
+    structured_distinct_docids:
+      type: ping_view
+      tables:
+        - table: mozdata.monitoring.structured_distinct_docids
+    structured_missing_columns:
+      type: ping_view
+      tables:
+        - table: mozdata.monitoring.structured_missing_columns
+    telemetry_distinct_docids:
+      type: ping_view
+      tables:
+        - table: mozdata.monitoring.telemetry_distinct_docids
+    telemetry_missing_columns:
+      type: ping_view
+      tables:
+        - table: mozdata.monitoring.telemetry_missing_columns
+  explores:
+    average_ping_sizes:
+      type: ping_explore
+      views:
+        base_view: average_ping_sizes
+    column_size:
+      type: ping_explore
+      views:
+        base_view: column_size
+    payload_bytes_decoded_all:
+      type: ping_explore
+      views:
+        base_view: payload_bytes_decoded_all
+    payload_bytes_error_all:
+      type: ping_explore
+      views:
+        base_view: payload_bytes_error_all
+    schema_error_counts:
+      type: ping_explore
+      views:
+        base_view: schema_error_counts
+    stable_table_sizes:
+      type: ping_explore
+      views:
+        base_view: stable_table_sizes
+    structured_distinct_docids:
+      type: ping_explore
+      views:
+        base_view: structured_distinct_docids
+    structured_missing_columns:
+      type: ping_explore
+      views:
+        base_view: structured_missing_columns
+    telemetry_distinct_docids:
+      type: ping_explore
+      views:
+        base_view: telemetry_distinct_docids
+    telemetry_missing_columns:
+      type: ping_explore
+      views:
+        base_view: telemetry_missing_columns
