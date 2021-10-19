@@ -427,7 +427,7 @@ monitoring:
     - jklukas@mozilla.com
     - ascholtz@mozilla.com
     - wlach@mozilla.com
-  pretty_name: Monitoring
+  pretty_name: Monitoring (Data Pipeline)
   views:
     average_ping_sizes:
       type: ping_view
