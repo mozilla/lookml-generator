@@ -31,9 +31,6 @@
                     <h2>API Documentation</h2>
                         <ul class="memberlist">
             <li>
-                    <a class="variable" href="#EXCLUDED_FIELDS">EXCLUDED_FIELDS</a>
-            </li>
-            <li>
                     <a class="class" href="#OperationalMonitoringScalarView">OperationalMonitoringScalarView</a>
                             <ul class="memberlist">
                         <li>
@@ -69,19 +66,11 @@
             <div class="codehilite"><pre><span></span><span class="sd">&quot;&quot;&quot;Class to describe an Operational Monitoring Scalar View.&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">textwrap</span> <span class="kn">import</span> <span class="n">dedent</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
 
+<span class="kn">from</span> <span class="nn">..constants</span> <span class="kn">import</span> <span class="n">OPMON_EXCLUDED_FIELDS</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">lookml_utils</span>
 <span class="kn">from</span> <span class="nn">.operational_monitoring_view</span> <span class="kn">import</span> <span class="n">OperationalMonitoringView</span>
-
-<span class="c1"># These are fields we don&#39;t need in our view</span>
-<span class="n">EXCLUDED_FIELDS</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;submission&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;client_id&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;build_id&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;agg_type&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;value&quot;</span><span class="p">,</span>
-<span class="p">}</span>
 
 
 <span class="k">class</span> <span class="nc">OperationalMonitoringScalarView</span><span class="p">(</span><span class="n">OperationalMonitoringView</span><span class="p">):</span>
@@ -119,7 +108,7 @@
         <span class="n">additional_dimensions</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">dimension</span>
             <span class="k">for</span> <span class="n">dimension</span> <span class="ow">in</span> <span class="n">all_dimensions</span>
-            <span class="k">if</span> <span class="n">dimension</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">EXCLUDED_FIELDS</span>
+            <span class="k">if</span> <span class="n">dimension</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">OPMON_EXCLUDED_FIELDS</span>
         <span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">additional_dimensions</span><span class="p">)</span>
 
@@ -150,15 +139,6 @@
         </details>
 
             </section>
-                <section id="EXCLUDED_FIELDS">
-                                <div class="attr variable"><a class="headerlink" href="#EXCLUDED_FIELDS">#&nbsp;&nbsp</a>
-
-        <span class="name">EXCLUDED_FIELDS</span><span class="annotation">: Set[str]</span><span class="default_value"> = {&#39;build_id&#39;, &#39;value&#39;, &#39;agg_type&#39;, &#39;client_id&#39;, &#39;submission&#39;}</span>
-    </div>
-
-    
-
-                </section>
                 <section id="OperationalMonitoringScalarView">
                                 <div class="attr class">
         <a class="headerlink" href="#OperationalMonitoringScalarView">#&nbsp;&nbsp</a>
@@ -205,7 +185,7 @@
         <span class="n">additional_dimensions</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">dimension</span>
             <span class="k">for</span> <span class="n">dimension</span> <span class="ow">in</span> <span class="n">all_dimensions</span>
-            <span class="k">if</span> <span class="n">dimension</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">EXCLUDED_FIELDS</span>
+            <span class="k">if</span> <span class="n">dimension</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">OPMON_EXCLUDED_FIELDS</span>
         <span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">additional_dimensions</span><span class="p">)</span>
 
@@ -268,7 +248,7 @@
         <span class="n">additional_dimensions</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">dimension</span>
             <span class="k">for</span> <span class="n">dimension</span> <span class="ow">in</span> <span class="n">all_dimensions</span>
-            <span class="k">if</span> <span class="n">dimension</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">EXCLUDED_FIELDS</span>
+            <span class="k">if</span> <span class="n">dimension</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">OPMON_EXCLUDED_FIELDS</span>
         <span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">additional_dimensions</span><span class="p">)</span>
 
