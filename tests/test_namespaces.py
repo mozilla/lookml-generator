@@ -384,6 +384,21 @@ def test_namespaces_full(
                     },
                 },
                 "operational_monitoring": {
+                    "dashboards": {
+                        "op_mon": {
+                            "tables": [
+                                {
+                                    "explore": "op_mon_histogram",
+                                    "table": "moz-fx-data-shared-prod.operational_monitoring.test_histogram",
+                                },
+                                {
+                                    "explore": "op_mon_scalar",
+                                    "table": "moz-fx-data-shared-prod.operational_monitoring.test_scalar",
+                                },
+                            ],
+                            "type": "operational_monitoring_dashboard",
+                        }
+                    },
                     "explores": {
                         "op_mon_histogram": {
                             "branches": ["enabled", "disabled"],

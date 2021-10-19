@@ -25,7 +25,7 @@ DEFAULT_SPOKE = "looker-spoke-default"
 OPMON_BUCKET_NAME = "operational_monitoring"
 PROD_PROJECT = "moz-fx-data-shared-prod"
 PROJECTS_FOLDER = "projects/"
-DATA_TYPES = {"histogram", "scalar"}
+DATA_TYPES = ["histogram", "scalar"]
 
 
 def _normalize_slug(name):
