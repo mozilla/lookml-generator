@@ -1,19 +1,11 @@
 """Class to describe an Operational Monitoring Scalar View."""
 
 from textwrap import dedent
-from typing import Any, Dict, Optional, Set
+from typing import Any, Dict, Optional
 
+from ..constants import OPMON_EXCLUDED_FIELDS
 from . import lookml_utils
 from .operational_monitoring_view import OperationalMonitoringView
-
-# These are fields we don't need in our view
-EXCLUDED_FIELDS: Set[str] = {
-    "submission",
-    "client_id",
-    "build_id",
-    "agg_type",
-    "value",
-}
 
 
 class OperationalMonitoringScalarView(OperationalMonitoringView):
@@ -51,7 +43,7 @@ class OperationalMonitoringScalarView(OperationalMonitoringView):
         additional_dimensions = [
             dimension
             for dimension in all_dimensions
-            if dimension["name"] not in EXCLUDED_FIELDS
+            if dimension["name"] not in OPMON_EXCLUDED_FIELDS
         ]
         self.dimensions.extend(additional_dimensions)
 

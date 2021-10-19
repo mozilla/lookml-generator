@@ -263,6 +263,11 @@ awesome_bar:
       type: ping_view
       tables:
         - table: mozdata.telemetry.urlbar_clients_daily
+  explores:
+    urlbar_clients_daily:
+      type: ping_explore
+      views:
+        base_view: urlbar_clients_daily
 experimentation:
   glean_app: false
   owners:

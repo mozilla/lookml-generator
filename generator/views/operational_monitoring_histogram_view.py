@@ -1,22 +1,11 @@
 """Class to describe an Operational Monitoring Histogram View."""
 
 from textwrap import dedent
-from typing import Any, Dict, Optional, Set
+from typing import Any, Dict, Optional
 
+from ..constants import OPMON_EXCLUDED_FIELDS
 from . import lookml_utils
 from .operational_monitoring_view import OperationalMonitoringView
-
-# These are fields we don't need in our view
-EXCLUDED_FIELDS: Set[str] = {
-    "submission",
-    "client_id",
-    "build_id",
-    "histogram__VALUES",
-    "histogram__bucket_count",
-    "histogram__histogram_type",
-    "histogram__range",
-    "histogram__sum",
-}
 
 
 class OperationalMonitoringHistogramView(OperationalMonitoringView):
@@ -54,7 +43,7 @@ class OperationalMonitoringHistogramView(OperationalMonitoringView):
         additional_dimensions = [
             dimension
             for dimension in all_dimensions
-            if dimension["name"] not in EXCLUDED_FIELDS
+            if dimension["name"] not in OPMON_EXCLUDED_FIELDS
         ]
         self.dimensions.extend(additional_dimensions)
 
