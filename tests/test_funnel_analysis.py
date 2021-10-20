@@ -165,13 +165,17 @@ def test_view_lookml(funnel_analysis_view):
                     "sql": (
                         "SELECT "
                         "mozfun.event_analysis.aggregate_match_strings( "
-                        "ARRAY_AGG( "
-                        "mozfun.event_analysis.event_index_to_match_string(index))) AS match_string "
+                        "ARRAY_AGG( CONCAT(mozfun.event_analysis.escape_metachars(property_value.value),"
+                        "mozfun.event_analysis.event_index_to_match_string(et.index)))) AS match_string "
                         "FROM "
-                        "`mozdata.glean_app.event_types` "
+                        "`mozdata.glean_app.event_types` as et "
+                        "CROSS JOIN UNNEST(event_properties) AS properties "
+                        "CROSS JOIN UNNEST(properties.value) AS property_value "
                         "WHERE "
                         "{% condition category %} category {% endcondition %} "
-                        "AND {% condition event %} event {% endcondition %}"
+                        "AND {% condition event %} event {% endcondition %} "
+                        "AND {% condition property_name %} properties.key {% endcondition %} "
+                        "AND {% condition property_value %} property_value.key {% endcondition %}"
                     )
                 },
                 "filters": [
@@ -228,6 +232,7 @@ def test_view_lookml(funnel_analysis_view):
                         "  event, "
                         "  property.key AS property_name, "
                         "  property_value.key AS property_value, "
+                        "  property_value.index as property_index "
                         "FROM `mozdata.glean_app.event_types` "
                         "LEFT JOIN UNNEST(event_properties) AS property "
                         "LEFT JOIN UNNEST(property.value) AS property_value "
