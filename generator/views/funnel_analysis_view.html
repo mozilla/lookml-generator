@@ -256,13 +256,17 @@ e.g. <code>completed_funnel_step_N</code>. We can then count those users across 
                         <span class="s2">&quot;sql&quot;</span><span class="p">:</span> <span class="p">(</span>
                             <span class="s2">&quot;SELECT &quot;</span>
                             <span class="s2">&quot;mozfun.event_analysis.aggregate_match_strings( &quot;</span>
-                            <span class="s2">&quot;ARRAY_AGG( &quot;</span>
-                            <span class="s2">&quot;mozfun.event_analysis.event_index_to_match_string(index))) AS match_string &quot;</span>
+                            <span class="s2">&quot;ARRAY_AGG( CONCAT(mozfun.event_analysis.escape_metachars(property_value.value),&quot;</span>
+                            <span class="s2">&quot;mozfun.event_analysis.event_index_to_match_string(et.index)))) AS match_string &quot;</span>
                             <span class="s2">&quot;FROM &quot;</span>
-                            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;event_types&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> &quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;event_types&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> as et &quot;</span>
+                            <span class="s2">&quot;CROSS JOIN UNNEST(event_properties) AS properties &quot;</span>
+                            <span class="s2">&quot;CROSS JOIN UNNEST(properties.value) AS property_value &quot;</span>
                             <span class="s2">&quot;WHERE &quot;</span>
                             <span class="s2">&quot;{</span><span class="si">% c</span><span class="s2">ondition category %} category {</span><span class="si">% e</span><span class="s2">ndcondition %} &quot;</span>
-                            <span class="s2">&quot;AND {</span><span class="si">% c</span><span class="s2">ondition event %} event {</span><span class="si">% e</span><span class="s2">ndcondition %}&quot;</span>
+                            <span class="s2">&quot;AND {</span><span class="si">% c</span><span class="s2">ondition event %} event {</span><span class="si">% e</span><span class="s2">ndcondition %} &quot;</span>
+                            <span class="s2">&quot;AND {</span><span class="si">% c</span><span class="s2">ondition property_name %} properties.key {</span><span class="si">% e</span><span class="s2">ndcondition %} &quot;</span>
+                            <span class="s2">&quot;AND {</span><span class="si">% c</span><span class="s2">ondition property_value %} property_value.key {</span><span class="si">% e</span><span class="s2">ndcondition %}&quot;</span>
                         <span class="p">)</span>
                     <span class="p">},</span>
                     <span class="s2">&quot;filters&quot;</span><span class="p">:</span> <span class="p">[</span>
@@ -320,6 +324,7 @@ e.g. <code>completed_funnel_step_N</code>. We can then count those users across 
                             <span class="s2">&quot;  event, &quot;</span>
                             <span class="s2">&quot;  property.key AS property_name, &quot;</span>
                             <span class="s2">&quot;  property_value.key AS property_value, &quot;</span>
+                            <span class="s2">&quot;  property_value.index as property_index &quot;</span>
                             <span class="sa">f</span><span class="s2">&quot;FROM </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;event_types&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> &quot;</span>
                             <span class="s2">&quot;LEFT JOIN UNNEST(event_properties) AS property &quot;</span>
                             <span class="s2">&quot;LEFT JOIN UNNEST(property.value) AS property_value &quot;</span>
@@ -506,13 +511,17 @@ e.g. <code>completed_funnel_step_N</code>. We can then count those users across 
                         <span class="s2">&quot;sql&quot;</span><span class="p">:</span> <span class="p">(</span>
                             <span class="s2">&quot;SELECT &quot;</span>
                             <span class="s2">&quot;mozfun.event_analysis.aggregate_match_strings( &quot;</span>
-                            <span class="s2">&quot;ARRAY_AGG( &quot;</span>
-                            <span class="s2">&quot;mozfun.event_analysis.event_index_to_match_string(index))) AS match_string &quot;</span>
+                            <span class="s2">&quot;ARRAY_AGG( CONCAT(mozfun.event_analysis.escape_metachars(property_value.value),&quot;</span>
+                            <span class="s2">&quot;mozfun.event_analysis.event_index_to_match_string(et.index)))) AS match_string &quot;</span>
                             <span class="s2">&quot;FROM &quot;</span>
-                            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;event_types&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> &quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;event_types&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> as et &quot;</span>
+                            <span class="s2">&quot;CROSS JOIN UNNEST(event_properties) AS properties &quot;</span>
+                            <span class="s2">&quot;CROSS JOIN UNNEST(properties.value) AS property_value &quot;</span>
                             <span class="s2">&quot;WHERE &quot;</span>
                             <span class="s2">&quot;{</span><span class="si">% c</span><span class="s2">ondition category %} category {</span><span class="si">% e</span><span class="s2">ndcondition %} &quot;</span>
-                            <span class="s2">&quot;AND {</span><span class="si">% c</span><span class="s2">ondition event %} event {</span><span class="si">% e</span><span class="s2">ndcondition %}&quot;</span>
+                            <span class="s2">&quot;AND {</span><span class="si">% c</span><span class="s2">ondition event %} event {</span><span class="si">% e</span><span class="s2">ndcondition %} &quot;</span>
+                            <span class="s2">&quot;AND {</span><span class="si">% c</span><span class="s2">ondition property_name %} properties.key {</span><span class="si">% e</span><span class="s2">ndcondition %} &quot;</span>
+                            <span class="s2">&quot;AND {</span><span class="si">% c</span><span class="s2">ondition property_value %} property_value.key {</span><span class="si">% e</span><span class="s2">ndcondition %}&quot;</span>
                         <span class="p">)</span>
                     <span class="p">},</span>
                     <span class="s2">&quot;filters&quot;</span><span class="p">:</span> <span class="p">[</span>
@@ -570,6 +579,7 @@ e.g. <code>completed_funnel_step_N</code>. We can then count those users across 
                             <span class="s2">&quot;  event, &quot;</span>
                             <span class="s2">&quot;  property.key AS property_name, &quot;</span>
                             <span class="s2">&quot;  property_value.key AS property_value, &quot;</span>
+                            <span class="s2">&quot;  property_value.index as property_index &quot;</span>
                             <span class="sa">f</span><span class="s2">&quot;FROM </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;event_types&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> &quot;</span>
                             <span class="s2">&quot;LEFT JOIN UNNEST(event_properties) AS property &quot;</span>
                             <span class="s2">&quot;LEFT JOIN UNNEST(property.value) AS property_value &quot;</span>
