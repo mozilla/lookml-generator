@@ -246,6 +246,12 @@ firefox_ios:
 fenix:
   owners:
     - vzare@mozilla.com
+focus_ios:
+  owners:
+    - loines@mozilla.com
+focus_android:
+  owners:
+    - loines@mozilla.com
 newtab:
   glean_app: false
   connection: bigquery-oauth
