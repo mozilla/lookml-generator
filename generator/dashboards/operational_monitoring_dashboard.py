@@ -56,19 +56,26 @@ class OperationalMonitoringDashboard(Dashboard):
                     ORDER BY 2 DESC
                 """
             )
+
+            title = self._slug_to_title(dimension_name)
             dimension_options = (
                 query_job.result().to_dataframe()[dimension_name].tolist()
             )
 
-            title = self._slug_to_title(dimension_name)
-            kwargs["dimensions"].append(
-                {
-                    "title": title,
-                    "name": dimension_name,
-                    "default": dimension_options[0],
-                    "options": dimension_options[:10],
-                }
-            )
+            dimension_kwarg = {
+                "title": title,
+                "name": dimension_name,
+            }
+
+            if len(dimension_options) > 0:
+                dimension_kwarg.update(
+                    {
+                        "default": dimension_options[0],
+                        "options": dimension_options[:10],
+                    }
+                )
+
+            kwargs["dimensions"].append(dimension_kwarg)
 
     @classmethod
     def from_dict(
