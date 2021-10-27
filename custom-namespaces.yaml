@@ -246,6 +246,7 @@ firefox_ios:
 fenix:
   owners:
     - vzare@mozilla.com
+    - ksiegler@mozilla.com
 focus_ios:
   owners:
     - loines@mozilla.com
