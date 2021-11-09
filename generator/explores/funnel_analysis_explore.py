@@ -4,6 +4,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional
 
+from google.cloud import bigquery
+
 from ..views import View
 from . import Explore
 
@@ -33,7 +35,9 @@ class FunnelAnalysisExplore(Explore):
         """Get an instance of this explore from a dictionary definition."""
         return FunnelAnalysisExplore(name, defn["views"], views_path)
 
-    def _to_lookml(self, v1_name: Optional[str]) -> List[Dict[str, Any]]:
+    def _to_lookml(
+        self, client: bigquery.Client, v1_name: Optional[str], data: Dict = {}
+    ) -> List[Dict[str, Any]]:
         view_lookml = self.get_view_lookml("funnel_analysis")
         views = view_lookml["views"]
         n_events = len([d for d in views if d["name"].startswith("step_")])
