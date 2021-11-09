@@ -4,6 +4,7 @@ operational_monitoring:
   owners:
     - msamuel@mozilla.com
   pretty_name: Operational Monitoring
+  data_functions: ["compute_opmon_dimensions"]
 duet:
   glean_app: false
   owners:

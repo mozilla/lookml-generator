@@ -28,6 +28,49 @@ TABLE_SCALAR = (
     "bug_1660366_pref_ongoing_fission_nightly_experiment_nightly_83_100_scalar"
 )
 
+DATA = {
+    "compute_opmon_dimensions": {
+        "fission_histogram": {
+            (
+                "moz-fx-data-shared-prod.operational_monitoring."
+                "bug_1660366_pref_ongoing_fission_nightly_experiment_nightly_83_100_histogram"
+            ): [
+                {
+                    "title": "Cores Count",
+                    "name": "cores_count",
+                    "default": "4",
+                    "options": ["1", "2", "3", "4", "6", "8", "10", "12", "16", "32"],
+                },
+                {
+                    "title": "Os",
+                    "name": "os",
+                    "default": "Windows",
+                    "options": ["Windows", "Mac", "Linux"],
+                },
+            ]
+        },
+        "fission_scalar": {
+            (
+                "moz-fx-data-shared-prod.operational_monitoring."
+                "bug_1660366_pref_ongoing_fission_nightly_experiment_nightly_83_100_scalar"
+            ): [
+                {
+                    "title": "Cores Count",
+                    "name": "cores_count",
+                    "default": "4",
+                    "options": ["1", "2", "3", "4", "6", "8", "10", "12", "16", "32"],
+                },
+                {
+                    "title": "Os",
+                    "name": "os",
+                    "default": "Windows",
+                    "options": ["Windows", "Mac", "Linux"],
+                },
+            ]
+        },
+    }
+}
+
 
 class MockClient:
     """Mock bigquery.Client."""
@@ -259,19 +302,47 @@ def test_scalar_view_lookml(operational_monitoring_scalar_view):
 
 
 def test_explore_lookml(operational_monitoring_explore):
+    mock_bq_client = MockClient()
     expected = [
         {
+            "aggregate_table": [
+                {
+                    "name": "rollup_GC_MS",
+                    "query": {
+                        "dimensions": ["build_id", "branch"],
+                        "filters": [
+                            {"fission_histogram.branch": "enabled, " "disabled"},
+                            {"fission_histogram.percentile_conf": "50"},
+                            {"fission_histogram.cores_count": "4"},
+                            {"fission_histogram.os": "Windows"},
+                            {"fission_histogram.probe": "GC_MS"},
+                        ],
+                        "measures": ["low", "high", "percentile"],
+                    },
+                    "materialization": {"sql_trigger_value": "SELECT CURRENT_DATE()"},
+                },
+                {
+                    "name": "rollup_GC_MS_CONTENT",
+                    "query": {
+                        "dimensions": ["build_id", "branch"],
+                        "filters": [
+                            {"fission_histogram.branch": "enabled, " "disabled"},
+                            {"fission_histogram.percentile_conf": "50"},
+                            {"fission_histogram.cores_count": "4"},
+                            {"fission_histogram.os": "Windows"},
+                            {"fission_histogram.probe": "GC_MS_CONTENT"},
+                        ],
+                        "measures": ["low", "high", "percentile"],
+                    },
+                    "materialization": {"sql_trigger_value": "SELECT CURRENT_DATE()"},
+                },
+            ],
+            "always_filter": {"filters": [{"branch": "enabled, disabled"}]},
             "name": "fission_histogram",
-            "always_filter": {
-                "filters": [
-                    {"os": "Windows"},
-                    {"branch": "enabled, disabled"},
-                ]
-            },
-        },
+        }
     ]
 
-    actual = operational_monitoring_explore.to_lookml(None)
+    actual = operational_monitoring_explore.to_lookml(mock_bq_client, None, DATA)
     print_and_test(expected=expected, actual=actual)
 
 
@@ -364,7 +435,16 @@ def test_dashboard_lookml(operational_monitoring_dashboard):
             type: dropdown_menu
             display: inline
             options:
+            - 1
+            - 2
+            - 3
             - 4
+            - 6
+            - 8
+            - 10
+            - 12
+            - 16
+            - 32
 
         - title: Os
           name: Os
@@ -377,9 +457,11 @@ def test_dashboard_lookml(operational_monitoring_dashboard):
             display: inline
             options:
             - Windows
+            - Mac
+            - Linux
 
     """
     )
-    actual, _ = operational_monitoring_dashboard.to_lookml(mock_bq_client)
+    actual, _ = operational_monitoring_dashboard.to_lookml(mock_bq_client, DATA)
 
     print_and_test(expected=expected, actual=dedent(actual))
