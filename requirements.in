@@ -6,7 +6,7 @@ google-cloud-storage==1.42.3
 googleapis-common-protos==1.53.0  # transitive dep that needs dependabot updates
 Jinja2==3.0.2
 lkml==1.1.1
-looker-sdk==21.18.0
+looker-sdk==21.20.0
 mozilla-schema-generator==0.5.1
 pip-tools==6.4.0
 pandas==1.3.4
