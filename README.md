@@ -46,6 +46,14 @@ project, clicking the "Git Actions" icon, and finding your personal branch in th
 
 Ensure Python 3.8+ is available on your machine (see [this guide](https://docs.python-guide.org/starting/install3/osx/) for instructions if you're on a mac and haven't installed anything other than the default system Python.)
 
+You will also need the Google Cloud SDK with valid credentials.
+After setting up the Google Cloud SDK, run:
+
+```bash
+gcloud config set project moz-fx-data-shared-prod
+gcloud auth login --update-adc
+```
+
 Install requirements in a Python venv
 ```bash
 python3.8 -m venv venv/
@@ -73,7 +81,20 @@ venv/bin/pytest -m integration
 ```
 
 Note that the integration tests require a valid login to BigQuery to succeed.
-After setting up the Google Cloud SDK, run `gcloud auth application-default login`.
+
+## Testing generation locally
+
+You can test namespace generation by running:
+
+```bash
+./bin/generator namespaces
+```
+
+To generate the actual lookml (in `looker-hub`), run:
+
+```bash
+./bin/generator lookml
+```
 
 ## Container Development
 
