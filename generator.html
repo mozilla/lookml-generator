@@ -39,6 +39,7 @@
       <li><a href="#pushing-changes-to-dev-branches">Pushing Changes to Dev Branches</a></li>
     </ul></li>
     <li><a href="#setup">Setup</a></li>
+    <li><a href="#testing-generation-locally">Testing generation locally</a></li>
     <li><a href="#container-development">Container Development</a></li>
     <li><a href="#deploying-new-lookml-generator-changes">Deploying new <code>lookml-generator</code> changes</a></li>
   </ul></li>
@@ -142,6 +143,13 @@ project, clicking the "Git Actions" icon, and finding your personal branch in th
 
 <p>Ensure Python 3.8+ is available on your machine (see <a href="https://docs.python-guide.org/starting/install3/osx/">this guide</a> for instructions if you're on a mac and haven't installed anything other than the default system Python.)</p>
 
+<p>You will also need the Google Cloud SDK with valid credentials.
+After setting up the Google Cloud SDK, run:</p>
+
+<div class="codehilite"><pre><span></span><code>gcloud config <span class="nb">set</span> project moz-fx-data-shared-prod
+gcloud auth login --update-adc
+</code></pre></div>
+
 <p>Install requirements in a Python venv</p>
 
 <div class="codehilite"><pre><span></span><code>python3.8 -m venv venv/
@@ -168,8 +176,19 @@ venv/bin/pip install -r requirements.txt
 <div class="codehilite"><pre><span></span><code>venv/bin/pytest -m integration
 </code></pre></div>
 
-<p>Note that the integration tests require a valid login to BigQuery to succeed.
-After setting up the Google Cloud SDK, run <code>gcloud auth application-default login</code>.</p>
+<p>Note that the integration tests require a valid login to BigQuery to succeed.</p>
+
+<h2 id="testing-generation-locally">Testing generation locally</h2>
+
+<p>You can test namespace generation by running:</p>
+
+<div class="codehilite"><pre><span></span><code>./bin/generator namespaces
+</code></pre></div>
+
+<p>To generate the actual lookml (in <code>looker-hub</code>), run:</p>
+
+<div class="codehilite"><pre><span></span><code>./bin/generator lookml
+</code></pre></div>
 
 <h2 id="container-development">Container Development</h2>
 
