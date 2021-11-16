@@ -33,6 +33,9 @@
             <li>
                     <a class="variable" href="#OPMON_EXCLUDED_FIELDS">OPMON_EXCLUDED_FIELDS</a>
             </li>
+            <li>
+                    <a class="variable" href="#OPMON_DASH_EXCLUDED_FIELDS">OPMON_DASH_EXCLUDED_FIELDS</a>
+            </li>
     </ul>
 
 
@@ -55,7 +58,7 @@
                         <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="sd">&quot;&quot;&quot;Constants.&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Set</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Set</span>
 
 <span class="c1"># These are fields we don&#39;t need for opmon views/explores/dashboards</span>
 <span class="n">OPMON_EXCLUDED_FIELDS</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
@@ -70,6 +73,14 @@
     <span class="s2">&quot;histogram__range&quot;</span><span class="p">,</span>
     <span class="s2">&quot;histogram__sum&quot;</span><span class="p">,</span>
 <span class="p">}</span>
+
+<span class="c1"># These are fields we don&#39;t need for opmon dashboards</span>
+<span class="n">OPMON_DASH_EXCLUDED_FIELDS</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;branch&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;probe&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;histogram__VALUES__key&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;histogram__VALUES__value&quot;</span><span class="p">,</span>
+<span class="p">]</span>
 </pre></div>
 
         </details>
@@ -78,7 +89,16 @@
                 <section id="OPMON_EXCLUDED_FIELDS">
                                 <div class="attr variable"><a class="headerlink" href="#OPMON_EXCLUDED_FIELDS">#&nbsp;&nbsp</a>
 
-        <span class="name">OPMON_EXCLUDED_FIELDS</span><span class="annotation">: Set[str]</span><span class="default_value"> = {&#39;histogram__sum&#39;, &#39;histogram__VALUES&#39;, &#39;build_id&#39;, &#39;histogram__bucket_count&#39;, &#39;histogram__histogram_type&#39;, &#39;histogram__range&#39;, &#39;submission&#39;, &#39;value&#39;, &#39;agg_type&#39;, &#39;client_id&#39;}</span>
+        <span class="name">OPMON_EXCLUDED_FIELDS</span><span class="annotation">: Set[str]</span><span class="default_value"> = {&#39;histogram__bucket_count&#39;, &#39;histogram__histogram_type&#39;, &#39;histogram__VALUES&#39;, &#39;histogram__sum&#39;, &#39;value&#39;, &#39;agg_type&#39;, &#39;submission&#39;, &#39;client_id&#39;, &#39;histogram__range&#39;, &#39;build_id&#39;}</span>
+    </div>
+
+    
+
+                </section>
+                <section id="OPMON_DASH_EXCLUDED_FIELDS">
+                                <div class="attr variable"><a class="headerlink" href="#OPMON_DASH_EXCLUDED_FIELDS">#&nbsp;&nbsp</a>
+
+        <span class="name">OPMON_DASH_EXCLUDED_FIELDS</span><span class="annotation">: List[str]</span><span class="default_value"> = [&#39;branch&#39;, &#39;probe&#39;, &#39;histogram__VALUES__key&#39;, &#39;histogram__VALUES__value&#39;]</span>
     </div>
 
     

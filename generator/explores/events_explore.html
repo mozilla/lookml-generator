@@ -76,6 +76,8 @@
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
 
+<span class="kn">from</span> <span class="nn">google.cloud</span> <span class="kn">import</span> <span class="n">bigquery</span>
+
 <span class="kn">from</span> <span class="nn">..views</span> <span class="kn">import</span> <span class="n">EventsView</span><span class="p">,</span> <span class="n">View</span>
 <span class="kn">from</span> <span class="nn">.explore</span> <span class="kn">import</span> <span class="n">Explore</span>
 
@@ -115,7 +117,9 @@
         <span class="sd">&quot;&quot;&quot;Get an instance of this explore from a dictionary definition.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">EventsExplore</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">defn</span><span class="p">[</span><span class="s2">&quot;views&quot;</span><span class="p">],</span> <span class="n">views_path</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_to_lookml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v1_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+    <span class="k">def</span> <span class="nf">_to_lookml</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span> <span class="n">v1_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
         <span class="n">lookml</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;event_counts&quot;</span><span class="p">,</span>
             <span class="s2">&quot;view_name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">views</span><span class="p">[</span><span class="s2">&quot;base_view&quot;</span><span class="p">],</span>
@@ -177,7 +181,9 @@
         <span class="sd">&quot;&quot;&quot;Get an instance of this explore from a dictionary definition.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">EventsExplore</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">defn</span><span class="p">[</span><span class="s2">&quot;views&quot;</span><span class="p">],</span> <span class="n">views_path</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_to_lookml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v1_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+    <span class="k">def</span> <span class="nf">_to_lookml</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span> <span class="n">v1_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
         <span class="n">lookml</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;event_counts&quot;</span><span class="p">,</span>
             <span class="s2">&quot;view_name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">views</span><span class="p">[</span><span class="s2">&quot;base_view&quot;</span><span class="p">],</span>

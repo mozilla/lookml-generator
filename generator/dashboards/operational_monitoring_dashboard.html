@@ -77,7 +77,6 @@
 
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
 
-<span class="kn">from</span> <span class="nn">..constants</span> <span class="kn">import</span> <span class="n">OPMON_EXCLUDED_FIELDS</span>
 <span class="kn">from</span> <span class="nn">..views</span> <span class="kn">import</span> <span class="n">lookml_utils</span>
 <span class="kn">from</span> <span class="nn">.dashboard</span> <span class="kn">import</span> <span class="n">Dashboard</span>
 
@@ -106,60 +105,14 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="n">tables</span><span class="p">)</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_slug_to_title</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slug</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">slug</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">title</span><span class="p">()</span>
-
-    <span class="k">def</span> <span class="nf">_compute_dimension_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bq_client</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">all_dimensions</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">_generate_dimensions</span><span class="p">(</span><span class="n">bq_client</span><span class="p">,</span> <span class="n">table</span><span class="p">)</span>
-        <span class="n">copy_excluded</span> <span class="o">=</span> <span class="n">OPMON_EXCLUDED_FIELDS</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">copy_excluded</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">OPMON_DASH_EXCLUDED_FIELDS</span><span class="p">)</span>
-
-        <span class="n">relevant_dimensions</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">dimension</span>
-            <span class="k">for</span> <span class="n">dimension</span> <span class="ow">in</span> <span class="n">all_dimensions</span>
-            <span class="k">if</span> <span class="n">dimension</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">copy_excluded</span>
-        <span class="p">]</span>
-
-        <span class="k">for</span> <span class="n">dimension</span> <span class="ow">in</span> <span class="n">relevant_dimensions</span><span class="p">:</span>
-            <span class="n">dimension_name</span> <span class="o">=</span> <span class="n">dimension</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
-            <span class="n">query_job</span> <span class="o">=</span> <span class="n">bq_client</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">                    SELECT DISTINCT </span><span class="si">{</span><span class="n">dimension_name</span><span class="si">}</span><span class="s2">, COUNT(*)</span>
-<span class="s2">                    FROM </span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2"></span>
-<span class="s2">                    GROUP BY 1</span>
-<span class="s2">                    ORDER BY 2 DESC</span>
-<span class="s2">                &quot;&quot;&quot;</span>
-            <span class="p">)</span>
-
-            <span class="n">title</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_slug_to_title</span><span class="p">(</span><span class="n">dimension_name</span><span class="p">)</span>
-            <span class="n">dimension_options</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="n">query_job</span><span class="o">.</span><span class="n">result</span><span class="p">()</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()[</span><span class="n">dimension_name</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-            <span class="p">)</span>
-
-            <span class="n">dimension_kwarg</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span>
-                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">dimension_name</span><span class="p">,</span>
-            <span class="p">}</span>
-
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dimension_options</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">dimension_kwarg</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-                    <span class="p">{</span>
-                        <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="n">dimension_options</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                        <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="n">dimension_options</span><span class="p">[:</span><span class="mi">10</span><span class="p">],</span>
-                    <span class="p">}</span>
-                <span class="p">)</span>
-
-            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;dimensions&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dimension_kwarg</span><span class="p">)</span>
-
-    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span>
         <span class="n">klass</span><span class="p">,</span> <span class="n">namespace</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">defn</span><span class="p">:</span> <span class="nb">dict</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OperationalMonitoringDashboard</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Get a OperationalMonitoringDashboard from a dict representation.&quot;&quot;&quot;</span>
-        <span class="n">title</span> <span class="o">=</span> <span class="n">klass</span><span class="o">.</span><span class="n">_slug_to_title</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">slug_to_title</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">klass</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="s2">&quot;newspaper&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="n">defn</span><span class="p">[</span><span class="s2">&quot;tables&quot;</span><span class="p">])</span>
 
-    <span class="k">def</span> <span class="nf">to_lookml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bq_client</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">to_lookml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bq_client</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get this dashboard as LookML.&quot;&quot;&quot;</span>
         <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
@@ -169,34 +122,36 @@
             <span class="s2">&quot;dimensions&quot;</span><span class="p">:</span> <span class="p">[],</span>
         <span class="p">}</span>
 
+        <span class="n">table_data</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">view_data</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;compute_opmon_dimensions&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">table_data</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">view_data</span><span class="p">)</span>
+
         <span class="n">includes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">graph_index</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">table_defn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;dimensions&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_compute_dimension_data</span><span class="p">(</span><span class="n">bq_client</span><span class="p">,</span> <span class="n">table_defn</span><span class="p">[</span><span class="s2">&quot;table&quot;</span><span class="p">],</span> <span class="n">kwargs</span><span class="p">)</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;dimensions&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">table_data</span><span class="p">[</span><span class="n">table_defn</span><span class="p">[</span><span class="s2">&quot;table&quot;</span><span class="p">]]</span>
 
-            <span class="n">query_job</span> <span class="o">=</span> <span class="n">bq_client</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">                    SELECT DISTINCT probe</span>
-<span class="s2">                    FROM </span><span class="si">{</span><span class="n">table_defn</span><span class="p">[</span><span class="s2">&quot;table&quot;</span><span class="p">]</span><span class="si">}</span><span class="s2"></span>
-<span class="s2">                &quot;&quot;&quot;</span>
+            <span class="n">metrics</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">get_distinct_vals</span><span class="p">(</span>
+                <span class="n">bq_client</span><span class="p">,</span> <span class="n">table_defn</span><span class="p">[</span><span class="s2">&quot;table&quot;</span><span class="p">],</span> <span class="s2">&quot;probe&quot;</span>
             <span class="p">)</span>
-            <span class="n">metrics</span> <span class="o">=</span> <span class="n">query_job</span><span class="o">.</span><span class="n">result</span><span class="p">()</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()[</span><span class="s2">&quot;probe&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
             <span class="n">explore</span> <span class="o">=</span> <span class="n">table_defn</span><span class="p">[</span><span class="s2">&quot;explore&quot;</span><span class="p">]</span>
             <span class="n">includes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;/looker-hub/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">namespace</span><span class="si">}</span><span class="s2">/explores/</span><span class="si">{</span><span class="n">explore</span><span class="si">}</span><span class="s2">.explore.lkml&quot;</span>
             <span class="p">)</span>
 
-            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">metric</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">metrics</span><span class="p">):</span>
-                <span class="n">title</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_slug_to_title</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="n">metrics</span><span class="p">:</span>
+                <span class="n">title</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">slug_to_title</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span>
                 <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;elements&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                     <span class="p">{</span>
                         <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span>
                         <span class="s2">&quot;metric&quot;</span><span class="p">:</span> <span class="n">metric</span><span class="p">,</span>
                         <span class="s2">&quot;explore&quot;</span><span class="p">:</span> <span class="n">explore</span><span class="p">,</span>
-                        <span class="s2">&quot;row&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">i</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span>
-                        <span class="s2">&quot;col&quot;</span><span class="p">:</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">12</span><span class="p">,</span>
+                        <span class="s2">&quot;row&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">graph_index</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span><span class="p">,</span>
+                        <span class="s2">&quot;col&quot;</span><span class="p">:</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">graph_index</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">12</span><span class="p">,</span>
                     <span class="p">}</span>
                 <span class="p">)</span>
+                <span class="n">graph_index</span> <span class="o">+=</span> <span class="mi">1</span>
 
         <span class="n">model_lookml</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">render_template</span><span class="p">(</span>
             <span class="s2">&quot;model.lkml&quot;</span><span class="p">,</span> <span class="s2">&quot;dashboards&quot;</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="s2">&quot;includes&quot;</span><span class="p">:</span> <span class="n">includes</span><span class="p">}</span>
@@ -245,60 +200,14 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="n">tables</span><span class="p">)</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_slug_to_title</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slug</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">slug</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">title</span><span class="p">()</span>
-
-    <span class="k">def</span> <span class="nf">_compute_dimension_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bq_client</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">all_dimensions</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">_generate_dimensions</span><span class="p">(</span><span class="n">bq_client</span><span class="p">,</span> <span class="n">table</span><span class="p">)</span>
-        <span class="n">copy_excluded</span> <span class="o">=</span> <span class="n">OPMON_EXCLUDED_FIELDS</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">copy_excluded</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">OPMON_DASH_EXCLUDED_FIELDS</span><span class="p">)</span>
-
-        <span class="n">relevant_dimensions</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">dimension</span>
-            <span class="k">for</span> <span class="n">dimension</span> <span class="ow">in</span> <span class="n">all_dimensions</span>
-            <span class="k">if</span> <span class="n">dimension</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">copy_excluded</span>
-        <span class="p">]</span>
-
-        <span class="k">for</span> <span class="n">dimension</span> <span class="ow">in</span> <span class="n">relevant_dimensions</span><span class="p">:</span>
-            <span class="n">dimension_name</span> <span class="o">=</span> <span class="n">dimension</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
-            <span class="n">query_job</span> <span class="o">=</span> <span class="n">bq_client</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">                    SELECT DISTINCT </span><span class="si">{</span><span class="n">dimension_name</span><span class="si">}</span><span class="s2">, COUNT(*)</span>
-<span class="s2">                    FROM </span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2"></span>
-<span class="s2">                    GROUP BY 1</span>
-<span class="s2">                    ORDER BY 2 DESC</span>
-<span class="s2">                &quot;&quot;&quot;</span>
-            <span class="p">)</span>
-
-            <span class="n">title</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_slug_to_title</span><span class="p">(</span><span class="n">dimension_name</span><span class="p">)</span>
-            <span class="n">dimension_options</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="n">query_job</span><span class="o">.</span><span class="n">result</span><span class="p">()</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()[</span><span class="n">dimension_name</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-            <span class="p">)</span>
-
-            <span class="n">dimension_kwarg</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span>
-                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">dimension_name</span><span class="p">,</span>
-            <span class="p">}</span>
-
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dimension_options</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">dimension_kwarg</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-                    <span class="p">{</span>
-                        <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="n">dimension_options</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                        <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="n">dimension_options</span><span class="p">[:</span><span class="mi">10</span><span class="p">],</span>
-                    <span class="p">}</span>
-                <span class="p">)</span>
-
-            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;dimensions&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dimension_kwarg</span><span class="p">)</span>
-
-    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span>
         <span class="n">klass</span><span class="p">,</span> <span class="n">namespace</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">defn</span><span class="p">:</span> <span class="nb">dict</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OperationalMonitoringDashboard</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Get a OperationalMonitoringDashboard from a dict representation.&quot;&quot;&quot;</span>
-        <span class="n">title</span> <span class="o">=</span> <span class="n">klass</span><span class="o">.</span><span class="n">_slug_to_title</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">slug_to_title</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">klass</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="s2">&quot;newspaper&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="n">defn</span><span class="p">[</span><span class="s2">&quot;tables&quot;</span><span class="p">])</span>
 
-    <span class="k">def</span> <span class="nf">to_lookml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bq_client</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">to_lookml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bq_client</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get this dashboard as LookML.&quot;&quot;&quot;</span>
         <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
@@ -308,34 +217,36 @@
             <span class="s2">&quot;dimensions&quot;</span><span class="p">:</span> <span class="p">[],</span>
         <span class="p">}</span>
 
+        <span class="n">table_data</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">view_data</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;compute_opmon_dimensions&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">table_data</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">view_data</span><span class="p">)</span>
+
         <span class="n">includes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">graph_index</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">table_defn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;dimensions&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_compute_dimension_data</span><span class="p">(</span><span class="n">bq_client</span><span class="p">,</span> <span class="n">table_defn</span><span class="p">[</span><span class="s2">&quot;table&quot;</span><span class="p">],</span> <span class="n">kwargs</span><span class="p">)</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;dimensions&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">table_data</span><span class="p">[</span><span class="n">table_defn</span><span class="p">[</span><span class="s2">&quot;table&quot;</span><span class="p">]]</span>
 
-            <span class="n">query_job</span> <span class="o">=</span> <span class="n">bq_client</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">                    SELECT DISTINCT probe</span>
-<span class="s2">                    FROM </span><span class="si">{</span><span class="n">table_defn</span><span class="p">[</span><span class="s2">&quot;table&quot;</span><span class="p">]</span><span class="si">}</span><span class="s2"></span>
-<span class="s2">                &quot;&quot;&quot;</span>
+            <span class="n">metrics</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">get_distinct_vals</span><span class="p">(</span>
+                <span class="n">bq_client</span><span class="p">,</span> <span class="n">table_defn</span><span class="p">[</span><span class="s2">&quot;table&quot;</span><span class="p">],</span> <span class="s2">&quot;probe&quot;</span>
             <span class="p">)</span>
-            <span class="n">metrics</span> <span class="o">=</span> <span class="n">query_job</span><span class="o">.</span><span class="n">result</span><span class="p">()</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()[</span><span class="s2">&quot;probe&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
             <span class="n">explore</span> <span class="o">=</span> <span class="n">table_defn</span><span class="p">[</span><span class="s2">&quot;explore&quot;</span><span class="p">]</span>
             <span class="n">includes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;/looker-hub/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">namespace</span><span class="si">}</span><span class="s2">/explores/</span><span class="si">{</span><span class="n">explore</span><span class="si">}</span><span class="s2">.explore.lkml&quot;</span>
             <span class="p">)</span>
 
-            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">metric</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">metrics</span><span class="p">):</span>
-                <span class="n">title</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_slug_to_title</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="n">metrics</span><span class="p">:</span>
+                <span class="n">title</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">slug_to_title</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span>
                 <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;elements&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                     <span class="p">{</span>
                         <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span>
                         <span class="s2">&quot;metric&quot;</span><span class="p">:</span> <span class="n">metric</span><span class="p">,</span>
                         <span class="s2">&quot;explore&quot;</span><span class="p">:</span> <span class="n">explore</span><span class="p">,</span>
-                        <span class="s2">&quot;row&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">i</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span>
-                        <span class="s2">&quot;col&quot;</span><span class="p">:</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">12</span><span class="p">,</span>
+                        <span class="s2">&quot;row&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">graph_index</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span><span class="p">,</span>
+                        <span class="s2">&quot;col&quot;</span><span class="p">:</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">graph_index</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">12</span><span class="p">,</span>
                     <span class="p">}</span>
                 <span class="p">)</span>
+                <span class="n">graph_index</span> <span class="o">+=</span> <span class="mi">1</span>
 
         <span class="n">model_lookml</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">render_template</span><span class="p">(</span>
             <span class="s2">&quot;model.lkml&quot;</span><span class="p">,</span> <span class="s2">&quot;dashboards&quot;</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="s2">&quot;includes&quot;</span><span class="p">:</span> <span class="n">includes</span><span class="p">}</span>
@@ -425,7 +336,7 @@
         <span class="n">klass</span><span class="p">,</span> <span class="n">namespace</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">defn</span><span class="p">:</span> <span class="nb">dict</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OperationalMonitoringDashboard</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Get a OperationalMonitoringDashboard from a dict representation.&quot;&quot;&quot;</span>
-        <span class="n">title</span> <span class="o">=</span> <span class="n">klass</span><span class="o">.</span><span class="n">_slug_to_title</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">slug_to_title</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">klass</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="s2">&quot;newspaper&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="n">defn</span><span class="p">[</span><span class="s2">&quot;tables&quot;</span><span class="p">])</span>
 </pre></div>
 
@@ -441,12 +352,12 @@
 
         
             <span class="def">def</span>
-            <span class="name">to_lookml</span><span class="signature">(self, bq_client)</span>:
+            <span class="name">to_lookml</span><span class="signature">(self, bq_client, data)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_lookml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bq_client</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_lookml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bq_client</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get this dashboard as LookML.&quot;&quot;&quot;</span>
         <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
@@ -456,34 +367,36 @@
             <span class="s2">&quot;dimensions&quot;</span><span class="p">:</span> <span class="p">[],</span>
         <span class="p">}</span>
 
+        <span class="n">table_data</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">view_data</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;compute_opmon_dimensions&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">table_data</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">view_data</span><span class="p">)</span>
+
         <span class="n">includes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">graph_index</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">table_defn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;dimensions&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_compute_dimension_data</span><span class="p">(</span><span class="n">bq_client</span><span class="p">,</span> <span class="n">table_defn</span><span class="p">[</span><span class="s2">&quot;table&quot;</span><span class="p">],</span> <span class="n">kwargs</span><span class="p">)</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;dimensions&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">table_data</span><span class="p">[</span><span class="n">table_defn</span><span class="p">[</span><span class="s2">&quot;table&quot;</span><span class="p">]]</span>
 
-            <span class="n">query_job</span> <span class="o">=</span> <span class="n">bq_client</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">                    SELECT DISTINCT probe</span>
-<span class="s2">                    FROM </span><span class="si">{</span><span class="n">table_defn</span><span class="p">[</span><span class="s2">&quot;table&quot;</span><span class="p">]</span><span class="si">}</span><span class="s2"></span>
-<span class="s2">                &quot;&quot;&quot;</span>
+            <span class="n">metrics</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">get_distinct_vals</span><span class="p">(</span>
+                <span class="n">bq_client</span><span class="p">,</span> <span class="n">table_defn</span><span class="p">[</span><span class="s2">&quot;table&quot;</span><span class="p">],</span> <span class="s2">&quot;probe&quot;</span>
             <span class="p">)</span>
-            <span class="n">metrics</span> <span class="o">=</span> <span class="n">query_job</span><span class="o">.</span><span class="n">result</span><span class="p">()</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()[</span><span class="s2">&quot;probe&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
             <span class="n">explore</span> <span class="o">=</span> <span class="n">table_defn</span><span class="p">[</span><span class="s2">&quot;explore&quot;</span><span class="p">]</span>
             <span class="n">includes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;/looker-hub/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">namespace</span><span class="si">}</span><span class="s2">/explores/</span><span class="si">{</span><span class="n">explore</span><span class="si">}</span><span class="s2">.explore.lkml&quot;</span>
             <span class="p">)</span>
 
-            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">metric</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">metrics</span><span class="p">):</span>
-                <span class="n">title</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_slug_to_title</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="n">metrics</span><span class="p">:</span>
+                <span class="n">title</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">slug_to_title</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span>
                 <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;elements&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                     <span class="p">{</span>
                         <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span>
                         <span class="s2">&quot;metric&quot;</span><span class="p">:</span> <span class="n">metric</span><span class="p">,</span>
                         <span class="s2">&quot;explore&quot;</span><span class="p">:</span> <span class="n">explore</span><span class="p">,</span>
-                        <span class="s2">&quot;row&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">i</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span>
-                        <span class="s2">&quot;col&quot;</span><span class="p">:</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">12</span><span class="p">,</span>
+                        <span class="s2">&quot;row&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">graph_index</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span><span class="p">,</span>
+                        <span class="s2">&quot;col&quot;</span><span class="p">:</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">graph_index</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">12</span><span class="p">,</span>
                     <span class="p">}</span>
                 <span class="p">)</span>
+                <span class="n">graph_index</span> <span class="o">+=</span> <span class="mi">1</span>
 
         <span class="n">model_lookml</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">render_template</span><span class="p">(</span>
             <span class="s2">&quot;model.lkml&quot;</span><span class="p">,</span> <span class="s2">&quot;dashboards&quot;</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="s2">&quot;includes&quot;</span><span class="p">:</span> <span class="n">includes</span><span class="p">}</span>

@@ -36,6 +36,12 @@
             <li>
                     <a class="function" href="#render_template">render_template</a>
             </li>
+            <li>
+                    <a class="function" href="#get_distinct_vals">get_distinct_vals</a>
+            </li>
+            <li>
+                    <a class="function" href="#slug_to_title">slug_to_title</a>
+            </li>
     </ul>
 
 
@@ -244,6 +250,23 @@
     <span class="n">template</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
     <span class="n">rendered</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">rendered</span>
+
+
+<span class="k">def</span> <span class="nf">get_distinct_vals</span><span class="p">(</span><span class="n">bq_client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span> <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Given a table and column name, return all distinct values for that column.&quot;&quot;&quot;</span>
+    <span class="n">query_job</span> <span class="o">=</span> <span class="n">bq_client</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">            SELECT DISTINCT </span><span class="si">{</span><span class="n">column</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">            FROM </span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">        &quot;&quot;&quot;</span>
+    <span class="p">)</span>
+    <span class="n">distinct_values</span> <span class="o">=</span> <span class="n">query_job</span><span class="o">.</span><span class="n">result</span><span class="p">()</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">distinct_values</span>
+
+
+<span class="k">def</span> <span class="nf">slug_to_title</span><span class="p">(</span><span class="n">slug</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert a slug to title case.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">slug</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">title</span><span class="p">()</span>
 </pre></div>
 
         </details>
@@ -292,6 +315,61 @@
         </details>
 
             <div class="docstring"><p>Render a given template using Jinja.</p>
+</div>
+
+
+                </section>
+                <section id="get_distinct_vals">
+                            <div class="attr function"><a class="headerlink" href="#get_distinct_vals">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">get_distinct_vals</span><span class="signature">(
+    bq_client: google.cloud.bigquery.client.Client,
+    table: str,
+    column: str
+)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">get_distinct_vals</span><span class="p">(</span><span class="n">bq_client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span> <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Given a table and column name, return all distinct values for that column.&quot;&quot;&quot;</span>
+    <span class="n">query_job</span> <span class="o">=</span> <span class="n">bq_client</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">            SELECT DISTINCT </span><span class="si">{</span><span class="n">column</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">            FROM </span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">        &quot;&quot;&quot;</span>
+    <span class="p">)</span>
+    <span class="n">distinct_values</span> <span class="o">=</span> <span class="n">query_job</span><span class="o">.</span><span class="n">result</span><span class="p">()</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">distinct_values</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Given a table and column name, return all distinct values for that column.</p>
+</div>
+
+
+                </section>
+                <section id="slug_to_title">
+                            <div class="attr function"><a class="headerlink" href="#slug_to_title">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">slug_to_title</span><span class="signature">(slug)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">slug_to_title</span><span class="p">(</span><span class="n">slug</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert a slug to title case.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">slug</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">title</span><span class="p">()</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Convert a slug to title case.</p>
 </div>
 
 
