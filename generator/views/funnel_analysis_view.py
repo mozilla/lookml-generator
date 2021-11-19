@@ -135,6 +135,7 @@ class FunnelAnalysisView(View):
                 "name": f"fraction_completed_step_{n}",
                 "description": f"Of the user-days that completed Step 1, the fraction that completed step {n}.",
                 "type": "number",
+                "value_format": "0.00%",
                 "sql": f"SAFE_DIVIDE(${{count_completed_step_{n}}}, ${{count_completed_step_1}})",
             }
             for n in range(1, self.n_events() + 1)
