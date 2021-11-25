@@ -258,6 +258,7 @@
         <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">            SELECT DISTINCT </span><span class="si">{</span><span class="n">column</span><span class="si">}</span><span class="s2"></span>
 <span class="s2">            FROM </span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">            ORDER BY </span><span class="si">{</span><span class="n">column</span><span class="si">}</span><span class="s2"></span>
 <span class="s2">        &quot;&quot;&quot;</span>
     <span class="p">)</span>
     <span class="n">distinct_values</span> <span class="o">=</span> <span class="n">query_job</span><span class="o">.</span><span class="n">result</span><span class="p">()</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
@@ -339,6 +340,7 @@
         <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">            SELECT DISTINCT </span><span class="si">{</span><span class="n">column</span><span class="si">}</span><span class="s2"></span>
 <span class="s2">            FROM </span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">            ORDER BY </span><span class="si">{</span><span class="n">column</span><span class="si">}</span><span class="s2"></span>
 <span class="s2">        &quot;&quot;&quot;</span>
     <span class="p">)</span>
     <span class="n">distinct_values</span> <span class="o">=</span> <span class="n">query_job</span><span class="o">.</span><span class="n">result</span><span class="p">()</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
