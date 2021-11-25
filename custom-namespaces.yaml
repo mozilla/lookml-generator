@@ -523,3 +523,18 @@ monitoring:
       type: ping_explore
       views:
         base_view: telemetry_missing_columns
+accessibility:
+  glean_app: false
+  owners:
+    - mreschenberg@mozilla.com
+  pretty_name: Accessibility
+  views:
+    accessibility_clients:
+      type: ping_view
+      tables:
+        - table: mozdata.telemetry.accessibility_clients
+  explores:
+    accessibility_clients:
+      type: ping_explore
+      views:
+        base_view: accessibility_clients
