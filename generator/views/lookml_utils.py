@@ -193,6 +193,7 @@ def get_distinct_vals(bq_client: bigquery.Client, table: str, column: str):
         f"""
             SELECT DISTINCT {column}
             FROM {table}
+            ORDER BY {column}
         """
     )
     distinct_values = query_job.result().to_dataframe()[column].tolist()
