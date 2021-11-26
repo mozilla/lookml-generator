@@ -7,6 +7,7 @@ from typing import Any, Dict, Iterator, List, Optional
 
 from google.cloud import bigquery
 
+from .. import operational_monitoring_utils
 from ..views import View, lookml_utils
 from . import Explore
 
@@ -64,6 +65,8 @@ class OperationalMonitoringExplore(Explore):
         )
         dimension_data = namespace_data[table_name]
 
+        xaxis = operational_monitoring_utils.get_xaxis_val(bq_client, table_name)
+
         filters = [
             {f"{base_view_name}.branch": self.branches},
             {f"{base_view_name}.percentile_conf": "50"},
@@ -82,7 +85,7 @@ class OperationalMonitoringExplore(Explore):
                 {
                     "name": f"rollup_{probe}",
                     "query": {
-                        "dimensions": ["build_id", "branch"],
+                        "dimensions": [xaxis, "branch"],
                         "measures": ["low", "high", "percentile"],
                         "filters": filters_copy,
                     },

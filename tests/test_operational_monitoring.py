@@ -153,8 +153,8 @@ class MockClient:
 def operational_monitoring_histogram_view():
     return OperationalMonitoringHistogramView(
         "operational_monitoring",
-        "fission",
-        [{"table": TABLE_HISTOGRAM}],
+        "fission_histogram",
+        [{"table": TABLE_HISTOGRAM, "xaxis": "build_id"}],
     )
 
 
@@ -162,8 +162,8 @@ def operational_monitoring_histogram_view():
 def operational_monitoring_scalar_view():
     return OperationalMonitoringScalarView(
         "operational_monitoring",
-        "fission",
-        [{"table": TABLE_SCALAR}],
+        "fission_scalar",
+        [{"table": TABLE_SCALAR, "xaxis": "submission_date"}],
     )
 
 
@@ -194,10 +194,10 @@ def operational_monitoring_dashboard():
 def test_view_from_dict(operational_monitoring_histogram_view):
     actual = OperationalMonitoringHistogramView.from_dict(
         "operational_monitoring",
-        "fission",
+        "fission_histogram",
         {
             "type": "operational_monitoring_histogram_view",
-            "tables": [{"table": TABLE_HISTOGRAM}],
+            "tables": [{"table": TABLE_HISTOGRAM, "xaxis": "build_id"}],
         },
     )
 
@@ -279,9 +279,8 @@ def test_scalar_view_lookml(operational_monitoring_scalar_view):
                 ],
                 "dimensions": [
                     {
-                        "name": "build_id",
-                        "sql": "PARSE_DATE('%Y%m%d', "
-                        "CAST(${TABLE}.build_id AS STRING))",
+                        "name": "submission_date",
+                        "sql": "${TABLE}.submission_date",
                         "type": "date",
                     },
                     {"name": "branch", "sql": "${TABLE}.branch", "type": "string"},
@@ -462,6 +461,6 @@ def test_dashboard_lookml(operational_monitoring_dashboard):
 
     """
     )
-    actual, _ = operational_monitoring_dashboard.to_lookml(mock_bq_client, DATA)
+    actual = operational_monitoring_dashboard.to_lookml(mock_bq_client, DATA)
 
     print_and_test(expected=expected, actual=dedent(actual))
