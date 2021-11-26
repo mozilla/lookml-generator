@@ -60,7 +60,6 @@ def _generate_explores(
 def _generate_dashboards(
     client,
     dash_dir: Path,
-    model_dir: Path,
     namespace: str,
     dashboards: dict,
     namespace_data: dict,
@@ -71,14 +70,9 @@ def _generate_dashboards(
             namespace, dashboard_name, dashboard_info
         )
 
-        # A dashboard needs an associated model to render
-        dashboard_lookml, model_lookml = dashboard.to_lookml(client, namespace_data)
-
+        dashboard_lookml = dashboard.to_lookml(client, namespace_data)
         dash_path = dash_dir / f"{dashboard_name}.dashboard.lookml"
-        model_path = model_dir / f"{dashboard_name}_data.model.lkml"
-
         dash_path.write_text(dashboard_lookml)
-        model_path.write_text(model_lookml)
         yield dash_path
 
 
@@ -153,12 +147,11 @@ def _lookml(namespaces, glean_apps, target_dir):
             logging.info(f"    ...Generating {explore_path}")
 
         logging.info("  Generating dashboards")
-        namespace_dir = target / namespace
-        dashboard_dir = namespace_dir / "dashboards"
+        dashboard_dir = target / namespace / "dashboards"
         dashboard_dir.mkdir(parents=True, exist_ok=True)
         dashboards = lookml_objects.get("dashboards", {})
         for dashboard_path in _generate_dashboards(
-            client, dashboard_dir, namespace_dir, namespace, dashboards, namespace_data
+            client, dashboard_dir, namespace, dashboards, namespace_data
         ):
             logging.info(f"    ...Generating {dashboard_path}")
 

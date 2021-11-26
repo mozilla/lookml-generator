@@ -10,7 +10,7 @@
     explore: {{element.explore}}
     type: "looker_line"
     fields: [
-      {{element.explore}}.build_id,
+      {{element.explore}}.{{element.xaxis}},
       {{element.explore}}.branch,
       {{element.explore}}.high,
       {{element.explore}}.low,

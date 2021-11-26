@@ -26,7 +26,6 @@ def compute_opmon_dimensions(
         for dimension in all_dimensions
         if dimension["name"] not in copy_excluded
     ]
-
     for dimension in relevant_dimensions:
         dimension_name = dimension["name"]
         query_job = bq_client.query(
@@ -57,3 +56,17 @@ def compute_opmon_dimensions(
         dimensions.append(dimension_kwarg)
 
     return dimensions
+
+
+def get_xaxis_val(bq_client: bigquery.Client, table: str) -> str:
+    """
+    Return whether the x-axis should be build_id or submission_date.
+
+    This is based on which one is found in the table provided.
+    """
+    all_dimensions = lookml_utils._generate_dimensions(bq_client, table)
+    return (
+        "build_id"
+        if "build_id" in {dimension["name"] for dimension in all_dimensions}
+        else "submission_date"
+    )

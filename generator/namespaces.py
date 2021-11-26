@@ -78,7 +78,7 @@ def _get_db_views(uri):
 
 
 def _append_view_and_explore_for_data_type(
-    om_content, project_name, table_prefix, data_type, branches
+    om_content, project_name, table_prefix, data_type, branches, xaxis
 ):
     project_data_type_id = f"{project_name}_{data_type}"
 
@@ -86,7 +86,8 @@ def _append_view_and_explore_for_data_type(
         "type": f"operational_monitoring_{data_type}_view",
         "tables": [
             {
-                "table": f"{PROD_PROJECT}.operational_monitoring.{table_prefix}_{data_type}"
+                "table": f"{PROD_PROJECT}.operational_monitoring.{table_prefix}_{data_type}",
+                "xaxis": xaxis,
             }
         ],
     }
@@ -112,12 +113,17 @@ def _get_opmon_views_explores_dashboards():
             PROD_PROJECT, bucket, blob.name
         )
         table_prefix = _normalize_slug(om_project["slug"])
-        project_name = om_project["name"].lower()
+        project_name = "_".join(om_project["name"].lower().split(" "))
         branches = om_project.get("branches", ["enabled", "disabled"])
 
         for data_type in DATA_TYPES:
             _append_view_and_explore_for_data_type(
-                om_content, project_name, table_prefix, data_type, branches
+                om_content,
+                project_name,
+                table_prefix,
+                data_type,
+                branches,
+                om_project["xaxis"],
             )
 
         om_content["dashboards"][project_name] = {
@@ -130,7 +136,7 @@ def _get_opmon_views_explores_dashboards():
                 for data_type in DATA_TYPES
             ],
         }
-        return om_content
+    return om_content
 
 
 def _get_glean_apps(

@@ -50,7 +50,7 @@ class OperationalMonitoringHistogramView(OperationalMonitoringView):
         return {
             "views": [
                 {
-                    "name": "fission_histogram",
+                    "name": self.name,
                     "sql_table_name": reference_table,
                     "dimensions": self.dimensions,
                     "parameters": self.parameters,

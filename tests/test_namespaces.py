@@ -107,7 +107,7 @@ class MockBlob:
         self.updated = "2021-05-01"
 
     def download_as_string(self):
-        return '{"slug": "test", "name": "op_mon"}'
+        return '{"slug": "test", "name": "op_mon", "xaxis": "build_id"}'
 
 
 class MockBucket:
@@ -419,7 +419,8 @@ def test_namespaces_full(
                         "op_mon_histogram": {
                             "tables": [
                                 {
-                                    "table": "moz-fx-data-shared-prod.operational_monitoring.test_histogram"
+                                    "table": "moz-fx-data-shared-prod.operational_monitoring.test_histogram",
+                                    "xaxis": "build_id",
                                 }
                             ],
                             "type": "operational_monitoring_histogram_view",
@@ -427,7 +428,8 @@ def test_namespaces_full(
                         "op_mon_scalar": {
                             "tables": [
                                 {
-                                    "table": "moz-fx-data-shared-prod.operational_monitoring.test_scalar"
+                                    "table": "moz-fx-data-shared-prod.operational_monitoring.test_scalar",
+                                    "xaxis": "build_id",
                                 }
                             ],
                             "type": "operational_monitoring_scalar_view",

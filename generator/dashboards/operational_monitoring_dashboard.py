@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from typing import Dict, List
 
+from .. import operational_monitoring_utils
 from ..views import lookml_utils
 from .dashboard import Dashboard
 
@@ -55,12 +56,13 @@ class OperationalMonitoringDashboard(Dashboard):
         includes = []
         graph_index = 0
         for table_defn in self.tables:
+            table_name = table_defn["table"]
             if len(kwargs["dimensions"]) == 0:
-                kwargs["dimensions"] = table_data[table_defn["table"]]
+                kwargs["dimensions"] = table_data[table_name]
 
-            metrics = lookml_utils.get_distinct_vals(
-                bq_client, table_defn["table"], "probe"
-            )
+            xaxis = operational_monitoring_utils.get_xaxis_val(bq_client, table_name)
+
+            metrics = lookml_utils.get_distinct_vals(bq_client, table_name, "probe")
             explore = table_defn["explore"]
             includes.append(
                 f"/looker-hub/{self.namespace}/explores/{explore}.explore.lkml"
@@ -73,16 +75,14 @@ class OperationalMonitoringDashboard(Dashboard):
                         "title": title,
                         "metric": metric,
                         "explore": explore,
+                        "xaxis": xaxis,
                         "row": int(graph_index / 2) * 10,
                         "col": 0 if graph_index % 2 == 0 else 12,
                     }
                 )
                 graph_index += 1
 
-        model_lookml = lookml_utils.render_template(
-            "model.lkml", "dashboards", **{"includes": includes}
-        )
         dash_lookml = lookml_utils.render_template(
             "dashboard.lkml", "dashboards", **kwargs
         )
-        return dash_lookml, model_lookml
+        return dash_lookml

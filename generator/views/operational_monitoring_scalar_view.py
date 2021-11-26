@@ -50,7 +50,7 @@ class OperationalMonitoringScalarView(OperationalMonitoringView):
         return {
             "views": [
                 {
-                    "name": "fission_scalar",
+                    "name": self.name,
                     "derived_table": {
                         "sql": dedent(
                             f"""
