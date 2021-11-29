@@ -77,6 +77,7 @@
 
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
 
+<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">operational_monitoring_utils</span>
 <span class="kn">from</span> <span class="nn">..views</span> <span class="kn">import</span> <span class="n">lookml_utils</span>
 <span class="kn">from</span> <span class="nn">.dashboard</span> <span class="kn">import</span> <span class="n">Dashboard</span>
 
@@ -129,12 +130,13 @@
         <span class="n">includes</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">graph_index</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">table_defn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="p">:</span>
+            <span class="n">table_name</span> <span class="o">=</span> <span class="n">table_defn</span><span class="p">[</span><span class="s2">&quot;table&quot;</span><span class="p">]</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;dimensions&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;dimensions&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">table_data</span><span class="p">[</span><span class="n">table_defn</span><span class="p">[</span><span class="s2">&quot;table&quot;</span><span class="p">]]</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;dimensions&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">table_data</span><span class="p">[</span><span class="n">table_name</span><span class="p">]</span>
 
-            <span class="n">metrics</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">get_distinct_vals</span><span class="p">(</span>
-                <span class="n">bq_client</span><span class="p">,</span> <span class="n">table_defn</span><span class="p">[</span><span class="s2">&quot;table&quot;</span><span class="p">],</span> <span class="s2">&quot;probe&quot;</span>
-            <span class="p">)</span>
+            <span class="n">xaxis</span> <span class="o">=</span> <span class="n">operational_monitoring_utils</span><span class="o">.</span><span class="n">get_xaxis_val</span><span class="p">(</span><span class="n">bq_client</span><span class="p">,</span> <span class="n">table_name</span><span class="p">)</span>
+
+            <span class="n">metrics</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">get_distinct_vals</span><span class="p">(</span><span class="n">bq_client</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="s2">&quot;probe&quot;</span><span class="p">)</span>
             <span class="n">explore</span> <span class="o">=</span> <span class="n">table_defn</span><span class="p">[</span><span class="s2">&quot;explore&quot;</span><span class="p">]</span>
             <span class="n">includes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;/looker-hub/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">namespace</span><span class="si">}</span><span class="s2">/explores/</span><span class="si">{</span><span class="n">explore</span><span class="si">}</span><span class="s2">.explore.lkml&quot;</span>
@@ -147,19 +149,17 @@
                         <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span>
                         <span class="s2">&quot;metric&quot;</span><span class="p">:</span> <span class="n">metric</span><span class="p">,</span>
                         <span class="s2">&quot;explore&quot;</span><span class="p">:</span> <span class="n">explore</span><span class="p">,</span>
+                        <span class="s2">&quot;xaxis&quot;</span><span class="p">:</span> <span class="n">xaxis</span><span class="p">,</span>
                         <span class="s2">&quot;row&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">graph_index</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span><span class="p">,</span>
                         <span class="s2">&quot;col&quot;</span><span class="p">:</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">graph_index</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">12</span><span class="p">,</span>
                     <span class="p">}</span>
                 <span class="p">)</span>
                 <span class="n">graph_index</span> <span class="o">+=</span> <span class="mi">1</span>
 
-        <span class="n">model_lookml</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">render_template</span><span class="p">(</span>
-            <span class="s2">&quot;model.lkml&quot;</span><span class="p">,</span> <span class="s2">&quot;dashboards&quot;</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="s2">&quot;includes&quot;</span><span class="p">:</span> <span class="n">includes</span><span class="p">}</span>
-        <span class="p">)</span>
         <span class="n">dash_lookml</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">render_template</span><span class="p">(</span>
             <span class="s2">&quot;dashboard.lkml&quot;</span><span class="p">,</span> <span class="s2">&quot;dashboards&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="n">dash_lookml</span><span class="p">,</span> <span class="n">model_lookml</span>
+        <span class="k">return</span> <span class="n">dash_lookml</span>
 </pre></div>
 
         </details>
@@ -224,12 +224,13 @@
         <span class="n">includes</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">graph_index</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">table_defn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="p">:</span>
+            <span class="n">table_name</span> <span class="o">=</span> <span class="n">table_defn</span><span class="p">[</span><span class="s2">&quot;table&quot;</span><span class="p">]</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;dimensions&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;dimensions&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">table_data</span><span class="p">[</span><span class="n">table_defn</span><span class="p">[</span><span class="s2">&quot;table&quot;</span><span class="p">]]</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;dimensions&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">table_data</span><span class="p">[</span><span class="n">table_name</span><span class="p">]</span>
 
-            <span class="n">metrics</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">get_distinct_vals</span><span class="p">(</span>
-                <span class="n">bq_client</span><span class="p">,</span> <span class="n">table_defn</span><span class="p">[</span><span class="s2">&quot;table&quot;</span><span class="p">],</span> <span class="s2">&quot;probe&quot;</span>
-            <span class="p">)</span>
+            <span class="n">xaxis</span> <span class="o">=</span> <span class="n">operational_monitoring_utils</span><span class="o">.</span><span class="n">get_xaxis_val</span><span class="p">(</span><span class="n">bq_client</span><span class="p">,</span> <span class="n">table_name</span><span class="p">)</span>
+
+            <span class="n">metrics</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">get_distinct_vals</span><span class="p">(</span><span class="n">bq_client</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="s2">&quot;probe&quot;</span><span class="p">)</span>
             <span class="n">explore</span> <span class="o">=</span> <span class="n">table_defn</span><span class="p">[</span><span class="s2">&quot;explore&quot;</span><span class="p">]</span>
             <span class="n">includes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;/looker-hub/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">namespace</span><span class="si">}</span><span class="s2">/explores/</span><span class="si">{</span><span class="n">explore</span><span class="si">}</span><span class="s2">.explore.lkml&quot;</span>
@@ -242,19 +243,17 @@
                         <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span>
                         <span class="s2">&quot;metric&quot;</span><span class="p">:</span> <span class="n">metric</span><span class="p">,</span>
                         <span class="s2">&quot;explore&quot;</span><span class="p">:</span> <span class="n">explore</span><span class="p">,</span>
+                        <span class="s2">&quot;xaxis&quot;</span><span class="p">:</span> <span class="n">xaxis</span><span class="p">,</span>
                         <span class="s2">&quot;row&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">graph_index</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span><span class="p">,</span>
                         <span class="s2">&quot;col&quot;</span><span class="p">:</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">graph_index</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">12</span><span class="p">,</span>
                     <span class="p">}</span>
                 <span class="p">)</span>
                 <span class="n">graph_index</span> <span class="o">+=</span> <span class="mi">1</span>
 
-        <span class="n">model_lookml</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">render_template</span><span class="p">(</span>
-            <span class="s2">&quot;model.lkml&quot;</span><span class="p">,</span> <span class="s2">&quot;dashboards&quot;</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="s2">&quot;includes&quot;</span><span class="p">:</span> <span class="n">includes</span><span class="p">}</span>
-        <span class="p">)</span>
         <span class="n">dash_lookml</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">render_template</span><span class="p">(</span>
             <span class="s2">&quot;dashboard.lkml&quot;</span><span class="p">,</span> <span class="s2">&quot;dashboards&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="n">dash_lookml</span><span class="p">,</span> <span class="n">model_lookml</span>
+        <span class="k">return</span> <span class="n">dash_lookml</span>
 </pre></div>
 
         </details>
@@ -374,12 +373,13 @@
         <span class="n">includes</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">graph_index</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">table_defn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="p">:</span>
+            <span class="n">table_name</span> <span class="o">=</span> <span class="n">table_defn</span><span class="p">[</span><span class="s2">&quot;table&quot;</span><span class="p">]</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;dimensions&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;dimensions&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">table_data</span><span class="p">[</span><span class="n">table_defn</span><span class="p">[</span><span class="s2">&quot;table&quot;</span><span class="p">]]</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;dimensions&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">table_data</span><span class="p">[</span><span class="n">table_name</span><span class="p">]</span>
 
-            <span class="n">metrics</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">get_distinct_vals</span><span class="p">(</span>
-                <span class="n">bq_client</span><span class="p">,</span> <span class="n">table_defn</span><span class="p">[</span><span class="s2">&quot;table&quot;</span><span class="p">],</span> <span class="s2">&quot;probe&quot;</span>
-            <span class="p">)</span>
+            <span class="n">xaxis</span> <span class="o">=</span> <span class="n">operational_monitoring_utils</span><span class="o">.</span><span class="n">get_xaxis_val</span><span class="p">(</span><span class="n">bq_client</span><span class="p">,</span> <span class="n">table_name</span><span class="p">)</span>
+
+            <span class="n">metrics</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">get_distinct_vals</span><span class="p">(</span><span class="n">bq_client</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="s2">&quot;probe&quot;</span><span class="p">)</span>
             <span class="n">explore</span> <span class="o">=</span> <span class="n">table_defn</span><span class="p">[</span><span class="s2">&quot;explore&quot;</span><span class="p">]</span>
             <span class="n">includes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;/looker-hub/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">namespace</span><span class="si">}</span><span class="s2">/explores/</span><span class="si">{</span><span class="n">explore</span><span class="si">}</span><span class="s2">.explore.lkml&quot;</span>
@@ -392,19 +392,17 @@
                         <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span>
                         <span class="s2">&quot;metric&quot;</span><span class="p">:</span> <span class="n">metric</span><span class="p">,</span>
                         <span class="s2">&quot;explore&quot;</span><span class="p">:</span> <span class="n">explore</span><span class="p">,</span>
+                        <span class="s2">&quot;xaxis&quot;</span><span class="p">:</span> <span class="n">xaxis</span><span class="p">,</span>
                         <span class="s2">&quot;row&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">graph_index</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span><span class="p">,</span>
                         <span class="s2">&quot;col&quot;</span><span class="p">:</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">graph_index</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">12</span><span class="p">,</span>
                     <span class="p">}</span>
                 <span class="p">)</span>
                 <span class="n">graph_index</span> <span class="o">+=</span> <span class="mi">1</span>
 
-        <span class="n">model_lookml</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">render_template</span><span class="p">(</span>
-            <span class="s2">&quot;model.lkml&quot;</span><span class="p">,</span> <span class="s2">&quot;dashboards&quot;</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="s2">&quot;includes&quot;</span><span class="p">:</span> <span class="n">includes</span><span class="p">}</span>
-        <span class="p">)</span>
         <span class="n">dash_lookml</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">render_template</span><span class="p">(</span>
             <span class="s2">&quot;dashboard.lkml&quot;</span><span class="p">,</span> <span class="s2">&quot;dashboards&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="n">dash_lookml</span><span class="p">,</span> <span class="n">model_lookml</span>
+        <span class="k">return</span> <span class="n">dash_lookml</span>
 </pre></div>
 
         </details>

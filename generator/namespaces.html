@@ -131,7 +131,7 @@
 
 
 <span class="k">def</span> <span class="nf">_append_view_and_explore_for_data_type</span><span class="p">(</span>
-    <span class="n">om_content</span><span class="p">,</span> <span class="n">project_name</span><span class="p">,</span> <span class="n">table_prefix</span><span class="p">,</span> <span class="n">data_type</span><span class="p">,</span> <span class="n">branches</span>
+    <span class="n">om_content</span><span class="p">,</span> <span class="n">project_name</span><span class="p">,</span> <span class="n">table_prefix</span><span class="p">,</span> <span class="n">data_type</span><span class="p">,</span> <span class="n">branches</span><span class="p">,</span> <span class="n">xaxis</span>
 <span class="p">):</span>
     <span class="n">project_data_type_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">project_name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">data_type</span><span class="si">}</span><span class="s2">&quot;</span>
 
@@ -139,7 +139,8 @@
         <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;operational_monitoring_</span><span class="si">{</span><span class="n">data_type</span><span class="si">}</span><span class="s2">_view&quot;</span><span class="p">,</span>
         <span class="s2">&quot;tables&quot;</span><span class="p">:</span> <span class="p">[</span>
             <span class="p">{</span>
-                <span class="s2">&quot;table&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PROD_PROJECT</span><span class="si">}</span><span class="s2">.operational_monitoring.</span><span class="si">{</span><span class="n">table_prefix</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">data_type</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;table&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PROD_PROJECT</span><span class="si">}</span><span class="s2">.operational_monitoring.</span><span class="si">{</span><span class="n">table_prefix</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">data_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;xaxis&quot;</span><span class="p">:</span> <span class="n">xaxis</span><span class="p">,</span>
             <span class="p">}</span>
         <span class="p">],</span>
     <span class="p">}</span>
@@ -165,12 +166,17 @@
             <span class="n">PROD_PROJECT</span><span class="p">,</span> <span class="n">bucket</span><span class="p">,</span> <span class="n">blob</span><span class="o">.</span><span class="n">name</span>
         <span class="p">)</span>
         <span class="n">table_prefix</span> <span class="o">=</span> <span class="n">_normalize_slug</span><span class="p">(</span><span class="n">om_project</span><span class="p">[</span><span class="s2">&quot;slug&quot;</span><span class="p">])</span>
-        <span class="n">project_name</span> <span class="o">=</span> <span class="n">om_project</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">project_name</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">om_project</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">))</span>
         <span class="n">branches</span> <span class="o">=</span> <span class="n">om_project</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;branches&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;enabled&quot;</span><span class="p">,</span> <span class="s2">&quot;disabled&quot;</span><span class="p">])</span>
 
         <span class="k">for</span> <span class="n">data_type</span> <span class="ow">in</span> <span class="n">DATA_TYPES</span><span class="p">:</span>
             <span class="n">_append_view_and_explore_for_data_type</span><span class="p">(</span>
-                <span class="n">om_content</span><span class="p">,</span> <span class="n">project_name</span><span class="p">,</span> <span class="n">table_prefix</span><span class="p">,</span> <span class="n">data_type</span><span class="p">,</span> <span class="n">branches</span>
+                <span class="n">om_content</span><span class="p">,</span>
+                <span class="n">project_name</span><span class="p">,</span>
+                <span class="n">table_prefix</span><span class="p">,</span>
+                <span class="n">data_type</span><span class="p">,</span>
+                <span class="n">branches</span><span class="p">,</span>
+                <span class="n">om_project</span><span class="p">[</span><span class="s2">&quot;xaxis&quot;</span><span class="p">],</span>
             <span class="p">)</span>
 
         <span class="n">om_content</span><span class="p">[</span><span class="s2">&quot;dashboards&quot;</span><span class="p">][</span><span class="n">project_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
@@ -183,7 +189,7 @@
                 <span class="k">for</span> <span class="n">data_type</span> <span class="ow">in</span> <span class="n">DATA_TYPES</span>
             <span class="p">],</span>
         <span class="p">}</span>
-        <span class="k">return</span> <span class="n">om_content</span>
+    <span class="k">return</span> <span class="n">om_content</span>
 
 
 <span class="k">def</span> <span class="nf">_get_glean_apps</span><span class="p">(</span>
