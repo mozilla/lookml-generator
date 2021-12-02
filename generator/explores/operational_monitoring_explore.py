@@ -89,7 +89,10 @@ class OperationalMonitoringExplore(Explore):
                         "measures": ["low", "high", "percentile"],
                         "filters": filters_copy,
                     },
-                    "materialization": {"sql_trigger_value": "SELECT CURRENT_DATE()"},
+                    "materialization": {
+                        # Reload the table at 9am when ETL should have been completed
+                        "sql_trigger_value": "SELECT CAST(DATE_ADD(hrs, -9, CURRENT_TIMESTAMP) AS DATE)"
+                    },
                 }
             )
 
