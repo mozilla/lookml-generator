@@ -318,7 +318,9 @@ def test_explore_lookml(operational_monitoring_explore):
                         ],
                         "measures": ["low", "high", "percentile"],
                     },
-                    "materialization": {"sql_trigger_value": "SELECT CURRENT_DATE()"},
+                    "materialization": {
+                        "sql_trigger_value": "SELECT CAST(DATE_ADD(hrs, -9, CURRENT_TIMESTAMP) AS DATE)"
+                    },
                 },
                 {
                     "name": "rollup_GC_MS_CONTENT",
@@ -333,7 +335,9 @@ def test_explore_lookml(operational_monitoring_explore):
                         ],
                         "measures": ["low", "high", "percentile"],
                     },
-                    "materialization": {"sql_trigger_value": "SELECT CURRENT_DATE()"},
+                    "materialization": {
+                        "sql_trigger_value": "SELECT CAST(DATE_ADD(hrs, -9, CURRENT_TIMESTAMP) AS DATE)"
+                    },
                 },
             ],
             "always_filter": {"filters": [{"branch": "enabled, disabled"}]},
