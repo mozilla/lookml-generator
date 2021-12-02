@@ -431,37 +431,37 @@ def test_dashboard_lookml(operational_monitoring_dashboard):
         - title: Cores Count
           name: Cores Count
           type: string_filter
-          default_value: 4
+          default_value: '4'
           allow_multiple_values: false
           required: true
           ui_config:
             type: dropdown_menu
             display: inline
             options:
-            - 1
-            - 2
-            - 3
-            - 4
-            - 6
-            - 8
-            - 10
-            - 12
-            - 16
-            - 32
+            - '1'
+            - '2'
+            - '3'
+            - '4'
+            - '6'
+            - '8'
+            - '10'
+            - '12'
+            - '16'
+            - '32'
 
         - title: Os
           name: Os
           type: string_filter
-          default_value: Windows
+          default_value: 'Windows'
           allow_multiple_values: false
           required: true
           ui_config:
             type: dropdown_menu
             display: inline
             options:
-            - Windows
-            - Mac
-            - Linux
+            - 'Windows'
+            - 'Mac'
+            - 'Linux'
 
     """
     )

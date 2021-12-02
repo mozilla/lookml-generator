@@ -56,7 +56,7 @@
   - title: {{dimension.title}}
     name: {{dimension.title}}
     type: string_filter
-    default_value: {{dimension.default}}
+    default_value: '{{dimension.default}}'
     allow_multiple_values: false
     required: true
     ui_config:
@@ -64,6 +64,6 @@
       display: inline
       options:
       {% for option in dimension.options -%}
-      - {{option}}
+      - '{{option}}'
       {% endfor %}
   {% endfor -%}
