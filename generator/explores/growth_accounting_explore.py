@@ -23,6 +23,7 @@ class GrowthAccountingExplore(Explore):
             {
                 "name": self.name,
                 "view_name": self.views["base_view"],
+                "joins": self.get_unnested_fields_joins_lookml(),
             }
         ]
 

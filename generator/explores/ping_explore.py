@@ -19,25 +19,6 @@ class PingExplore(Explore):
         self, client: bigquery.Client, v1_name: Optional[str], data: Dict = {}
     ) -> List[Dict[str, Any]]:
         """Generate LookML to represent this explore."""
-        views_lookml = self.get_view_lookml(self.views["base_view"])
-        views: List[str] = [view["name"] for view in views_lookml["views"]]
-
-        joins = []
-        for view in views_lookml["views"][1:]:
-            view_name = view["name"]
-            base_name, metric = self._get_base_name_and_metric(
-                view_name=view_name, views=views
-            )
-            joins.append(
-                {
-                    "name": view_name,
-                    "relationship": "one_to_many",
-                    "sql": (
-                        f"LEFT JOIN UNNEST(${{{base_name}.{metric}}}) AS {view_name} "
-                    ),
-                }
-            )
-
         return [
             {
                 "name": self.name,
@@ -45,7 +26,7 @@ class PingExplore(Explore):
                 "always_filter": {
                     "filters": self.get_required_filters("base_view"),
                 },
-                "joins": joins,
+                "joins": self.get_unnested_fields_joins_lookml(),
             }
         ]
 

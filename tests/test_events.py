@@ -179,6 +179,7 @@ def test_explore_lookml(events_explore):
             },
             "sql_always_where": "${events.submission_date} >= '2010-01-01'",
             "queries": deepcopy(EventsExplore.queries),
+            "joins": [],
         },
     ]
 

@@ -1832,29 +1832,34 @@ def test_context_id(runner, glean_apps, tmp_path):
         )
 
         expected_explore = {
-            "includes": ["/looker-hub/custom/views/context.view.lkml"],
             "explores": [
                 {
-                    "sql_always_where": "${context.submission_date} >= '2010-01-01'",
-                    "view_name": "context",
                     "always_filter": {
                         "filters__all": [[{"submission_date": "28 days"}]]
                     },
                     "joins": [
                         {
-                            "relationship": "one_to_many",
-                            "sql": "LEFT JOIN UNNEST(${context.contexts}) AS context__contexts",
                             "name": "context__contexts",
+                            "relationship": "one_to_many",
+                            "sql": "LEFT JOIN UNNEST(${context.contexts}) "
+                            "AS context__contexts",
+                            "view_label": "Context  Contexts",
                         },
                         {
-                            "relationship": "one_to_many",
-                            "sql": "LEFT JOIN UNNEST(${context__contexts.position}) AS context__contexts__position",
                             "name": "context__contexts__position",
+                            "relationship": "one_to_many",
+                            "sql": "LEFT JOIN "
+                            "UNNEST(${context__contexts.position}) "
+                            "AS context__contexts__position",
+                            "view_label": "Context  Contexts  Position",
                         },
                     ],
                     "name": "context",
+                    "sql_always_where": "${context.submission_date} >= " "'2010-01-01'",
+                    "view_name": "context",
                 }
             ],
+            "includes": ["/looker-hub/custom/views/context.view.lkml"],
         }
 
         print_and_test(

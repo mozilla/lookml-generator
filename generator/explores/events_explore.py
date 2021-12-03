@@ -54,6 +54,7 @@ class EventsExplore(Explore):
             "view_name": self.views["base_view"],
             "description": "Event counts over time.",
             "queries": deepcopy(EventsExplore.queries),
+            "joins": self.get_unnested_fields_joins_lookml(),
         }
         required_filters = self.get_required_filters("extended_view")
         if required_filters:
