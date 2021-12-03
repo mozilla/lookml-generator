@@ -57,6 +57,7 @@ search:
   owners:
     - mmccorquodale@mozilla.com
     - xluo@mozilla.com
+    - skahmann@mozilla.com
   pretty_name: Search
   views:
     search_clients_engines_sources_daily:
