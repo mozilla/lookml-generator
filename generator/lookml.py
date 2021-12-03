@@ -18,7 +18,7 @@ FILE_HEADER = """
 # *Do not manually modify this file*
 #
 # This file has been generated via https://github.com/mozilla/lookml-generator
-# Manual changes need to be made in https://github.com/mozilla/looker-spoke-default
+# You can extend this view in the looker-spoke-default project (https://github.com/mozilla/looker-spoke-default)
 
 """
 
