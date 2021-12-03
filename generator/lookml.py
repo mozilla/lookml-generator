@@ -14,6 +14,14 @@ from .explores import EXPLORE_TYPES
 from .namespaces import _get_glean_apps
 from .views import VIEW_TYPES, View, ViewDict
 
+FILE_HEADER = """
+# *Do not manually modify this file*
+#
+# This file has been generated via https://github.com/mozilla/lookml-generator
+# Manual changes need to be made in https://github.com/mozilla/looker-spoke-default
+
+"""
+
 
 def _generate_views(
     client, out_dir: Path, views: Iterable[View], v1_name: Optional[str]
@@ -24,7 +32,7 @@ def _generate_views(
         )
         path = out_dir / f"{view.name}.view.lkml"
         lookml = view.to_lookml(client, v1_name)
-        path.write_text(lkml.dump(lookml))
+        path.write_text(FILE_HEADER + lkml.dump(lookml))
         yield path
 
 
@@ -53,7 +61,7 @@ def _generate_explores(
             "explores": explore.to_lookml(client, v1_name, namespace_data),
         }
         path = out_dir / (explore_name + ".explore.lkml")
-        path.write_text(lkml.dump(file_lookml))
+        path.write_text(FILE_HEADER + lkml.dump(file_lookml))
         yield path
 
 
@@ -72,7 +80,7 @@ def _generate_dashboards(
 
         dashboard_lookml = dashboard.to_lookml(client, namespace_data)
         dash_path = dash_dir / f"{dashboard_name}.dashboard.lookml"
-        dash_path.write_text(dashboard_lookml)
+        dash_path.write_text(FILE_HEADER + dashboard_lookml)
         yield dash_path
 
 
