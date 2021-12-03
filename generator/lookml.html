@@ -67,6 +67,14 @@
 <span class="kn">from</span> <span class="nn">.namespaces</span> <span class="kn">import</span> <span class="n">_get_glean_apps</span>
 <span class="kn">from</span> <span class="nn">.views</span> <span class="kn">import</span> <span class="n">VIEW_TYPES</span><span class="p">,</span> <span class="n">View</span><span class="p">,</span> <span class="n">ViewDict</span>
 
+<span class="n">FILE_HEADER</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2"># *Do not manually modify this file*</span>
+<span class="s2">#</span>
+<span class="s2"># This file has been generated via https://github.com/mozilla/lookml-generator</span>
+<span class="s2"># You can extend this view in the looker-spoke-default project (https://github.com/mozilla/looker-spoke-default)</span>
+
+<span class="s2">&quot;&quot;&quot;</span>
+
 
 <span class="k">def</span> <span class="nf">_generate_views</span><span class="p">(</span>
     <span class="n">client</span><span class="p">,</span> <span class="n">out_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">views</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">View</span><span class="p">],</span> <span class="n">v1_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
@@ -77,7 +85,7 @@
         <span class="p">)</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">out_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">view</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.view.lkml&quot;</span>
         <span class="n">lookml</span> <span class="o">=</span> <span class="n">view</span><span class="o">.</span><span class="n">to_lookml</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">v1_name</span><span class="p">)</span>
-        <span class="n">path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">lkml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">lookml</span><span class="p">))</span>
+        <span class="n">path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">FILE_HEADER</span> <span class="o">+</span> <span class="n">lkml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">lookml</span><span class="p">))</span>
         <span class="k">yield</span> <span class="n">path</span>
 
 
@@ -106,7 +114,7 @@
             <span class="s2">&quot;explores&quot;</span><span class="p">:</span> <span class="n">explore</span><span class="o">.</span><span class="n">to_lookml</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">v1_name</span><span class="p">,</span> <span class="n">namespace_data</span><span class="p">),</span>
         <span class="p">}</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">out_dir</span> <span class="o">/</span> <span class="p">(</span><span class="n">explore_name</span> <span class="o">+</span> <span class="s2">&quot;.explore.lkml&quot;</span><span class="p">)</span>
-        <span class="n">path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">lkml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">file_lookml</span><span class="p">))</span>
+        <span class="n">path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">FILE_HEADER</span> <span class="o">+</span> <span class="n">lkml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">file_lookml</span><span class="p">))</span>
         <span class="k">yield</span> <span class="n">path</span>
 
 
@@ -125,7 +133,7 @@
 
         <span class="n">dashboard_lookml</span> <span class="o">=</span> <span class="n">dashboard</span><span class="o">.</span><span class="n">to_lookml</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">namespace_data</span><span class="p">)</span>
         <span class="n">dash_path</span> <span class="o">=</span> <span class="n">dash_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dashboard_name</span><span class="si">}</span><span class="s2">.dashboard.lookml&quot;</span>
-        <span class="n">dash_path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">dashboard_lookml</span><span class="p">)</span>
+        <span class="n">dash_path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">FILE_HEADER</span> <span class="o">+</span> <span class="n">dashboard_lookml</span><span class="p">)</span>
         <span class="k">yield</span> <span class="n">dash_path</span>
 
 
