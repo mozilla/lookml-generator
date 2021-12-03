@@ -414,6 +414,11 @@ firefox_desktop:
       type: growth_accounting_explore
       views:
         base_view: growth_accounting
+    events:
+      type: events_explore
+      views:
+        base_view: events
+        extended_view: desktop_events_table
 pocket:
   glean_app: false
   owners:

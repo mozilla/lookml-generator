@@ -52,6 +52,7 @@ class ClientCountsExplore(Explore):
                     "filters": self.get_required_filters("extended_view"),
                 },
                 "queries": deepcopy(ClientCountsExplore.queries),
+                "joins": self.get_unnested_fields_joins_lookml(),
             }
         ]
 

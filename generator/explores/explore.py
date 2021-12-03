@@ -95,6 +95,55 @@ class Explore:
             return lkml.load((self.views_path / f"{view}.view.lkml").read_text())
         raise Exception("Missing view path for get_view_lookml")
 
+    def get_unnested_fields_joins_lookml(
+        self,
+    ) -> list:
+        """Get the LookML for joining unnested fields."""
+        views_lookml = self.get_view_lookml(self.views["base_view"])
+        views: List[str] = [view["name"] for view in views_lookml["views"]]
+        parent_base_name = views_lookml["views"][0]["name"]
+
+        extended_views: List[str] = []
+        if "extended_view" in self.views:
+            # check for extended views
+            extended_views_lookml = self.get_view_lookml(self.views["extended_view"])
+            extended_views = [view["name"] for view in extended_views_lookml["views"]]
+
+            views_lookml.update(extended_views_lookml)
+            views += extended_views
+
+        joins = []
+        for view in views_lookml["views"][1:]:
+            view_name = view["name"]
+            # get repeated, nested fields that exist as separate views in lookml
+            base_name, metric = self._get_base_name_and_metric(
+                view_name=view_name, views=views
+            )
+            metric_name = view_name
+            metric_label = metric_name.replace("_", " ").title()
+
+            if view_name in extended_views:
+                # names of extended views are overriden by the name of the view that is extending them
+                metric_label = (
+                    metric_name.replace(base_name, parent_base_name)
+                    .replace("_", " ")
+                    .title()
+                )
+                base_name = parent_base_name
+
+            joins.append(
+                {
+                    "name": view_name,
+                    "view_label": metric_label,
+                    "relationship": "one_to_many",
+                    "sql": (
+                        f"LEFT JOIN UNNEST(${{{base_name}.{metric}}}) AS {metric_name} "
+                    ),
+                }
+            )
+
+        return joins
+
     def _get_default_channel(self, view: str) -> Optional[str]:
         channel_params = [
             param
