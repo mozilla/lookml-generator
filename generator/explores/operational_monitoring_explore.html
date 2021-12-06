@@ -162,7 +162,7 @@
                     <span class="p">},</span>
                     <span class="s2">&quot;materialization&quot;</span><span class="p">:</span> <span class="p">{</span>
                         <span class="c1"># Reload the table at 9am when ETL should have been completed</span>
-                        <span class="s2">&quot;sql_trigger_value&quot;</span><span class="p">:</span> <span class="s2">&quot;SELECT CAST(DATE_ADD(hrs, -9, CURRENT_TIMESTAMP) AS DATE)&quot;</span>
+                        <span class="s2">&quot;sql_trigger_value&quot;</span><span class="p">:</span> <span class="s2">&quot;SELECT CAST(TIMESTAMP_SUB(CURRENT_TIMESTAMP, INTERVAL 9 HOUR) AS DATE)&quot;</span>
                     <span class="p">},</span>
                 <span class="p">}</span>
             <span class="p">)</span>
@@ -275,7 +275,7 @@
                     <span class="p">},</span>
                     <span class="s2">&quot;materialization&quot;</span><span class="p">:</span> <span class="p">{</span>
                         <span class="c1"># Reload the table at 9am when ETL should have been completed</span>
-                        <span class="s2">&quot;sql_trigger_value&quot;</span><span class="p">:</span> <span class="s2">&quot;SELECT CAST(DATE_ADD(hrs, -9, CURRENT_TIMESTAMP) AS DATE)&quot;</span>
+                        <span class="s2">&quot;sql_trigger_value&quot;</span><span class="p">:</span> <span class="s2">&quot;SELECT CAST(TIMESTAMP_SUB(CURRENT_TIMESTAMP, INTERVAL 9 HOUR) AS DATE)&quot;</span>
                     <span class="p">},</span>
                 <span class="p">}</span>
             <span class="p">)</span>
