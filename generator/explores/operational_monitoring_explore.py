@@ -91,7 +91,7 @@ class OperationalMonitoringExplore(Explore):
                     },
                     "materialization": {
                         # Reload the table at 9am when ETL should have been completed
-                        "sql_trigger_value": "SELECT CAST(DATE_ADD(hrs, -9, CURRENT_TIMESTAMP) AS DATE)"
+                        "sql_trigger_value": "SELECT CAST(TIMESTAMP_SUB(CURRENT_TIMESTAMP, INTERVAL 9 HOUR) AS DATE)"
                     },
                 }
             )
