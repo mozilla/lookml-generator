@@ -87,25 +87,6 @@
         <span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span> <span class="n">v1_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
         <span class="sd">&quot;&quot;&quot;Generate LookML to represent this explore.&quot;&quot;&quot;</span>
-        <span class="n">views_lookml</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_view_lookml</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">views</span><span class="p">[</span><span class="s2">&quot;base_view&quot;</span><span class="p">])</span>
-        <span class="n">views</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">view</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">view</span> <span class="ow">in</span> <span class="n">views_lookml</span><span class="p">[</span><span class="s2">&quot;views&quot;</span><span class="p">]]</span>
-
-        <span class="n">joins</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">view</span> <span class="ow">in</span> <span class="n">views_lookml</span><span class="p">[</span><span class="s2">&quot;views&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">:]:</span>
-            <span class="n">view_name</span> <span class="o">=</span> <span class="n">view</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
-            <span class="n">base_name</span><span class="p">,</span> <span class="n">metric</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_base_name_and_metric</span><span class="p">(</span>
-                <span class="n">view_name</span><span class="o">=</span><span class="n">view_name</span><span class="p">,</span> <span class="n">views</span><span class="o">=</span><span class="n">views</span>
-            <span class="p">)</span>
-            <span class="n">joins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="p">{</span>
-                    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">view_name</span><span class="p">,</span>
-                    <span class="s2">&quot;relationship&quot;</span><span class="p">:</span> <span class="s2">&quot;one_to_many&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;sql&quot;</span><span class="p">:</span> <span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;LEFT JOIN UNNEST($</span><span class="se">{{</span><span class="si">{</span><span class="n">base_name</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">metric</span><span class="si">}</span><span class="se">}}</span><span class="s2">) AS </span><span class="si">{</span><span class="n">view_name</span><span class="si">}</span><span class="s2"> &quot;</span>
-                    <span class="p">),</span>
-                <span class="p">}</span>
-            <span class="p">)</span>
-
         <span class="k">return</span> <span class="p">[</span>
             <span class="p">{</span>
                 <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
@@ -113,7 +94,7 @@
                 <span class="s2">&quot;always_filter&quot;</span><span class="p">:</span> <span class="p">{</span>
                     <span class="s2">&quot;filters&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_required_filters</span><span class="p">(</span><span class="s2">&quot;base_view&quot;</span><span class="p">),</span>
                 <span class="p">},</span>
-                <span class="s2">&quot;joins&quot;</span><span class="p">:</span> <span class="n">joins</span><span class="p">,</span>
+                <span class="s2">&quot;joins&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_unnested_fields_joins_lookml</span><span class="p">(),</span>
             <span class="p">}</span>
         <span class="p">]</span>
 
@@ -153,25 +134,6 @@
         <span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span> <span class="n">v1_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
         <span class="sd">&quot;&quot;&quot;Generate LookML to represent this explore.&quot;&quot;&quot;</span>
-        <span class="n">views_lookml</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_view_lookml</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">views</span><span class="p">[</span><span class="s2">&quot;base_view&quot;</span><span class="p">])</span>
-        <span class="n">views</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">view</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">view</span> <span class="ow">in</span> <span class="n">views_lookml</span><span class="p">[</span><span class="s2">&quot;views&quot;</span><span class="p">]]</span>
-
-        <span class="n">joins</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">view</span> <span class="ow">in</span> <span class="n">views_lookml</span><span class="p">[</span><span class="s2">&quot;views&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">:]:</span>
-            <span class="n">view_name</span> <span class="o">=</span> <span class="n">view</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
-            <span class="n">base_name</span><span class="p">,</span> <span class="n">metric</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_base_name_and_metric</span><span class="p">(</span>
-                <span class="n">view_name</span><span class="o">=</span><span class="n">view_name</span><span class="p">,</span> <span class="n">views</span><span class="o">=</span><span class="n">views</span>
-            <span class="p">)</span>
-            <span class="n">joins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="p">{</span>
-                    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">view_name</span><span class="p">,</span>
-                    <span class="s2">&quot;relationship&quot;</span><span class="p">:</span> <span class="s2">&quot;one_to_many&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;sql&quot;</span><span class="p">:</span> <span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;LEFT JOIN UNNEST($</span><span class="se">{{</span><span class="si">{</span><span class="n">base_name</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">metric</span><span class="si">}</span><span class="se">}}</span><span class="s2">) AS </span><span class="si">{</span><span class="n">view_name</span><span class="si">}</span><span class="s2"> &quot;</span>
-                    <span class="p">),</span>
-                <span class="p">}</span>
-            <span class="p">)</span>
-
         <span class="k">return</span> <span class="p">[</span>
             <span class="p">{</span>
                 <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
@@ -179,7 +141,7 @@
                 <span class="s2">&quot;always_filter&quot;</span><span class="p">:</span> <span class="p">{</span>
                     <span class="s2">&quot;filters&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_required_filters</span><span class="p">(</span><span class="s2">&quot;base_view&quot;</span><span class="p">),</span>
                 <span class="p">},</span>
-                <span class="s2">&quot;joins&quot;</span><span class="p">:</span> <span class="n">joins</span><span class="p">,</span>
+                <span class="s2">&quot;joins&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_unnested_fields_joins_lookml</span><span class="p">(),</span>
             <span class="p">}</span>
         <span class="p">]</span>
 
@@ -278,6 +240,7 @@
                 <dd id="PingExplore.to_lookml" class="function"><a href="explore.html#Explore.to_lookml">to_lookml</a></dd>
                 <dd id="PingExplore.get_dependent_views" class="function"><a href="explore.html#Explore.get_dependent_views">get_dependent_views</a></dd>
                 <dd id="PingExplore.get_view_lookml" class="function"><a href="explore.html#Explore.get_view_lookml">get_view_lookml</a></dd>
+                <dd id="PingExplore.get_unnested_fields_joins_lookml" class="function"><a href="explore.html#Explore.get_unnested_fields_joins_lookml">get_unnested_fields_joins_lookml</a></dd>
                 <dd id="PingExplore.get_required_filters" class="function"><a href="explore.html#Explore.get_required_filters">get_required_filters</a></dd>
 
             </div>

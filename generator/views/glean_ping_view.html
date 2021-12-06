@@ -85,6 +85,7 @@
 <span class="kn">from</span> <span class="nn">mozilla_schema_generator.glean_ping</span> <span class="kn">import</span> <span class="n">GleanPing</span>
 <span class="kn">from</span> <span class="nn">mozilla_schema_generator.probes</span> <span class="kn">import</span> <span class="n">GleanProbe</span>
 
+<span class="kn">from</span> <span class="nn">.lookml_utils</span> <span class="kn">import</span> <span class="n">slug_to_title</span>
 <span class="kn">from</span> <span class="nn">.ping_view</span> <span class="kn">import</span> <span class="n">PingView</span>
 
 <span class="n">DISTRIBUTION_TYPES</span> <span class="o">=</span> <span class="p">{</span>
@@ -154,8 +155,7 @@
                 <span class="n">suggest_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;suggest__</span><span class="si">{</span><span class="n">view_name</span><span class="si">}</span><span class="s2">&quot;</span>
 
                 <span class="n">category</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="p">[</span>
-                    <span class="n">v</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">title</span><span class="p">()</span>
-                    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_category_and_name</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span>
+                    <span class="n">slug_to_title</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_category_and_name</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span>
                 <span class="p">]</span>
                 <span class="n">view_label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">category</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
                 <span class="n">metric_hidden</span> <span class="o">=</span> <span class="s2">&quot;no&quot;</span> <span class="k">if</span> <span class="n">metric</span><span class="o">.</span><span class="n">is_in_source</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;yes&quot;</span>
@@ -245,7 +245,7 @@
     <span class="k">def</span> <span class="nf">_get_links</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimension</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
         <span class="sd">&quot;&quot;&quot;Get a link annotation given a metric name.&quot;&quot;&quot;</span>
         <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_name</span><span class="p">(</span><span class="n">dimension</span><span class="p">)</span>
-        <span class="n">title</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">title</span><span class="p">()</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="n">slug_to_title</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">[</span>
             <span class="p">{</span>
                 <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Glean Dictionary reference for </span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">),</span>
@@ -326,8 +326,8 @@
         <span class="k">if</span> <span class="n">looker_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sql_map</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
-        <span class="n">group_label</span> <span class="o">=</span> <span class="n">category</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">title</span><span class="p">()</span>
-        <span class="n">group_item_label</span> <span class="o">=</span> <span class="n">label</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">title</span><span class="p">()</span>
+        <span class="n">group_label</span> <span class="o">=</span> <span class="n">slug_to_title</span><span class="p">(</span><span class="n">category</span><span class="p">)</span>
+        <span class="n">group_item_label</span> <span class="o">=</span> <span class="n">slug_to_title</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">group_label</span><span class="p">:</span>
             <span class="n">group_label</span> <span class="o">=</span> <span class="s2">&quot;Glean&quot;</span>
@@ -522,8 +522,7 @@
                 <span class="n">suggest_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;suggest__</span><span class="si">{</span><span class="n">view_name</span><span class="si">}</span><span class="s2">&quot;</span>
 
                 <span class="n">category</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="p">[</span>
-                    <span class="n">v</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">title</span><span class="p">()</span>
-                    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_category_and_name</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span>
+                    <span class="n">slug_to_title</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_category_and_name</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span>
                 <span class="p">]</span>
                 <span class="n">view_label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">category</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
                 <span class="n">metric_hidden</span> <span class="o">=</span> <span class="s2">&quot;no&quot;</span> <span class="k">if</span> <span class="n">metric</span><span class="o">.</span><span class="n">is_in_source</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;yes&quot;</span>
@@ -613,7 +612,7 @@
     <span class="k">def</span> <span class="nf">_get_links</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimension</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
         <span class="sd">&quot;&quot;&quot;Get a link annotation given a metric name.&quot;&quot;&quot;</span>
         <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_name</span><span class="p">(</span><span class="n">dimension</span><span class="p">)</span>
-        <span class="n">title</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">title</span><span class="p">()</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="n">slug_to_title</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">[</span>
             <span class="p">{</span>
                 <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Glean Dictionary reference for </span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">),</span>
@@ -694,8 +693,8 @@
         <span class="k">if</span> <span class="n">looker_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sql_map</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
-        <span class="n">group_label</span> <span class="o">=</span> <span class="n">category</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">title</span><span class="p">()</span>
-        <span class="n">group_item_label</span> <span class="o">=</span> <span class="n">label</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">title</span><span class="p">()</span>
+        <span class="n">group_label</span> <span class="o">=</span> <span class="n">slug_to_title</span><span class="p">(</span><span class="n">category</span><span class="p">)</span>
+        <span class="n">group_item_label</span> <span class="o">=</span> <span class="n">slug_to_title</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">group_label</span><span class="p">:</span>
             <span class="n">group_label</span> <span class="o">=</span> <span class="s2">&quot;Glean&quot;</span>
@@ -923,8 +922,7 @@
                 <span class="n">suggest_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;suggest__</span><span class="si">{</span><span class="n">view_name</span><span class="si">}</span><span class="s2">&quot;</span>
 
                 <span class="n">category</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="p">[</span>
-                    <span class="n">v</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">title</span><span class="p">()</span>
-                    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_category_and_name</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span>
+                    <span class="n">slug_to_title</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_category_and_name</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span>
                 <span class="p">]</span>
                 <span class="n">view_label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">category</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
                 <span class="n">metric_hidden</span> <span class="o">=</span> <span class="s2">&quot;no&quot;</span> <span class="k">if</span> <span class="n">metric</span><span class="o">.</span><span class="n">is_in_source</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;yes&quot;</span>

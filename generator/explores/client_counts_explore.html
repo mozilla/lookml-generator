@@ -123,6 +123,7 @@
                     <span class="s2">&quot;filters&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_required_filters</span><span class="p">(</span><span class="s2">&quot;extended_view&quot;</span><span class="p">),</span>
                 <span class="p">},</span>
                 <span class="s2">&quot;queries&quot;</span><span class="p">:</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">ClientCountsExplore</span><span class="o">.</span><span class="n">queries</span><span class="p">),</span>
+                <span class="s2">&quot;joins&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_unnested_fields_joins_lookml</span><span class="p">(),</span>
             <span class="p">}</span>
         <span class="p">]</span>
 
@@ -204,6 +205,7 @@
                     <span class="s2">&quot;filters&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_required_filters</span><span class="p">(</span><span class="s2">&quot;extended_view&quot;</span><span class="p">),</span>
                 <span class="p">},</span>
                 <span class="s2">&quot;queries&quot;</span><span class="p">:</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">ClientCountsExplore</span><span class="o">.</span><span class="n">queries</span><span class="p">),</span>
+                <span class="s2">&quot;joins&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_unnested_fields_joins_lookml</span><span class="p">(),</span>
             <span class="p">}</span>
         <span class="p">]</span>
 
@@ -333,6 +335,7 @@
                 <dd id="ClientCountsExplore.to_lookml" class="function"><a href="explore.html#Explore.to_lookml">to_lookml</a></dd>
                 <dd id="ClientCountsExplore.get_dependent_views" class="function"><a href="explore.html#Explore.get_dependent_views">get_dependent_views</a></dd>
                 <dd id="ClientCountsExplore.get_view_lookml" class="function"><a href="explore.html#Explore.get_view_lookml">get_view_lookml</a></dd>
+                <dd id="ClientCountsExplore.get_unnested_fields_joins_lookml" class="function"><a href="explore.html#Explore.get_unnested_fields_joins_lookml">get_unnested_fields_joins_lookml</a></dd>
                 <dd id="ClientCountsExplore.get_required_filters" class="function"><a href="explore.html#Explore.get_required_filters">get_required_filters</a></dd>
 
             </div>

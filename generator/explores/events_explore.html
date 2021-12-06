@@ -125,6 +125,7 @@
             <span class="s2">&quot;view_name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">views</span><span class="p">[</span><span class="s2">&quot;base_view&quot;</span><span class="p">],</span>
             <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Event counts over time.&quot;</span><span class="p">,</span>
             <span class="s2">&quot;queries&quot;</span><span class="p">:</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">EventsExplore</span><span class="o">.</span><span class="n">queries</span><span class="p">),</span>
+            <span class="s2">&quot;joins&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_unnested_fields_joins_lookml</span><span class="p">(),</span>
         <span class="p">}</span>
         <span class="n">required_filters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_required_filters</span><span class="p">(</span><span class="s2">&quot;extended_view&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">required_filters</span><span class="p">:</span>
@@ -189,6 +190,7 @@
             <span class="s2">&quot;view_name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">views</span><span class="p">[</span><span class="s2">&quot;base_view&quot;</span><span class="p">],</span>
             <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Event counts over time.&quot;</span><span class="p">,</span>
             <span class="s2">&quot;queries&quot;</span><span class="p">:</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">EventsExplore</span><span class="o">.</span><span class="n">queries</span><span class="p">),</span>
+            <span class="s2">&quot;joins&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_unnested_fields_joins_lookml</span><span class="p">(),</span>
         <span class="p">}</span>
         <span class="n">required_filters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_required_filters</span><span class="p">(</span><span class="s2">&quot;extended_view&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">required_filters</span><span class="p">:</span>
@@ -293,6 +295,7 @@
                 <dd id="EventsExplore.to_lookml" class="function"><a href="explore.html#Explore.to_lookml">to_lookml</a></dd>
                 <dd id="EventsExplore.get_dependent_views" class="function"><a href="explore.html#Explore.get_dependent_views">get_dependent_views</a></dd>
                 <dd id="EventsExplore.get_view_lookml" class="function"><a href="explore.html#Explore.get_view_lookml">get_view_lookml</a></dd>
+                <dd id="EventsExplore.get_unnested_fields_joins_lookml" class="function"><a href="explore.html#Explore.get_unnested_fields_joins_lookml">get_unnested_fields_joins_lookml</a></dd>
                 <dd id="EventsExplore.get_required_filters" class="function"><a href="explore.html#Explore.get_required_filters">get_required_filters</a></dd>
 
             </div>
