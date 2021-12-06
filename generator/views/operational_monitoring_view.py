@@ -16,7 +16,9 @@ class OperationalMonitoringView(PingView):
     def __init__(self, namespace: str, name: str, tables: List[Dict[str, str]]):
         """Create instance of a OperationalMonitoringView."""
         super().__init__(namespace, name, tables)
-        xaxis = tables[0]["xaxis"] if len(tables) > 0 else "build_id"
+        xaxis = "build_id"
+        if "xaxis" in tables[0] and len(tables) > 0:
+            xaxis = tables[0]["xaxis"]
 
         xaxis_to_sql_mapping = {
             "build_id": f"PARSE_DATE('%Y%m%d', CAST(${{TABLE}}.{xaxis} AS STRING))",

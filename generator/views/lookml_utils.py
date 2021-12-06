@@ -51,8 +51,8 @@ def _get_dimension(
 
         group_label, group_item_label = None, None
         if len(path) > 1:
-            group_label = " ".join(path[:-1]).replace("_", " ").title()
-            group_item_label = path[-1].replace("_", " ").title()
+            group_label = slug_to_title(" ".join(path[:-1]))
+            group_item_label = slug_to_title(path[-1])
         if result["type"] == "time":
             # Remove _{type} suffix from the last path element for dimension group
             # names For example submission_date and submission_timestamp become
