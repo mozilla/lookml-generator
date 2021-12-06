@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import lkml
 from google.cloud import bigquery
 
-from ..views.lookml_utils import escape_filter_expr
+from ..views.lookml_utils import escape_filter_expr, slug_to_title
 
 
 @dataclass
@@ -120,14 +120,12 @@ class Explore:
                 view_name=view_name, views=views
             )
             metric_name = view_name
-            metric_label = metric_name.replace("_", " ").title()
+            metric_label = slug_to_title(metric_name)
 
             if view_name in extended_views:
                 # names of extended views are overriden by the name of the view that is extending them
-                metric_label = (
+                metric_label = slug_to_title(
                     metric_name.replace(base_name, parent_base_name)
-                    .replace("_", " ")
-                    .title()
                 )
                 base_name = parent_base_name
 

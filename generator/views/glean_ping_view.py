@@ -8,6 +8,7 @@ import click
 from mozilla_schema_generator.glean_ping import GleanPing
 from mozilla_schema_generator.probes import GleanProbe
 
+from .lookml_utils import slug_to_title
 from .ping_view import PingView
 
 DISTRIBUTION_TYPES = {
@@ -77,8 +78,7 @@ class GleanPingView(PingView):
                 suggest_name = f"suggest__{view_name}"
 
                 category, name = [
-                    v.replace("_", " ").title()
-                    for v in self._get_category_and_name(metric)
+                    slug_to_title(v) for v in self._get_category_and_name(metric)
                 ]
                 view_label = f"{category} - {name}"
                 metric_hidden = "no" if metric.is_in_source() else "yes"
@@ -168,7 +168,7 @@ class GleanPingView(PingView):
     def _get_links(self, dimension: dict) -> List[Dict[str, str]]:
         """Get a link annotation given a metric name."""
         name = self._get_name(dimension)
-        title = name.replace("_", " ").title()
+        title = slug_to_title(name)
         return [
             {
                 "label": (f"Glean Dictionary reference for {title}"),
@@ -249,8 +249,8 @@ class GleanPingView(PingView):
         if looker_name not in sql_map:
             return None
 
-        group_label = category.replace("_", " ").title()
-        group_item_label = label.replace("_", " ").title()
+        group_label = slug_to_title(category)
+        group_item_label = slug_to_title(label)
 
         if not group_label:
             group_label = "Glean"
