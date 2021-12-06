@@ -319,7 +319,7 @@ def test_explore_lookml(operational_monitoring_explore):
                         "measures": ["low", "high", "percentile"],
                     },
                     "materialization": {
-                        "sql_trigger_value": "SELECT CAST(DATE_ADD(hrs, -9, CURRENT_TIMESTAMP) AS DATE)"
+                        "sql_trigger_value": "SELECT CAST(TIMESTAMP_SUB(CURRENT_TIMESTAMP, INTERVAL 9 HOUR) AS DATE)"
                     },
                 },
                 {
@@ -336,7 +336,7 @@ def test_explore_lookml(operational_monitoring_explore):
                         "measures": ["low", "high", "percentile"],
                     },
                     "materialization": {
-                        "sql_trigger_value": "SELECT CAST(DATE_ADD(hrs, -9, CURRENT_TIMESTAMP) AS DATE)"
+                        "sql_trigger_value": "SELECT CAST(TIMESTAMP_SUB(CURRENT_TIMESTAMP, INTERVAL 9 HOUR) AS DATE)"
                     },
                 },
             ],
