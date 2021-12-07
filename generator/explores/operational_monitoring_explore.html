@@ -143,9 +143,10 @@
             <span class="p">{</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_view_name</span><span class="si">}</span><span class="s2">.percentile_conf&quot;</span><span class="p">:</span> <span class="s2">&quot;50&quot;</span><span class="p">},</span>
         <span class="p">]</span>
         <span class="k">for</span> <span class="n">dimension</span> <span class="ow">in</span> <span class="n">dimension_data</span><span class="p">:</span>
-            <span class="n">filters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="p">{</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_view_name</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">dimension</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="n">dimension</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]}</span>
-            <span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;default&quot;</span> <span class="ow">in</span> <span class="n">dimension</span><span class="p">:</span>
+                <span class="n">filters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">{</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_view_name</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">dimension</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="n">dimension</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]}</span>
+                <span class="p">)</span>
 
         <span class="n">aggregate_tables</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">probes</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">get_distinct_vals</span><span class="p">(</span><span class="n">bq_client</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="s2">&quot;probe&quot;</span><span class="p">)</span>
@@ -256,9 +257,10 @@
             <span class="p">{</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_view_name</span><span class="si">}</span><span class="s2">.percentile_conf&quot;</span><span class="p">:</span> <span class="s2">&quot;50&quot;</span><span class="p">},</span>
         <span class="p">]</span>
         <span class="k">for</span> <span class="n">dimension</span> <span class="ow">in</span> <span class="n">dimension_data</span><span class="p">:</span>
-            <span class="n">filters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="p">{</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_view_name</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">dimension</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="n">dimension</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]}</span>
-            <span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;default&quot;</span> <span class="ow">in</span> <span class="n">dimension</span><span class="p">:</span>
+                <span class="n">filters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">{</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_view_name</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">dimension</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="n">dimension</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]}</span>
+                <span class="p">)</span>
 
         <span class="n">aggregate_tables</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">probes</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">get_distinct_vals</span><span class="p">(</span><span class="n">bq_client</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="s2">&quot;probe&quot;</span><span class="p">)</span>
