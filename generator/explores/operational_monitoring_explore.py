@@ -72,9 +72,10 @@ class OperationalMonitoringExplore(Explore):
             {f"{base_view_name}.percentile_conf": "50"},
         ]
         for dimension in dimension_data:
-            filters.append(
-                {f"{base_view_name}.{dimension['name']}": dimension["default"]}
-            )
+            if "default" in dimension:
+                filters.append(
+                    {f"{base_view_name}.{dimension['name']}": dimension["default"]}
+                )
 
         aggregate_tables = []
         probes = lookml_utils.get_distinct_vals(bq_client, table_name, "probe")
