@@ -39,6 +39,17 @@ class OperationalMonitoringDashboard(Dashboard):
         title = lookml_utils.slug_to_title(name)
         return klass(title, name, "newspaper", namespace, defn["tables"])
 
+    def _map_series_to_colours(self, branches, explore):
+        colours = ["#ff6a06", "#ffb380", "#ffb380", "blue", "#8cd3ff", "#8cd3ff"]
+        series_labels = []
+        for branch in branches:
+            series_labels += [
+                f"{branch} - {explore}.percentile",
+                f"{branch} - {explore}.high",
+                f"{branch} - {explore}.low",
+            ]
+        return dict((label, colour) for (label, colour) in zip(series_labels, colours))
+
     def to_lookml(self, bq_client, data):
         """Get this dashboard as LookML."""
         kwargs = {
@@ -68,6 +79,7 @@ class OperationalMonitoringDashboard(Dashboard):
                 f"/looker-hub/{self.namespace}/explores/{explore}.explore.lkml"
             )
 
+            series_colors = self._map_series_to_colours(table_defn["branches"], explore)
             for metric in metrics:
                 title = lookml_utils.slug_to_title(metric)
                 kwargs["elements"].append(
@@ -75,6 +87,7 @@ class OperationalMonitoringDashboard(Dashboard):
                         "title": title,
                         "metric": metric,
                         "explore": explore,
+                        "series_colors": series_colors,
                         "xaxis": xaxis,
                         "row": int(graph_index / 2) * 10,
                         "col": 0 if graph_index % 2 == 0 else 12,
