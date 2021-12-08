@@ -390,10 +390,12 @@ def test_namespaces_full(
                                 {
                                     "explore": "op_mon_histogram",
                                     "table": "moz-fx-data-shared-prod.operational_monitoring.test_histogram",
+                                    "branches": ["enabled", "disabled"],
                                 },
                                 {
                                     "explore": "op_mon_scalar",
                                     "table": "moz-fx-data-shared-prod.operational_monitoring.test_scalar",
+                                    "branches": ["enabled", "disabled"],
                                 },
                             ],
                             "type": "operational_monitoring_dashboard",
