@@ -132,6 +132,7 @@ def _get_opmon_views_explores_dashboards():
                 {
                     "explore": f"{project_name}_{data_type}",
                     "table": f"{PROD_PROJECT}.operational_monitoring.{table_prefix}_{data_type}",
+                    "branches": branches,
                 }
                 for data_type in DATA_TYPES
             ],
