@@ -25,8 +25,13 @@
     height: 8
     listen:
       Percentile: {{element.explore}}.percentile_conf
-      {% for dimension in dimensions -%}
+      {%- for dimension in dimensions %}
       {{dimension.title}}: {{element.explore}}.{{dimension.name}}
+      {%- endfor %}
+    y_axes: [{type: log}]
+    series_colors:
+      {% for label, colour in element.series_colors.items() -%}
+      {{label}}: {{colour}}
       {% endfor %}
   {% endfor -%}
   filters:
