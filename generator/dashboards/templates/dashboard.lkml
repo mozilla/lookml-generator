@@ -31,7 +31,7 @@
     y_axes: [{type: log}]
     series_colors:
       {% for label, colour in element.series_colors.items() -%}
-      {{label}}: {{colour}}
+      {{label}}: "{{colour}}"
       {% endfor %}
   {% endfor -%}
   filters:
