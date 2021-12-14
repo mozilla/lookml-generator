@@ -113,6 +113,17 @@
         <span class="n">title</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">slug_to_title</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">klass</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="s2">&quot;newspaper&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="n">defn</span><span class="p">[</span><span class="s2">&quot;tables&quot;</span><span class="p">])</span>
 
+    <span class="k">def</span> <span class="nf">_map_series_to_colours</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">branches</span><span class="p">,</span> <span class="n">explore</span><span class="p">):</span>
+        <span class="n">colours</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;#ff6a06&quot;</span><span class="p">,</span> <span class="s2">&quot;#ffb380&quot;</span><span class="p">,</span> <span class="s2">&quot;#ffb380&quot;</span><span class="p">,</span> <span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="s2">&quot;#8cd3ff&quot;</span><span class="p">,</span> <span class="s2">&quot;#8cd3ff&quot;</span><span class="p">]</span>
+        <span class="n">series_labels</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">branch</span> <span class="ow">in</span> <span class="n">branches</span><span class="p">:</span>
+            <span class="n">series_labels</span> <span class="o">+=</span> <span class="p">[</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">branch</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">explore</span><span class="si">}</span><span class="s2">.percentile&quot;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">branch</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">explore</span><span class="si">}</span><span class="s2">.high&quot;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">branch</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">explore</span><span class="si">}</span><span class="s2">.low&quot;</span><span class="p">,</span>
+            <span class="p">]</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">((</span><span class="n">label</span><span class="p">,</span> <span class="n">colour</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">colour</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">series_labels</span><span class="p">,</span> <span class="n">colours</span><span class="p">))</span>
+
     <span class="k">def</span> <span class="nf">to_lookml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bq_client</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get this dashboard as LookML.&quot;&quot;&quot;</span>
         <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
@@ -142,6 +153,7 @@
                 <span class="sa">f</span><span class="s2">&quot;/looker-hub/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">namespace</span><span class="si">}</span><span class="s2">/explores/</span><span class="si">{</span><span class="n">explore</span><span class="si">}</span><span class="s2">.explore.lkml&quot;</span>
             <span class="p">)</span>
 
+            <span class="n">series_colors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_map_series_to_colours</span><span class="p">(</span><span class="n">table_defn</span><span class="p">[</span><span class="s2">&quot;branches&quot;</span><span class="p">],</span> <span class="n">explore</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="n">metrics</span><span class="p">:</span>
                 <span class="n">title</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">slug_to_title</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span>
                 <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;elements&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
@@ -149,6 +161,7 @@
                         <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span>
                         <span class="s2">&quot;metric&quot;</span><span class="p">:</span> <span class="n">metric</span><span class="p">,</span>
                         <span class="s2">&quot;explore&quot;</span><span class="p">:</span> <span class="n">explore</span><span class="p">,</span>
+                        <span class="s2">&quot;series_colors&quot;</span><span class="p">:</span> <span class="n">series_colors</span><span class="p">,</span>
                         <span class="s2">&quot;xaxis&quot;</span><span class="p">:</span> <span class="n">xaxis</span><span class="p">,</span>
                         <span class="s2">&quot;row&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">graph_index</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span><span class="p">,</span>
                         <span class="s2">&quot;col&quot;</span><span class="p">:</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">graph_index</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">12</span><span class="p">,</span>
@@ -207,6 +220,17 @@
         <span class="n">title</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">slug_to_title</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">klass</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="s2">&quot;newspaper&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="n">defn</span><span class="p">[</span><span class="s2">&quot;tables&quot;</span><span class="p">])</span>
 
+    <span class="k">def</span> <span class="nf">_map_series_to_colours</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">branches</span><span class="p">,</span> <span class="n">explore</span><span class="p">):</span>
+        <span class="n">colours</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;#ff6a06&quot;</span><span class="p">,</span> <span class="s2">&quot;#ffb380&quot;</span><span class="p">,</span> <span class="s2">&quot;#ffb380&quot;</span><span class="p">,</span> <span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="s2">&quot;#8cd3ff&quot;</span><span class="p">,</span> <span class="s2">&quot;#8cd3ff&quot;</span><span class="p">]</span>
+        <span class="n">series_labels</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">branch</span> <span class="ow">in</span> <span class="n">branches</span><span class="p">:</span>
+            <span class="n">series_labels</span> <span class="o">+=</span> <span class="p">[</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">branch</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">explore</span><span class="si">}</span><span class="s2">.percentile&quot;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">branch</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">explore</span><span class="si">}</span><span class="s2">.high&quot;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">branch</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">explore</span><span class="si">}</span><span class="s2">.low&quot;</span><span class="p">,</span>
+            <span class="p">]</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">((</span><span class="n">label</span><span class="p">,</span> <span class="n">colour</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">colour</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">series_labels</span><span class="p">,</span> <span class="n">colours</span><span class="p">))</span>
+
     <span class="k">def</span> <span class="nf">to_lookml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bq_client</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get this dashboard as LookML.&quot;&quot;&quot;</span>
         <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
@@ -236,6 +260,7 @@
                 <span class="sa">f</span><span class="s2">&quot;/looker-hub/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">namespace</span><span class="si">}</span><span class="s2">/explores/</span><span class="si">{</span><span class="n">explore</span><span class="si">}</span><span class="s2">.explore.lkml&quot;</span>
             <span class="p">)</span>
 
+            <span class="n">series_colors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_map_series_to_colours</span><span class="p">(</span><span class="n">table_defn</span><span class="p">[</span><span class="s2">&quot;branches&quot;</span><span class="p">],</span> <span class="n">explore</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="n">metrics</span><span class="p">:</span>
                 <span class="n">title</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">slug_to_title</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span>
                 <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;elements&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
@@ -243,6 +268,7 @@
                         <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span>
                         <span class="s2">&quot;metric&quot;</span><span class="p">:</span> <span class="n">metric</span><span class="p">,</span>
                         <span class="s2">&quot;explore&quot;</span><span class="p">:</span> <span class="n">explore</span><span class="p">,</span>
+                        <span class="s2">&quot;series_colors&quot;</span><span class="p">:</span> <span class="n">series_colors</span><span class="p">,</span>
                         <span class="s2">&quot;xaxis&quot;</span><span class="p">:</span> <span class="n">xaxis</span><span class="p">,</span>
                         <span class="s2">&quot;row&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">graph_index</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span><span class="p">,</span>
                         <span class="s2">&quot;col&quot;</span><span class="p">:</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">graph_index</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">12</span><span class="p">,</span>
@@ -385,6 +411,7 @@
                 <span class="sa">f</span><span class="s2">&quot;/looker-hub/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">namespace</span><span class="si">}</span><span class="s2">/explores/</span><span class="si">{</span><span class="n">explore</span><span class="si">}</span><span class="s2">.explore.lkml&quot;</span>
             <span class="p">)</span>
 
+            <span class="n">series_colors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_map_series_to_colours</span><span class="p">(</span><span class="n">table_defn</span><span class="p">[</span><span class="s2">&quot;branches&quot;</span><span class="p">],</span> <span class="n">explore</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="n">metrics</span><span class="p">:</span>
                 <span class="n">title</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">slug_to_title</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span>
                 <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;elements&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
@@ -392,6 +419,7 @@
                         <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span>
                         <span class="s2">&quot;metric&quot;</span><span class="p">:</span> <span class="n">metric</span><span class="p">,</span>
                         <span class="s2">&quot;explore&quot;</span><span class="p">:</span> <span class="n">explore</span><span class="p">,</span>
+                        <span class="s2">&quot;series_colors&quot;</span><span class="p">:</span> <span class="n">series_colors</span><span class="p">,</span>
                         <span class="s2">&quot;xaxis&quot;</span><span class="p">:</span> <span class="n">xaxis</span><span class="p">,</span>
                         <span class="s2">&quot;row&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">graph_index</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span><span class="p">,</span>
                         <span class="s2">&quot;col&quot;</span><span class="p">:</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">graph_index</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">12</span><span class="p">,</span>
