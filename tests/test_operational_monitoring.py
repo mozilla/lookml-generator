@@ -389,12 +389,12 @@ def test_dashboard_lookml(operational_monitoring_dashboard):
             Os: fission_histogram.os
           y_axes: [{type: log}]
           series_colors:
-            enabled - fission_histogram.percentile: #ff6a06
-            enabled - fission_histogram.high: #ffb380
-            enabled - fission_histogram.low: #ffb380
-            disabled - fission_histogram.percentile: blue
-            disabled - fission_histogram.high: #8cd3ff
-            disabled - fission_histogram.low: #8cd3ff
+            enabled - fission_histogram.percentile: "#ff6a06"
+            enabled - fission_histogram.high: "#ffb380"
+            enabled - fission_histogram.low: "#ffb380"
+            disabled - fission_histogram.percentile: "blue"
+            disabled - fission_histogram.high: "#8cd3ff"
+            disabled - fission_histogram.low: "#8cd3ff"
 
         - title: Gc Ms Content
           name: Gc Ms Content
@@ -420,12 +420,12 @@ def test_dashboard_lookml(operational_monitoring_dashboard):
             Os: fission_histogram.os
           y_axes: [{type: log}]
           series_colors:
-            enabled - fission_histogram.percentile: #ff6a06
-            enabled - fission_histogram.high: #ffb380
-            enabled - fission_histogram.low: #ffb380
-            disabled - fission_histogram.percentile: blue
-            disabled - fission_histogram.high: #8cd3ff
-            disabled - fission_histogram.low: #8cd3ff
+            enabled - fission_histogram.percentile: "#ff6a06"
+            enabled - fission_histogram.high: "#ffb380"
+            enabled - fission_histogram.low: "#ffb380"
+            disabled - fission_histogram.percentile: "blue"
+            disabled - fission_histogram.high: "#8cd3ff"
+            disabled - fission_histogram.low: "#8cd3ff"
 
         filters:
         - name: Percentile
