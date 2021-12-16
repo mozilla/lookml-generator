@@ -273,9 +273,9 @@ jsonschema==3.2.0 \
     --hash=sha256:4e5b3cf8216f577bee9ce139cbe72eca3ea4f292ec60928ff24758ce626cd163 \
     --hash=sha256:c8a85b28d377cc7737e46e2d9f2b4f44ee3c0e1deac6bf46ddefc7187d30797a
     # via mozilla-schema-generator
-lkml==1.1.1 \
-    --hash=sha256:9ad261f7d0cb92a0fe1a7c161865e53d611c858a3647738783169373cf2e5ab5 \
-    --hash=sha256:f10ffd313a1fa767cb0b99b602e8842dd81e15a10b9cd26c66a7d53e2eb547d4
+lkml==1.1.2 \
+    --hash=sha256:0802bfbbf85450e9acd484cdf3f04f5f0a2a19674cad43f66e754ab2bb2bbc4b \
+    --hash=sha256:5a6a84f6f8bc0e1ed68e8aab47995bbc249f1e23608283dd9a541e569f1ba03a
     # via -r requirements.in
 looker-sdk==21.20.0 \
     --hash=sha256:07ffab5bd42bd256f4377a74049876db82ba5f41c4436f7d761524ea3e8887bb \
