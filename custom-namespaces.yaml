@@ -544,3 +544,17 @@ accessibility:
       type: ping_explore
       views:
         base_view: accessibility_clients
+casa:
+  glean_app: false
+  owners:
+    - anicholson@mozilla.com
+  pretty_name: CASA
+  views:
+    projects:
+      type: table_view
+      tables:
+        - table: mozdata.casa.projects
+    users:
+      type: table_view
+      tables:
+        - table: mozdata.casa.users
