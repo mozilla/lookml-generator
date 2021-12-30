@@ -546,6 +546,8 @@ accessibility:
         base_view: accessibility_clients
 casa:
   glean_app: false
+  spoke: looker-spoke-private
+  connection: bigquery-oauth
   owners:
     - anicholson@mozilla.com
   pretty_name: CASA
