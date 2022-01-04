@@ -72,6 +72,10 @@ search:
       type: ping_view
       tables:
         - table: mozdata.analysis.desktop_search_alert_records
+    desktop_search_alert_latest_daily:
+      type: ping_view
+      tables:
+        - table: mozdata.analysis.desktop_search_alert_latest_daily
   explores:
     desktop_search_counts:
       type: ping_explore
@@ -85,6 +89,10 @@ search:
       type: ping_explore
       views:
         base_view: desktop_search_alert_records
+    desktop_search_alert_latest_daily:
+      type: ping_explore
+      views:
+        base_view: desktop_search_alert_latest_daily
 contextual_services:
   glean_app: false
   connection: bigquery-oauth
