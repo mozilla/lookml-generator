@@ -73,7 +73,7 @@ search:
       tables:
         - table: mozdata.analysis.desktop_search_alert_records
     desktop_search_alert_latest_daily:
-      type: ping_view
+      type: table_view
       tables:
         - table: mozdata.analysis.desktop_search_alert_latest_daily
   explores:
@@ -89,10 +89,6 @@ search:
       type: ping_explore
       views:
         base_view: desktop_search_alert_records
-    desktop_search_alert_latest_daily:
-      type: ping_explore
-      views:
-        base_view: desktop_search_alert_latest_daily
 contextual_services:
   glean_app: false
   connection: bigquery-oauth
@@ -454,6 +450,10 @@ monitoring:
     - jklukas@mozilla.com
     - ascholtz@mozilla.com
     - wlach@mozilla.com
+    - akomar@mozilla.com
+    - anicholson@mozilla.com
+    - mhirose@mozilla.com
+    - kignasiak@mozilla.com
   pretty_name: Monitoring (Data Pipeline)
   views:
     average_ping_sizes:
