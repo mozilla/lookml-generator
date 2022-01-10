@@ -568,3 +568,15 @@ casa:
       type: table_view
       tables:
         - table: mozdata.casa.users
+regrets_reporter:
+  glean_app: true
+  connection: bigquery-oauth
+  pretty_name: RegretsReporter
+  owners:
+    - jessed@mozillafoundation.org
+  spoke: looker-spoke-private
+  views:
+    regrets_reporter_summary:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.regrets_reporter_derived.regrets_reporter_summary_v1
