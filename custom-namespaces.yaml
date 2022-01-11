@@ -569,12 +569,11 @@ casa:
       tables:
         - table: mozdata.casa.users
 regrets_reporter:
-  glean_app: true
-  connection: bigquery-oauth
+  glean_app: false
   pretty_name: RegretsReporter
   owners:
     - jessed@mozillafoundation.org
-  spoke: looker-spoke-private
+  spoke: looker-spoke-default
   views:
     regrets_reporter_summary:
       type: table_view
