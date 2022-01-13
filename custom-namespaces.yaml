@@ -480,6 +480,10 @@ monitoring:
       type: ping_view
       tables:
         - table: mozdata.monitoring.stable_table_sizes
+    stable_table_column_counts:
+      type: ping_view
+      tables:
+        - table: mozdata.monitoring.stable_table_column_counts
     structured_distinct_docids:
       type: ping_view
       tables:
@@ -521,6 +525,10 @@ monitoring:
       type: ping_explore
       views:
         base_view: stable_table_sizes
+    stable_table_column_counts:
+      type: ping_explore
+      views:
+        base_view: stable_table_column_counts
     structured_distinct_docids:
       type: ping_explore
       views:
