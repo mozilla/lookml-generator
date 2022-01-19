@@ -14,6 +14,7 @@ from .utils import get_mock_bq_client, print_and_test
 def events_view():
     return EventsView(
         "glean_app",
+        "events",
         [
             {
                 "events_table_view": "events_unnested_table",
