@@ -21,9 +21,9 @@ class EventsView(View):
         },
     ]
 
-    def __init__(self, namespace: str, tables: List[Dict[str, str]]):
+    def __init__(self, namespace: str, name: str, tables: List[Dict[str, str]]):
         """Get an instance of an EventsView."""
-        super().__init__(namespace, "events", EventsView.type, tables)
+        super().__init__(namespace, name, EventsView.type, tables)
 
     @classmethod
     def from_db_views(
@@ -46,6 +46,7 @@ class EventsView(View):
             if view_id == "events_unnested":
                 yield EventsView(
                     namespace,
+                    "events",
                     [
                         {
                             "events_table_view": "events_unnested_table",
@@ -57,7 +58,7 @@ class EventsView(View):
     @classmethod
     def from_dict(klass, namespace: str, name: str, _dict: ViewDict) -> EventsView:
         """Get a view from a name and dict definition."""
-        return EventsView(namespace, _dict["tables"])
+        return EventsView(namespace, name, _dict["tables"])
 
     def to_lookml(self, bq_client, v1_name: Optional[str]) -> Dict[str, Any]:
         """Generate LookML for this view."""
