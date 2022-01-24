@@ -49,8 +49,12 @@ class EventsExplore(Explore):
     def _to_lookml(
         self, client: bigquery.Client, v1_name: Optional[str], data: Dict = {}
     ) -> List[Dict[str, Any]]:
+        name = self.name
+        if not name.endswith("_counts"):
+            name = "event_counts"
+
         lookml = {
-            "name": self.name,
+            "name": name,
             "view_name": self.views["base_view"],
             "description": "Event counts over time.",
             "queries": deepcopy(EventsExplore.queries),
