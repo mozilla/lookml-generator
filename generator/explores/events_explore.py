@@ -50,7 +50,7 @@ class EventsExplore(Explore):
         self, client: bigquery.Client, v1_name: Optional[str], data: Dict = {}
     ) -> List[Dict[str, Any]]:
         lookml = {
-            "name": "event_counts",
+            "name": self.name,
             "view_name": self.views["base_view"],
             "description": "Event counts over time.",
             "queries": deepcopy(EventsExplore.queries),
