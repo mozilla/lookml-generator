@@ -120,8 +120,12 @@
     <span class="k">def</span> <span class="nf">_to_lookml</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span> <span class="n">v1_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;_counts&quot;</span><span class="p">):</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;event_counts&quot;</span>
+
         <span class="n">lookml</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
             <span class="s2">&quot;view_name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">views</span><span class="p">[</span><span class="s2">&quot;base_view&quot;</span><span class="p">],</span>
             <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Event counts over time.&quot;</span><span class="p">,</span>
             <span class="s2">&quot;queries&quot;</span><span class="p">:</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">EventsExplore</span><span class="o">.</span><span class="n">queries</span><span class="p">),</span>
@@ -185,8 +189,12 @@
     <span class="k">def</span> <span class="nf">_to_lookml</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span> <span class="n">v1_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;_counts&quot;</span><span class="p">):</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;event_counts&quot;</span>
+
         <span class="n">lookml</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
             <span class="s2">&quot;view_name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">views</span><span class="p">[</span><span class="s2">&quot;base_view&quot;</span><span class="p">],</span>
             <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Event counts over time.&quot;</span><span class="p">,</span>
             <span class="s2">&quot;queries&quot;</span><span class="p">:</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">EventsExplore</span><span class="o">.</span><span class="n">queries</span><span class="p">),</span>
