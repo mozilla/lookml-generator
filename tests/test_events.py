@@ -170,7 +170,7 @@ def test_view_lookml(events_view):
 def test_explore_lookml(events_explore):
     expected = [
         {
-            "name": "event_counts",
+            "name": "events",
             "view_name": "events",
             "description": "Event counts over time.",
             "always_filter": {
