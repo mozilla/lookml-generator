@@ -1,11 +1,11 @@
 """Generic class to describe Looker views."""
 from __future__ import annotations
 
-from typing import Any, Dict, Iterator, List, Optional, TypedDict
+from typing import Any, Dict, Iterator, List, Optional, Set, TypedDict
 
 from click import ClickException
 
-OMIT_VIEWS = {"deletion_request"}
+OMIT_VIEWS: Set[str] = set()
 
 
 class ViewDict(TypedDict):
