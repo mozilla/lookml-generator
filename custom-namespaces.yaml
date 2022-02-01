@@ -144,6 +144,7 @@ mozilla_vpn:
   glean_app: true
   owners:
     - dthorn@mozilla.com
+    - sbird@mozilla.com
   pretty_name: Mozilla VPN
   views:
     devices:
