@@ -597,9 +597,9 @@ pyrsistent==0.18.0 \
     --hash=sha256:f3ef98d7b76da5eb19c37fda834d50262ff9167c65658d1d8f974d2e4d90676b \
     --hash=sha256:f4c8cabb46ff8e5d61f56a037974228e978f26bfefce4f61a4b1ac0ba7a2ab72
     # via jsonschema
-pytest==6.2.5 \
-    --hash=sha256:131b36680866a76e6781d13f101efb86cf674ebb9762eb70d3082b6f29889e89 \
-    --hash=sha256:7310f8d27bc79ced999e760ca304d69f6ba6c6649c0b60fb0e04a4a77cacc134
+pytest==7.0.0 \
+    --hash=sha256:42901e6bd4bd4a0e533358a86e848427a49005a3256f657c5c8f8dd35ef137a9 \
+    --hash=sha256:dad48ffda394e5ad9aa3b7d7ddf339ed502e5e365b1350e0af65f4a602344b11
     # via
     #   -r requirements.in
     #   pytest-black
@@ -758,7 +758,6 @@ toml==0.10.2 \
     # via
     #   mypy
     #   pre-commit
-    #   pytest
     #   pytest-black
 tomli==1.1.0 \
     --hash=sha256:33d7984738f8bb699c9b0a816eb646a8178a69eaa792d258486776a5d21b8ca5 \
@@ -766,6 +765,7 @@ tomli==1.1.0 \
     # via
     #   black
     #   pep517
+    #   pytest
 types-pyyaml==6.0.4 \
     --hash=sha256:6252f62d785e730e454dfa0c9f0fb99d8dae254c5c3c686903cf878ea27c04b7 \
     --hash=sha256:693b01c713464a6851f36ff41077f8adbc6e355eda929addfb4a97208aea9b4b
