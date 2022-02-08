@@ -17,7 +17,7 @@ attrs==21.2.0 \
     #   looker-sdk
     #   pytest
     #   pytest-mypy
-backports.entry-points-selectable==1.1.1 \
+backports-entry-points-selectable==1.1.1 \
     --hash=sha256:7fceed9532a7aa2bd888654a7314f864a3c16a4e710b34a58cfc0f08114c663b \
     --hash=sha256:914b21a479fde881635f7af5adc7f6e38d6b274be32269070c53b698c60d5386
     # via virtualenv
