@@ -454,9 +454,9 @@ pep517==0.11.0 \
     --hash=sha256:3fa6b85b9def7ba4de99fb7f96fe3f02e2d630df8aa2720a5cf3b183f087a738 \
     --hash=sha256:e1ba5dffa3a131387979a68ff3e391ac7d645be409216b961bc2efe6468ab0b2
     # via pip-tools
-pip-tools==6.5.0 \
-    --hash=sha256:9cf69a020e3c208a7a1bcc78cbfd436dab323efc187919df6182eca98efbe3f2 \
-    --hash=sha256:d14ea4fc2c118db2a6af65a4345a8b9b355e792aedad6bf64dd3eb97c5fc5fee
+pip-tools==6.5.1 \
+    --hash=sha256:80f1cfc7156e4a4465b1a46a6bb3599587909537db1a149cf3a6b73eed979ee4 \
+    --hash=sha256:80f562aa699fc76a424539697e0bef41e490a050e57a6a21468531981a9d419e
     # via -r requirements.in
 platformdirs==2.2.0 \
     --hash=sha256:4666d822218db6a262bdfdc9c39d21f23b4cfdb08af331a81e92751daf6c866c \
@@ -604,6 +604,7 @@ pytest==7.0.0 \
     #   -r requirements.in
     #   pytest-black
     #   pytest-flake8
+    #   pytest-isort
     #   pytest-mypy
     #   pytest-pydocstyle
 pytest-black==0.3.12 \
@@ -613,9 +614,9 @@ pytest-flake8==1.0.7 \
     --hash=sha256:c28cf23e7d359753c896745fd4ba859495d02e16c84bac36caa8b1eec58f5bc1 \
     --hash=sha256:f0259761a903563f33d6f099914afef339c085085e643bee8343eb323b32dd6b
     # via -r requirements.in
-pytest-isort==2.0.0 \
-    --hash=sha256:821a8c5c9c4f3a3c52cfa9c541fbe89ac9e28728125125af53724c4c3f129117 \
-    --hash=sha256:ab949c593213dad38ba75db32a0ce361fcddd11d4152be4a2c93b85104cc4376
+pytest-isort==3.0.0 \
+    --hash=sha256:2d96a25a135d6fd084ac36878e7d54f26f27c6987c2c65f0d12809bffade9cb9 \
+    --hash=sha256:4fe4b26ead2af776730ec23f5870d7421f35aace22a41c4e938586ef4d8787cb
     # via -r requirements.in
 pytest-mypy==0.9.1 \
     --hash=sha256:9ffa3bf405c12c5c6be9e92e22bebb6ab2c91b9c32f45b0f0c93af473269ab5c \
