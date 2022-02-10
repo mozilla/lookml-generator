@@ -604,3 +604,22 @@ regrets_reporter:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.regrets_reporter_derived.regrets_reporter_summary_v1
+messaging_system:
+  glean_app: false
+  pretty_name: Messaging System
+  owners:
+    - mviar@mozilla.com
+    - brennie@mozilla.com
+    - aoprea@mozilla.com
+    - dmosedale@mozilla.com
+    - elee@mozilla.com
+    - emcminn@mozilla.com
+    - pdahiya@mozilla.com
+    - tspurway@mozilla.com
+  spoke: looker-spoke-default
+  views:
+    events_daily:
+      type: table_view
+      tables:
+        - channel: release
+          table: mozdata.messaging_system.events_daily
