@@ -140,6 +140,13 @@ contextual_services:
       type: ping_explore
       views:
         base_view: topsites_impression
+mozilla_vpn_private:
+  glean_app: false
+  connection: bigquery-oauth
+  pretty_name: Mozilla VPN
+  owners:
+    - dthorn@mozilla.com
+  spoke: looker-spoke-private
 mozilla_vpn:
   glean_app: true
   owners:
