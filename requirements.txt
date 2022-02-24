@@ -126,7 +126,6 @@ google-api-core[grpc]==1.31.3 \
     --hash=sha256:4b7ad965865aef22afa4aded3318b8fa09b20bcc7e8dbb639a3753cf60af08ea \
     --hash=sha256:f52c708ab9fd958862dea9ac94d9db1a065608073fe583c3b9c18537b177f59a
     # via
-    #   -r requirements.in
     #   google-cloud-bigquery
     #   google-cloud-core
     #   google-cloud-storage
@@ -191,9 +190,7 @@ google-resumable-media==1.3.1 \
 googleapis-common-protos==1.55.0 \
     --hash=sha256:183bb0356bd614c4330ad5158bc1c1bcf9bcf7f5e7f911317559fe209496eeee \
     --hash=sha256:53eb313064738f45d5ac634155ae208e121c963659627b90dfcb61ef514c03e1
-    # via
-    #   -r requirements.in
-    #   google-api-core
+    # via google-api-core
 grpcio==1.39.0 \
     --hash=sha256:02e8a8b41db8e13df53078355b439363e4ac46d0ac9a8a461a39e42829e2bcf8 \
     --hash=sha256:050901a5baa6c4ca445e1781ef4c32d864f965ccec70c46cd5ad92d15e282c6a \
