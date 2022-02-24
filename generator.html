@@ -144,7 +144,7 @@ gcloud auth login --update-adc
 <p>Install requirements in a Python venv</p>
 
 <div class="pdoc-code codehilite"><pre><span></span><code>python3.8 -m venv venv/
-venv/bin/pip install -r requirements.txt
+venv/bin/pip install --no-deps -r requirements.txt
 </code></pre></div>
 
 <p>Update requirements when they change with <code>pip-sync</code></p>
