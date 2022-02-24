@@ -57,7 +57,7 @@ gcloud auth login --update-adc
 Install requirements in a Python venv
 ```bash
 python3.8 -m venv venv/
-venv/bin/pip install -r requirements.txt
+venv/bin/pip install --no-deps -r requirements.txt
 ```
 
 Update requirements when they change with `pip-sync`

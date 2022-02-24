@@ -27,7 +27,7 @@ RUN chown -R ${USER_ID}:${GROUP_ID} ${HOME}
 RUN pip install --upgrade pip
 COPY requirements.txt ${HOME}
 RUN chown ${USER_ID}:${GROUP_ID} ${HOME}/requirements.txt
-RUN pip install -r ${HOME}/requirements.txt
+RUN pip install --no-deps -r ${HOME}/requirements.txt
 
 COPY . ${HOME}/lookml-generator
 RUN chown -R ${USER_ID}:${GROUP_ID} ${HOME}/lookml-generator
