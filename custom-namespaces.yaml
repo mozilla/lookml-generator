@@ -270,6 +270,11 @@ revenue:
     - akomarzewski@mozilla.com
     - skahmann@mozilla.com
   spoke: looker-spoke-private
+  views:
+    stripe_itemized_payout_reconciliation:
+      type: table_view
+      tables:
+        - table: mozdata.stripe.itemized_payout_reconciliation
 firefox_ios:
   owners:
     - athomas@mozilla.com
