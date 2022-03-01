@@ -617,3 +617,22 @@ regrets_reporter:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.regrets_reporter_derived.regrets_reporter_summary_v1
+kpi:
+  glean_app: false
+  owners:
+    - loines@mozilla.com
+  pretty_name: KPI
+  views:
+    unified_metrics:
+      type: ping_view
+      tables:
+        - table: mozdata.telemetry.unified_metrics
+    loines_browser_2022_forecasts:
+      type: table_view
+      tables:
+        - table: mozdata.analysis.loines_browser_2022_forecasts
+  explores:
+    unified_metrics:
+      type: ping_explore
+      views:
+        base_view: unified_metrics
