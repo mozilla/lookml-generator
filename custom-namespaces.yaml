@@ -146,6 +146,7 @@ mozilla_vpn_private:
   pretty_name: Mozilla VPN
   owners:
     - dthorn@mozilla.com
+    - sbird@mozilla.com
   spoke: looker-spoke-private
 mozilla_vpn:
   glean_app: true
