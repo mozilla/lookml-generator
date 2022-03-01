@@ -627,10 +627,6 @@ kpi:
       type: ping_view
       tables:
         - table: mozdata.telemetry.unified_metrics
-    loines_browser_2022_forecasts:
-      type: table_view
-      tables:
-        - table: mozdata.analysis.loines_browser_2022_forecasts
   explores:
     unified_metrics:
       type: ping_explore
