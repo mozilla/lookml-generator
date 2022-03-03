@@ -1,6 +1,6 @@
 PyYAML==6.0
 click==8.0.4
-google-cloud-bigquery==2.34.0
+google-cloud-bigquery==2.34.1
 google-cloud-storage==2.1.0
 Jinja2==3.0.3
 lkml==1.2.0
