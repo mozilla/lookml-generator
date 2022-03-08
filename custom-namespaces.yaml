@@ -632,3 +632,10 @@ kpi:
       type: ping_explore
       views:
         base_view: unified_metrics
+fpa:
+  glean_app: false
+  connection: bigquery-oauth
+  pretty_name: FP&A
+  owners:
+    - ngrammater@mozilla.com
+  spoke: looker-spoke-private
