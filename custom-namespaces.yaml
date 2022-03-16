@@ -638,4 +638,6 @@ fpa:
   pretty_name: FP&A
   owners:
     - ngrammater@mozilla.com
+    - rmiller@mozilla.com
+    - lakshmimurugan@google.com
   spoke: looker-spoke-private
