@@ -119,6 +119,15 @@ contextual_services:
       type: ping_view
       tables:
         - table: mozdata.contextual_services.topsites_impression
+    topsites_impression_fenix:
+      tables:
+        - channel: release
+          table: mozdata.fenix.topsites_impression
+        - channel: beta
+          table: mozdata.org_mozilla_firefox_beta.topsites_impression
+        - channel: nightly
+          table: mozdata.org_mozilla_fenix.topsites_impression
+      type: ping_view
   explores:
     event_aggregates:
       type: ping_explore
@@ -140,6 +149,10 @@ contextual_services:
       type: ping_explore
       views:
         base_view: topsites_impression
+    topsites_impressions_fenix:
+      type: ping_explore
+      views:
+        base_view: topsites_impression_fenix
 mozilla_vpn_private:
   glean_app: false
   connection: bigquery-oauth
