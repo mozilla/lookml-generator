@@ -292,6 +292,7 @@ revenue:
 firefox_ios:
   owners:
     - athomas@mozilla.com
+    - darcese@mozilla.com
 fenix:
   owners:
     - vzare@mozilla.com
