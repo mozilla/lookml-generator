@@ -70,3 +70,17 @@ def get_xaxis_val(bq_client: bigquery.Client, table: str) -> str:
         if "build_id" in {dimension["name"] for dimension in all_dimensions}
         else "submission_date"
     )
+
+
+def get_projects(
+    bq_client: bigquery.Client, project_table: str
+) -> List[Dict[str, Any]]:
+    query_job = bq_client.query(
+        f"""
+            SELECT *
+            FROM {project_table}
+        """
+    )
+
+    projects = [dict(row) for row in query_job.result()]
+    return projects

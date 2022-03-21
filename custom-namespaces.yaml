@@ -4,7 +4,11 @@ operational_monitoring:
   owners:
     - msamuel@mozilla.com
   pretty_name: Operational Monitoring
-  data_functions: ["compute_opmon_dimensions"]
+  views:
+    projects:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.operational_monitoring_derived.projects_v1
 duet:
   glean_app: false
   owners:

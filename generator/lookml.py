@@ -8,7 +8,6 @@ import lkml
 import yaml
 from google.cloud import bigquery
 
-from . import operational_monitoring_utils
 from .dashboards import DASHBOARD_TYPES
 from .explores import EXPLORE_TYPES
 from .namespaces import _get_glean_apps
@@ -95,24 +94,6 @@ def _glean_apps_to_v1_map(glean_apps):
     return {d["name"]: d["v1_name"] for d in glean_apps}
 
 
-def _append_data(bq_client, data_functions, view, namespace_data):
-    # For now, assume that data functions are applied
-    # to each table. Later it could be a mapping so only
-    # certain functions are applied to certain tables.
-    for function_name in data_functions:
-        if function_name not in namespace_data:
-            namespace_data[function_name] = {}
-
-        namespace_data[function_name][view.name] = {}
-
-        for table in view.tables:
-            table_name = table["table"]
-            data_function = getattr(operational_monitoring_utils, function_name)
-            namespace_data[function_name][view.name][table_name] = data_function(
-                bq_client, table_name
-            )
-
-
 def _lookml(namespaces, glean_apps, target_dir):
     client = bigquery.Client()
 
@@ -135,11 +116,6 @@ def _lookml(namespaces, glean_apps, target_dir):
         views = list(_get_views_from_dict(lookml_objects.get("views", {}), namespace))
 
         namespace_data = {}
-        for view in views:
-            _append_data(
-                client, lookml_objects.get("data_functions", []), view, namespace_data
-            )
-
         logging.info("  Generating views")
         v1_name: Optional[str] = v1_mapping.get(namespace)
         for view_path in _generate_views(client, view_dir, views, v1_name):
