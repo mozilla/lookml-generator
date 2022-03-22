@@ -28,6 +28,9 @@ class OperationalMonitoringExplore(Explore):
         super().__init__(name, views, views_path)
         if defn is not None:
             self.branches = ", ".join(defn["branches"])
+            self.xaxis = defn.get("xaxis")
+            self.dimensions = defn.get("dimensions")
+            self.probes = defn.get("probes")
 
     @staticmethod
     def from_views(views: List[View]) -> Iterator[Explore]:
@@ -57,15 +60,9 @@ class OperationalMonitoringExplore(Explore):
     ) -> List[Dict[str, Any]]:
         base_view_name = self.views["base_view"]
 
-        namespace_data = data.get("compute_opmon_dimensions", {}).get(
-            base_view_name, {}
+        dimension_data = operational_monitoring_utils.compute_opmon_dimensions(
+            bq_client=bq_client, table=base_view_name, allowed_dimensions=self.dim
         )
-        table_name = (
-            "" if len(namespace_data.keys()) == 0 else list(namespace_data.keys())[0]
-        )
-        dimension_data = namespace_data[table_name]
-
-        xaxis = operational_monitoring_utils.get_xaxis_val(bq_client, table_name)
 
         filters = [
             {f"{base_view_name}.branch": self.branches},
@@ -78,15 +75,14 @@ class OperationalMonitoringExplore(Explore):
                 )
 
         aggregate_tables = []
-        probes = lookml_utils.get_distinct_vals(bq_client, table_name, "probe")
-        for probe in probes:
+        for probe in self.probes:
             filters_copy = deepcopy(filters)
             filters_copy.append({f"{base_view_name}.probe": probe})
             aggregate_tables.append(
                 {
                     "name": f"rollup_{probe}",
                     "query": {
-                        "dimensions": [xaxis, "branch"],
+                        "dimensions": [self.xaxis, "branch"],
                         "measures": ["low", "high", "percentile"],
                         "filters": filters_copy,
                     },

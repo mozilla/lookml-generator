@@ -100,6 +100,7 @@ def _get_opmon(bq_client: bigquery.Client, namespaces: Dict[str, Any]):
                     {
                         "table": f"{PROD_PROJECT}.{OPMON_DATASET}.{table_prefix}_{data_type}",
                         "xaxis": project["xaxis"],
+                        "dimensions": project["dimensions"],
                     }
                 ],
             }

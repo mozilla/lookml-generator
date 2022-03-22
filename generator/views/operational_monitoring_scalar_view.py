@@ -18,6 +18,7 @@ class OperationalMonitoringScalarView(OperationalMonitoringView):
             "name": percentile_ci_label,
             "type": "number",
             "sql": dedent(
+                # todo: bucket data
                 f"""
                 `moz-fx-data-shared-prod`.udf_js.jackknife_percentile_ci(
                     {{% parameter percentile_conf %}},
@@ -43,7 +44,7 @@ class OperationalMonitoringScalarView(OperationalMonitoringView):
         additional_dimensions = [
             dimension
             for dimension in all_dimensions
-            if dimension["name"] not in OPMON_EXCLUDED_FIELDS
+            if dimension["name"] in self.tables[0]["dimensions"]
         ]
         self.dimensions.extend(additional_dimensions)
 

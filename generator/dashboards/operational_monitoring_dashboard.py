@@ -28,7 +28,7 @@ class OperationalMonitoringDashboard(Dashboard):
         namespace: str,
         tables: List[Dict[str, str]],
     ):
-        """Get an instance of a FunnelAnalysisView."""
+        """Get an instance of a Operational Monitoring Dashboard."""
         super().__init__(title, name, layout, namespace, tables)
 
     @classmethod

@@ -43,7 +43,7 @@ class OperationalMonitoringHistogramView(OperationalMonitoringView):
         additional_dimensions = [
             dimension
             for dimension in all_dimensions
-            if dimension["name"] not in OPMON_EXCLUDED_FIELDS
+            if dimension["name"] in self.tables[0]["dimensions"]
         ]
         self.dimensions.extend(additional_dimensions)
 

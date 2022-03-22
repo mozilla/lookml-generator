@@ -6,9 +6,11 @@ from google.cloud import bigquery
 from .constants import OPMON_DASH_EXCLUDED_FIELDS, OPMON_EXCLUDED_FIELDS
 from .views import lookml_utils
 
+# todo: move to methods and delete file
+
 
 def compute_opmon_dimensions(
-    bq_client: bigquery.Client, table: str
+    bq_client: bigquery.Client, table: str, allowed_dimensions: List[str] = []
 ) -> List[Dict[str, Any]]:
     """
     Compute dimensions for Operational Monitoring.
@@ -17,24 +19,22 @@ def compute_opmon_dimensions(
     value and its top 10 most common to be used as dropdown options.
     """
     all_dimensions = lookml_utils._generate_dimensions(bq_client, table)
-    copy_excluded = OPMON_EXCLUDED_FIELDS.copy()
-    copy_excluded.update(OPMON_DASH_EXCLUDED_FIELDS)
     dimensions = []
 
     relevant_dimensions = [
         dimension
         for dimension in all_dimensions
-        if dimension["name"] not in copy_excluded
+        if dimension["name"] in allowed_dimensions
     ]
     for dimension in relevant_dimensions:
         dimension_name = dimension["name"]
         query_job = bq_client.query(
             f"""
-                    SELECT DISTINCT {dimension_name}, COUNT(*)
-                    FROM {table}
-                    GROUP BY 1
-                    ORDER BY 2 DESC
-                """
+                SELECT DISTINCT {dimension_name}, COUNT(*)
+                FROM {table}
+                GROUP BY 1
+                ORDER BY 2 DESC
+            """
         )
 
         title = lookml_utils.slug_to_title(dimension_name)
@@ -68,7 +68,7 @@ def get_xaxis_val(bq_client: bigquery.Client, table: str) -> str:
     return (
         "build_id"
         if "build_id" in {dimension["name"] for dimension in all_dimensions}
-        else "submission_date"
+        else "day"
     )
 
 

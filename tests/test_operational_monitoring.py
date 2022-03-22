@@ -19,13 +19,13 @@ from .utils import print_and_test
 TABLE_HISTOGRAM = (
     "moz-fx-data-shared-prod."
     "operational_monitoring."
-    "bug_1660366_pref_ongoing_fission_nightly_experiment_nightly_83_100_histogram"
+    "bug_123_test_histogram"
 )
 
 TABLE_SCALAR = (
     "moz-fx-data-shared-prod."
     "operational_monitoring."
-    "bug_1660366_pref_ongoing_fission_nightly_experiment_nightly_83_100_scalar"
+    "bug_123_test_scalar"
 )
 
 DATA = {
@@ -33,7 +33,7 @@ DATA = {
         "fission_histogram": {
             (
                 "moz-fx-data-shared-prod.operational_monitoring."
-                "bug_1660366_pref_ongoing_fission_nightly_experiment_nightly_83_100_histogram"
+                "bug_123_test_histogram"
             ): [
                 {
                     "title": "Cores Count",
@@ -52,7 +52,7 @@ DATA = {
         "fission_scalar": {
             (
                 "moz-fx-data-shared-prod.operational_monitoring."
-                "bug_1660366_pref_ongoing_fission_nightly_experiment_nightly_83_100_scalar"
+                "bug_123_test_scalar"
             ): [
                 {
                     "title": "Cores Count",

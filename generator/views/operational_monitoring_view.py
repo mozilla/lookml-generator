@@ -22,7 +22,7 @@ class OperationalMonitoringView(PingView):
 
         xaxis_to_sql_mapping = {
             "build_id": f"PARSE_DATE('%Y%m%d', CAST(${{TABLE}}.{xaxis} AS STRING))",
-            "submission_date": f"${{TABLE}}.{xaxis}",
+            "day": f"${{TABLE}}.{xaxis}",
         }
         self.dimensions: List[Dict[str, str]] = [
             {
