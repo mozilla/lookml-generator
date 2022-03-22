@@ -17,15 +17,11 @@ from generator.views import (
 from .utils import print_and_test
 
 TABLE_HISTOGRAM = (
-    "moz-fx-data-shared-prod."
-    "operational_monitoring."
-    "bug_123_test_histogram"
+    "moz-fx-data-shared-prod." "operational_monitoring." "bug_123_test_histogram"
 )
 
 TABLE_SCALAR = (
-    "moz-fx-data-shared-prod."
-    "operational_monitoring."
-    "bug_123_test_scalar"
+    "moz-fx-data-shared-prod." "operational_monitoring." "bug_123_test_scalar"
 )
 
 DATA = {
@@ -50,10 +46,7 @@ DATA = {
             ]
         },
         "fission_scalar": {
-            (
-                "moz-fx-data-shared-prod.operational_monitoring."
-                "bug_123_test_scalar"
-            ): [
+            ("moz-fx-data-shared-prod.operational_monitoring." "bug_123_test_scalar"): [
                 {
                     "title": "Cores Count",
                     "name": "cores_count",

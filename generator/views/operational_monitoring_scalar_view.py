@@ -3,7 +3,6 @@
 from textwrap import dedent
 from typing import Any, Dict, Optional
 
-from ..constants import OPMON_EXCLUDED_FIELDS
 from . import lookml_utils
 from .operational_monitoring_view import OperationalMonitoringView
 

@@ -43,6 +43,10 @@ def custom_namespaces(tmp_path):
                 owners:
                 - opmon-owner@allizom.com
                 pretty_name: Operational Monitoring
+                views:
+                  projects:
+                    tables:
+                    - table: mozdata.operational_monitoring.projects
             custom:
               connection: bigquery-oauth
               glean_app: false
@@ -99,35 +103,23 @@ def namespace_disallowlist(tmp_path):
     return dest.absolute()
 
 
-class MockBlob:
-    """Mock Blob."""
+class MockClient:
+    """Mock bigquery.Client."""
 
-    def __init__(self, name):
-        self.name = name
-        self.updated = "2021-05-01"
+    def query(self, query):
+        class QueryJob:
+            def result(self):
+                return [
+                    {
+                        "slug": "op-mon",
+                        "name": "OpMon",
+                        "branches": ["enabled", "disabled"],
+                        "xaxis": "day",
+                        "dimensions": ["cores"],
+                    }
+                ]
 
-    def download_as_string(self):
-        return '{"slug": "test", "name": "op_mon", "xaxis": "build_id"}'
-
-
-class MockBucket:
-    """Mock Bucket."""
-
-    def list_blobs(self, prefix):
-        return [MockBlob("test")]
-
-    def get_blob(self, filename):
-        return MockBlob("test")
-
-
-class MockStorageClient:
-    """Mock storage.Client."""
-
-    def __init__(self, project_name):
-        pass
-
-    def get_bucket(self, bucket_name):
-        return MockBucket()
+        return QueryJob()
 
 
 def add_to_tar(tar, path, content):
@@ -193,7 +185,7 @@ def test_namespaces_full(
     app_listings_uri,
     namespace_disallowlist,
 ):
-    with patch("google.cloud.storage.Client", MockStorageClient):
+    with patch("google.cloud.bigquery.Client", MockClient):
         with runner.isolated_filesystem():
             result = runner.invoke(
                 namespaces,
@@ -385,16 +377,16 @@ def test_namespaces_full(
                 },
                 "operational_monitoring": {
                     "dashboards": {
-                        "op_mon": {
+                        "opmon": {
                             "tables": [
                                 {
-                                    "explore": "op_mon_histogram",
-                                    "table": "moz-fx-data-shared-prod.operational_monitoring.test_histogram",
+                                    "explore": "opmon_histogram",
+                                    "table": "moz-fx-data-shared-prod.operational_monitoring.op_mon_histogram",
                                     "branches": ["enabled", "disabled"],
                                 },
                                 {
-                                    "explore": "op_mon_scalar",
-                                    "table": "moz-fx-data-shared-prod.operational_monitoring.test_scalar",
+                                    "explore": "opmon_scalar",
+                                    "table": "moz-fx-data-shared-prod.operational_monitoring.op_mon_scalar",
                                     "branches": ["enabled", "disabled"],
                                 },
                             ],
@@ -402,15 +394,15 @@ def test_namespaces_full(
                         }
                     },
                     "explores": {
-                        "op_mon_histogram": {
+                        "opmon_histogram": {
                             "branches": ["enabled", "disabled"],
                             "type": "operational_monitoring_explore",
-                            "views": {"base_view": "op_mon_histogram"},
+                            "views": {"base_view": "opmon_histogram"},
                         },
-                        "op_mon_scalar": {
+                        "opmon_scalar": {
                             "branches": ["enabled", "disabled"],
                             "type": "operational_monitoring_explore",
-                            "views": {"base_view": "op_mon_scalar"},
+                            "views": {"base_view": "opmon_scalar"},
                         },
                     },
                     "glean_app": False,
@@ -418,20 +410,22 @@ def test_namespaces_full(
                     "pretty_name": "Operational Monitoring",
                     "spoke": "looker-spoke-default",
                     "views": {
-                        "op_mon_histogram": {
+                        "opmon_histogram": {
                             "tables": [
                                 {
-                                    "table": "moz-fx-data-shared-prod.operational_monitoring.test_histogram",
-                                    "xaxis": "build_id",
+                                    "dimensions": ["cores"],
+                                    "table": "moz-fx-data-shared-prod.operational_monitoring.op_mon_histogram",
+                                    "xaxis": "day",
                                 }
                             ],
                             "type": "operational_monitoring_histogram_view",
                         },
-                        "op_mon_scalar": {
+                        "opmon_scalar": {
                             "tables": [
                                 {
-                                    "table": "moz-fx-data-shared-prod.operational_monitoring.test_scalar",
-                                    "xaxis": "build_id",
+                                    "dimensions": ["cores"],
+                                    "table": "moz-fx-data-shared-prod.operational_monitoring.op_mon_scalar",
+                                    "xaxis": "day",
                                 }
                             ],
                             "type": "operational_monitoring_scalar_view",

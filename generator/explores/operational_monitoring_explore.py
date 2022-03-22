@@ -22,15 +22,15 @@ class OperationalMonitoringExplore(Explore):
         name: str,
         views: Dict[str, str],
         views_path: Path = None,
-        defn: Dict[str, str] = None,
+        defn: Dict[str, Any] = None,
     ):
         """Initialize OperationalMonitoringExplore."""
         super().__init__(name, views, views_path)
         if defn is not None:
             self.branches = ", ".join(defn["branches"])
             self.xaxis = defn.get("xaxis")
-            self.dimensions = defn.get("dimensions")
-            self.probes = defn.get("probes")
+            self.dimensions = defn.get("dimensions", [])
+            self.probes = defn.get("probes", [])
 
     @staticmethod
     def from_views(views: List[View]) -> Iterator[Explore]:
@@ -61,7 +61,7 @@ class OperationalMonitoringExplore(Explore):
         base_view_name = self.views["base_view"]
 
         dimension_data = operational_monitoring_utils.compute_opmon_dimensions(
-            bq_client=bq_client, table=base_view_name, allowed_dimensions=self.dim
+            bq_client=bq_client, table=base_view_name, allowed_dimensions=self.dimensions
         )
 
         filters = [

@@ -70,11 +70,17 @@ def _get_db_views(uri):
 
 
 def _get_opmon(bq_client: bigquery.Client, namespaces: Dict[str, Any]):
-    om_content = {"views": {}, "explores": {}, "dashboards": {}}
+    om_content: Dict[str, Any] = {"views": {}, "explores": {}, "dashboards": {}}
     # get operational monitoring namespace information
 
     opmon_namespace = namespaces["operational_monitoring"]
-    projects_view = opmon_namespace.get("views").get("projects")
+    views = opmon_namespace.get("views")
+    
+    if views is None:
+        print("No views defined for operational monitoring")
+        return {}
+
+    projects_view = views.get("projects")
 
     if projects_view is None:
         print("No projects view defined for operational monitoring")
@@ -82,10 +88,17 @@ def _get_opmon(bq_client: bigquery.Client, namespaces: Dict[str, Any]):
 
     projects_table = projects_view["tables"][0]
 
+    query_job = bq_client.query(
+        f"""
+            SELECT *
+            FROM {projects_table}
+        """
+    )
+
+    projects = [dict(row) for row in query_job.result()]
+
     # Iterating over all defined operational monitoring projects
-    for project in operational_monitoring_utils.get_projects(
-        bq_client, project_table=projects_table
-    ):
+    for project in projects:
         table_prefix = _normalize_slug(project["slug"])
         project_name = "_".join(project["name"].lower().split(" "))
         branches = project.get("branches", ["enabled", "disabled"])
@@ -274,7 +287,7 @@ def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri, disallowl
         # generating operational monitoring namespace, if available
         if "operational_monitoring" in custom_namespaces:
             client = bigquery.Client()
-            opmon = _get_opmon()
+            opmon = _get_opmon(bq_client=client, namespaces=custom_namespaces)
             custom_namespaces["operational_monitoring"].update(opmon)
             _merge_namespaces(namespaces, custom_namespaces)
 

@@ -3,7 +3,6 @@ from typing import Any, Dict, List
 
 from google.cloud import bigquery
 
-from .constants import OPMON_DASH_EXCLUDED_FIELDS, OPMON_EXCLUDED_FIELDS
 from .views import lookml_utils
 
 # todo: move to methods and delete file
