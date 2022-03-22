@@ -12,10 +12,10 @@ from itertools import groupby
 from operator import itemgetter
 from pathlib import Path
 from typing import Any, Dict, List, Union
-from google.cloud import bigquery
 
 import click
 import yaml
+from google.cloud import bigquery
 
 from generator import operational_monitoring_utils
 
@@ -86,7 +86,7 @@ def _get_opmon(bq_client: bigquery.Client, namespaces: Dict[str, Any]):
         print("No projects view defined for operational monitoring")
         return {}
 
-    projects_table = projects_view["tables"][0]
+    projects_table = projects_view["tables"][0]["table"]
     projects = operational_monitoring_utils.get_projects(
         bq_client, project_table=projects_table
     )
@@ -121,6 +121,9 @@ def _get_opmon(bq_client: bigquery.Client, namespaces: Dict[str, Any]):
                 "branches": branches,
                 "xaxis": project["xaxis"],
                 "dimensions": dimensions,
+                "probes": [
+                    p["name"] for p in project["probes"] if p["agg_type"] == data_type
+                ],
             }
 
         om_content["dashboards"][project_name] = {
@@ -132,6 +135,11 @@ def _get_opmon(bq_client: bigquery.Client, namespaces: Dict[str, Any]):
                     "branches": branches,
                     "xaxis": project["xaxis"],
                     "dimensions": dimensions,
+                    "probes": [
+                        p["name"]
+                        for p in project["probes"]
+                        if p["agg_type"] == data_type
+                    ],
                 }
                 for data_type in DATA_TYPES
             ],

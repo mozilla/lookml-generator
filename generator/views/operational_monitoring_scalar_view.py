@@ -22,7 +22,6 @@ class OperationalMonitoringScalarView(OperationalMonitoringView):
             "name": percentile_ci_label,
             "type": "number",
             "sql": dedent(
-                # todo: bucket data
                 f"""
                 `moz-fx-data-shared-prod`.udf_js.jackknife_percentile_ci(
                     {{% parameter percentile_conf %}},

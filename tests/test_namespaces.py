@@ -139,6 +139,10 @@ class MockClient:
                             "name": "OpMon",
                             "branches": ["enabled", "disabled"],
                             "xaxis": "submission_date",
+                            "probes": [
+                                {"name": "GC_MS", "agg_type": "histogram"},
+                                {"name": "GC_MS_CONTENT", "agg_type": "histogram"},
+                            ],
                             "dimensions": {
                                 "cores_count": {"default": "4", "options": ["4", "1"]}
                             },
@@ -416,6 +420,7 @@ def test_namespaces_full(
                                         }
                                     },
                                     "xaxis": "submission_date",
+                                    "probes": ["GC_MS", "GC_MS_CONTENT"],
                                 },
                                 {
                                     "explore": "opmon_scalar",
@@ -428,6 +433,7 @@ def test_namespaces_full(
                                         }
                                     },
                                     "xaxis": "submission_date",
+                                    "probes": [],
                                 },
                             ],
                             "type": "operational_monitoring_dashboard",
@@ -445,6 +451,7 @@ def test_namespaces_full(
                                 }
                             },
                             "xaxis": "submission_date",
+                            "probes": ["GC_MS", "GC_MS_CONTENT"],
                         },
                         "opmon_scalar": {
                             "branches": ["enabled", "disabled"],
@@ -457,6 +464,7 @@ def test_namespaces_full(
                                 }
                             },
                             "xaxis": "submission_date",
+                            "probes": [],
                         },
                     },
                     "glean_app": False,

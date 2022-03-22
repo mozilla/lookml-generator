@@ -1,9 +1,8 @@
 """Class to describe Operational Monitoring Dashboard."""
 from __future__ import annotations
 
-from typing import Dict, List
+from typing import Any, Dict, List
 
-from .. import operational_monitoring_utils
 from ..views import lookml_utils
 from .dashboard import Dashboard
 
@@ -26,10 +25,13 @@ class OperationalMonitoringDashboard(Dashboard):
         name: str,
         layout: str,
         namespace: str,
-        tables: List[Dict[str, str]],
+        defn: List[Dict[str, Any]],
     ):
         """Get an instance of a Operational Monitoring Dashboard."""
-        super().__init__(title, name, layout, namespace, tables)
+        self.dimensions = defn[0].get("dimensions", {})
+        self.xaxis = defn[0]["xaxis"]
+
+        super().__init__(title, name, layout, namespace, defn)
 
     @classmethod
     def from_dict(
@@ -50,7 +52,7 @@ class OperationalMonitoringDashboard(Dashboard):
             ]
         return dict((label, colour) for (label, colour) in zip(series_labels, colours))
 
-    def to_lookml(self, bq_client, data):
+    def to_lookml(self, bq_client):
         """Get this dashboard as LookML."""
         kwargs = {
             "name": self.name,
@@ -60,27 +62,27 @@ class OperationalMonitoringDashboard(Dashboard):
             "dimensions": [],
         }
 
-        table_data = {}
-        for view_data in data.get("compute_opmon_dimensions", {}).values():
-            table_data.update(view_data)
-
         includes = []
         graph_index = 0
         for table_defn in self.tables:
-            table_name = table_defn["table"]
             if len(kwargs["dimensions"]) == 0:
-                kwargs["dimensions"] = table_data[table_name]
+                kwargs["dimensions"] = [
+                    {
+                        "name": name,
+                        "title": lookml_utils.slug_to_title(name),
+                        "default": info["default"],
+                        "options": info["options"],
+                    }
+                    for name, info in self.dimensions.items()
+                ]
 
-            xaxis = operational_monitoring_utils.get_xaxis_val(bq_client, table_name)
-
-            metrics = lookml_utils.get_distinct_vals(bq_client, table_name, "probe")
             explore = table_defn["explore"]
             includes.append(
                 f"/looker-hub/{self.namespace}/explores/{explore}.explore.lkml"
             )
 
             series_colors = self._map_series_to_colours(table_defn["branches"], explore)
-            for metric in metrics:
+            for metric in table_defn.get("probes", []):
                 title = lookml_utils.slug_to_title(metric)
                 kwargs["elements"].append(
                     {
@@ -88,13 +90,12 @@ class OperationalMonitoringDashboard(Dashboard):
                         "metric": metric,
                         "explore": explore,
                         "series_colors": series_colors,
-                        "xaxis": xaxis,
+                        "xaxis": self.xaxis,
                         "row": int(graph_index / 2) * 10,
                         "col": 0 if graph_index % 2 == 0 else 12,
                     }
                 )
                 graph_index += 1
-
         dash_lookml = lookml_utils.render_template(
             "dashboard.lkml", "dashboards", **kwargs
         )

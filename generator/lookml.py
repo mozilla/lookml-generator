@@ -44,7 +44,6 @@ def _generate_explores(
     v1_name: Optional[
         str
     ],  # v1_name for Glean explores: see: https://mozilla.github.io/probe-scraper/#tag/library
-    namespace_data: dict,
 ) -> Iterable[Path]:
     for explore_name, defn in explores.items():
         logging.info(f"Generating lookml for explore {explore_name} in {namespace}")
@@ -57,7 +56,7 @@ def _generate_explores(
                 f"/looker-hub/{namespace}/views/{view}.view.lkml"
                 for view in explore.get_dependent_views()
             ],
-            "explores": explore.to_lookml(client, v1_name, namespace_data),
+            "explores": explore.to_lookml(client, v1_name),
         }
         path = out_dir / (explore_name + ".explore.lkml")
         path.write_text(FILE_HEADER + lkml.dump(file_lookml))
@@ -69,7 +68,6 @@ def _generate_dashboards(
     dash_dir: Path,
     namespace: str,
     dashboards: dict,
-    namespace_data: dict,
 ):
     for dashboard_name, dashboard_info in dashboards.items():
         logging.info(f"Generating lookml for dashboard {dashboard_name} in {namespace}")
@@ -77,7 +75,7 @@ def _generate_dashboards(
             namespace, dashboard_name, dashboard_info
         )
 
-        dashboard_lookml = dashboard.to_lookml(client, namespace_data)
+        dashboard_lookml = dashboard.to_lookml(client)
         dash_path = dash_dir / f"{dashboard_name}.dashboard.lookml"
         dash_path.write_text(FILE_HEADER + dashboard_lookml)
         yield dash_path
@@ -115,7 +113,6 @@ def _lookml(namespaces, glean_apps, target_dir):
         view_dir.mkdir(parents=True, exist_ok=True)
         views = list(_get_views_from_dict(lookml_objects.get("views", {}), namespace))
 
-        namespace_data = {}
         logging.info("  Generating views")
         v1_name: Optional[str] = v1_mapping.get(namespace)
         for view_path in _generate_views(client, view_dir, views, v1_name):
@@ -126,7 +123,7 @@ def _lookml(namespaces, glean_apps, target_dir):
         explores = lookml_objects.get("explores", {})
         logging.info("  Generating explores")
         for explore_path in _generate_explores(
-            client, explore_dir, namespace, explores, view_dir, v1_name, namespace_data
+            client, explore_dir, namespace, explores, view_dir, v1_name
         ):
             logging.info(f"    ...Generating {explore_path}")
 
@@ -135,7 +132,7 @@ def _lookml(namespaces, glean_apps, target_dir):
         dashboard_dir.mkdir(parents=True, exist_ok=True)
         dashboards = lookml_objects.get("dashboards", {})
         for dashboard_path in _generate_dashboards(
-            client, dashboard_dir, namespace, dashboards, namespace_data
+            client, dashboard_dir, namespace, dashboards
         ):
             logging.info(f"    ...Generating {dashboard_path}")
 

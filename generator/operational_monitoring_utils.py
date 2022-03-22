@@ -1,66 +1,18 @@
 """Utils for operational monitoring."""
 from typing import Any, Dict, List
 
+from google.api_core import exceptions
 from google.cloud import bigquery
 
 from .views import lookml_utils
-
-# todo: move to methods and delete file
-
-
-def compute_opmon_dimensions(
-    bq_client: bigquery.Client, table: str, allowed_dimensions: List[str] = []
-) -> List[Dict[str, Any]]:
-    """
-    Compute dimensions for Operational Monitoring.
-
-    For a given Operational Monitoring dimension, find its default (most common)
-    value and its top 10 most common to be used as dropdown options.
-    """
-    all_dimensions = lookml_utils._generate_dimensions(bq_client, table)
-    dimensions = []
-
-    relevant_dimensions = [
-        dimension
-        for dimension in all_dimensions
-        if dimension["name"] in allowed_dimensions
-    ]
-    for dimension in relevant_dimensions:
-        dimension_name = dimension["name"]
-        query_job = bq_client.query(
-            f"""
-                SELECT DISTINCT {dimension_name}, COUNT(*)
-                FROM {table}
-                GROUP BY 1
-                ORDER BY 2 DESC
-            """
-        )
-
-        title = lookml_utils.slug_to_title(dimension_name)
-        dimension_options = query_job.result().to_dataframe()[dimension_name].tolist()
-
-        dimension_kwarg = {
-            "title": title,
-            "name": dimension_name,
-        }
-
-        if len(dimension_options) > 0:
-            dimension_kwarg.update(
-                {
-                    "default": dimension_options[0],
-                    "options": dimension_options[:10],
-                }
-            )
-
-        dimensions.append(dimension_kwarg)
-
-    return dimensions
 
 
 def get_dimension_defaults(
     bq_client: bigquery.Client, table: str, dimensions: List[str]
 ) -> Dict[str, Any]:
     """
+    Find default values for certain dimensions.
+
     For a given Operational Monitoring dimension, find its default (most common)
     value and its top 10 most common to be used as dropdown options.
     """
@@ -71,14 +23,13 @@ def get_dimension_defaults(
             f"""
                 SELECT DISTINCT {dimension} AS option, COUNT(*)
                 FROM {table}
+                WHERE {dimension} IS NOT NULL
                 GROUP BY 1
                 ORDER BY 2 DESC
             """
         )
 
         dimension_options = [dict(row) for row in query_job.result()]
-
-        print(dimension_options)
 
         if len(dimension_options) > 0:
             dimension_defaults[dimension] = {
@@ -106,12 +57,16 @@ def get_xaxis_val(bq_client: bigquery.Client, table: str) -> str:
 def get_projects(
     bq_client: bigquery.Client, project_table: str
 ) -> List[Dict[str, Any]]:
-    query_job = bq_client.query(
-        f"""
-            SELECT *
-            FROM {project_table}
-        """
-    )
+    """Select all operational monitoring projects."""
+    try:
+        query_job = bq_client.query(
+            f"""
+                SELECT *
+                FROM `{project_table}`
+            """
+        )
 
-    projects = [dict(row) for row in query_job.result()]
+        projects = [dict(row) for row in query_job.result()]
+    except exceptions.Forbidden:
+        projects = []
     return projects

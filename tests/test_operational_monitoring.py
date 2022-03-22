@@ -17,47 +17,6 @@ from generator.views import (
 from .utils import print_and_test
 
 
-DATA = {
-    "compute_opmon_dimensions": {
-        "fission_histogram": {
-            (
-                "moz-fx-data-shared-prod.operational_monitoring."
-                "bug_123_test_histogram"
-            ): [
-                {
-                    "title": "Cores Count",
-                    "name": "cores_count",
-                    "default": "4",
-                    "options": ["1", "2", "3", "4", "6", "8", "10", "12", "16", "32"],
-                },
-                {
-                    "title": "Os",
-                    "name": "os",
-                    "default": "Windows",
-                    "options": ["Windows", "Mac", "Linux"],
-                },
-            ]
-        },
-        "fission_scalar": {
-            ("moz-fx-data-shared-prod.operational_monitoring." "bug_123_test_scalar"): [
-                {
-                    "title": "Cores Count",
-                    "name": "cores_count",
-                    "default": "4",
-                    "options": ["1", "2", "3", "4", "6", "8", "10", "12", "16", "32"],
-                },
-                {
-                    "title": "Os",
-                    "name": "os",
-                    "default": "Windows",
-                    "options": ["Windows", "Mac", "Linux"],
-                },
-            ]
-        },
-    }
-}
-
-
 class MockClient:
     """Mock bigquery.Client."""
 
@@ -204,6 +163,8 @@ def operational_monitoring_explore(tmp_path, operational_monitoring_histogram_vi
                     "options": ["Windows", "Linux"],
                 },
             },
+            "probes": ["GC_MS", "GC_MS_CONTENT"],
+            "xaxis": "build_id",
         },
     )
 
@@ -230,7 +191,9 @@ def operational_monitoring_dashboard():
                         "options": ["Windows", "Linux"],
                     },
                 },
-            }
+                "xaxis": "build_id",
+                "probes": ["GC_MS", "GC_MS_CONTENT"],
+            },
         ],
     )
 
@@ -403,7 +366,7 @@ def test_explore_lookml(operational_monitoring_explore):
         }
     ]
 
-    actual = operational_monitoring_explore.to_lookml(mock_bq_client, None, DATA)
+    actual = operational_monitoring_explore.to_lookml(mock_bq_client, None)
     print_and_test(expected=expected, actual=actual)
 
 
@@ -512,8 +475,8 @@ def test_dashboard_lookml(operational_monitoring_dashboard):
             type: dropdown_menu
             display: inline
             options:
-            - '1'
             - '4'
+            - '1'
 
         - title: Os
           name: Os
@@ -526,10 +489,10 @@ def test_dashboard_lookml(operational_monitoring_dashboard):
             display: inline
             options:
             - 'Windows'
-            - 'Mac'
+            - 'Linux'
 
     """
     )
-    actual = operational_monitoring_dashboard.to_lookml(mock_bq_client, DATA)
+    actual = operational_monitoring_dashboard.to_lookml(mock_bq_client)
 
     print_and_test(expected=expected, actual=dedent(actual))
