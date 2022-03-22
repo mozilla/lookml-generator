@@ -16,13 +16,6 @@ from generator.views import (
 
 from .utils import print_and_test
 
-TABLE_HISTOGRAM = (
-    "moz-fx-data-shared-prod." "operational_monitoring." "bug_123_test_histogram"
-)
-
-TABLE_SCALAR = (
-    "moz-fx-data-shared-prod." "operational_monitoring." "bug_123_test_scalar"
-)
 
 DATA = {
     "compute_opmon_dimensions": {
@@ -93,7 +86,7 @@ class MockClient:
     def get_table(self, table_ref):
         """Mock bigquery.Client.get_table."""
 
-        if table_ref == TABLE_HISTOGRAM:
+        if "histogram" in table_ref:
             return bigquery.Table(
                 table_ref,
                 schema=[
@@ -124,7 +117,7 @@ class MockClient:
                 ],
             )
 
-        if table_ref == TABLE_SCALAR:
+        if "scalar" in table_ref:
             return bigquery.Table(
                 table_ref,
                 schema=[
@@ -147,7 +140,22 @@ def operational_monitoring_histogram_view():
     return OperationalMonitoringHistogramView(
         "operational_monitoring",
         "fission_histogram",
-        [{"table": TABLE_HISTOGRAM, "xaxis": "build_id"}],
+        [
+            {
+                "table": "moz-fx-data-shared-prod.operational_monitoring.bug_123_test_histogram",
+                "xaxis": "build_id",
+                "dimensions": {
+                    "cores_count": {
+                        "default": "4",
+                        "options": ["4", "1"],
+                    },
+                    "os": {
+                        "default": "Windows",
+                        "options": ["Windows", "Linux"],
+                    },
+                },
+            }
+        ],
     )
 
 
@@ -156,7 +164,22 @@ def operational_monitoring_scalar_view():
     return OperationalMonitoringScalarView(
         "operational_monitoring",
         "fission_scalar",
-        [{"table": TABLE_SCALAR, "xaxis": "submission_date"}],
+        [
+            {
+                "table": "moz-fx-data-shared-prod.operational_monitoring.bug_123_test_scalar",
+                "xaxis": "submission_date",
+                "dimensions": {
+                    "cores_count": {
+                        "default": "4",
+                        "options": ["4", "1"],
+                    },
+                    "os": {
+                        "default": "Windows",
+                        "options": ["Windows", "Linux"],
+                    },
+                },
+            }
+        ],
     )
 
 
@@ -169,7 +192,19 @@ def operational_monitoring_explore(tmp_path, operational_monitoring_histogram_vi
         "fission_histogram",
         {"base_view": "fission_histogram"},
         tmp_path,
-        {"branches": ["enabled", "disabled"]},
+        {
+            "branches": ["enabled", "disabled"],
+            "dimensions": {
+                "cores_count": {
+                    "default": "4",
+                    "options": ["4", "1"],
+                },
+                "os": {
+                    "default": "Windows",
+                    "options": ["Windows", "Linux"],
+                },
+            },
+        },
     )
 
 
@@ -182,9 +217,19 @@ def operational_monitoring_dashboard():
         "operational_monitoring",
         [
             {
-                "table": TABLE_HISTOGRAM,
+                "table": "moz-fx-data-shared-prod.operational_monitoring.bug_123_test_histogram",
                 "explore": "fission_histogram",
                 "branches": ["enabled", "disabled"],
+                "dimensions": {
+                    "cores_count": {
+                        "default": "4",
+                        "options": ["4", "1"],
+                    },
+                    "os": {
+                        "default": "Windows",
+                        "options": ["Windows", "Linux"],
+                    },
+                },
             }
         ],
     )
@@ -196,7 +241,22 @@ def test_view_from_dict(operational_monitoring_histogram_view):
         "fission_histogram",
         {
             "type": "operational_monitoring_histogram_view",
-            "tables": [{"table": TABLE_HISTOGRAM, "xaxis": "build_id"}],
+            "tables": [
+                {
+                    "table": "moz-fx-data-shared-prod.operational_monitoring.bug_123_test_histogram",
+                    "xaxis": "build_id",
+                    "dimensions": {
+                        "cores_count": {
+                            "default": "4",
+                            "options": ["4", "1"],
+                        },
+                        "os": {
+                            "default": "Windows",
+                            "options": ["Windows", "Linux"],
+                        },
+                    },
+                }
+            ],
         },
     )
 
@@ -210,8 +270,7 @@ def test_histogram_view_lookml(operational_monitoring_histogram_view):
             {
                 "name": "fission_histogram",
                 "sql_table_name": (
-                    "moz-fx-data-shared-prod.operational_monitoring.bug_1660366_"
-                    "pref_ongoing_fission_nightly_experiment_nightly_83_100_histogram"
+                    "moz-fx-data-shared-prod.operational_monitoring.bug_123_test_histogram"
                 ),
                 "parameters": operational_monitoring_histogram_view.parameters,
                 "measures": [
@@ -266,7 +325,7 @@ def test_scalar_view_lookml(operational_monitoring_scalar_view):
                     "sql": dedent(
                         f"""
                         SELECT *
-                        FROM `{TABLE_SCALAR}`
+                        FROM `{"moz-fx-data-shared-prod.operational_monitoring.bug_123_test_scalar"}`
                         WHERE agg_type = "SUM"
                         """
                     )
@@ -454,15 +513,7 @@ def test_dashboard_lookml(operational_monitoring_dashboard):
             display: inline
             options:
             - '1'
-            - '2'
-            - '3'
             - '4'
-            - '6'
-            - '8'
-            - '10'
-            - '12'
-            - '16'
-            - '32'
 
         - title: Os
           name: Os
@@ -476,7 +527,6 @@ def test_dashboard_lookml(operational_monitoring_dashboard):
             options:
             - 'Windows'
             - 'Mac'
-            - 'Linux'
 
     """
     )

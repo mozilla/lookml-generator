@@ -13,7 +13,7 @@ class OperationalMonitoringView(PingView):
     type: str = "operational_monitoring_view"
     percentile_ci_labels = ["percentile", "low", "high"]
 
-    def __init__(self, namespace: str, name: str, tables: List[Dict[str, str]]):
+    def __init__(self, namespace: str, name: str, tables: List[Dict[str, Any]]):
         """Create instance of a OperationalMonitoringView."""
         super().__init__(namespace, name, tables)
         xaxis = "build_id"
@@ -22,7 +22,7 @@ class OperationalMonitoringView(PingView):
 
         xaxis_to_sql_mapping = {
             "build_id": f"PARSE_DATE('%Y%m%d', CAST(${{TABLE}}.{xaxis} AS STRING))",
-            "day": f"${{TABLE}}.{xaxis}",
+            "submission_date": f"${{TABLE}}.{xaxis}",
         }
         self.dimensions: List[Dict[str, str]] = [
             {

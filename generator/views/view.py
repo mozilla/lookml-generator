@@ -20,7 +20,7 @@ class View(object):
 
     name: str
     view_type: str
-    tables: List[Dict[str, str]]
+    tables: List[Dict[str, Any]]
     namespace: str
 
     def __init__(
@@ -28,7 +28,7 @@ class View(object):
         namespace: str,
         name: str,
         view_type: str,
-        tables: List[Dict[str, str]],
+        tables: List[Dict[str, Any]],
         **kwargs,
     ):
         """Create an instance of a view."""
@@ -72,7 +72,7 @@ class View(object):
         """Check for equality with other View."""
 
         def comparable_dict(d):
-            return {tuple(sorted(t.items())) for t in d}
+            return {tuple(sorted([(k, str(v)) for k, v in t.items()])) for t in d}
 
         if isinstance(other, View):
             return (

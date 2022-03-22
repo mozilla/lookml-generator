@@ -75,7 +75,7 @@ def _get_opmon(bq_client: bigquery.Client, namespaces: Dict[str, Any]):
 
     opmon_namespace = namespaces["operational_monitoring"]
     views = opmon_namespace.get("views")
-    
+
     if views is None:
         print("No views defined for operational monitoring")
         return {}
@@ -87,15 +87,9 @@ def _get_opmon(bq_client: bigquery.Client, namespaces: Dict[str, Any]):
         return {}
 
     projects_table = projects_view["tables"][0]
-
-    query_job = bq_client.query(
-        f"""
-            SELECT *
-            FROM {projects_table}
-        """
+    projects = operational_monitoring_utils.get_projects(
+        bq_client, project_table=projects_table
     )
-
-    projects = [dict(row) for row in query_job.result()]
 
     # Iterating over all defined operational monitoring projects
     for project in projects:
@@ -106,14 +100,18 @@ def _get_opmon(bq_client: bigquery.Client, namespaces: Dict[str, Any]):
         for data_type in DATA_TYPES:
             # append view and explore for data type
             project_data_type_id = f"{project_name}_{data_type}"
+            table = f"{PROD_PROJECT}.{OPMON_DATASET}.{table_prefix}_{data_type}"
+            dimensions = operational_monitoring_utils.get_dimension_defaults(
+                bq_client, table, project["dimensions"]
+            )
 
             om_content["views"][project_data_type_id] = {
                 "type": f"operational_monitoring_{data_type}_view",
                 "tables": [
                     {
-                        "table": f"{PROD_PROJECT}.{OPMON_DATASET}.{table_prefix}_{data_type}",
+                        "table": table,
                         "xaxis": project["xaxis"],
-                        "dimensions": project["dimensions"],
+                        "dimensions": dimensions,
                     }
                 ],
             }
@@ -121,6 +119,8 @@ def _get_opmon(bq_client: bigquery.Client, namespaces: Dict[str, Any]):
                 "type": "operational_monitoring_explore",
                 "views": {"base_view": f"{project_name}_{data_type}"},
                 "branches": branches,
+                "xaxis": project["xaxis"],
+                "dimensions": dimensions,
             }
 
         om_content["dashboards"][project_name] = {
@@ -129,7 +129,9 @@ def _get_opmon(bq_client: bigquery.Client, namespaces: Dict[str, Any]):
                 {
                     "explore": f"{project_name}_{data_type}",
                     "table": f"{PROD_PROJECT}.{OPMON_DATASET}.{table_prefix}_{data_type}",
-                    "branches": branches,  # todo: needed?
+                    "branches": branches,
+                    "xaxis": project["xaxis"],
+                    "dimensions": dimensions,
                 }
                 for data_type in DATA_TYPES
             ],

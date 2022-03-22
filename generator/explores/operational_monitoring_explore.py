@@ -26,6 +26,9 @@ class OperationalMonitoringExplore(Explore):
     ):
         """Initialize OperationalMonitoringExplore."""
         super().__init__(name, views, views_path)
+        print("---asdf")
+        print(views)
+        print(defn)
         if defn is not None:
             self.branches = ", ".join(defn["branches"])
             self.xaxis = defn.get("xaxis")
@@ -61,7 +64,9 @@ class OperationalMonitoringExplore(Explore):
         base_view_name = self.views["base_view"]
 
         dimension_data = operational_monitoring_utils.compute_opmon_dimensions(
-            bq_client=bq_client, table=base_view_name, allowed_dimensions=self.dimensions
+            bq_client=bq_client,
+            table=base_view_name,
+            allowed_dimensions=self.dimensions,
         )
 
         filters = [

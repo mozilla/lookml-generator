@@ -109,15 +109,41 @@ class MockClient:
     def query(self, query):
         class QueryJob:
             def result(self):
-                return [
-                    {
-                        "slug": "op-mon",
-                        "name": "OpMon",
-                        "branches": ["enabled", "disabled"],
-                        "xaxis": "day",
-                        "dimensions": ["cores"],
-                    }
-                ]
+                print(query)
+                if "os AS option" in query:
+                    return [
+                        {
+                            "option": "Windows",
+                            "count": "10",
+                        },
+                        {
+                            "option": "Linux",
+                            "count": "1",
+                        },
+                    ]
+                elif "cores_count AS option" in query:
+                    return [
+                        {
+                            "option": "4",
+                            "count": "10",
+                        },
+                        {
+                            "option": "1",
+                            "count": "1",
+                        },
+                    ]
+                else:
+                    return [
+                        {
+                            "slug": "op-mon",
+                            "name": "OpMon",
+                            "branches": ["enabled", "disabled"],
+                            "xaxis": "submission_date",
+                            "dimensions": {
+                                "cores_count": {"default": "4", "options": ["4", "1"]}
+                            },
+                        }
+                    ]
 
         return QueryJob()
 
@@ -383,11 +409,25 @@ def test_namespaces_full(
                                     "explore": "opmon_histogram",
                                     "table": "moz-fx-data-shared-prod.operational_monitoring.op_mon_histogram",
                                     "branches": ["enabled", "disabled"],
+                                    "dimensions": {
+                                        "cores_count": {
+                                            "default": "4",
+                                            "options": ["4", "1"],
+                                        }
+                                    },
+                                    "xaxis": "submission_date",
                                 },
                                 {
                                     "explore": "opmon_scalar",
                                     "table": "moz-fx-data-shared-prod.operational_monitoring.op_mon_scalar",
                                     "branches": ["enabled", "disabled"],
+                                    "dimensions": {
+                                        "cores_count": {
+                                            "default": "4",
+                                            "options": ["4", "1"],
+                                        }
+                                    },
+                                    "xaxis": "submission_date",
                                 },
                             ],
                             "type": "operational_monitoring_dashboard",
@@ -398,11 +438,25 @@ def test_namespaces_full(
                             "branches": ["enabled", "disabled"],
                             "type": "operational_monitoring_explore",
                             "views": {"base_view": "opmon_histogram"},
+                            "dimensions": {
+                                "cores_count": {
+                                    "default": "4",
+                                    "options": ["4", "1"],
+                                }
+                            },
+                            "xaxis": "submission_date",
                         },
                         "opmon_scalar": {
                             "branches": ["enabled", "disabled"],
                             "type": "operational_monitoring_explore",
                             "views": {"base_view": "opmon_scalar"},
+                            "dimensions": {
+                                "cores_count": {
+                                    "default": "4",
+                                    "options": ["4", "1"],
+                                }
+                            },
+                            "xaxis": "submission_date",
                         },
                     },
                     "glean_app": False,
@@ -413,9 +467,14 @@ def test_namespaces_full(
                         "opmon_histogram": {
                             "tables": [
                                 {
-                                    "dimensions": ["cores"],
+                                    "dimensions": {
+                                        "cores_count": {
+                                            "default": "4",
+                                            "options": ["4", "1"],
+                                        }
+                                    },
                                     "table": "moz-fx-data-shared-prod.operational_monitoring.op_mon_histogram",
-                                    "xaxis": "day",
+                                    "xaxis": "submission_date",
                                 }
                             ],
                             "type": "operational_monitoring_histogram_view",
@@ -423,9 +482,14 @@ def test_namespaces_full(
                         "opmon_scalar": {
                             "tables": [
                                 {
-                                    "dimensions": ["cores"],
+                                    "dimensions": {
+                                        "cores_count": {
+                                            "default": "4",
+                                            "options": ["4", "1"],
+                                        }
+                                    },
                                     "table": "moz-fx-data-shared-prod.operational_monitoring.op_mon_scalar",
-                                    "xaxis": "day",
+                                    "xaxis": "submission_date",
                                 }
                             ],
                             "type": "operational_monitoring_scalar_view",
