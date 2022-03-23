@@ -5,7 +5,6 @@ from typing import Any, Sequence
 
 import click
 import looker_sdk
-import yaml
 
 
 def setup_env_with_looker_creds() -> bool:
@@ -154,4 +153,4 @@ def generate_folders(namespaces: dict):
 def generate_content(namespaces):
     """Generate content folders."""
     setup_env_with_looker_creds()
-    generate_folders(yaml.safe_load(namespaces))
+    # generate_folders(yaml.safe_load(namespaces))
