@@ -13,7 +13,7 @@ class OperationalMonitoringView(PingView):
     type: str = "operational_monitoring_view"
     percentile_ci_labels = ["percentile", "low", "high"]
 
-    def __init__(self, namespace: str, name: str, tables: List[Dict[str, str]]):
+    def __init__(self, namespace: str, name: str, tables: List[Dict[str, Any]]):
         """Create instance of a OperationalMonitoringView."""
         super().__init__(namespace, name, tables)
         xaxis = "build_id"

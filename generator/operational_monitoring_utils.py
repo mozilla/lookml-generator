@@ -1,61 +1,43 @@
 """Utils for operational monitoring."""
 from typing import Any, Dict, List
 
+from google.api_core import exceptions
 from google.cloud import bigquery
 
-from .constants import OPMON_DASH_EXCLUDED_FIELDS, OPMON_EXCLUDED_FIELDS
 from .views import lookml_utils
 
 
-def compute_opmon_dimensions(
-    bq_client: bigquery.Client, table: str
-) -> List[Dict[str, Any]]:
+def get_dimension_defaults(
+    bq_client: bigquery.Client, table: str, dimensions: List[str]
+) -> Dict[str, Any]:
     """
-    Compute dimensions for Operational Monitoring.
+    Find default values for certain dimensions.
 
     For a given Operational Monitoring dimension, find its default (most common)
     value and its top 10 most common to be used as dropdown options.
     """
-    all_dimensions = lookml_utils._generate_dimensions(bq_client, table)
-    copy_excluded = OPMON_EXCLUDED_FIELDS.copy()
-    copy_excluded.update(OPMON_DASH_EXCLUDED_FIELDS)
-    dimensions = []
+    dimension_defaults = {}
 
-    relevant_dimensions = [
-        dimension
-        for dimension in all_dimensions
-        if dimension["name"] not in copy_excluded
-    ]
-    for dimension in relevant_dimensions:
-        dimension_name = dimension["name"]
+    for dimension in dimensions:
         query_job = bq_client.query(
             f"""
-                    SELECT DISTINCT {dimension_name}, COUNT(*)
-                    FROM {table}
-                    GROUP BY 1
-                    ORDER BY 2 DESC
-                """
+                SELECT DISTINCT {dimension} AS option, COUNT(*)
+                FROM {table}
+                WHERE {dimension} IS NOT NULL
+                GROUP BY 1
+                ORDER BY 2 DESC
+            """
         )
 
-        title = lookml_utils.slug_to_title(dimension_name)
-        dimension_options = query_job.result().to_dataframe()[dimension_name].tolist()
-
-        dimension_kwarg = {
-            "title": title,
-            "name": dimension_name,
-        }
+        dimension_options = [dict(row) for row in query_job.result()]
 
         if len(dimension_options) > 0:
-            dimension_kwarg.update(
-                {
-                    "default": dimension_options[0],
-                    "options": dimension_options[:10],
-                }
-            )
+            dimension_defaults[dimension] = {
+                "default": dimension_options[0]["option"],
+                "options": [d["option"] for d in dimension_options[:10]],
+            }
 
-        dimensions.append(dimension_kwarg)
-
-    return dimensions
+    return dimension_defaults
 
 
 def get_xaxis_val(bq_client: bigquery.Client, table: str) -> str:
@@ -70,3 +52,21 @@ def get_xaxis_val(bq_client: bigquery.Client, table: str) -> str:
         if "build_id" in {dimension["name"] for dimension in all_dimensions}
         else "submission_date"
     )
+
+
+def get_projects(
+    bq_client: bigquery.Client, project_table: str
+) -> List[Dict[str, Any]]:
+    """Select all operational monitoring projects."""
+    try:
+        query_job = bq_client.query(
+            f"""
+                SELECT *
+                FROM `{project_table}`
+            """
+        )
+
+        projects = [dict(row) for row in query_job.result()]
+    except exceptions.Forbidden:
+        projects = []
+    return projects

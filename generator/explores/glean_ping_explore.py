@@ -17,7 +17,7 @@ class GleanPingExplore(PingExplore):
     type: str = "glean_ping_explore"
 
     def _to_lookml(
-        self, client: bigquery.Client, v1_name: Optional[str], data: Dict = {}
+        self, client: bigquery.Client, v1_name: Optional[str]
     ) -> List[Dict[str, Any]]:
         """Generate LookML to represent this explore."""
         repo = next((r for r in GleanPing.get_repos() if r["name"] == v1_name))

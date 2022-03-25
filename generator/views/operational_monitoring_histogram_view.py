@@ -3,9 +3,15 @@
 from textwrap import dedent
 from typing import Any, Dict, Optional
 
-from ..constants import OPMON_EXCLUDED_FIELDS
 from . import lookml_utils
 from .operational_monitoring_view import OperationalMonitoringView
+
+ALLOWED_DIMENSIONS = {
+    "branch",
+    "probe",
+    "histogram__VALUES__key",
+    "histogram__VALUES__value",
+}
 
 
 class OperationalMonitoringHistogramView(OperationalMonitoringView):
@@ -40,12 +46,14 @@ class OperationalMonitoringHistogramView(OperationalMonitoringView):
 
         reference_table = self.tables[0]["table"]
         all_dimensions = lookml_utils._generate_dimensions(bq_client, reference_table)
-        additional_dimensions = [
-            dimension
-            for dimension in all_dimensions
-            if dimension["name"] not in OPMON_EXCLUDED_FIELDS
+
+        filtered_dimensions = [
+            d
+            for d in all_dimensions
+            if d["name"] in ALLOWED_DIMENSIONS
+            or d["name"] in self.tables[0].get("dimensions", {}).keys()
         ]
-        self.dimensions.extend(additional_dimensions)
+        self.dimensions.extend(filtered_dimensions)
 
         return {
             "views": [

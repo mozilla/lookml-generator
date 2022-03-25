@@ -7,8 +7,7 @@ from typing import Any, Dict, Iterator, List, Optional
 
 from google.cloud import bigquery
 
-from .. import operational_monitoring_utils
-from ..views import View, lookml_utils
+from ..views import View
 from . import Explore
 
 
@@ -22,12 +21,15 @@ class OperationalMonitoringExplore(Explore):
         name: str,
         views: Dict[str, str],
         views_path: Path = None,
-        defn: Dict[str, str] = None,
+        defn: Dict[str, Any] = None,
     ):
         """Initialize OperationalMonitoringExplore."""
         super().__init__(name, views, views_path)
         if defn is not None:
             self.branches = ", ".join(defn["branches"])
+            self.xaxis = defn.get("xaxis")
+            self.dimensions = defn.get("dimensions", {})
+            self.probes = defn.get("probes", [])
 
     @staticmethod
     def from_views(views: List[View]) -> Iterator[Explore]:
@@ -53,40 +55,26 @@ class OperationalMonitoringExplore(Explore):
         self,
         bq_client: bigquery.Client,
         v1_name: Optional[str],
-        data: Dict = {},
     ) -> List[Dict[str, Any]]:
         base_view_name = self.views["base_view"]
-
-        namespace_data = data.get("compute_opmon_dimensions", {}).get(
-            base_view_name, {}
-        )
-        table_name = (
-            "" if len(namespace_data.keys()) == 0 else list(namespace_data.keys())[0]
-        )
-        dimension_data = namespace_data[table_name]
-
-        xaxis = operational_monitoring_utils.get_xaxis_val(bq_client, table_name)
 
         filters = [
             {f"{base_view_name}.branch": self.branches},
             {f"{base_view_name}.percentile_conf": "50"},
         ]
-        for dimension in dimension_data:
-            if "default" in dimension:
-                filters.append(
-                    {f"{base_view_name}.{dimension['name']}": dimension["default"]}
-                )
+        for dimension, info in self.dimensions.items():
+            if "default" in info:
+                filters.append({f"{base_view_name}.{dimension}": info["default"]})
 
         aggregate_tables = []
-        probes = lookml_utils.get_distinct_vals(bq_client, table_name, "probe")
-        for probe in probes:
+        for probe in self.probes:
             filters_copy = deepcopy(filters)
             filters_copy.append({f"{base_view_name}.probe": probe})
             aggregate_tables.append(
                 {
                     "name": f"rollup_{probe}",
                     "query": {
-                        "dimensions": [xaxis, "branch"],
+                        "dimensions": [self.xaxis, "branch"],
                         "measures": ["low", "high", "percentile"],
                         "filters": filters_copy,
                     },

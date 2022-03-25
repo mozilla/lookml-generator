@@ -14,7 +14,7 @@ class PingView(View):
     type: str = "ping_view"
     allow_glean: bool = False
 
-    def __init__(self, namespace: str, name: str, tables: List[Dict[str, str]]):
+    def __init__(self, namespace: str, name: str, tables: List[Dict[str, Any]]):
         """Create instance of a PingView."""
         super().__init__(namespace, name, self.__class__.type, tables)
 
