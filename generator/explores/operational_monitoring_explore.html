@@ -78,8 +78,7 @@
 
 <span class="kn">from</span> <span class="nn">google.cloud</span> <span class="kn">import</span> <span class="n">bigquery</span>
 
-<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">operational_monitoring_utils</span>
-<span class="kn">from</span> <span class="nn">..views</span> <span class="kn">import</span> <span class="n">View</span><span class="p">,</span> <span class="n">lookml_utils</span>
+<span class="kn">from</span> <span class="nn">..views</span> <span class="kn">import</span> <span class="n">View</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">Explore</span>
 
 
@@ -93,12 +92,15 @@
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">views</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
         <span class="n">views_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">defn</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">defn</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Initialize OperationalMonitoringExplore.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">views</span><span class="p">,</span> <span class="n">views_path</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">defn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">branches</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">defn</span><span class="p">[</span><span class="s2">&quot;branches&quot;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">xaxis</span> <span class="o">=</span> <span class="n">defn</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;xaxis&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span> <span class="o">=</span> <span class="n">defn</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;dimensions&quot;</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">probes</span> <span class="o">=</span> <span class="n">defn</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;probes&quot;</span><span class="p">,</span> <span class="p">[])</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">from_views</span><span class="p">(</span><span class="n">views</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">View</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Explore</span><span class="p">]:</span>
@@ -124,40 +126,26 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">bq_client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span>
         <span class="n">v1_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-        <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{},</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
         <span class="n">base_view_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">views</span><span class="p">[</span><span class="s2">&quot;base_view&quot;</span><span class="p">]</span>
-
-        <span class="n">namespace_data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;compute_opmon_dimensions&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-            <span class="n">base_view_name</span><span class="p">,</span> <span class="p">{}</span>
-        <span class="p">)</span>
-        <span class="n">table_name</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s2">&quot;&quot;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">namespace_data</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="nb">list</span><span class="p">(</span><span class="n">namespace_data</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="p">)</span>
-        <span class="n">dimension_data</span> <span class="o">=</span> <span class="n">namespace_data</span><span class="p">[</span><span class="n">table_name</span><span class="p">]</span>
-
-        <span class="n">xaxis</span> <span class="o">=</span> <span class="n">operational_monitoring_utils</span><span class="o">.</span><span class="n">get_xaxis_val</span><span class="p">(</span><span class="n">bq_client</span><span class="p">,</span> <span class="n">table_name</span><span class="p">)</span>
 
         <span class="n">filters</span> <span class="o">=</span> <span class="p">[</span>
             <span class="p">{</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_view_name</span><span class="si">}</span><span class="s2">.branch&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">branches</span><span class="p">},</span>
             <span class="p">{</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_view_name</span><span class="si">}</span><span class="s2">.percentile_conf&quot;</span><span class="p">:</span> <span class="s2">&quot;50&quot;</span><span class="p">},</span>
         <span class="p">]</span>
-        <span class="k">for</span> <span class="n">dimension</span> <span class="ow">in</span> <span class="n">dimension_data</span><span class="p">:</span>
-            <span class="k">if</span> <span class="s2">&quot;default&quot;</span> <span class="ow">in</span> <span class="n">dimension</span><span class="p">:</span>
-                <span class="n">filters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                    <span class="p">{</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_view_name</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">dimension</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="n">dimension</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]}</span>
-                <span class="p">)</span>
+        <span class="k">for</span> <span class="n">dimension</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="s2">&quot;default&quot;</span> <span class="ow">in</span> <span class="n">info</span><span class="p">:</span>
+                <span class="n">filters</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_view_name</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">dimension</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]})</span>
 
         <span class="n">aggregate_tables</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">probes</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">get_distinct_vals</span><span class="p">(</span><span class="n">bq_client</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="s2">&quot;probe&quot;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">probe</span> <span class="ow">in</span> <span class="n">probes</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">probe</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">probes</span><span class="p">:</span>
             <span class="n">filters_copy</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">filters</span><span class="p">)</span>
             <span class="n">filters_copy</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_view_name</span><span class="si">}</span><span class="s2">.probe&quot;</span><span class="p">:</span> <span class="n">probe</span><span class="p">})</span>
             <span class="n">aggregate_tables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="p">{</span>
                     <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;rollup_</span><span class="si">{</span><span class="n">probe</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
                     <span class="s2">&quot;query&quot;</span><span class="p">:</span> <span class="p">{</span>
-                        <span class="s2">&quot;dimensions&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">xaxis</span><span class="p">,</span> <span class="s2">&quot;branch&quot;</span><span class="p">],</span>
+                        <span class="s2">&quot;dimensions&quot;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">xaxis</span><span class="p">,</span> <span class="s2">&quot;branch&quot;</span><span class="p">],</span>
                         <span class="s2">&quot;measures&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;low&quot;</span><span class="p">,</span> <span class="s2">&quot;high&quot;</span><span class="p">,</span> <span class="s2">&quot;percentile&quot;</span><span class="p">],</span>
                         <span class="s2">&quot;filters&quot;</span><span class="p">:</span> <span class="n">filters_copy</span><span class="p">,</span>
                     <span class="p">},</span>
@@ -207,12 +195,15 @@
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">views</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
         <span class="n">views_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">defn</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">defn</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Initialize OperationalMonitoringExplore.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">views</span><span class="p">,</span> <span class="n">views_path</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">defn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">branches</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">defn</span><span class="p">[</span><span class="s2">&quot;branches&quot;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">xaxis</span> <span class="o">=</span> <span class="n">defn</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;xaxis&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span> <span class="o">=</span> <span class="n">defn</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;dimensions&quot;</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">probes</span> <span class="o">=</span> <span class="n">defn</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;probes&quot;</span><span class="p">,</span> <span class="p">[])</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">from_views</span><span class="p">(</span><span class="n">views</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">View</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Explore</span><span class="p">]:</span>
@@ -238,40 +229,26 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">bq_client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span>
         <span class="n">v1_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-        <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{},</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
         <span class="n">base_view_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">views</span><span class="p">[</span><span class="s2">&quot;base_view&quot;</span><span class="p">]</span>
-
-        <span class="n">namespace_data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;compute_opmon_dimensions&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-            <span class="n">base_view_name</span><span class="p">,</span> <span class="p">{}</span>
-        <span class="p">)</span>
-        <span class="n">table_name</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s2">&quot;&quot;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">namespace_data</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="nb">list</span><span class="p">(</span><span class="n">namespace_data</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="p">)</span>
-        <span class="n">dimension_data</span> <span class="o">=</span> <span class="n">namespace_data</span><span class="p">[</span><span class="n">table_name</span><span class="p">]</span>
-
-        <span class="n">xaxis</span> <span class="o">=</span> <span class="n">operational_monitoring_utils</span><span class="o">.</span><span class="n">get_xaxis_val</span><span class="p">(</span><span class="n">bq_client</span><span class="p">,</span> <span class="n">table_name</span><span class="p">)</span>
 
         <span class="n">filters</span> <span class="o">=</span> <span class="p">[</span>
             <span class="p">{</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_view_name</span><span class="si">}</span><span class="s2">.branch&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">branches</span><span class="p">},</span>
             <span class="p">{</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_view_name</span><span class="si">}</span><span class="s2">.percentile_conf&quot;</span><span class="p">:</span> <span class="s2">&quot;50&quot;</span><span class="p">},</span>
         <span class="p">]</span>
-        <span class="k">for</span> <span class="n">dimension</span> <span class="ow">in</span> <span class="n">dimension_data</span><span class="p">:</span>
-            <span class="k">if</span> <span class="s2">&quot;default&quot;</span> <span class="ow">in</span> <span class="n">dimension</span><span class="p">:</span>
-                <span class="n">filters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                    <span class="p">{</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_view_name</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">dimension</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="n">dimension</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]}</span>
-                <span class="p">)</span>
+        <span class="k">for</span> <span class="n">dimension</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="s2">&quot;default&quot;</span> <span class="ow">in</span> <span class="n">info</span><span class="p">:</span>
+                <span class="n">filters</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_view_name</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">dimension</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]})</span>
 
         <span class="n">aggregate_tables</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">probes</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">get_distinct_vals</span><span class="p">(</span><span class="n">bq_client</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="s2">&quot;probe&quot;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">probe</span> <span class="ow">in</span> <span class="n">probes</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">probe</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">probes</span><span class="p">:</span>
             <span class="n">filters_copy</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">filters</span><span class="p">)</span>
             <span class="n">filters_copy</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_view_name</span><span class="si">}</span><span class="s2">.probe&quot;</span><span class="p">:</span> <span class="n">probe</span><span class="p">})</span>
             <span class="n">aggregate_tables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="p">{</span>
                     <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;rollup_</span><span class="si">{</span><span class="n">probe</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
                     <span class="s2">&quot;query&quot;</span><span class="p">:</span> <span class="p">{</span>
-                        <span class="s2">&quot;dimensions&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">xaxis</span><span class="p">,</span> <span class="s2">&quot;branch&quot;</span><span class="p">],</span>
+                        <span class="s2">&quot;dimensions&quot;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">xaxis</span><span class="p">,</span> <span class="s2">&quot;branch&quot;</span><span class="p">],</span>
                         <span class="s2">&quot;measures&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;low&quot;</span><span class="p">,</span> <span class="s2">&quot;high&quot;</span><span class="p">,</span> <span class="s2">&quot;percentile&quot;</span><span class="p">],</span>
                         <span class="s2">&quot;filters&quot;</span><span class="p">:</span> <span class="n">filters_copy</span><span class="p">,</span>
                     <span class="p">},</span>
@@ -311,7 +288,7 @@
     name: str,
     views: Dict[str, str],
     views_path: pathlib.Path = None,
-    defn: Dict[str, str] = None
+    defn: Dict[str, Any] = None
 )</span>
     </div>
 
@@ -322,12 +299,15 @@
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">views</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
         <span class="n">views_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">defn</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">defn</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Initialize OperationalMonitoringExplore.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">views</span><span class="p">,</span> <span class="n">views_path</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">defn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">branches</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">defn</span><span class="p">[</span><span class="s2">&quot;branches&quot;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">xaxis</span> <span class="o">=</span> <span class="n">defn</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;xaxis&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span> <span class="o">=</span> <span class="n">defn</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;dimensions&quot;</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">probes</span> <span class="o">=</span> <span class="n">defn</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;probes&quot;</span><span class="p">,</span> <span class="p">[])</span>
 </pre></div>
 
         </details>

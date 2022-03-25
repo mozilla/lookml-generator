@@ -31,10 +31,13 @@
         <h2>API Documentation</h2>
             <ul class="memberlist">
             <li>
-                    <a class="function" href="#compute_opmon_dimensions">compute_opmon_dimensions</a>
+                    <a class="function" href="#get_dimension_defaults">get_dimension_defaults</a>
             </li>
             <li>
                     <a class="function" href="#get_xaxis_val">get_xaxis_val</a>
+            </li>
+            <li>
+                    <a class="function" href="#get_projects">get_projects</a>
             </li>
     </ul>
 
@@ -60,61 +63,43 @@
             <div class="pdoc-code codehilite"><pre><span></span><span class="sd">&quot;&quot;&quot;Utils for operational monitoring.&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
 
+<span class="kn">from</span> <span class="nn">google.api_core</span> <span class="kn">import</span> <span class="n">exceptions</span>
 <span class="kn">from</span> <span class="nn">google.cloud</span> <span class="kn">import</span> <span class="n">bigquery</span>
 
-<span class="kn">from</span> <span class="nn">.constants</span> <span class="kn">import</span> <span class="n">OPMON_DASH_EXCLUDED_FIELDS</span><span class="p">,</span> <span class="n">OPMON_EXCLUDED_FIELDS</span>
 <span class="kn">from</span> <span class="nn">.views</span> <span class="kn">import</span> <span class="n">lookml_utils</span>
 
 
-<span class="k">def</span> <span class="nf">compute_opmon_dimensions</span><span class="p">(</span>
-    <span class="n">bq_client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span> <span class="n">table</span><span class="p">:</span> <span class="nb">str</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="k">def</span> <span class="nf">get_dimension_defaults</span><span class="p">(</span>
+    <span class="n">bq_client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span> <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Compute dimensions for Operational Monitoring.</span>
+<span class="sd">    Find default values for certain dimensions.</span>
 
 <span class="sd">    For a given Operational Monitoring dimension, find its default (most common)</span>
 <span class="sd">    value and its top 10 most common to be used as dropdown options.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">all_dimensions</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">_generate_dimensions</span><span class="p">(</span><span class="n">bq_client</span><span class="p">,</span> <span class="n">table</span><span class="p">)</span>
-    <span class="n">copy_excluded</span> <span class="o">=</span> <span class="n">OPMON_EXCLUDED_FIELDS</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">copy_excluded</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">OPMON_DASH_EXCLUDED_FIELDS</span><span class="p">)</span>
-    <span class="n">dimensions</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">dimension_defaults</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="n">relevant_dimensions</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">dimension</span>
-        <span class="k">for</span> <span class="n">dimension</span> <span class="ow">in</span> <span class="n">all_dimensions</span>
-        <span class="k">if</span> <span class="n">dimension</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">copy_excluded</span>
-    <span class="p">]</span>
-    <span class="k">for</span> <span class="n">dimension</span> <span class="ow">in</span> <span class="n">relevant_dimensions</span><span class="p">:</span>
-        <span class="n">dimension_name</span> <span class="o">=</span> <span class="n">dimension</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">dimension</span> <span class="ow">in</span> <span class="n">dimensions</span><span class="p">:</span>
         <span class="n">query_job</span> <span class="o">=</span> <span class="n">bq_client</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">                    SELECT DISTINCT </span><span class="si">{</span><span class="n">dimension_name</span><span class="si">}</span><span class="s2">, COUNT(*)</span>
-<span class="s2">                    FROM </span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2"></span>
-<span class="s2">                    GROUP BY 1</span>
-<span class="s2">                    ORDER BY 2 DESC</span>
-<span class="s2">                &quot;&quot;&quot;</span>
+<span class="s2">                SELECT DISTINCT </span><span class="si">{</span><span class="n">dimension</span><span class="si">}</span><span class="s2"> AS option, COUNT(*)</span>
+<span class="s2">                FROM </span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">                WHERE </span><span class="si">{</span><span class="n">dimension</span><span class="si">}</span><span class="s2"> IS NOT NULL</span>
+<span class="s2">                GROUP BY 1</span>
+<span class="s2">                ORDER BY 2 DESC</span>
+<span class="s2">            &quot;&quot;&quot;</span>
         <span class="p">)</span>
 
-        <span class="n">title</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">slug_to_title</span><span class="p">(</span><span class="n">dimension_name</span><span class="p">)</span>
-        <span class="n">dimension_options</span> <span class="o">=</span> <span class="n">query_job</span><span class="o">.</span><span class="n">result</span><span class="p">()</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()[</span><span class="n">dimension_name</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-
-        <span class="n">dimension_kwarg</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span>
-            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">dimension_name</span><span class="p">,</span>
-        <span class="p">}</span>
+        <span class="n">dimension_options</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">query_job</span><span class="o">.</span><span class="n">result</span><span class="p">()]</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dimension_options</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">dimension_kwarg</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-                <span class="p">{</span>
-                    <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="n">dimension_options</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                    <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="n">dimension_options</span><span class="p">[:</span><span class="mi">10</span><span class="p">],</span>
-                <span class="p">}</span>
-            <span class="p">)</span>
+            <span class="n">dimension_defaults</span><span class="p">[</span><span class="n">dimension</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="n">dimension_options</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;option&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;option&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dimension_options</span><span class="p">[:</span><span class="mi">10</span><span class="p">]],</span>
+            <span class="p">}</span>
 
-        <span class="n">dimensions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dimension_kwarg</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">dimensions</span>
+    <span class="k">return</span> <span class="n">dimension_defaults</span>
 
 
 <span class="k">def</span> <span class="nf">get_xaxis_val</span><span class="p">(</span><span class="n">bq_client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span> <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -129,78 +114,79 @@
         <span class="k">if</span> <span class="s2">&quot;build_id&quot;</span> <span class="ow">in</span> <span class="p">{</span><span class="n">dimension</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">dimension</span> <span class="ow">in</span> <span class="n">all_dimensions</span><span class="p">}</span>
         <span class="k">else</span> <span class="s2">&quot;submission_date&quot;</span>
     <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">get_projects</span><span class="p">(</span>
+    <span class="n">bq_client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span> <span class="n">project_table</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+    <span class="sd">&quot;&quot;&quot;Select all operational monitoring projects.&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">query_job</span> <span class="o">=</span> <span class="n">bq_client</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                SELECT *</span>
+<span class="s2">                FROM `</span><span class="si">{</span><span class="n">project_table</span><span class="si">}</span><span class="s2">`</span>
+<span class="s2">            &quot;&quot;&quot;</span>
+        <span class="p">)</span>
+
+        <span class="n">projects</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">query_job</span><span class="o">.</span><span class="n">result</span><span class="p">()]</span>
+    <span class="k">except</span> <span class="n">exceptions</span><span class="o">.</span><span class="n">Forbidden</span><span class="p">:</span>
+        <span class="n">projects</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">return</span> <span class="n">projects</span>
 </pre></div>
 
         </details>
 
             </section>
-                <section id="compute_opmon_dimensions">
-                            <div class="attr function"><a class="headerlink" href="#compute_opmon_dimensions">#&nbsp;&nbsp</a>
+                <section id="get_dimension_defaults">
+                            <div class="attr function"><a class="headerlink" href="#get_dimension_defaults">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">compute_opmon_dimensions</span><span class="signature">(
+            <span class="name">get_dimension_defaults</span><span class="signature">(
     bq_client: google.cloud.bigquery.client.Client,
-    table: str
-) -&gt; List[Dict[str, Any]]</span>:
+    table: str,
+    dimensions: List[str]
+) -&gt; Dict[str, Any]</span>:
     </div>
 
             <details>
             <summary>View Source</summary>
-            <div class="pdoc-code codehilite"><pre><span></span><span class="k">def</span> <span class="nf">compute_opmon_dimensions</span><span class="p">(</span>
-    <span class="n">bq_client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span> <span class="n">table</span><span class="p">:</span> <span class="nb">str</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span class="k">def</span> <span class="nf">get_dimension_defaults</span><span class="p">(</span>
+    <span class="n">bq_client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span> <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Compute dimensions for Operational Monitoring.</span>
+<span class="sd">    Find default values for certain dimensions.</span>
 
 <span class="sd">    For a given Operational Monitoring dimension, find its default (most common)</span>
 <span class="sd">    value and its top 10 most common to be used as dropdown options.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">all_dimensions</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">_generate_dimensions</span><span class="p">(</span><span class="n">bq_client</span><span class="p">,</span> <span class="n">table</span><span class="p">)</span>
-    <span class="n">copy_excluded</span> <span class="o">=</span> <span class="n">OPMON_EXCLUDED_FIELDS</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">copy_excluded</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">OPMON_DASH_EXCLUDED_FIELDS</span><span class="p">)</span>
-    <span class="n">dimensions</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">dimension_defaults</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="n">relevant_dimensions</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">dimension</span>
-        <span class="k">for</span> <span class="n">dimension</span> <span class="ow">in</span> <span class="n">all_dimensions</span>
-        <span class="k">if</span> <span class="n">dimension</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">copy_excluded</span>
-    <span class="p">]</span>
-    <span class="k">for</span> <span class="n">dimension</span> <span class="ow">in</span> <span class="n">relevant_dimensions</span><span class="p">:</span>
-        <span class="n">dimension_name</span> <span class="o">=</span> <span class="n">dimension</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">dimension</span> <span class="ow">in</span> <span class="n">dimensions</span><span class="p">:</span>
         <span class="n">query_job</span> <span class="o">=</span> <span class="n">bq_client</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">                    SELECT DISTINCT </span><span class="si">{</span><span class="n">dimension_name</span><span class="si">}</span><span class="s2">, COUNT(*)</span>
-<span class="s2">                    FROM </span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2"></span>
-<span class="s2">                    GROUP BY 1</span>
-<span class="s2">                    ORDER BY 2 DESC</span>
-<span class="s2">                &quot;&quot;&quot;</span>
+<span class="s2">                SELECT DISTINCT </span><span class="si">{</span><span class="n">dimension</span><span class="si">}</span><span class="s2"> AS option, COUNT(*)</span>
+<span class="s2">                FROM </span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">                WHERE </span><span class="si">{</span><span class="n">dimension</span><span class="si">}</span><span class="s2"> IS NOT NULL</span>
+<span class="s2">                GROUP BY 1</span>
+<span class="s2">                ORDER BY 2 DESC</span>
+<span class="s2">            &quot;&quot;&quot;</span>
         <span class="p">)</span>
 
-        <span class="n">title</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">slug_to_title</span><span class="p">(</span><span class="n">dimension_name</span><span class="p">)</span>
-        <span class="n">dimension_options</span> <span class="o">=</span> <span class="n">query_job</span><span class="o">.</span><span class="n">result</span><span class="p">()</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()[</span><span class="n">dimension_name</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-
-        <span class="n">dimension_kwarg</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span>
-            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">dimension_name</span><span class="p">,</span>
-        <span class="p">}</span>
+        <span class="n">dimension_options</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">query_job</span><span class="o">.</span><span class="n">result</span><span class="p">()]</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dimension_options</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">dimension_kwarg</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-                <span class="p">{</span>
-                    <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="n">dimension_options</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                    <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="n">dimension_options</span><span class="p">[:</span><span class="mi">10</span><span class="p">],</span>
-                <span class="p">}</span>
-            <span class="p">)</span>
+            <span class="n">dimension_defaults</span><span class="p">[</span><span class="n">dimension</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="n">dimension_options</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;option&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;option&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dimension_options</span><span class="p">[:</span><span class="mi">10</span><span class="p">]],</span>
+            <span class="p">}</span>
 
-        <span class="n">dimensions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dimension_kwarg</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">dimensions</span>
+    <span class="k">return</span> <span class="n">dimension_defaults</span>
 </pre></div>
 
         </details>
 
-            <div class="docstring"><p>Compute dimensions for Operational Monitoring.</p>
+            <div class="docstring"><p>Find default values for certain dimensions.</p>
 
 <p>For a given Operational Monitoring dimension, find its default (most common)
 value and its top 10 most common to be used as dropdown options.</p>
@@ -237,6 +223,44 @@ value and its top 10 most common to be used as dropdown options.</p>
             <div class="docstring"><p>Return whether the x-axis should be build_id or submission_date.</p>
 
 <p>This is based on which one is found in the table provided.</p>
+</div>
+
+
+                </section>
+                <section id="get_projects">
+                            <div class="attr function"><a class="headerlink" href="#get_projects">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">get_projects</span><span class="signature">(
+    bq_client: google.cloud.bigquery.client.Client,
+    project_table: str
+) -&gt; List[Dict[str, Any]]</span>:
+    </div>
+
+            <details>
+            <summary>View Source</summary>
+            <div class="pdoc-code codehilite"><pre><span></span><span class="k">def</span> <span class="nf">get_projects</span><span class="p">(</span>
+    <span class="n">bq_client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span> <span class="n">project_table</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+    <span class="sd">&quot;&quot;&quot;Select all operational monitoring projects.&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">query_job</span> <span class="o">=</span> <span class="n">bq_client</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                SELECT *</span>
+<span class="s2">                FROM `</span><span class="si">{</span><span class="n">project_table</span><span class="si">}</span><span class="s2">`</span>
+<span class="s2">            &quot;&quot;&quot;</span>
+        <span class="p">)</span>
+
+        <span class="n">projects</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">query_job</span><span class="o">.</span><span class="n">result</span><span class="p">()]</span>
+    <span class="k">except</span> <span class="n">exceptions</span><span class="o">.</span><span class="n">Forbidden</span><span class="p">:</span>
+        <span class="n">projects</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">return</span> <span class="n">projects</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Select all operational monitoring projects.</p>
 </div>
 
 

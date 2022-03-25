@@ -115,7 +115,7 @@
         <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="s2">&quot;views&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">views</span><span class="p">}}</span>
 
     <span class="k">def</span> <span class="nf">to_lookml</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span> <span class="n">v1_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span> <span class="n">v1_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate LookML for this explore.</span>
@@ -151,7 +151,7 @@
                 <span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;$</span><span class="se">{{</span><span class="si">{</span><span class="n">base_view_name</span><span class="si">}</span><span class="s2">.submission_date</span><span class="se">}}</span><span class="s2"> &gt;= &#39;2010-01-01&#39;&quot;</span>
 
         <span class="c1"># We only update the first returned explore</span>
-        <span class="n">new_lookml</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_lookml</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">v1_name</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="n">new_lookml</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_lookml</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">v1_name</span><span class="p">)</span>
         <span class="n">base_lookml</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">new_lookml</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">new_lookml</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">base_lookml</span>
 
@@ -161,7 +161,6 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span>
         <span class="n">v1_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-        <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{},</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Only implemented in subclasses&quot;</span><span class="p">)</span>
 
@@ -373,7 +372,7 @@
         <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="s2">&quot;views&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">views</span><span class="p">}}</span>
 
     <span class="k">def</span> <span class="nf">to_lookml</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span> <span class="n">v1_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span> <span class="n">v1_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate LookML for this explore.</span>
@@ -409,7 +408,7 @@
                 <span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;$</span><span class="se">{{</span><span class="si">{</span><span class="n">base_view_name</span><span class="si">}</span><span class="s2">.submission_date</span><span class="se">}}</span><span class="s2"> &gt;= &#39;2010-01-01&#39;&quot;</span>
 
         <span class="c1"># We only update the first returned explore</span>
-        <span class="n">new_lookml</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_lookml</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">v1_name</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="n">new_lookml</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_lookml</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">v1_name</span><span class="p">)</span>
         <span class="n">base_lookml</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">new_lookml</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">new_lookml</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">base_lookml</span>
 
@@ -419,7 +418,6 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span>
         <span class="n">v1_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-        <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{},</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Only implemented in subclasses&quot;</span><span class="p">)</span>
 
@@ -675,15 +673,14 @@
             <span class="name">to_lookml</span><span class="signature">(
     self,
     client: google.cloud.bigquery.client.Client,
-    v1_name: Union[str, NoneType],
-    data: Dict = {}
+    v1_name: Union[str, NoneType]
 ) -&gt; List[Dict[str, Any]]</span>:
     </div>
 
             <details>
             <summary>View Source</summary>
             <div class="pdoc-code codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_lookml</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span> <span class="n">v1_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span> <span class="n">v1_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate LookML for this explore.</span>
@@ -719,7 +716,7 @@
                 <span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;$</span><span class="se">{{</span><span class="si">{</span><span class="n">base_view_name</span><span class="si">}</span><span class="s2">.submission_date</span><span class="se">}}</span><span class="s2"> &gt;= &#39;2010-01-01&#39;&quot;</span>
 
         <span class="c1"># We only update the first returned explore</span>
-        <span class="n">new_lookml</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_lookml</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">v1_name</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="n">new_lookml</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_lookml</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">v1_name</span><span class="p">)</span>
         <span class="n">base_lookml</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">new_lookml</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">new_lookml</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">base_lookml</span>
 
