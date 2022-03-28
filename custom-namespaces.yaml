@@ -477,6 +477,11 @@ pocket:
     - kenny@getpocket.com
     - kirill@getpocket.com
   pretty_name: Pocket
+  views:
+    twice_weekly_active_user_counts_history_v1:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.pocket_derived.twice_weekly_active_user_counts_history_v1
 sync:
   glean_app: false
   owners:
