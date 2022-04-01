@@ -223,6 +223,11 @@ firefox_accounts:
       tables:
         - events_table_view: fxa_auth_events_table
           base_table: mozdata.firefox_accounts.fxa_content_auth_events
+    content_auth_stdout_events:
+      type: events_view
+      tables:
+        - events_table_view: fxa_content_auth_stdout_events_table
+          base_table: mozdata.firefox_accounts.fxa_content_auth_stdout_events
     fxa_events_table:
       type: table_view
       tables:
@@ -233,6 +238,11 @@ firefox_accounts:
       tables:
         - channel: release
           table: mozdata.firefox_accounts.fxa_content_auth_events
+    fxa_content_auth_stdout_events_table:
+      type: table_view
+      tables:
+        - channel: release
+          table: mozdata.firefox_accounts.fxa_content_auth_stdout_events
     funnel_analysis:
       type: funnel_analysis_view
       tables:
