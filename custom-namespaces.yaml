@@ -282,6 +282,11 @@ firefox_accounts:
       views:
         base_view: auth_events
         extended_view: fxa_auth_events_table
+    content_auth_stdout_event_counts:
+      type: events_explore
+      views:
+        base_view: content_auth_stdout_events
+        extended_view: fxa_content_auth_stdout_events_table
     funnel_analysis:
       type: funnel_analysis_explore
       views:
