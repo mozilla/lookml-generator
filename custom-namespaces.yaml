@@ -679,3 +679,13 @@ fpa:
     - rmiller@mozilla.com
     - lakshmimurugan@google.com
   spoke: looker-spoke-private
+shared:
+  glean_app: false
+  pretty name: Shared
+  owners:
+    - anicholson@mozilla.com
+  views:
+    countries:
+      type: table_view
+      tables:
+        - table: mozdata.static.country_codes_v1
