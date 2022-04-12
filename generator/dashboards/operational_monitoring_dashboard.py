@@ -30,6 +30,7 @@ class OperationalMonitoringDashboard(Dashboard):
         """Get an instance of a Operational Monitoring Dashboard."""
         self.dimensions = defn[0].get("dimensions", {})
         self.xaxis = defn[0]["xaxis"]
+        self.group_by_dimension = defn[0].get("group_by_dimension", None)
 
         super().__init__(title, name, layout, namespace, defn)
 
@@ -60,6 +61,7 @@ class OperationalMonitoringDashboard(Dashboard):
             "layout": self.layout,
             "elements": [],
             "dimensions": [],
+            "group_by_dimension": self.group_by_dimension,
         }
 
         includes = []

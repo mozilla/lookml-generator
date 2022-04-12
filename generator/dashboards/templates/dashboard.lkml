@@ -16,7 +16,10 @@
       {{element.explore}}.low,
       {{element.explore}}.percentile
     ]
-    pivots: [{{element.explore}}.branch]
+    pivots: [
+      {{element.explore}}.branch, 
+      {% if group_by_dimension %} {{element.explore}}.{{group_by_dimension}} {% endif %}
+    ]
     filters:
       {{element.explore}}.probe: {{element.metric}}
     row: {{element.row}}

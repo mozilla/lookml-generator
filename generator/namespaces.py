@@ -135,6 +135,7 @@ def _get_opmon(bq_client: bigquery.Client, namespaces: Dict[str, Any]):
                     "branches": branches,
                     "xaxis": project["xaxis"],
                     "dimensions": dimensions,
+                    "group_by_dimension": project["group_by_dimension"],
                     "probes": [
                         p["name"]
                         for p in project["probes"]
