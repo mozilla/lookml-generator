@@ -16,7 +16,10 @@
       {{element.explore}}.low,
       {{element.explore}}.percentile
     ]
-    pivots: [{{element.explore}}.branch]
+    pivots: [
+      {{element.explore}}.branch 
+      {%- if group_by_dimension %}, {{element.explore}}.{{group_by_dimension}} {% endif %}
+    ]
     filters:
       {{element.explore}}.probe: {{element.metric}}
     row: {{element.row}}
@@ -58,6 +61,7 @@
       - '99'
 
   {% for dimension in dimensions -%}
+  {% if dimension.name != group_by_dimension -%}
   - title: {{dimension.title}}
     name: {{dimension.title}}
     type: string_filter
@@ -71,4 +75,19 @@
       {% for option in dimension.options -%}
       - '{{option}}'
       {% endfor %}
+  {% else -%}
+  - title: {{dimension.title}}
+    name: {{dimension.title}}
+    type: string_filter
+    default_value: {% for option in (dimension.options | sort)[10] -%}'{{option}}'{% if not loop.last %}{% endif %}{% endfor %}
+    allow_multiple_values: true
+    required: true
+    ui_config:
+      type: advanced
+      display: inline
+      options:
+      {% for option in dimension.options | sort -%}
+      - '{{option}}'
+      {% endfor %}
+    {% endif -%}
   {% endfor -%}
