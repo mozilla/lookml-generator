@@ -681,7 +681,7 @@ fpa:
   spoke: looker-spoke-private
 shared:
   glean_app: false
-  pretty name: Shared
+  pretty_name: Shared
   owners:
     - anicholson@mozilla.com
   views:
