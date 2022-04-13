@@ -469,6 +469,7 @@ def test_dashboard_lookml(operational_monitoring_dashboard):
             - '95'
             - '99'
 
+
         - title: Cores Count
           name: Cores Count
           type: string_filter
@@ -482,6 +483,8 @@ def test_dashboard_lookml(operational_monitoring_dashboard):
             - '4'
             - '1'
 
+
+
         - title: Os
           name: Os
           type: string_filter
@@ -494,6 +497,7 @@ def test_dashboard_lookml(operational_monitoring_dashboard):
             options:
             - 'Windows'
             - 'Linux'
+
 
     """
     )
