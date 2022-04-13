@@ -391,7 +391,9 @@ def test_dashboard_lookml(operational_monitoring_dashboard):
             fission_histogram.low,
             fission_histogram.percentile
           ]
-          pivots: [fission_histogram.branch]
+          pivots: [
+            fission_histogram.branch
+          ]
           filters:
             fission_histogram.probe: GC_MS
           row: 0
@@ -422,7 +424,9 @@ def test_dashboard_lookml(operational_monitoring_dashboard):
             fission_histogram.low,
             fission_histogram.percentile
           ]
-          pivots: [fission_histogram.branch]
+          pivots: [
+            fission_histogram.branch
+          ]
           filters:
             fission_histogram.probe: GC_MS_CONTENT
           row: 0

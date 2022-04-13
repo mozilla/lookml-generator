@@ -421,6 +421,7 @@ def test_namespaces_full(
                                     },
                                     "xaxis": "submission_date",
                                     "probes": ["GC_MS", "GC_MS_CONTENT"],
+                                    "group_by_dimension": None,
                                 },
                                 {
                                     "explore": "opmon_scalar",
@@ -434,6 +435,7 @@ def test_namespaces_full(
                                     },
                                     "xaxis": "submission_date",
                                     "probes": [],
+                                    "group_by_dimension": None,
                                 },
                             ],
                             "type": "operational_monitoring_dashboard",
