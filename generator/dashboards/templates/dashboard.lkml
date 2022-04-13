@@ -61,7 +61,7 @@
       - '99'
 
   {% for dimension in dimensions -%}
-  {% if dimension.name != group_by_dimension -%}
+  {% if dimension.name != group_by_dimension %}
   - title: {{dimension.title}}
     name: {{dimension.title}}
     type: string_filter
@@ -75,7 +75,7 @@
       {% for option in dimension.options -%}
       - '{{option}}'
       {% endfor %}
-  {% else -%}
+  {% else %}
   - title: {{dimension.title}}
     name: {{dimension.title}}
     type: string_filter
@@ -89,5 +89,5 @@
       {% for option in dimension.options | sort -%}
       - '{{option}}'
       {% endfor %}
-    {% endif -%}
+    {% endif %}
   {% endfor -%}
