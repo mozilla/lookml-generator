@@ -98,6 +98,21 @@ class OperationalMonitoringDashboard(Dashboard):
                     }
                 )
                 graph_index += 1
+
+                if self.group_by_dimension:
+                    kwargs["elements"].append(
+                        {
+                            "title": f"{title} - By {self.group_by_dimension}",
+                            "metric": metric,
+                            "explore": explore,
+                            "series_colors": series_colors,
+                            "xaxis": self.xaxis,
+                            "row": int(graph_index / 2) * 10,
+                            "col": 0 if graph_index % 2 == 0 else 12,
+                        }
+                    )
+                    graph_index += 1
+
         dash_lookml = lookml_utils.render_template(
             "dashboard.lkml", "dashboards", **kwargs
         )

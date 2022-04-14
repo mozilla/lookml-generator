@@ -18,7 +18,7 @@
     ]
     pivots: [
       {{element.explore}}.branch 
-      {%- if group_by_dimension %}, {{element.explore}}.{{group_by_dimension}} {% endif %}
+      {%- if group_by_dimension and element.title.endswith(group_by_dimension) %}, {{element.explore}}.{{group_by_dimension}} {% endif %}
     ]
     filters:
       {{element.explore}}.probe: {{element.metric}}
