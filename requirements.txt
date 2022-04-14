@@ -145,15 +145,15 @@ google-cloud-bigquery-storage==2.13.0 \
     --hash=sha256:5e7084af079e224ed06e689d60be39e79b33297fb1709e88bc33b469f50cc0ea \
     --hash=sha256:7085221c4a47967cb7905032e1d6645dcaa98461be145ceafd5e154f16945d5c
     # via google-cloud-bigquery
-google-cloud-core==1.7.2 \
-    --hash=sha256:5b77935f3d9573e27007749a3b522f08d764c5b5930ff1527b2ab2743e9f0c15 \
-    --hash=sha256:b1030aadcbb2aeb4ee51475426351af83c1072456b918fb8fdb80666c4bb63b5
+google-cloud-core==2.3.0 \
+    --hash=sha256:35900f614045a33d5208e1d50f0d7945df98ce088388ce7237e7a2db12d5656e \
+    --hash=sha256:fdaa629e6174b4177c2d56eb8ab1ddd87661064d0a3e9bb06b62e4d7e2344669
     # via
     #   google-cloud-bigquery
     #   google-cloud-storage
-google-cloud-storage==2.2.1 \
-    --hash=sha256:0244f4612710cb5ec445fc6774387564e23f9823363fb408b28724e2102401b7 \
-    --hash=sha256:abdf0fadf26516172e804e00b9c24819a3b3f7351cd32f35ca249bbfac965494
+google-cloud-storage==2.3.0 \
+    --hash=sha256:9a7b1d07d53bc1df5384a9906c1e6d9c920a2bdb5ffa5982d2c1d2bdaacd70c8 \
+    --hash=sha256:f4cbb0de5e17228e9c09cdc897d81eaa70e2c396f58513f79de0e824584c8f5b
     # via -r requirements.in
 google-crc32c==1.1.2 \
     --hash=sha256:0ae3cf54e0d4d83c8af1afe96fc0970fbf32f1b29275f3bfd44ce25c4b622a2b \
@@ -744,7 +744,6 @@ six==1.16.0 \
     # via
     #   google-api-core
     #   google-auth
-    #   google-cloud-core
     #   grpcio
     #   jsonschema
     #   protobuf

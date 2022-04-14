@@ -79,7 +79,7 @@
   - title: {{dimension.title}}
     name: {{dimension.title}}
     type: string_filter
-    default_value: {% for option in (dimension.options | sort)[10] -%}'{{option}}'{% if not loop.last %}{% endif %}{% endfor %}
+    default_value: '{% for option in dimension.options | sort -%}{{option}}{% if not loop.last %},{% endif %}{% endfor %}'
     allow_multiple_values: true
     required: true
     ui_config:
