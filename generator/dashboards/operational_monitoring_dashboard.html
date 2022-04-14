@@ -172,6 +172,21 @@
                     <span class="p">}</span>
                 <span class="p">)</span>
                 <span class="n">graph_index</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">group_by_dimension</span><span class="p">:</span>
+                    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;elements&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="p">{</span>
+                            <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2"> - By </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">group_by_dimension</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;metric&quot;</span><span class="p">:</span> <span class="n">metric</span><span class="p">,</span>
+                            <span class="s2">&quot;explore&quot;</span><span class="p">:</span> <span class="n">explore</span><span class="p">,</span>
+                            <span class="s2">&quot;series_colors&quot;</span><span class="p">:</span> <span class="n">series_colors</span><span class="p">,</span>
+                            <span class="s2">&quot;xaxis&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">xaxis</span><span class="p">,</span>
+                            <span class="s2">&quot;row&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">graph_index</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span><span class="p">,</span>
+                            <span class="s2">&quot;col&quot;</span><span class="p">:</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">graph_index</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">12</span><span class="p">,</span>
+                        <span class="p">}</span>
+                    <span class="p">)</span>
+                    <span class="n">graph_index</span> <span class="o">+=</span> <span class="mi">1</span>
+
         <span class="n">dash_lookml</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">render_template</span><span class="p">(</span>
             <span class="s2">&quot;dashboard.lkml&quot;</span><span class="p">,</span> <span class="s2">&quot;dashboards&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">)</span>
@@ -283,6 +298,21 @@
                     <span class="p">}</span>
                 <span class="p">)</span>
                 <span class="n">graph_index</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">group_by_dimension</span><span class="p">:</span>
+                    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;elements&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="p">{</span>
+                            <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2"> - By </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">group_by_dimension</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;metric&quot;</span><span class="p">:</span> <span class="n">metric</span><span class="p">,</span>
+                            <span class="s2">&quot;explore&quot;</span><span class="p">:</span> <span class="n">explore</span><span class="p">,</span>
+                            <span class="s2">&quot;series_colors&quot;</span><span class="p">:</span> <span class="n">series_colors</span><span class="p">,</span>
+                            <span class="s2">&quot;xaxis&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">xaxis</span><span class="p">,</span>
+                            <span class="s2">&quot;row&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">graph_index</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span><span class="p">,</span>
+                            <span class="s2">&quot;col&quot;</span><span class="p">:</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">graph_index</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">12</span><span class="p">,</span>
+                        <span class="p">}</span>
+                    <span class="p">)</span>
+                    <span class="n">graph_index</span> <span class="o">+=</span> <span class="mi">1</span>
+
         <span class="n">dash_lookml</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">render_template</span><span class="p">(</span>
             <span class="s2">&quot;dashboard.lkml&quot;</span><span class="p">,</span> <span class="s2">&quot;dashboards&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">)</span>
@@ -440,6 +470,21 @@
                     <span class="p">}</span>
                 <span class="p">)</span>
                 <span class="n">graph_index</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">group_by_dimension</span><span class="p">:</span>
+                    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;elements&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="p">{</span>
+                            <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2"> - By </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">group_by_dimension</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;metric&quot;</span><span class="p">:</span> <span class="n">metric</span><span class="p">,</span>
+                            <span class="s2">&quot;explore&quot;</span><span class="p">:</span> <span class="n">explore</span><span class="p">,</span>
+                            <span class="s2">&quot;series_colors&quot;</span><span class="p">:</span> <span class="n">series_colors</span><span class="p">,</span>
+                            <span class="s2">&quot;xaxis&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">xaxis</span><span class="p">,</span>
+                            <span class="s2">&quot;row&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">graph_index</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span><span class="p">,</span>
+                            <span class="s2">&quot;col&quot;</span><span class="p">:</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">graph_index</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">12</span><span class="p">,</span>
+                        <span class="p">}</span>
+                    <span class="p">)</span>
+                    <span class="n">graph_index</span> <span class="o">+=</span> <span class="mi">1</span>
+
         <span class="n">dash_lookml</span> <span class="o">=</span> <span class="n">lookml_utils</span><span class="o">.</span><span class="n">render_template</span><span class="p">(</span>
             <span class="s2">&quot;dashboard.lkml&quot;</span><span class="p">,</span> <span class="s2">&quot;dashboards&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">)</span>
