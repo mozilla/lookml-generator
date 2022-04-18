@@ -266,6 +266,10 @@ firefox_accounts:
       tables:
         - channel: release
           table: mozdata.firefox_accounts.fxa_users_first_seen
+    fxa_users_services_daily_table:
+      type: table_view
+      tables:
+        - table: mozdata.firefox_accounts.fxa_users_services_daily
     fxa_log_device_command_events:
       type: table_view
       tables:
