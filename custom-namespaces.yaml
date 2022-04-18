@@ -684,8 +684,13 @@ shared:
   pretty_name: Shared
   owners:
     - anicholson@mozilla.com
+    - ascholtz@mozilla.com
   views:
     countries:
       type: table_view
       tables:
         - table: mozdata.static.country_codes_v1
+    data_incidents:
+      type: table_view
+      tables:
+        - table: mozdata.static.data_incidents_v1
