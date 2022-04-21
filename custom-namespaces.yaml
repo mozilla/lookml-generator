@@ -266,6 +266,10 @@ firefox_accounts:
       tables:
         - channel: release
           table: mozdata.firefox_accounts.fxa_users_first_seen
+    fxa_users_services_daily_table:
+      type: table_view
+      tables:
+        - table: mozdata.firefox_accounts.fxa_users_services_daily
     fxa_log_device_command_events:
       type: table_view
       tables:
@@ -568,6 +572,22 @@ monitoring:
       type: ping_view
       tables:
         - table: mozdata.monitoring.telemetry_missing_columns
+    distinct_docids_notes:
+      type: table_view
+      tables:
+        - table: mozdata.static.monitoring_distinct_docids_notes_v1
+    missing_columns_notes:
+      type: table_view
+      tables:
+        - table: mozdata.static.monitoring_missing_columns_notes_v1
+    missing_document_namespaces_notes:
+      type: table_view
+      tables:
+        - table: mozdata.static.monitoring_missing_document_namespaces_notes_v1
+    schema_errors_notes:
+      type: table_view
+      tables:
+        - table: mozdata.static.monitoring_schema_errors_notes_v1
   explores:
     average_ping_sizes:
       type: ping_explore
@@ -684,8 +704,13 @@ shared:
   pretty_name: Shared
   owners:
     - anicholson@mozilla.com
+    - ascholtz@mozilla.com
   views:
     countries:
       type: table_view
       tables:
         - table: mozdata.static.country_codes_v1
+    data_incidents:
+      type: table_view
+      tables:
+        - table: mozdata.static.data_incidents_v1
