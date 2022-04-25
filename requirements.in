@@ -15,6 +15,6 @@ pytest-flake8==1.1.1
 pytest-isort==3.0.0
 pytest-mypy==0.9.1
 pytest-pydocstyle==2.3.0
-pytest==7.1.1
+pytest==7.1.2
 types-PyYaml==6.0.7
 yamllint==1.26.3
