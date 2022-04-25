@@ -223,6 +223,11 @@ firefox_accounts:
       tables:
         - events_table_view: fxa_auth_events_table
           base_table: mozdata.firefox_accounts.fxa_content_auth_events
+    content_auth_stdout_events:
+      type: events_view
+      tables:
+        - events_table_view: fxa_content_auth_stdout_events_table
+          base_table: mozdata.firefox_accounts.fxa_content_auth_stdout_events
     fxa_events_table:
       type: table_view
       tables:
@@ -233,6 +238,11 @@ firefox_accounts:
       tables:
         - channel: release
           table: mozdata.firefox_accounts.fxa_content_auth_events
+    fxa_content_auth_stdout_events_table:
+      type: table_view
+      tables:
+        - channel: release
+          table: mozdata.firefox_accounts.fxa_content_auth_stdout_events
     funnel_analysis:
       type: funnel_analysis_view
       tables:
@@ -256,6 +266,10 @@ firefox_accounts:
       tables:
         - channel: release
           table: mozdata.firefox_accounts.fxa_users_first_seen
+    fxa_users_services_daily_table:
+      type: table_view
+      tables:
+        - table: mozdata.firefox_accounts.fxa_users_services_daily
     fxa_log_device_command_events:
       type: table_view
       tables:
@@ -272,6 +286,11 @@ firefox_accounts:
       views:
         base_view: auth_events
         extended_view: fxa_auth_events_table
+    content_auth_stdout_event_counts:
+      type: events_explore
+      views:
+        base_view: content_auth_stdout_events
+        extended_view: fxa_content_auth_stdout_events_table
     funnel_analysis:
       type: funnel_analysis_explore
       views:
@@ -553,6 +572,22 @@ monitoring:
       type: ping_view
       tables:
         - table: mozdata.monitoring.telemetry_missing_columns
+    distinct_docids_notes:
+      type: table_view
+      tables:
+        - table: mozdata.static.monitoring_distinct_docids_notes_v1
+    missing_columns_notes:
+      type: table_view
+      tables:
+        - table: mozdata.static.monitoring_missing_columns_notes_v1
+    missing_document_namespaces_notes:
+      type: table_view
+      tables:
+        - table: mozdata.static.monitoring_missing_document_namespaces_notes_v1
+    schema_errors_notes:
+      type: table_view
+      tables:
+        - table: mozdata.static.monitoring_schema_errors_notes_v1
   explores:
     average_ping_sizes:
       type: ping_explore
@@ -664,3 +699,18 @@ fpa:
     - rmiller@mozilla.com
     - lakshmimurugan@google.com
   spoke: looker-spoke-private
+shared:
+  glean_app: false
+  pretty_name: Shared
+  owners:
+    - anicholson@mozilla.com
+    - ascholtz@mozilla.com
+  views:
+    countries:
+      type: table_view
+      tables:
+        - table: mozdata.static.country_codes_v1
+    data_incidents:
+      type: table_view
+      tables:
+        - table: mozdata.static.data_incidents_v1

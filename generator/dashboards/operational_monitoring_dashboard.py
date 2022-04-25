@@ -30,6 +30,7 @@ class OperationalMonitoringDashboard(Dashboard):
         """Get an instance of a Operational Monitoring Dashboard."""
         self.dimensions = defn[0].get("dimensions", {})
         self.xaxis = defn[0]["xaxis"]
+        self.group_by_dimension = defn[0].get("group_by_dimension", None)
 
         super().__init__(title, name, layout, namespace, defn)
 
@@ -60,6 +61,7 @@ class OperationalMonitoringDashboard(Dashboard):
             "layout": self.layout,
             "elements": [],
             "dimensions": [],
+            "group_by_dimension": self.group_by_dimension,
         }
 
         includes = []
@@ -96,6 +98,21 @@ class OperationalMonitoringDashboard(Dashboard):
                     }
                 )
                 graph_index += 1
+
+                if self.group_by_dimension:
+                    kwargs["elements"].append(
+                        {
+                            "title": f"{title} - By {self.group_by_dimension}",
+                            "metric": metric,
+                            "explore": explore,
+                            "series_colors": series_colors,
+                            "xaxis": self.xaxis,
+                            "row": int(graph_index / 2) * 10,
+                            "col": 0 if graph_index % 2 == 0 else 12,
+                        }
+                    )
+                    graph_index += 1
+
         dash_lookml = lookml_utils.render_template(
             "dashboard.lkml", "dashboards", **kwargs
         )
