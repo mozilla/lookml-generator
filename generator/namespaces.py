@@ -94,7 +94,9 @@ def _get_opmon(bq_client: bigquery.Client, namespaces: Dict[str, Any]):
     # Iterating over all defined operational monitoring projects
     for project in projects:
         table_prefix = _normalize_slug(project["slug"])
-        project_name = "_".join(project["name"].lower().split(" "))
+        project_name = re.sub(
+            "[^0-9a-zA-Z_]+", "_", "_".join(project["name"].lower().split(" "))
+        )
         branches = project.get("branches", ["enabled", "disabled"])
 
         for data_type in DATA_TYPES:
@@ -135,6 +137,7 @@ def _get_opmon(bq_client: bigquery.Client, namespaces: Dict[str, Any]):
                     "branches": branches,
                     "xaxis": project["xaxis"],
                     "dimensions": dimensions,
+                    "group_by_dimension": project.get("group_by_dimension", None),
                     "probes": [
                         p["name"]
                         for p in project["probes"]
