@@ -10,7 +10,6 @@ import lkml
 import looker_sdk
 import yaml
 
-from .content import setup_env_with_looker_creds
 from .lookml import ViewDict
 
 MODEL_SETS_BY_INSTANCE: Dict[str, List[str]] = {
@@ -38,6 +37,29 @@ class NamespaceDict(TypedDict):
     glean_app: bool
     connection: str
     spoke: str
+
+
+def setup_env_with_looker_creds() -> bool:
+    """
+    Set up env with looker credentials.
+
+    Returns TRUE if the config is complete.
+    """
+    client_id = os.environ.get("LOOKER_API_CLIENT_ID")
+    client_secret = os.environ.get("LOOKER_API_CLIENT_SECRET")
+    instance = os.environ.get("LOOKER_INSTANCE_URI")
+
+    if client_id is None or client_secret is None or instance is None:
+        return False
+
+    os.environ["LOOKERSDK_BASE_URL"] = instance
+    os.environ["LOOKERSDK_API_VERSION"] = "3.1"
+    os.environ["LOOKERSDK_VERIFY_SSL"] = "true"
+    os.environ["LOOKERSDK_TIMEOUT"] = "120"
+    os.environ["LOOKERSDK_CLIENT_ID"] = client_id
+    os.environ["LOOKERSDK_CLIENT_SECRET"] = client_secret
+
+    return True
 
 
 def generate_model(
