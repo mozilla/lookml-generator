@@ -229,20 +229,6 @@ function generate_spoke_commits() {
   popd
 }
 
-function generate_looker_content() {
-  pushd .
-  cd /app
-
-  if [[ -z $LOOKER_API_CLIENT_ID || -z $LOOKER_API_CLIENT_SECRET ]]; then
-    echo "Looker API vars are not set."
-  else
-    lookml-generator content \
-      --namespaces "namespaces.yaml"
-  fi
-
-  popd
-}
-
 function hit_looker_webhooks() {
   # These webhooks ensure production is up-to-date.
   # See https://help.looker.com/hc/en-us/articles/360001288268-Deploy-Webhook-Pulling-From-Remote-Git-Repository
@@ -303,7 +289,6 @@ function main() {
     push_and_open_spoke_pull_request
 
     # Update Looker content
-    generate_looker_content
     hit_looker_webhooks
   fi
 
