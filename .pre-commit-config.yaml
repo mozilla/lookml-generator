@@ -1,33 +1,33 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.4.0
+    rev: v4.2.0
     hooks:
       - id: trailing-whitespace
       - id: no-commit-to-branch
         args: [--branch, main]
   - repo: https://github.com/psf/black
-    rev: 20.8b1
+    rev: 22.3.0
     hooks:
       - id: black
   - repo: https://github.com/PyCQA/flake8
-    rev: 3.8.4
+    rev: 4.0.1
     hooks:
       - id: flake8
   - repo: https://github.com/PyCQA/isort
-    rev: 5.7.0
+    rev: 5.10.1
     hooks:
       - id: isort
   - repo: https://github.com/PyCQA/pydocstyle
-    rev: 5.1.1
+    rev: 6.1.1
     hooks:
       - id: pydocstyle
         exclude: (.*/)?test_.*\.py
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v0.812
+    rev: v0.942
     hooks:
       - id: mypy
   - repo: https://github.com/adrienverge/yamllint
-    rev: v1.26.0
+    rev: v1.26.3
     hooks:
       - id: yamllint
         args: [-c, .yamllint.yaml, .]

@@ -9,7 +9,6 @@ import warnings
 
 import click
 
-from .content import generate_content
 from .lookml import lookml
 from .namespaces import namespaces
 from .spoke import update_spoke
@@ -21,7 +20,6 @@ def cli(prog_name=None):
         "namespaces": namespaces,
         "lookml": lookml,
         "update-spoke": update_spoke,
-        "content": generate_content,
     }
 
     @click.group(commands=commands)
