@@ -407,10 +407,10 @@ def test_namespaces_full(
                 },
                 "operational_monitoring": {
                     "dashboards": {
-                        "opmon": {
+                        "op_mon": {
                             "tables": [
                                 {
-                                    "explore": "opmon_histogram",
+                                    "explore": "op_mon_histogram",
                                     "table": "moz-fx-data-shared-prod.operational_monitoring.op_mon_histogram",
                                     "branches": ["enabled", "disabled"],
                                     "dimensions": {
@@ -424,7 +424,7 @@ def test_namespaces_full(
                                     "group_by_dimension": None,
                                 },
                                 {
-                                    "explore": "opmon_scalar",
+                                    "explore": "op_mon_scalar",
                                     "table": "moz-fx-data-shared-prod.operational_monitoring.op_mon_scalar",
                                     "branches": ["enabled", "disabled"],
                                     "dimensions": {
@@ -438,14 +438,15 @@ def test_namespaces_full(
                                     "group_by_dimension": None,
                                 },
                             ],
+                            "title": "Opmon",
                             "type": "operational_monitoring_dashboard",
                         }
                     },
                     "explores": {
-                        "opmon_histogram": {
+                        "op_mon_histogram": {
                             "branches": ["enabled", "disabled"],
                             "type": "operational_monitoring_explore",
-                            "views": {"base_view": "opmon_histogram"},
+                            "views": {"base_view": "op_mon_histogram"},
                             "dimensions": {
                                 "cores_count": {
                                     "default": "4",
@@ -455,10 +456,10 @@ def test_namespaces_full(
                             "xaxis": "submission_date",
                             "probes": ["GC_MS", "GC_MS_CONTENT"],
                         },
-                        "opmon_scalar": {
+                        "op_mon_scalar": {
                             "branches": ["enabled", "disabled"],
                             "type": "operational_monitoring_explore",
-                            "views": {"base_view": "opmon_scalar"},
+                            "views": {"base_view": "op_mon_scalar"},
                             "dimensions": {
                                 "cores_count": {
                                     "default": "4",
@@ -474,7 +475,7 @@ def test_namespaces_full(
                     "pretty_name": "Operational Monitoring",
                     "spoke": "looker-spoke-default",
                     "views": {
-                        "opmon_histogram": {
+                        "op_mon_histogram": {
                             "tables": [
                                 {
                                     "dimensions": {
@@ -489,7 +490,7 @@ def test_namespaces_full(
                             ],
                             "type": "operational_monitoring_histogram_view",
                         },
-                        "opmon_scalar": {
+                        "op_mon_scalar": {
                             "tables": [
                                 {
                                     "dimensions": {

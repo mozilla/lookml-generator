@@ -39,7 +39,7 @@ class OperationalMonitoringDashboard(Dashboard):
         klass, namespace: str, name: str, defn: dict
     ) -> OperationalMonitoringDashboard:
         """Get a OperationalMonitoringDashboard from a dict representation."""
-        title = lookml_utils.slug_to_title(name)
+        title = defn["title"]
         return klass(title, name, "newspaper", namespace, defn["tables"])
 
     def _map_series_to_colours(self, branches, explore):

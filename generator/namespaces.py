@@ -20,7 +20,7 @@ from google.cloud import bigquery
 from generator import operational_monitoring_utils
 
 from .explores import EXPLORE_TYPES
-from .views import VIEW_TYPES, View
+from .views import VIEW_TYPES, View, lookml_utils
 
 PROBE_INFO_BASE_URI = "https://probeinfo.telemetry.mozilla.org"
 DEFAULT_SPOKE = "looker-spoke-default"
@@ -94,14 +94,14 @@ def _get_opmon(bq_client: bigquery.Client, namespaces: Dict[str, Any]):
     # Iterating over all defined operational monitoring projects
     for project in projects:
         table_prefix = _normalize_slug(project["slug"])
-        project_name = re.sub(
-            "[^0-9a-zA-Z_]+", "_", "_".join(project["name"].lower().split(" "))
+        project_name = lookml_utils.slug_to_title(
+            re.sub("[^0-9a-zA-Z_]+", "_", "_".join(project["name"].lower().split(" ")))
         )
         branches = project.get("branches", ["enabled", "disabled"])
 
         for data_type in DATA_TYPES:
             # append view and explore for data type
-            project_data_type_id = f"{project_name}_{data_type}"
+            project_data_type_id = f"{table_prefix}_{data_type}"
             table = f"{PROD_PROJECT}.{OPMON_DATASET}.{table_prefix}_{data_type}"
             dimensions = operational_monitoring_utils.get_dimension_defaults(
                 bq_client, table, project["dimensions"]
@@ -119,7 +119,7 @@ def _get_opmon(bq_client: bigquery.Client, namespaces: Dict[str, Any]):
             }
             om_content["explores"][project_data_type_id] = {
                 "type": "operational_monitoring_explore",
-                "views": {"base_view": f"{project_name}_{data_type}"},
+                "views": {"base_view": f"{table_prefix}_{data_type}"},
                 "branches": branches,
                 "xaxis": project["xaxis"],
                 "dimensions": dimensions,
@@ -128,11 +128,12 @@ def _get_opmon(bq_client: bigquery.Client, namespaces: Dict[str, Any]):
                 ],
             }
 
-        om_content["dashboards"][project_name] = {
+        om_content["dashboards"][table_prefix] = {
             "type": "operational_monitoring_dashboard",
+            "title": project_name,
             "tables": [
                 {
-                    "explore": f"{project_name}_{data_type}",
+                    "explore": f"{table_prefix}_{data_type}",
                     "table": f"{PROD_PROJECT}.{OPMON_DATASET}.{table_prefix}_{data_type}",
                     "branches": branches,
                     "xaxis": project["xaxis"],
