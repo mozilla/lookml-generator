@@ -10,7 +10,6 @@ import lkml
 import looker_sdk
 import yaml
 
-# from .content import setup_env_with_looker_creds
 from .lookml import ViewDict
 
 MODEL_SETS_BY_INSTANCE: Dict[str, List[str]] = {
