@@ -383,7 +383,7 @@ def test_dashboard_lookml(operational_monitoring_dashboard):
         - title: Gc Ms
           name: Gc Ms
           explore: fission_histogram
-          type: "looker_line"
+          type: "ci-line-chart"
           fields: [
             fission_histogram.build_id,
             fission_histogram.branch,
@@ -400,23 +400,22 @@ def test_dashboard_lookml(operational_monitoring_dashboard):
           col: 0
           width: 12
           height: 8
+          field_x: fission_histogram.submission_date
+          field_y: fission_histogram.percentile
+          log_scale: true
+          ci_lower: fission_histogram.low
+          ci_upper: fission_histogram.high
+          show_grid: true
           listen:
             Percentile: fission_histogram.percentile_conf
             Cores Count: fission_histogram.cores_count
             Os: fission_histogram.os
-          y_axes: [{type: log}]
-          series_colors:
-            enabled - fission_histogram.percentile: "#ff6a06"
-            enabled - fission_histogram.high: "#ffb380"
-            enabled - fission_histogram.low: "#ffb380"
-            disabled - fission_histogram.percentile: "blue"
-            disabled - fission_histogram.high: "#8cd3ff"
-            disabled - fission_histogram.low: "#8cd3ff"
-
+          enabled: "#3FE1B0"
+          disabled: "#0060E0"
         - title: Gc Ms Content
           name: Gc Ms Content
           explore: fission_histogram
-          type: "looker_line"
+          type: "ci-line-chart"
           fields: [
             fission_histogram.build_id,
             fission_histogram.branch,
@@ -433,19 +432,18 @@ def test_dashboard_lookml(operational_monitoring_dashboard):
           col: 12
           width: 12
           height: 8
+          field_x: fission_histogram.submission_date
+          field_y: fission_histogram.percentile
+          log_scale: true
+          ci_lower: fission_histogram.low
+          ci_upper: fission_histogram.high
+          show_grid: true
           listen:
             Percentile: fission_histogram.percentile_conf
             Cores Count: fission_histogram.cores_count
             Os: fission_histogram.os
-          y_axes: [{type: log}]
-          series_colors:
-            enabled - fission_histogram.percentile: "#ff6a06"
-            enabled - fission_histogram.high: "#ffb380"
-            enabled - fission_histogram.low: "#ffb380"
-            disabled - fission_histogram.percentile: "blue"
-            disabled - fission_histogram.high: "#8cd3ff"
-            disabled - fission_histogram.low: "#8cd3ff"
-
+          enabled: "#3FE1B0"
+          disabled: "#0060E0"
         filters:
         - name: Percentile
           title: Percentile
