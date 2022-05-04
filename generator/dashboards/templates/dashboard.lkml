@@ -8,7 +8,7 @@
   - title: {{element.title}}
     name: {{element.title}}
     explore: {{element.explore}}
-    type: "looker_line"
+    type: "ci-line-chart"
     fields: [
       {{element.explore}}.{{element.xaxis}},
       {{element.explore}}.branch,
@@ -26,16 +26,20 @@
     col: {{element.col}}
     width: 12
     height: 8
+    field_x: {{element.explore}}.submission_date
+    field_y: {{element.explore}}.percentile
+    log_scale: true
+    ci_lower: {{element.explore}}.low
+    ci_upper: {{element.explore}}.high
+    show_grid: true
     listen:
       Percentile: {{element.explore}}.percentile_conf
       {%- for dimension in dimensions %}
       {{dimension.title}}: {{element.explore}}.{{dimension.name}}
       {%- endfor %}
-    y_axes: [{type: log}]
-    series_colors:
-      {% for label, colour in element.series_colors.items() -%}
-      {{label}}: "{{colour}}"
-      {% endfor %}
+    {%- for branch, color in element.series_colors.items() %}
+    {{ branch }}: "{{ color }}"
+    {%- endfor %}
   {% endfor -%}
   filters:
   - name: Percentile

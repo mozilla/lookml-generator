@@ -43,15 +43,21 @@ class OperationalMonitoringDashboard(Dashboard):
         return klass(title, name, "newspaper", namespace, defn["tables"])
 
     def _map_series_to_colours(self, branches, explore):
-        colours = ["#ff6a06", "#ffb380", "#ffb380", "blue", "#8cd3ff", "#8cd3ff"]
-        series_labels = []
-        for branch in branches:
-            series_labels += [
-                f"{branch} - {explore}.percentile",
-                f"{branch} - {explore}.high",
-                f"{branch} - {explore}.low",
-            ]
-        return dict((label, colour) for (label, colour) in zip(series_labels, colours))
+        colours = [
+            "#3FE1B0",
+            "#0060E0",
+            "#9059FF",
+            "#B933E1",
+            "#FF2A8A",
+            "#FF505F",
+            "#FF7139",
+            "#FFA537",
+            "#005E5D",
+            "#073072",
+            "#7F165B",
+            "#A7341F",
+        ]
+        return {branch: color for branch, color in zip(branches, colours)}
 
     def to_lookml(self, bq_client):
         """Get this dashboard as LookML."""
