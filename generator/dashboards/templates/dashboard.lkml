@@ -28,7 +28,7 @@
     height: 8
     field_x: {{element.explore}}.submission_date
     field_y: {{element.explore}}.percentile
-    log_scale: true
+    log_scale: false
     ci_lower: {{element.explore}}.low
     ci_upper: {{element.explore}}.high
     show_grid: true
