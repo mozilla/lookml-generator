@@ -1,6 +1,6 @@
 ### A list of files and file patterns to be excluded from the Dockerfile
 
-# 3rd-party configuratiojn
+# 3rd-party configuration
 .circleci
 .github
 .vscode
