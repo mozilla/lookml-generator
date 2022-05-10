@@ -714,3 +714,26 @@ shared:
       type: table_view
       tables:
         - table: mozdata.static.data_incidents_v1
+site:
+  glean_app: false
+  pretty_name: Site
+  spoke: looker-spoke-default
+  owners:
+    - kignasiak@mozilla.com
+  views:
+    www_site_page_metrics:
+      type: table_view
+      tables:
+        - table: moz-fx-data-marketing-prod.ga_derived.www_site_page_metrics_v1
+    www_site_metrics_summary:
+      type: table_view
+      tables:
+        - table: moz-fx-data-marketing-prod.ga_derived.www_site_metrics_summary_v1
+    www_site_landing_page_metrics:
+      type: table_view
+      tables:
+        - table: moz-fx-data-marketing-prod.ga_derived.www_site_landing_page_metrics_v1
+    blogs_daily_summary:
+      type: table_view
+      tables:
+        - table: moz-fx-data-marketing-prod.ga_derived.blogs_daily_summary_v1
