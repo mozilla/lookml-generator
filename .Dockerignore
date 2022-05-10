@@ -1,0 +1,21 @@
+### A list of files and file patterns to be excluded from the Dockerfile
+
+# 3rd-party configuratiojn
+.circleci
+.github
+.vscode
+.gitignore
+
+# Config files
+.pre-commit-config.yaml
+
+# Docker artifacts
+Dockerfile
+docker-compose.yml
+
+# Python artifacts
+requirements.in
+*.pyc
+
+# Other
+Makefile
