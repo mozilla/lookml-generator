@@ -9,6 +9,16 @@ operational_monitoring:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.operational_monitoring_derived.projects_v1
+combined_browser_metrics:
+  glean_app: false
+  owners:
+    - gkaberere@mozilla.com
+  pretty_name: Combined Browser Metrics
+  views:
+    projects:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.telemetry.agg_active_users
 duet:
   glean_app: false
   owners:
