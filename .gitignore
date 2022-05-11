@@ -3,6 +3,7 @@
 *.swo
 *.egg-info/
 .DS_Store
+.vscode
 .mypy_cache/
 venv/
 namespaces.yaml
