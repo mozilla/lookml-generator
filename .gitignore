@@ -8,3 +8,4 @@ venv/
 namespaces.yaml
 looker-hub/
 .env
+.vscode
