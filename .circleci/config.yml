@@ -53,7 +53,7 @@ jobs:
           command: |
             pip install pip-tools --constraint requirements.in
             pip-compile --quiet --allow-unsafe --generate-hashes
-            git diff --exit-code requirements.txt
+            git diff --exit-code -G '^ *[^# ]' -- requirements.txt
   integration-tests:
     docker: *docker
     steps:
