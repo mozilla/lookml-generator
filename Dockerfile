@@ -1,5 +1,6 @@
 FROM python:3.8.9-slim
-MAINTAINER Frank Bertsch <frank@mozilla.com>
+
+LABEL maintainer="kignasiak@mozilla.com"
 
 ENV USER_ID="10001"
 ENV GROUP_ID="app"
@@ -9,31 +10,43 @@ RUN groupadd --gid ${USER_ID} ${GROUP_ID} && \
     useradd --create-home --uid ${USER_ID} --gid ${GROUP_ID} --home-dir /app ${GROUP_ID}
 
 # For grpc https://github.com/grpc/grpc/issues/24556#issuecomment-751797589
-RUN apt-get update -qqy && \
-    apt-get install -qqy python-dev build-essential git curl software-properties-common
+RUN apt-get update -qqy \
+    && apt-get install --no-install-recommends -qqy \
+        # python-dev \
+        # build-essential \
+        curl \
+        git \
+        gnupg2 \
+        software-properties-common \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
-RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key C99B11DEB97541F0
-RUN apt-add-repository https://cli.github.com/packages
-RUN apt update
-RUN apt install -y gh
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0 \
+    && apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key C99B11DEB97541F0 \
+    && apt-add-repository https://cli.github.com/packages
+
+RUN apt update \
+    && apt install --no-install-recommends -y \
+        gh \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY --from=google/cloud-sdk:339.0.0-alpine /google-cloud-sdk /google-cloud-sdk
 ENV PATH /google-cloud-sdk/bin:$PATH
 
 WORKDIR ${HOME}
-RUN chown -R ${USER_ID}:${GROUP_ID} ${HOME}
 
-RUN pip install --upgrade pip
-COPY requirements.txt ${HOME}
-RUN chown ${USER_ID}:${GROUP_ID} ${HOME}/requirements.txt
-RUN pip install --no-deps -r ${HOME}/requirements.txt
+COPY requirements.txt .
 
-COPY . ${HOME}/lookml-generator
-RUN chown -R ${USER_ID}:${GROUP_ID} ${HOME}/lookml-generator
+RUN pip install --upgrade pip \
+    && pip install --no-deps --no-cache-dir -r requirements.txt \
+    && rm requirements.txt
+
+COPY . ./lookml-generator
+RUN pip install --no-dependencies --no-cache-dir -e ./lookml-generator
 ENV PATH $PATH:${HOME}/lookml-generator/bin
-RUN pip install --no-dependencies -e ${HOME}/lookml-generator
 
+RUN chown -R ${USER_ID}:${GROUP_ID} ${HOME}
 USER ${USER_ID}
 
 ENTRYPOINT ["generate"]
