@@ -12,8 +12,8 @@ RUN groupadd --gid ${USER_ID} ${GROUP_ID} && \
 # For grpc https://github.com/grpc/grpc/issues/24556#issuecomment-751797589
 RUN apt-get update -qqy \
     && apt-get install --no-install-recommends -qqy \
-        # python-dev \
-        # build-essential \
+        python-dev \
+        build-essential \
         curl \
         git \
         gnupg2 \
