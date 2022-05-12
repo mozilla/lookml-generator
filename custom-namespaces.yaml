@@ -18,7 +18,7 @@ combined_browser_metrics:
     projects:
       type: table_view
       tables:
-        - table: moz-fx-data-shared-prod.telemetry.agg_active_users
+        - table: moz-fx-data-shared-prod.telemetry.active_users_aggregates_v1
 duet:
   glean_app: false
   owners:
