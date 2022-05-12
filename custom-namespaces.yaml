@@ -15,6 +15,8 @@ combined_browser_metrics:
     - gkaberere@mozilla.com
     - lvargas@mozilla.com
     - mhirose@mozilla.com
+    - anicholson@mozilla.com
+    - kignasiak@mozilla.com
   pretty_name: Combined Browser Metrics
   views:
     active_users_aggregates:
