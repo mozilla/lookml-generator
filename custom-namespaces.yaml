@@ -751,3 +751,7 @@ websites:
       type: table_view
       tables:
         - table: moz-fx-data-marketing-prod.ga_derived.blogs_daily_summary_v1
+    blogs_landing_page_summary:
+      type: table_view
+      tables:
+        - table: moz-fx-data-marketing-prod.ga_derived.blogs_landing_page_summary_v1
