@@ -751,3 +751,18 @@ websites:
       type: table_view
       tables:
         - table: moz-fx-data-marketing-prod.ga_derived.blogs_daily_summary_v1
+marketing:
+  glean_app: false
+  pretty_name: Marketing
+  spoke: looker-spoke-default
+  owners:
+    - kignasiak@mozilla.com
+  views:
+    acoustic_contacts:
+      type: table_view
+      tables:
+        - table: moz-fx-data-marketing-prod.acoustic.contact_v1
+    acoustic_email_events:
+      type: table_view
+      tables:
+        - table: moz-fx-data-marketing-prod.acoustic.raw_recipient_v1
