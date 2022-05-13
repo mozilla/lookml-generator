@@ -751,6 +751,10 @@ websites:
       type: table_view
       tables:
         - table: moz-fx-data-marketing-prod.ga_derived.blogs_daily_summary_v1
+    blogs_landing_page_summary:
+      type: table_view
+      tables:
+        - table: moz-fx-data-marketing-prod.ga_derived.blogs_landing_page_summary_v1
 marketing:
   glean_app: false
   pretty_name: Marketing
@@ -765,4 +769,4 @@ marketing:
     acoustic_email_events:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.acoustic.raw_recipient_v1
+        - table: moz-fx-data-marketing-prod.acoustic.raw_recipient_v1    
