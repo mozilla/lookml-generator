@@ -23,6 +23,10 @@ combined_browser_metrics:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.telemetry.active_users_aggregates
+    cohort_daily_statistics:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.telemetry.cohort_daily_statistics
 duet:
   glean_app: false
   owners:
@@ -769,4 +773,4 @@ marketing:
     acoustic_email_events:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.acoustic.raw_recipient_v1    
+        - table: moz-fx-data-marketing-prod.acoustic.raw_recipient_v1
