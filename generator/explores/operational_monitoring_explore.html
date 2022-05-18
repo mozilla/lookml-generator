@@ -48,6 +48,24 @@
                 </ul>
 
             </li>
+            <li>
+                    <a class="class" href="#OperationalMonitoringAlertingExplore">OperationalMonitoringAlertingExplore</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#OperationalMonitoringAlertingExplore.__init__">OperationalMonitoringAlertingExplore</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#OperationalMonitoringAlertingExplore.type">type</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#OperationalMonitoringAlertingExplore.from_views">from_views</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#OperationalMonitoringAlertingExplore.from_dict">from_dict</a>
+                        </li>
+                </ul>
+
+            </li>
     </ul>
 
 
@@ -171,6 +189,78 @@
 </span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>        <span class="p">]</span>
 </span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>
 </span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>        <span class="k">return</span> <span class="n">defn</span>
+</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>
+</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>
+</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a><span class="k">class</span> <span class="nc">OperationalMonitoringAlertingExplore</span><span class="p">(</span><span class="n">Explore</span><span class="p">):</span>
+</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a>    <span class="sd">&quot;&quot;&quot;An Operational Monitoring Alerting Explore.&quot;&quot;&quot;</span>
+</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>
+</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a>    <span class="nb">type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;operational_monitoring_alerting_explore&quot;</span>
+</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>
+</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a>        <span class="bp">self</span><span class="p">,</span>
+</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a>        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a>        <span class="n">views</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
+</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a>        <span class="n">views_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>        <span class="n">defn</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a>    <span class="p">):</span>
+</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>        <span class="sd">&quot;&quot;&quot;Initialize OperationalMonitoringExplore.&quot;&quot;&quot;</span>
+</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">views</span><span class="p">,</span> <span class="n">views_path</span><span class="p">)</span>
+</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a>
+</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>    <span class="nd">@staticmethod</span>
+</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>    <span class="k">def</span> <span class="nf">from_views</span><span class="p">(</span><span class="n">views</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">View</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Explore</span><span class="p">]:</span>
+</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a>        <span class="sd">&quot;&quot;&quot;Generate an Operational Monitoring explore for this namespace.&quot;&quot;&quot;</span>
+</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a>        <span class="k">for</span> <span class="n">view</span> <span class="ow">in</span> <span class="n">views</span><span class="p">:</span>
+</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a>            <span class="k">if</span> <span class="n">view</span><span class="o">.</span><span class="n">view_type</span> <span class="ow">in</span> <span class="p">{</span>
+</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a>                <span class="s2">&quot;operational_monitoring_alerting_view&quot;</span><span class="p">,</span>
+</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a>            <span class="p">}:</span>
+</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a>                <span class="k">yield</span> <span class="n">OperationalMonitoringAlertingExplore</span><span class="p">(</span>
+</span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a>                    <span class="s2">&quot;operational_monitoring&quot;</span><span class="p">,</span>
+</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a>                    <span class="p">{</span><span class="s2">&quot;base_view&quot;</span><span class="p">:</span> <span class="n">view</span><span class="o">.</span><span class="n">name</span><span class="p">},</span>
+</span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a>                <span class="p">)</span>
+</span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a>
+</span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a>    <span class="nd">@staticmethod</span>
+</span><span id="L-131"><a href="#L-131"><span class="linenos">131</span></a>    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span>
+</span><span id="L-132"><a href="#L-132"><span class="linenos">132</span></a>        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">defn</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">views_path</span><span class="p">:</span> <span class="n">Path</span>
+</span><span id="L-133"><a href="#L-133"><span class="linenos">133</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OperationalMonitoringAlertingExplore</span><span class="p">:</span>
+</span><span id="L-134"><a href="#L-134"><span class="linenos">134</span></a>        <span class="sd">&quot;&quot;&quot;Get an instance of this explore from a dictionary definition.&quot;&quot;&quot;</span>
+</span><span id="L-135"><a href="#L-135"><span class="linenos">135</span></a>        <span class="k">return</span> <span class="n">OperationalMonitoringAlertingExplore</span><span class="p">(</span>
+</span><span id="L-136"><a href="#L-136"><span class="linenos">136</span></a>            <span class="n">name</span><span class="p">,</span> <span class="n">defn</span><span class="p">[</span><span class="s2">&quot;views&quot;</span><span class="p">],</span> <span class="n">views_path</span><span class="p">,</span> <span class="n">defn</span>
+</span><span id="L-137"><a href="#L-137"><span class="linenos">137</span></a>        <span class="p">)</span>
+</span><span id="L-138"><a href="#L-138"><span class="linenos">138</span></a>
+</span><span id="L-139"><a href="#L-139"><span class="linenos">139</span></a>    <span class="k">def</span> <span class="nf">_to_lookml</span><span class="p">(</span>
+</span><span id="L-140"><a href="#L-140"><span class="linenos">140</span></a>        <span class="bp">self</span><span class="p">,</span>
+</span><span id="L-141"><a href="#L-141"><span class="linenos">141</span></a>        <span class="n">bq_client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span>
+</span><span id="L-142"><a href="#L-142"><span class="linenos">142</span></a>        <span class="n">v1_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+</span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+</span><span id="L-144"><a href="#L-144"><span class="linenos">144</span></a>        <span class="n">aggregate_tables</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="L-145"><a href="#L-145"><span class="linenos">145</span></a>        <span class="n">aggregate_tables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+</span><span id="L-146"><a href="#L-146"><span class="linenos">146</span></a>            <span class="p">{</span>
+</span><span id="L-147"><a href="#L-147"><span class="linenos">147</span></a>                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;rollup_alerts&quot;</span><span class="p">,</span>
+</span><span id="L-148"><a href="#L-148"><span class="linenos">148</span></a>                <span class="s2">&quot;query&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="L-149"><a href="#L-149"><span class="linenos">149</span></a>                    <span class="s2">&quot;dimensions&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span><span id="L-150"><a href="#L-150"><span class="linenos">150</span></a>                        <span class="s2">&quot;submission_date&quot;</span><span class="p">,</span>
+</span><span id="L-151"><a href="#L-151"><span class="linenos">151</span></a>                        <span class="s2">&quot;branch&quot;</span><span class="p">,</span>
+</span><span id="L-152"><a href="#L-152"><span class="linenos">152</span></a>                        <span class="s2">&quot;percentile&quot;</span><span class="p">,</span>
+</span><span id="L-153"><a href="#L-153"><span class="linenos">153</span></a>                        <span class="s2">&quot;probe&quot;</span><span class="p">,</span>
+</span><span id="L-154"><a href="#L-154"><span class="linenos">154</span></a>                        <span class="s2">&quot;message&quot;</span><span class="p">,</span>
+</span><span id="L-155"><a href="#L-155"><span class="linenos">155</span></a>                    <span class="p">],</span>
+</span><span id="L-156"><a href="#L-156"><span class="linenos">156</span></a>                    <span class="s2">&quot;measures&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;errors&quot;</span><span class="p">],</span>
+</span><span id="L-157"><a href="#L-157"><span class="linenos">157</span></a>                <span class="p">},</span>
+</span><span id="L-158"><a href="#L-158"><span class="linenos">158</span></a>                <span class="s2">&quot;materialization&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="L-159"><a href="#L-159"><span class="linenos">159</span></a>                    <span class="c1"># Reload the table at 9am when ETL should have been completed</span>
+</span><span id="L-160"><a href="#L-160"><span class="linenos">160</span></a>                    <span class="s2">&quot;sql_trigger_value&quot;</span><span class="p">:</span> <span class="s2">&quot;SELECT CAST(TIMESTAMP_SUB(CURRENT_TIMESTAMP, INTERVAL 9 HOUR) AS DATE)&quot;</span>
+</span><span id="L-161"><a href="#L-161"><span class="linenos">161</span></a>                <span class="p">},</span>
+</span><span id="L-162"><a href="#L-162"><span class="linenos">162</span></a>            <span class="p">}</span>
+</span><span id="L-163"><a href="#L-163"><span class="linenos">163</span></a>        <span class="p">)</span>
+</span><span id="L-164"><a href="#L-164"><span class="linenos">164</span></a>
+</span><span id="L-165"><a href="#L-165"><span class="linenos">165</span></a>        <span class="n">defn</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="L-166"><a href="#L-166"><span class="linenos">166</span></a>            <span class="p">{</span>
+</span><span id="L-167"><a href="#L-167"><span class="linenos">167</span></a>                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">views</span><span class="p">[</span><span class="s2">&quot;base_view&quot;</span><span class="p">],</span>
+</span><span id="L-168"><a href="#L-168"><span class="linenos">168</span></a>                <span class="s2">&quot;aggregate_table&quot;</span><span class="p">:</span> <span class="n">aggregate_tables</span><span class="p">,</span>
+</span><span id="L-169"><a href="#L-169"><span class="linenos">169</span></a>            <span class="p">},</span>
+</span><span id="L-170"><a href="#L-170"><span class="linenos">170</span></a>        <span class="p">]</span>
+</span><span id="L-171"><a href="#L-171"><span class="linenos">171</span></a>
+</span><span id="L-172"><a href="#L-172"><span class="linenos">172</span></a>        <span class="k">return</span> <span class="n">defn</span>
 </span></pre></div>
 
 
@@ -393,6 +483,208 @@
                 <dd id="OperationalMonitoringExplore.get_view_lookml" class="function"><a href="explore.html#Explore.get_view_lookml">get_view_lookml</a></dd>
                 <dd id="OperationalMonitoringExplore.get_unnested_fields_joins_lookml" class="function"><a href="explore.html#Explore.get_unnested_fields_joins_lookml">get_unnested_fields_joins_lookml</a></dd>
                 <dd id="OperationalMonitoringExplore.get_required_filters" class="function"><a href="explore.html#Explore.get_required_filters">get_required_filters</a></dd>
+
+            </div>
+                                </dl>
+                            </div>
+                </section>
+                <section id="OperationalMonitoringAlertingExplore">
+                            <input id="OperationalMonitoringAlertingExplore-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">OperationalMonitoringAlertingExplore</span><wbr>(<span class="base"><a href="explore.html#Explore">generator.explores.explore.Explore</a></span>):
+
+                <label class="view-source-button" for="OperationalMonitoringAlertingExplore-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#OperationalMonitoringAlertingExplore"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="OperationalMonitoringAlertingExplore-104"><a href="#OperationalMonitoringAlertingExplore-104"><span class="linenos">104</span></a><span class="k">class</span> <span class="nc">OperationalMonitoringAlertingExplore</span><span class="p">(</span><span class="n">Explore</span><span class="p">):</span>
+</span><span id="OperationalMonitoringAlertingExplore-105"><a href="#OperationalMonitoringAlertingExplore-105"><span class="linenos">105</span></a>    <span class="sd">&quot;&quot;&quot;An Operational Monitoring Alerting Explore.&quot;&quot;&quot;</span>
+</span><span id="OperationalMonitoringAlertingExplore-106"><a href="#OperationalMonitoringAlertingExplore-106"><span class="linenos">106</span></a>
+</span><span id="OperationalMonitoringAlertingExplore-107"><a href="#OperationalMonitoringAlertingExplore-107"><span class="linenos">107</span></a>    <span class="nb">type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;operational_monitoring_alerting_explore&quot;</span>
+</span><span id="OperationalMonitoringAlertingExplore-108"><a href="#OperationalMonitoringAlertingExplore-108"><span class="linenos">108</span></a>
+</span><span id="OperationalMonitoringAlertingExplore-109"><a href="#OperationalMonitoringAlertingExplore-109"><span class="linenos">109</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+</span><span id="OperationalMonitoringAlertingExplore-110"><a href="#OperationalMonitoringAlertingExplore-110"><span class="linenos">110</span></a>        <span class="bp">self</span><span class="p">,</span>
+</span><span id="OperationalMonitoringAlertingExplore-111"><a href="#OperationalMonitoringAlertingExplore-111"><span class="linenos">111</span></a>        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="OperationalMonitoringAlertingExplore-112"><a href="#OperationalMonitoringAlertingExplore-112"><span class="linenos">112</span></a>        <span class="n">views</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
+</span><span id="OperationalMonitoringAlertingExplore-113"><a href="#OperationalMonitoringAlertingExplore-113"><span class="linenos">113</span></a>        <span class="n">views_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="OperationalMonitoringAlertingExplore-114"><a href="#OperationalMonitoringAlertingExplore-114"><span class="linenos">114</span></a>        <span class="n">defn</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="OperationalMonitoringAlertingExplore-115"><a href="#OperationalMonitoringAlertingExplore-115"><span class="linenos">115</span></a>    <span class="p">):</span>
+</span><span id="OperationalMonitoringAlertingExplore-116"><a href="#OperationalMonitoringAlertingExplore-116"><span class="linenos">116</span></a>        <span class="sd">&quot;&quot;&quot;Initialize OperationalMonitoringExplore.&quot;&quot;&quot;</span>
+</span><span id="OperationalMonitoringAlertingExplore-117"><a href="#OperationalMonitoringAlertingExplore-117"><span class="linenos">117</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">views</span><span class="p">,</span> <span class="n">views_path</span><span class="p">)</span>
+</span><span id="OperationalMonitoringAlertingExplore-118"><a href="#OperationalMonitoringAlertingExplore-118"><span class="linenos">118</span></a>
+</span><span id="OperationalMonitoringAlertingExplore-119"><a href="#OperationalMonitoringAlertingExplore-119"><span class="linenos">119</span></a>    <span class="nd">@staticmethod</span>
+</span><span id="OperationalMonitoringAlertingExplore-120"><a href="#OperationalMonitoringAlertingExplore-120"><span class="linenos">120</span></a>    <span class="k">def</span> <span class="nf">from_views</span><span class="p">(</span><span class="n">views</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">View</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Explore</span><span class="p">]:</span>
+</span><span id="OperationalMonitoringAlertingExplore-121"><a href="#OperationalMonitoringAlertingExplore-121"><span class="linenos">121</span></a>        <span class="sd">&quot;&quot;&quot;Generate an Operational Monitoring explore for this namespace.&quot;&quot;&quot;</span>
+</span><span id="OperationalMonitoringAlertingExplore-122"><a href="#OperationalMonitoringAlertingExplore-122"><span class="linenos">122</span></a>        <span class="k">for</span> <span class="n">view</span> <span class="ow">in</span> <span class="n">views</span><span class="p">:</span>
+</span><span id="OperationalMonitoringAlertingExplore-123"><a href="#OperationalMonitoringAlertingExplore-123"><span class="linenos">123</span></a>            <span class="k">if</span> <span class="n">view</span><span class="o">.</span><span class="n">view_type</span> <span class="ow">in</span> <span class="p">{</span>
+</span><span id="OperationalMonitoringAlertingExplore-124"><a href="#OperationalMonitoringAlertingExplore-124"><span class="linenos">124</span></a>                <span class="s2">&quot;operational_monitoring_alerting_view&quot;</span><span class="p">,</span>
+</span><span id="OperationalMonitoringAlertingExplore-125"><a href="#OperationalMonitoringAlertingExplore-125"><span class="linenos">125</span></a>            <span class="p">}:</span>
+</span><span id="OperationalMonitoringAlertingExplore-126"><a href="#OperationalMonitoringAlertingExplore-126"><span class="linenos">126</span></a>                <span class="k">yield</span> <span class="n">OperationalMonitoringAlertingExplore</span><span class="p">(</span>
+</span><span id="OperationalMonitoringAlertingExplore-127"><a href="#OperationalMonitoringAlertingExplore-127"><span class="linenos">127</span></a>                    <span class="s2">&quot;operational_monitoring&quot;</span><span class="p">,</span>
+</span><span id="OperationalMonitoringAlertingExplore-128"><a href="#OperationalMonitoringAlertingExplore-128"><span class="linenos">128</span></a>                    <span class="p">{</span><span class="s2">&quot;base_view&quot;</span><span class="p">:</span> <span class="n">view</span><span class="o">.</span><span class="n">name</span><span class="p">},</span>
+</span><span id="OperationalMonitoringAlertingExplore-129"><a href="#OperationalMonitoringAlertingExplore-129"><span class="linenos">129</span></a>                <span class="p">)</span>
+</span><span id="OperationalMonitoringAlertingExplore-130"><a href="#OperationalMonitoringAlertingExplore-130"><span class="linenos">130</span></a>
+</span><span id="OperationalMonitoringAlertingExplore-131"><a href="#OperationalMonitoringAlertingExplore-131"><span class="linenos">131</span></a>    <span class="nd">@staticmethod</span>
+</span><span id="OperationalMonitoringAlertingExplore-132"><a href="#OperationalMonitoringAlertingExplore-132"><span class="linenos">132</span></a>    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span>
+</span><span id="OperationalMonitoringAlertingExplore-133"><a href="#OperationalMonitoringAlertingExplore-133"><span class="linenos">133</span></a>        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">defn</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">views_path</span><span class="p">:</span> <span class="n">Path</span>
+</span><span id="OperationalMonitoringAlertingExplore-134"><a href="#OperationalMonitoringAlertingExplore-134"><span class="linenos">134</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OperationalMonitoringAlertingExplore</span><span class="p">:</span>
+</span><span id="OperationalMonitoringAlertingExplore-135"><a href="#OperationalMonitoringAlertingExplore-135"><span class="linenos">135</span></a>        <span class="sd">&quot;&quot;&quot;Get an instance of this explore from a dictionary definition.&quot;&quot;&quot;</span>
+</span><span id="OperationalMonitoringAlertingExplore-136"><a href="#OperationalMonitoringAlertingExplore-136"><span class="linenos">136</span></a>        <span class="k">return</span> <span class="n">OperationalMonitoringAlertingExplore</span><span class="p">(</span>
+</span><span id="OperationalMonitoringAlertingExplore-137"><a href="#OperationalMonitoringAlertingExplore-137"><span class="linenos">137</span></a>            <span class="n">name</span><span class="p">,</span> <span class="n">defn</span><span class="p">[</span><span class="s2">&quot;views&quot;</span><span class="p">],</span> <span class="n">views_path</span><span class="p">,</span> <span class="n">defn</span>
+</span><span id="OperationalMonitoringAlertingExplore-138"><a href="#OperationalMonitoringAlertingExplore-138"><span class="linenos">138</span></a>        <span class="p">)</span>
+</span><span id="OperationalMonitoringAlertingExplore-139"><a href="#OperationalMonitoringAlertingExplore-139"><span class="linenos">139</span></a>
+</span><span id="OperationalMonitoringAlertingExplore-140"><a href="#OperationalMonitoringAlertingExplore-140"><span class="linenos">140</span></a>    <span class="k">def</span> <span class="nf">_to_lookml</span><span class="p">(</span>
+</span><span id="OperationalMonitoringAlertingExplore-141"><a href="#OperationalMonitoringAlertingExplore-141"><span class="linenos">141</span></a>        <span class="bp">self</span><span class="p">,</span>
+</span><span id="OperationalMonitoringAlertingExplore-142"><a href="#OperationalMonitoringAlertingExplore-142"><span class="linenos">142</span></a>        <span class="n">bq_client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span>
+</span><span id="OperationalMonitoringAlertingExplore-143"><a href="#OperationalMonitoringAlertingExplore-143"><span class="linenos">143</span></a>        <span class="n">v1_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+</span><span id="OperationalMonitoringAlertingExplore-144"><a href="#OperationalMonitoringAlertingExplore-144"><span class="linenos">144</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+</span><span id="OperationalMonitoringAlertingExplore-145"><a href="#OperationalMonitoringAlertingExplore-145"><span class="linenos">145</span></a>        <span class="n">aggregate_tables</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="OperationalMonitoringAlertingExplore-146"><a href="#OperationalMonitoringAlertingExplore-146"><span class="linenos">146</span></a>        <span class="n">aggregate_tables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+</span><span id="OperationalMonitoringAlertingExplore-147"><a href="#OperationalMonitoringAlertingExplore-147"><span class="linenos">147</span></a>            <span class="p">{</span>
+</span><span id="OperationalMonitoringAlertingExplore-148"><a href="#OperationalMonitoringAlertingExplore-148"><span class="linenos">148</span></a>                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;rollup_alerts&quot;</span><span class="p">,</span>
+</span><span id="OperationalMonitoringAlertingExplore-149"><a href="#OperationalMonitoringAlertingExplore-149"><span class="linenos">149</span></a>                <span class="s2">&quot;query&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="OperationalMonitoringAlertingExplore-150"><a href="#OperationalMonitoringAlertingExplore-150"><span class="linenos">150</span></a>                    <span class="s2">&quot;dimensions&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span><span id="OperationalMonitoringAlertingExplore-151"><a href="#OperationalMonitoringAlertingExplore-151"><span class="linenos">151</span></a>                        <span class="s2">&quot;submission_date&quot;</span><span class="p">,</span>
+</span><span id="OperationalMonitoringAlertingExplore-152"><a href="#OperationalMonitoringAlertingExplore-152"><span class="linenos">152</span></a>                        <span class="s2">&quot;branch&quot;</span><span class="p">,</span>
+</span><span id="OperationalMonitoringAlertingExplore-153"><a href="#OperationalMonitoringAlertingExplore-153"><span class="linenos">153</span></a>                        <span class="s2">&quot;percentile&quot;</span><span class="p">,</span>
+</span><span id="OperationalMonitoringAlertingExplore-154"><a href="#OperationalMonitoringAlertingExplore-154"><span class="linenos">154</span></a>                        <span class="s2">&quot;probe&quot;</span><span class="p">,</span>
+</span><span id="OperationalMonitoringAlertingExplore-155"><a href="#OperationalMonitoringAlertingExplore-155"><span class="linenos">155</span></a>                        <span class="s2">&quot;message&quot;</span><span class="p">,</span>
+</span><span id="OperationalMonitoringAlertingExplore-156"><a href="#OperationalMonitoringAlertingExplore-156"><span class="linenos">156</span></a>                    <span class="p">],</span>
+</span><span id="OperationalMonitoringAlertingExplore-157"><a href="#OperationalMonitoringAlertingExplore-157"><span class="linenos">157</span></a>                    <span class="s2">&quot;measures&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;errors&quot;</span><span class="p">],</span>
+</span><span id="OperationalMonitoringAlertingExplore-158"><a href="#OperationalMonitoringAlertingExplore-158"><span class="linenos">158</span></a>                <span class="p">},</span>
+</span><span id="OperationalMonitoringAlertingExplore-159"><a href="#OperationalMonitoringAlertingExplore-159"><span class="linenos">159</span></a>                <span class="s2">&quot;materialization&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="OperationalMonitoringAlertingExplore-160"><a href="#OperationalMonitoringAlertingExplore-160"><span class="linenos">160</span></a>                    <span class="c1"># Reload the table at 9am when ETL should have been completed</span>
+</span><span id="OperationalMonitoringAlertingExplore-161"><a href="#OperationalMonitoringAlertingExplore-161"><span class="linenos">161</span></a>                    <span class="s2">&quot;sql_trigger_value&quot;</span><span class="p">:</span> <span class="s2">&quot;SELECT CAST(TIMESTAMP_SUB(CURRENT_TIMESTAMP, INTERVAL 9 HOUR) AS DATE)&quot;</span>
+</span><span id="OperationalMonitoringAlertingExplore-162"><a href="#OperationalMonitoringAlertingExplore-162"><span class="linenos">162</span></a>                <span class="p">},</span>
+</span><span id="OperationalMonitoringAlertingExplore-163"><a href="#OperationalMonitoringAlertingExplore-163"><span class="linenos">163</span></a>            <span class="p">}</span>
+</span><span id="OperationalMonitoringAlertingExplore-164"><a href="#OperationalMonitoringAlertingExplore-164"><span class="linenos">164</span></a>        <span class="p">)</span>
+</span><span id="OperationalMonitoringAlertingExplore-165"><a href="#OperationalMonitoringAlertingExplore-165"><span class="linenos">165</span></a>
+</span><span id="OperationalMonitoringAlertingExplore-166"><a href="#OperationalMonitoringAlertingExplore-166"><span class="linenos">166</span></a>        <span class="n">defn</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="OperationalMonitoringAlertingExplore-167"><a href="#OperationalMonitoringAlertingExplore-167"><span class="linenos">167</span></a>            <span class="p">{</span>
+</span><span id="OperationalMonitoringAlertingExplore-168"><a href="#OperationalMonitoringAlertingExplore-168"><span class="linenos">168</span></a>                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">views</span><span class="p">[</span><span class="s2">&quot;base_view&quot;</span><span class="p">],</span>
+</span><span id="OperationalMonitoringAlertingExplore-169"><a href="#OperationalMonitoringAlertingExplore-169"><span class="linenos">169</span></a>                <span class="s2">&quot;aggregate_table&quot;</span><span class="p">:</span> <span class="n">aggregate_tables</span><span class="p">,</span>
+</span><span id="OperationalMonitoringAlertingExplore-170"><a href="#OperationalMonitoringAlertingExplore-170"><span class="linenos">170</span></a>            <span class="p">},</span>
+</span><span id="OperationalMonitoringAlertingExplore-171"><a href="#OperationalMonitoringAlertingExplore-171"><span class="linenos">171</span></a>        <span class="p">]</span>
+</span><span id="OperationalMonitoringAlertingExplore-172"><a href="#OperationalMonitoringAlertingExplore-172"><span class="linenos">172</span></a>
+</span><span id="OperationalMonitoringAlertingExplore-173"><a href="#OperationalMonitoringAlertingExplore-173"><span class="linenos">173</span></a>        <span class="k">return</span> <span class="n">defn</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>An Operational Monitoring Alerting Explore.</p>
+</div>
+
+
+                            <div id="OperationalMonitoringAlertingExplore.__init__" class="classattr">
+                                        <input id="OperationalMonitoringAlertingExplore.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="name">OperationalMonitoringAlertingExplore</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">name</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="n">views</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>,</span><span class="param">	<span class="n">views_path</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">defn</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span>)</span>
+
+                <label class="view-source-button" for="OperationalMonitoringAlertingExplore.__init__-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#OperationalMonitoringAlertingExplore.__init__"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="OperationalMonitoringAlertingExplore.__init__-109"><a href="#OperationalMonitoringAlertingExplore.__init__-109"><span class="linenos">109</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+</span><span id="OperationalMonitoringAlertingExplore.__init__-110"><a href="#OperationalMonitoringAlertingExplore.__init__-110"><span class="linenos">110</span></a>        <span class="bp">self</span><span class="p">,</span>
+</span><span id="OperationalMonitoringAlertingExplore.__init__-111"><a href="#OperationalMonitoringAlertingExplore.__init__-111"><span class="linenos">111</span></a>        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="OperationalMonitoringAlertingExplore.__init__-112"><a href="#OperationalMonitoringAlertingExplore.__init__-112"><span class="linenos">112</span></a>        <span class="n">views</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
+</span><span id="OperationalMonitoringAlertingExplore.__init__-113"><a href="#OperationalMonitoringAlertingExplore.__init__-113"><span class="linenos">113</span></a>        <span class="n">views_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="OperationalMonitoringAlertingExplore.__init__-114"><a href="#OperationalMonitoringAlertingExplore.__init__-114"><span class="linenos">114</span></a>        <span class="n">defn</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="OperationalMonitoringAlertingExplore.__init__-115"><a href="#OperationalMonitoringAlertingExplore.__init__-115"><span class="linenos">115</span></a>    <span class="p">):</span>
+</span><span id="OperationalMonitoringAlertingExplore.__init__-116"><a href="#OperationalMonitoringAlertingExplore.__init__-116"><span class="linenos">116</span></a>        <span class="sd">&quot;&quot;&quot;Initialize OperationalMonitoringExplore.&quot;&quot;&quot;</span>
+</span><span id="OperationalMonitoringAlertingExplore.__init__-117"><a href="#OperationalMonitoringAlertingExplore.__init__-117"><span class="linenos">117</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">views</span><span class="p">,</span> <span class="n">views_path</span><span class="p">)</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Initialize OperationalMonitoringExplore.</p>
+</div>
+
+
+                            </div>
+                            <div id="OperationalMonitoringAlertingExplore.type" class="classattr">
+                                <div class="attr variable">
+            <span class="name">type</span><span class="annotation">: str</span><span class="default_value"> = &#39;operational_monitoring_alerting_explore&#39;</span>
+
+        
+    </div>
+    <a class="headerlink" href="#OperationalMonitoringAlertingExplore.type"></a>
+    
+    
+
+                            </div>
+                            <div id="OperationalMonitoringAlertingExplore.from_views" class="classattr">
+                                        <input id="OperationalMonitoringAlertingExplore.from_views-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+                    <div class="decorator">@staticmethod</div>
+
+        <span class="def">def</span>
+        <span class="name">from_views</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">views</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">generator</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">View</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">Iterator</span><span class="p">[</span><span class="n">generator</span><span class="o">.</span><span class="n">explores</span><span class="o">.</span><span class="n">explore</span><span class="o">.</span><span class="n">Explore</span><span class="p">]</span>:</span></span>
+
+                <label class="view-source-button" for="OperationalMonitoringAlertingExplore.from_views-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#OperationalMonitoringAlertingExplore.from_views"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="OperationalMonitoringAlertingExplore.from_views-119"><a href="#OperationalMonitoringAlertingExplore.from_views-119"><span class="linenos">119</span></a>    <span class="nd">@staticmethod</span>
+</span><span id="OperationalMonitoringAlertingExplore.from_views-120"><a href="#OperationalMonitoringAlertingExplore.from_views-120"><span class="linenos">120</span></a>    <span class="k">def</span> <span class="nf">from_views</span><span class="p">(</span><span class="n">views</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">View</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Explore</span><span class="p">]:</span>
+</span><span id="OperationalMonitoringAlertingExplore.from_views-121"><a href="#OperationalMonitoringAlertingExplore.from_views-121"><span class="linenos">121</span></a>        <span class="sd">&quot;&quot;&quot;Generate an Operational Monitoring explore for this namespace.&quot;&quot;&quot;</span>
+</span><span id="OperationalMonitoringAlertingExplore.from_views-122"><a href="#OperationalMonitoringAlertingExplore.from_views-122"><span class="linenos">122</span></a>        <span class="k">for</span> <span class="n">view</span> <span class="ow">in</span> <span class="n">views</span><span class="p">:</span>
+</span><span id="OperationalMonitoringAlertingExplore.from_views-123"><a href="#OperationalMonitoringAlertingExplore.from_views-123"><span class="linenos">123</span></a>            <span class="k">if</span> <span class="n">view</span><span class="o">.</span><span class="n">view_type</span> <span class="ow">in</span> <span class="p">{</span>
+</span><span id="OperationalMonitoringAlertingExplore.from_views-124"><a href="#OperationalMonitoringAlertingExplore.from_views-124"><span class="linenos">124</span></a>                <span class="s2">&quot;operational_monitoring_alerting_view&quot;</span><span class="p">,</span>
+</span><span id="OperationalMonitoringAlertingExplore.from_views-125"><a href="#OperationalMonitoringAlertingExplore.from_views-125"><span class="linenos">125</span></a>            <span class="p">}:</span>
+</span><span id="OperationalMonitoringAlertingExplore.from_views-126"><a href="#OperationalMonitoringAlertingExplore.from_views-126"><span class="linenos">126</span></a>                <span class="k">yield</span> <span class="n">OperationalMonitoringAlertingExplore</span><span class="p">(</span>
+</span><span id="OperationalMonitoringAlertingExplore.from_views-127"><a href="#OperationalMonitoringAlertingExplore.from_views-127"><span class="linenos">127</span></a>                    <span class="s2">&quot;operational_monitoring&quot;</span><span class="p">,</span>
+</span><span id="OperationalMonitoringAlertingExplore.from_views-128"><a href="#OperationalMonitoringAlertingExplore.from_views-128"><span class="linenos">128</span></a>                    <span class="p">{</span><span class="s2">&quot;base_view&quot;</span><span class="p">:</span> <span class="n">view</span><span class="o">.</span><span class="n">name</span><span class="p">},</span>
+</span><span id="OperationalMonitoringAlertingExplore.from_views-129"><a href="#OperationalMonitoringAlertingExplore.from_views-129"><span class="linenos">129</span></a>                <span class="p">)</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Generate an Operational Monitoring explore for this namespace.</p>
+</div>
+
+
+                            </div>
+                            <div id="OperationalMonitoringAlertingExplore.from_dict" class="classattr">
+                                        <input id="OperationalMonitoringAlertingExplore.from_dict-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+                    <div class="decorator">@staticmethod</div>
+
+        <span class="def">def</span>
+        <span class="name">from_dict</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">name</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="n">defn</span><span class="p">:</span> <span class="nb">dict</span>,</span><span class="param">	<span class="n">views_path</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span></span><span class="return-annotation">) -> <span class="n">generator</span><span class="o">.</span><span class="n">explores</span><span class="o">.</span><span class="n">operational_monitoring_explore</span><span class="o">.</span><span class="n">OperationalMonitoringAlertingExplore</span>:</span></span>
+
+                <label class="view-source-button" for="OperationalMonitoringAlertingExplore.from_dict-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#OperationalMonitoringAlertingExplore.from_dict"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="OperationalMonitoringAlertingExplore.from_dict-131"><a href="#OperationalMonitoringAlertingExplore.from_dict-131"><span class="linenos">131</span></a>    <span class="nd">@staticmethod</span>
+</span><span id="OperationalMonitoringAlertingExplore.from_dict-132"><a href="#OperationalMonitoringAlertingExplore.from_dict-132"><span class="linenos">132</span></a>    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span>
+</span><span id="OperationalMonitoringAlertingExplore.from_dict-133"><a href="#OperationalMonitoringAlertingExplore.from_dict-133"><span class="linenos">133</span></a>        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">defn</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">views_path</span><span class="p">:</span> <span class="n">Path</span>
+</span><span id="OperationalMonitoringAlertingExplore.from_dict-134"><a href="#OperationalMonitoringAlertingExplore.from_dict-134"><span class="linenos">134</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OperationalMonitoringAlertingExplore</span><span class="p">:</span>
+</span><span id="OperationalMonitoringAlertingExplore.from_dict-135"><a href="#OperationalMonitoringAlertingExplore.from_dict-135"><span class="linenos">135</span></a>        <span class="sd">&quot;&quot;&quot;Get an instance of this explore from a dictionary definition.&quot;&quot;&quot;</span>
+</span><span id="OperationalMonitoringAlertingExplore.from_dict-136"><a href="#OperationalMonitoringAlertingExplore.from_dict-136"><span class="linenos">136</span></a>        <span class="k">return</span> <span class="n">OperationalMonitoringAlertingExplore</span><span class="p">(</span>
+</span><span id="OperationalMonitoringAlertingExplore.from_dict-137"><a href="#OperationalMonitoringAlertingExplore.from_dict-137"><span class="linenos">137</span></a>            <span class="n">name</span><span class="p">,</span> <span class="n">defn</span><span class="p">[</span><span class="s2">&quot;views&quot;</span><span class="p">],</span> <span class="n">views_path</span><span class="p">,</span> <span class="n">defn</span>
+</span><span id="OperationalMonitoringAlertingExplore.from_dict-138"><a href="#OperationalMonitoringAlertingExplore.from_dict-138"><span class="linenos">138</span></a>        <span class="p">)</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Get an instance of this explore from a dictionary definition.</p>
+</div>
+
+
+                            </div>
+                            <div class="inherited">
+                                <h5>Inherited Members</h5>
+                                <dl>
+                                    <div><dt><a href="explore.html#Explore">generator.explores.explore.Explore</a></dt>
+                                <dd id="OperationalMonitoringAlertingExplore.views_path" class="variable"><a href="explore.html#Explore.views_path">views_path</a></dd>
+                <dd id="OperationalMonitoringAlertingExplore.defn" class="variable"><a href="explore.html#Explore.defn">defn</a></dd>
+                <dd id="OperationalMonitoringAlertingExplore.to_dict" class="function"><a href="explore.html#Explore.to_dict">to_dict</a></dd>
+                <dd id="OperationalMonitoringAlertingExplore.to_lookml" class="function"><a href="explore.html#Explore.to_lookml">to_lookml</a></dd>
+                <dd id="OperationalMonitoringAlertingExplore.get_dependent_views" class="function"><a href="explore.html#Explore.get_dependent_views">get_dependent_views</a></dd>
+                <dd id="OperationalMonitoringAlertingExplore.get_view_lookml" class="function"><a href="explore.html#Explore.get_view_lookml">get_view_lookml</a></dd>
+                <dd id="OperationalMonitoringAlertingExplore.get_unnested_fields_joins_lookml" class="function"><a href="explore.html#Explore.get_unnested_fields_joins_lookml">get_unnested_fields_joins_lookml</a></dd>
+                <dd id="OperationalMonitoringAlertingExplore.get_required_filters" class="function"><a href="explore.html#Explore.get_required_filters">get_required_filters</a></dd>
 
             </div>
                                 </dl>
