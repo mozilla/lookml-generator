@@ -98,3 +98,75 @@ class OperationalMonitoringExplore(Explore):
         ]
 
         return defn
+
+
+class OperationalMonitoringAlertingExplore(Explore):
+    """An Operational Monitoring Alerting Explore."""
+
+    type: str = "operational_monitoring_alerting_explore"
+
+    def __init__(
+        self,
+        name: str,
+        views: Dict[str, str],
+        views_path: Path = None,
+        defn: Dict[str, Any] = None,
+    ):
+        """Initialize OperationalMonitoringExplore."""
+        super().__init__(name, views, views_path)
+
+    @staticmethod
+    def from_views(views: List[View]) -> Iterator[Explore]:
+        """Generate an Operational Monitoring explore for this namespace."""
+        for view in views:
+            if view.view_type in {
+                "operational_monitoring_alerting_view",
+            }:
+                yield OperationalMonitoringAlertingExplore(
+                    "operational_monitoring",
+                    {"base_view": view.name},
+                )
+
+    @staticmethod
+    def from_dict(
+        name: str, defn: dict, views_path: Path
+    ) -> OperationalMonitoringAlertingExplore:
+        """Get an instance of this explore from a dictionary definition."""
+        return OperationalMonitoringAlertingExplore(
+            name, defn["views"], views_path, defn
+        )
+
+    def _to_lookml(
+        self,
+        bq_client: bigquery.Client,
+        v1_name: Optional[str],
+    ) -> List[Dict[str, Any]]:
+        aggregate_tables = []
+        aggregate_tables.append(
+            {
+                "name": "rollup_alerts",
+                "query": {
+                    "dimensions": [
+                        "submission_date",
+                        "branch",
+                        "percentile",
+                        "probe",
+                        "message",
+                    ],
+                    "measures": ["errors"],
+                },
+                "materialization": {
+                    # Reload the table at 9am when ETL should have been completed
+                    "sql_trigger_value": "SELECT CAST(TIMESTAMP_SUB(CURRENT_TIMESTAMP, INTERVAL 9 HOUR) AS DATE)"
+                },
+            }
+        )
+
+        defn: List[Dict[str, Any]] = [
+            {
+                "name": self.views["base_view"],
+                "aggregate_table": aggregate_tables,
+            },
+        ]
+
+        return defn

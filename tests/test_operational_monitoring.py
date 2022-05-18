@@ -444,6 +444,7 @@ def test_dashboard_lookml(operational_monitoring_dashboard):
             Os: fission_histogram.os
           enabled: "#3FE1B0"
           disabled: "#0060E0"
+
         filters:
         - name: Percentile
           title: Percentile
