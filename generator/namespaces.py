@@ -128,6 +128,21 @@ def _get_opmon(bq_client: bigquery.Client, namespaces: Dict[str, Any]):
                 ],
             }
 
+        if "alerting" in project and project["alerting"]:
+            # create an alerting view if available
+            om_content["views"][f"{table_prefix}_alerts"] = {
+                "type": "operational_monitoring_alerting_view",
+                "tables": [
+                    {
+                        "table": f"{PROD_PROJECT}.{OPMON_DATASET}.{table_prefix}_alerts",
+                    }
+                ],
+            }
+            om_content["explores"][f"{table_prefix}_alerts"] = {
+                "type": "operational_monitoring_alerting_explore",
+                "views": {"base_view": f"{table_prefix}_alerts"},
+            }
+
         om_content["dashboards"][table_prefix] = {
             "type": "operational_monitoring_dashboard",
             "title": project_name,
@@ -148,6 +163,14 @@ def _get_opmon(bq_client: bigquery.Client, namespaces: Dict[str, Any]):
                 for data_type in DATA_TYPES
             ],
         }
+
+        if "alerting" in project and project["alerting"]:
+            om_content["dashboards"][table_prefix]["tables"].append(
+                {
+                    "explore": f"{table_prefix}_alerts",
+                    "table": f"{PROD_PROJECT}.{OPMON_DATASET}.{table_prefix}_alerts",
+                }
+            )
 
     return om_content
 

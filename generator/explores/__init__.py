@@ -5,7 +5,10 @@ from .events_explore import EventsExplore
 from .funnel_analysis_explore import FunnelAnalysisExplore
 from .glean_ping_explore import GleanPingExplore
 from .growth_accounting_explore import GrowthAccountingExplore
-from .operational_monitoring_explore import OperationalMonitoringExplore
+from .operational_monitoring_explore import (
+    OperationalMonitoringAlertingExplore,
+    OperationalMonitoringExplore,
+)
 from .ping_explore import PingExplore
 
 EXPLORE_TYPES = {
@@ -16,4 +19,5 @@ EXPLORE_TYPES = {
     PingExplore.type: PingExplore,
     GrowthAccountingExplore.type: GrowthAccountingExplore,
     OperationalMonitoringExplore.type: OperationalMonitoringExplore,
+    OperationalMonitoringAlertingExplore.type: OperationalMonitoringAlertingExplore,
 }
