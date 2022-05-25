@@ -60,6 +60,11 @@ def custom_namespaces(tmp_path):
                   tables:
                   - channel: release
                     table: mozdata.custom.baseline
+                partitioned_table:
+                  type: table_view
+                  tables:
+                  - table: mozdata.custom.partitioned_table
+                    time_partitioning_field: timestamp
             disallowed:
               pretty_name: Disallowed
               owners:
@@ -255,60 +260,16 @@ def test_namespaces_full(
                                 }
                             ],
                             "type": "ping_view",
-                        }
-                    },
-                },
-                "glean-app": {
-                    "explores": {
-                        "baseline": {
-                            "type": "glean_ping_explore",
-                            "views": {"base_view": "baseline"},
                         },
-                        "client_counts": {
-                            "type": "client_counts_explore",
-                            "views": {
-                                "base_view": "client_counts",
-                                "extended_view": "baseline_clients_daily_table",
-                            },
-                        },
-                        "growth_accounting": {
-                            "type": "growth_accounting_explore",
-                            "views": {"base_view": "growth_accounting"},
-                        },
-                    },
-                    "glean_app": True,
-                    "owners": [
-                        "glean-app-owner@allizom.com",
-                        "glean-app-owner2@allizom.com",
-                    ],
-                },
-            }
-            sys.stdout.write(result.stdout)
-            if result.stderr_bytes is not None:
-                sys.stderr.write(result.stderr)
-            try:
-                assert result.exit_code == 0
-            except Exception as e:
-                # use exception chaining to expose original traceback
-                raise e from result.exception
-
-            expected = {
-                "custom": {
-                    "glean_app": False,
-                    "connection": "bigquery-oauth",
-                    "owners": ["custom-owner@allizom.com", "custom-owner2@allizom.com"],
-                    "pretty_name": "Custom",
-                    "spoke": "looker-spoke-default",
-                    "views": {
-                        "baseline": {
+                        "partitioned_table": {
                             "tables": [
                                 {
-                                    "channel": "release",
-                                    "table": "mozdata.custom.baseline",
+                                    "table": "mozdata.custom.partitioned_table",
+                                    "time_partitioning_field": "timestamp",
                                 }
                             ],
-                            "type": "ping_view",
-                        }
+                            "type": "table_view",
+                        },
                     },
                 },
                 "glean-app": {

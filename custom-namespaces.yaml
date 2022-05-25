@@ -251,16 +251,19 @@ firefox_accounts:
       tables:
         - channel: release
           table: mozdata.firefox_accounts.fxa_content_auth_oauth_events
+          time_partitioning_field: "timestamp"
     fxa_auth_events_table:
       type: table_view
       tables:
         - channel: release
           table: mozdata.firefox_accounts.fxa_content_auth_events
+          time_partitioning_field: "timestamp"
     fxa_content_auth_stdout_events_table:
       type: table_view
       tables:
         - channel: release
           table: mozdata.firefox_accounts.fxa_content_auth_stdout_events
+          time_partitioning_field: "timestamp"
     funnel_analysis:
       type: funnel_analysis_view
       tables:

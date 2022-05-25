@@ -56,10 +56,10 @@ class Explore:
             # This allows for filter queries to succeed.
             if "join" in view_type:
                 continue
-            if self._get_view_has_submission(view):
+            if time_partitioning_group := self.get_view_time_partitioning_group(view):
                 base_lookml[
                     "sql_always_where"
-                ] = f"${{{base_view_name}.submission_date}} >= '2010-01-01'"
+                ] = f"${{{base_view_name}.{time_partitioning_group}_date}} >= '2010-01-01'"
 
         # We only update the first returned explore
         new_lookml = self._to_lookml(client, v1_name)
@@ -211,18 +211,24 @@ class Explore:
                 return (base_view, metric)
         raise Exception(f"Cannot get base name and metric from view {view_name}")
 
-    def _get_view_has_submission(self, view: str) -> bool:
-        return (
-            len(
-                [
-                    dim
-                    for _view_defn in self.get_view_lookml(view)["views"]
-                    for dim in _view_defn.get("dimension_groups", [])
-                    if _view_defn["name"] == view and dim["name"] == "submission"
-                ]
-            )
-            > 0
-        )
+    def get_view_time_partitioning_group(self, view: str) -> Optional[str]:
+        """Get time partitiong dimension group for this view.
+
+        Return the name of the first dimension group tagged "time_partitioning_field",
+        and fall back to "submission" if available.
+        """
+        has_submission = False
+        for _view_defn in self.get_view_lookml(view)["views"]:
+            if not _view_defn["name"] == view:
+                continue
+            for dim in _view_defn.get("dimension_groups", []):
+                if "time_partitioning_field" in dim.get("tags", []):
+                    return dim["name"]
+                elif dim["name"] == "submission":
+                    has_submission = True
+        if has_submission:
+            return "submission"
+        return None
 
     def get_required_filters(self, view_name: str) -> List[Dict[str, str]]:
         """Get required filters for this view."""
@@ -235,8 +241,8 @@ class Explore:
             filters.append({"channel": default_channel})
 
         # Add submission filter, if present in the view
-        if self._get_view_has_submission(view):
-            filters.append({"submission_date": "28 days"})
+        if time_partitioning_group := self.get_view_time_partitioning_group(view):
+            filters.append({f"{time_partitioning_group}_date": "28 days"})
 
         return filters
 
