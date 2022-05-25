@@ -129,7 +129,7 @@ class OperationalMonitoringDashboard(Dashboard):
                         graph_index += 1
 
         if "alerts" in kwargs and kwargs["alerts"] is not None:
-            kwargs["alerts"]["row"] = (int(graph_index / 2) * 10,)
+            kwargs["alerts"]["row"] = int(graph_index / 2) * 10
 
         dash_lookml = lookml_utils.render_template(
             "dashboard.lkml", "dashboards", **kwargs
