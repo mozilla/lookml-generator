@@ -3,7 +3,9 @@ from __future__ import annotations
 
 from collections import defaultdict
 from itertools import filterfalse
-from typing import Any, Dict, Iterator, List, Optional
+from typing import Any, Dict, Iterator, List, Optional, Set
+
+from click import ClickException
 
 from . import lookml_utils
 from .view import OMIT_VIEWS, View, ViewDict
@@ -68,6 +70,29 @@ class TableView(View):
         view_defn["dimension_groups"] = list(
             filter(lookml_utils._is_dimension_group, dimensions)
         )
+
+        # add tag "time_partitioning_field"
+        time_partitioning_fields: Set[str] = set(
+            # filter out falsy values
+            filter(
+                None, (table.get("time_partitioning_field") for table in self.tables)
+            )
+        )
+        if len(time_partitioning_fields) > 1:
+            raise ClickException(f"Multiple time_partitioning_fields for {self.name!r}")
+        elif len(time_partitioning_fields) == 1:
+            field_name = time_partitioning_fields.pop()
+            sql = f"${{TABLE}}.{field_name}"
+            for group_defn in view_defn["dimension_groups"]:
+                if group_defn["sql"] == sql:
+                    if "tags" not in group_defn:
+                        group_defn["tags"] = []
+                    group_defn["tags"].append("time_partitioning_field")
+                    break
+            else:
+                raise ClickException(
+                    f"time_partitioning_field {field_name!r} not found in {self.name!r}"
+                )
 
         nested_views = lookml_utils._generate_nested_dimension_views(
             bq_client.get_table(table).schema, self.name

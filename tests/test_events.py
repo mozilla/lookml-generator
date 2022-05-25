@@ -1,5 +1,3 @@
-from copy import deepcopy
-
 import lkml
 import pytest
 from google.cloud.bigquery.schema import SchemaField
@@ -24,8 +22,13 @@ def events_view():
     )
 
 
+@pytest.fixture(params=["submission", "timestamp"])
+def time_partitioning_group(request):
+    return request.param
+
+
 @pytest.fixture()
-def events_explore(events_view, tmp_path):
+def events_explore(events_view, tmp_path, time_partitioning_group):
     (tmp_path / "events_unnested_table.view.lkml").write_text(
         lkml.dump(
             {
@@ -40,7 +43,12 @@ def events_explore(events_view, tmp_path):
                         ],
                         "dimension_groups": [
                             {
-                                "name": "submission",
+                                "name": time_partitioning_group,
+                                "tags": (
+                                    ["time_partitioning_field"]
+                                    if time_partitioning_group != "submission"
+                                    else []
+                                ),
                                 "type": "time",
                                 "timeframes": [
                                     "raw",
@@ -167,7 +175,8 @@ def test_view_lookml(events_view):
     print_and_test(expected=expected, actual=actual)
 
 
-def test_explore_lookml(events_explore):
+def test_explore_lookml(time_partitioning_group, events_explore):
+    date_dimension = f"{time_partitioning_group}_date"
     expected = [
         {
             "name": "event_counts",
@@ -175,11 +184,21 @@ def test_explore_lookml(events_explore):
             "description": "Event counts over time.",
             "always_filter": {
                 "filters": [
-                    {"submission_date": "28 days"},
+                    {date_dimension: "28 days"},
                 ]
             },
-            "sql_always_where": "${events.submission_date} >= '2010-01-01'",
-            "queries": deepcopy(EventsExplore.queries),
+            "sql_always_where": f"${{events.{date_dimension}}} >= '2010-01-01'",
+            "queries": [
+                {
+                    "description": "Event counts from all events over the past two weeks.",
+                    "dimensions": [date_dimension],
+                    "measures": ["event_count"],
+                    "filters": [
+                        {date_dimension: "14 days"},
+                    ],
+                    "name": "all_event_counts",
+                },
+            ],
             "joins": [],
         },
     ]

@@ -26,6 +26,8 @@ repos:
     rev: v0.942
     hooks:
       - id: mypy
+        additional_dependencies:
+          - types-PyYAML
   - repo: https://github.com/adrienverge/yamllint
     rev: v1.26.3
     hooks:

@@ -1,7 +1,6 @@
 """An explore for Events Views."""
 from __future__ import annotations
 
-from copy import deepcopy
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional
 
@@ -15,18 +14,6 @@ class EventsExplore(Explore):
     """An Events Explore, from any unnested events table."""
 
     type: str = "events_explore"
-
-    queries: List[dict] = [
-        {
-            "description": "Event counts from all events over the past two weeks.",
-            "dimensions": ["submission_date"],
-            "measures": ["event_count"],
-            "filters": [
-                {"submission_date": "14 days"},
-            ],
-            "name": "all_event_counts",
-        },
-    ]
 
     @staticmethod
     def from_views(views: List[View]) -> Iterator[EventsExplore]:
@@ -53,14 +40,27 @@ class EventsExplore(Explore):
         if not name.endswith("_counts"):
             name = "event_counts"
 
-        lookml = {
+        lookml: Dict[str, Any] = {
             "name": name,
             "view_name": self.views["base_view"],
             "description": "Event counts over time.",
-            "queries": deepcopy(EventsExplore.queries),
             "joins": self.get_unnested_fields_joins_lookml(),
         }
-        required_filters = self.get_required_filters("extended_view")
-        if required_filters:
+        if required_filters := self.get_required_filters("extended_view"):
             lookml["always_filter"] = {"filters": required_filters}
+        if time_partitioning_group := self.get_view_time_partitioning_group(
+            self.views["extended_view"]
+        ):
+            date_dimension = f"{time_partitioning_group}_date"
+            lookml["queries"] = [
+                {
+                    "description": "Event counts from all events over the past two weeks.",
+                    "dimensions": [date_dimension],
+                    "measures": ["event_count"],
+                    "filters": [
+                        {date_dimension: "14 days"},
+                    ],
+                    "name": "all_event_counts",
+                },
+            ]
         return [lookml]
