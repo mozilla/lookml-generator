@@ -211,6 +211,16 @@ class Explore:
                 return (base_view, metric)
         raise Exception(f"Cannot get base name and metric from view {view_name}")
 
+    def has_view_dimension(self, view: str, dimension_name: str) -> bool:
+        """Determine whether a this view has this dimension."""
+        for _view_defn in self.get_view_lookml(view)["views"]:
+            if _view_defn["name"] != view:
+                continue
+            for dim in _view_defn.get("dimensions", []):
+                if dim["name"] == dimension_name:
+                    return True
+        return False
+
     def get_view_time_partitioning_group(self, view: str) -> Optional[str]:
         """Get time partitiong dimension group for this view.
 
