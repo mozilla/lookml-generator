@@ -11,7 +11,6 @@ from google.cloud import bigquery
 from google.cloud.bigquery.schema import SchemaField
 from mozilla_schema_generator.probes import GleanProbe
 
-from generator.explores import ClientCountsExplore
 from generator.lookml import _lookml
 from generator.views import ClientCountsView, GrowthAccountingView
 
@@ -39,6 +38,7 @@ class MockClient:
             return bigquery.Table(
                 table_ref,
                 schema=[
+                    SchemaField("app_build", "STRING"),
                     SchemaField("client_id", "STRING"),
                     SchemaField("country", "STRING"),
                     SchemaField(
@@ -52,10 +52,11 @@ class MockClient:
             return bigquery.Table(
                 table_ref,
                 schema=[
-                    bigquery.schema.SchemaField("client_id", "STRING"),
-                    bigquery.schema.SchemaField("submission_date", "DATE"),
-                    bigquery.schema.SchemaField("country", "STRING"),
-                    bigquery.schema.SchemaField("document_id", "STRING"),
+                    SchemaField("app_build", "STRING"),
+                    SchemaField("client_id", "STRING"),
+                    SchemaField("submission_date", "DATE"),
+                    SchemaField("country", "STRING"),
+                    SchemaField("document_id", "STRING"),
                 ],
             )
         if table_ref == "mozdata.glean_app.baseline_clients_last_seen":
@@ -763,6 +764,11 @@ def test_lookml_actual_baseline_view(
                     "name": "baseline",
                     "sql_table_name": "`mozdata.custom.baseline`",
                     "dimensions": [
+                        {
+                            "name": "app_build",
+                            "sql": "${TABLE}.app_build",
+                            "type": "string",
+                        },
                         {
                             "name": "client_id",
                             "hidden": "yes",
@@ -1674,7 +1680,29 @@ def test_lookml_actual_client_counts(
                             ],
                         ],
                     },
-                    "queries": ClientCountsExplore.queries,
+                    "queries": [
+                        {
+                            "description": "Client Counts of weekly cohorts over the past N days.",
+                            "dimensions": ["days_since_first_seen", "first_seen_week"],
+                            "measures": ["client_count"],
+                            "pivots": ["first_seen_week"],
+                            "filters": [
+                                {"submission_date": "8 weeks"},
+                                {"first_seen_date": "8 weeks"},
+                                {"have_completed_period": "yes"},
+                            ],
+                            "sorts": [{"days_since_first_seen": "asc"}],
+                            "name": "cohort_analysis",
+                        },
+                        {
+                            "description": "Number of clients per build.",
+                            "dimensions": ["submission_date", "app_build"],
+                            "measures": ["client_count"],
+                            "pivots": ["app_build"],
+                            "sorts": [{"submission_date": "asc"}],
+                            "name": "build_breakdown",
+                        },
+                    ],
                     "sql_always_where": "${client_counts.submission_date} >= '2010-01-01'",
                 }
             ],
