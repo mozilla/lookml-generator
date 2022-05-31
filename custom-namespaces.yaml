@@ -26,7 +26,7 @@ combined_browser_metrics:
     active_users_aggregates_device:
       type: table_view
       tables:
-        - table: moz-fx-data-shared-prod.telemetryactive_users_aggregates_device
+        - table: moz-fx-data-shared-prod.telemetry.active_users_aggregates_device
     cohort_daily_statistics:
       type: table_view
       tables:
