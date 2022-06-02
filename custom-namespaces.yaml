@@ -777,7 +777,7 @@ marketing:
       type: table_view
       tables:
         - table: moz-fx-data-marketing-prod.acoustic.contact_v1
-    acoustic_contacts_current_snapshot:
+    acoustic_contact_current_snapshot:
       type: table_view
       tables:
         - table: moz-fx-data-marketing-prod.acoustic.contact_current_snapshot_v1
