@@ -773,10 +773,14 @@ marketing:
   owners:
     - kignasiak@mozilla.com
   views:
-    acoustic_contacts:
+    acoustic_contact_change_events:
       type: table_view
       tables:
         - table: moz-fx-data-marketing-prod.acoustic.contact_v1
+    acoustic_contacts_current_snapshot:
+      type: table_view
+      tables:
+        - table: moz-fx-data-marketing-prod.acoustic.contact_current_snapshot_v1
     acoustic_email_events:
       type: table_view
       tables:
