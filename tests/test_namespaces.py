@@ -101,7 +101,7 @@ def namespace_disallowlist(tmp_path):
         dedent(
             """
             ---
-            disallowed
+            - disallowed
             """
         )
     )
