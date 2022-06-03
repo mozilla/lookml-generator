@@ -9,6 +9,11 @@ operational_monitoring:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.operational_monitoring_derived.projects_v1
+pioneer_test:
+  glean_app: false
+  owners:
+    - mhirose@mozilla.com
+  pretty_name: Pioneer_test
 combined_browser_metrics:
   glean_app: false
   owners:
