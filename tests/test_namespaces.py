@@ -102,6 +102,7 @@ def namespace_disallowlist(tmp_path):
             """
             ---
             - disallowed
+            - combined_browser_metrics
             """
         )
     )
