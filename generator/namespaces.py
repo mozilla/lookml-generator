@@ -337,7 +337,7 @@ def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri, disallowl
 
     updated_namespaces = {}
     for namespace, _ in namespaces.items():
-        if not disallowed_namespaces_pattern.match(namespace):
+        if not disallowed_namespaces_pattern.fullmatch(namespace):
             if "spoke" not in namespaces[namespace]:
                 namespaces[namespace]["spoke"] = DEFAULT_SPOKE
             if "glean_app" not in namespaces[namespace]:
