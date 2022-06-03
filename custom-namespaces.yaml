@@ -27,6 +27,10 @@ combined_browser_metrics:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.telemetry.active_users_aggregates_device
+    active_users_aggregates_attribution:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.telemetry.active_users_aggregates_attribution
     cohort_daily_statistics:
       type: table_view
       tables:
@@ -773,10 +777,14 @@ marketing:
   owners:
     - kignasiak@mozilla.com
   views:
-    acoustic_contacts:
+    acoustic_contact_change_events:
       type: table_view
       tables:
         - table: moz-fx-data-marketing-prod.acoustic.contact_v1
+    acoustic_contact_current_snapshot:
+      type: table_view
+      tables:
+        - table: moz-fx-data-marketing-prod.acoustic.contact_current_snapshot_v1
     acoustic_email_events:
       type: table_view
       tables:
