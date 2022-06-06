@@ -1,4 +1,5 @@
 """Generate namespaces.yaml."""
+import fnmatch
 import gzip
 import json
 import re
@@ -329,10 +330,14 @@ def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri, disallowl
             _merge_namespaces(namespaces, custom_namespaces)
 
     disallowed_namespaces = yaml.safe_load(disallowlist.read()) or {}
+    disallowed_regex = [
+        fnmatch.translate(namespace) for namespace in disallowed_namespaces
+    ]
+    disallowed_namespaces_pattern = re.compile("|".join(disallowed_regex))
 
     updated_namespaces = {}
     for namespace, _ in namespaces.items():
-        if namespace not in disallowed_namespaces:
+        if not disallowed_namespaces_pattern.fullmatch(namespace):
             if "spoke" not in namespaces[namespace]:
                 namespaces[namespace]["spoke"] = DEFAULT_SPOKE
             if "glean_app" not in namespaces[namespace]:
