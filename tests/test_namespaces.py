@@ -75,6 +75,16 @@ def custom_namespaces(tmp_path):
                   tables:
                   - channel: release
                     table: mozdata.disallowed.baseline
+            disallowed_wildcard:
+              pretty_name: Disallowed Wildcard
+              owners:
+              - disallowed-owner@allizom.com
+              views:
+                baseline:
+                  type: ping_view
+                  tables:
+                  - channel: release
+                    table: mozdata.disallowed.baseline
             private:
               pretty_name: Private
               spoke: looker-spoke-private
@@ -101,7 +111,7 @@ def namespace_disallowlist(tmp_path):
         dedent(
             """
             ---
-            - disallowed
+            - disallowed*
             """
         )
     )
