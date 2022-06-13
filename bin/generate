@@ -246,7 +246,9 @@ function push_and_open_spoke_pull_request() {
   git diff --quiet $SPOKE_BRANCH_PUBLISH...$SPOKE_BRANCH_WORKING ||
     gh pr create \
     --title "Auto-push from LookML Generator" \
-    --reviewer mozilla/data-looker \
+    # https://bugzilla.mozilla.org/show_bug.cgi?id=1774030
+    # could not request reviewer: 'mozilla/data-looker' not found
+    # --reviewer mozilla/data-looker \
     --base $SPOKE_BRANCH_PUBLISH \
     --head $SPOKE_BRANCH_WORKING \
     --body ""
