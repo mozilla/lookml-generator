@@ -85,7 +85,7 @@ activity_stream:
 search_private:
   glean_app: false
   connection: bigquery-oauth
-  pretty_name: Search
+  pretty_name: Search Private
   owners:
     - mmccorquodale@mozilla.com
     - xluo@mozilla.com
