@@ -82,6 +82,22 @@ activity_stream:
       type: ping_explore
       views:
         base_view: impression_stats_flat
+search_private:
+  glean_app: false
+  connection: bigquery-oauth
+  pretty_name: Search Private
+  owners:
+    - mmccorquodale@mozilla.com
+    - xluo@mozilla.com
+    - skahmann@mozilla.com
+    - wbrahic@mozilla.com
+    - ctroy@mozilla.com
+  spoke: looker-spoke-private
+  views:
+    search_term_sanitization_job_metadata_daily:
+      type: table_view
+      tables:
+        - table: mozdata.search_terms_unsanitized_analysis.prototype_sanitation_job_metadata
 search:
   glean_app: false
   owners:
@@ -108,10 +124,6 @@ search:
       type: table_view
       tables:
         - table: mozdata.analysis.desktop_search_alert_latest_daily
-    search_term_sanitization_job_metadata_daily:
-      type: table_view
-      tables:
-        - table: mozdata.search_terms_unsanitized_analysis.prototype_sanitation_job_metadata
   explores:
     desktop_search_counts:
       type: ping_explore
