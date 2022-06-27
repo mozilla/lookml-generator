@@ -325,42 +325,6 @@ def test_explore_lookml(operational_monitoring_explore):
     mock_bq_client = MockClient()
     expected = [
         {
-            "aggregate_table": [
-                {
-                    "name": "rollup_GC_MS",
-                    "query": {
-                        "dimensions": ["build_id", "branch"],
-                        "filters": [
-                            {"fission_histogram.branch": "enabled, " "disabled"},
-                            {"fission_histogram.percentile_conf": "50"},
-                            {"fission_histogram.cores_count": "4"},
-                            {"fission_histogram.os": "Windows"},
-                            {"fission_histogram.probe": "GC_MS"},
-                        ],
-                        "measures": ["low", "high", "percentile"],
-                    },
-                    "materialization": {
-                        "sql_trigger_value": "SELECT CAST(TIMESTAMP_SUB(CURRENT_TIMESTAMP, INTERVAL 9 HOUR) AS DATE)"
-                    },
-                },
-                {
-                    "name": "rollup_GC_MS_CONTENT",
-                    "query": {
-                        "dimensions": ["build_id", "branch"],
-                        "filters": [
-                            {"fission_histogram.branch": "enabled, " "disabled"},
-                            {"fission_histogram.percentile_conf": "50"},
-                            {"fission_histogram.cores_count": "4"},
-                            {"fission_histogram.os": "Windows"},
-                            {"fission_histogram.probe": "GC_MS_CONTENT"},
-                        ],
-                        "measures": ["low", "high", "percentile"],
-                    },
-                    "materialization": {
-                        "sql_trigger_value": "SELECT CAST(TIMESTAMP_SUB(CURRENT_TIMESTAMP, INTERVAL 9 HOUR) AS DATE)"
-                    },
-                },
-            ],
             "always_filter": {"filters": [{"branch": "enabled, disabled"}]},
             "name": "fission_histogram",
         }
