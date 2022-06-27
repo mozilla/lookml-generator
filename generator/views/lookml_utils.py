@@ -112,9 +112,9 @@ def _generate_dimensions(client: bigquery.Client, table: str) -> List[Dict[str, 
     dimensions = {}
     for dimension in _generate_dimensions_helper(client.get_table(table).schema):
         name = dimension["name"]
-        # overwrite duplicate "submission" dimension group, thus picking the
+        # overwrite duplicate "submission", "end", "start" dimension group, thus picking the
         # last value sorted by field name, which is submission_timestamp
-        if name in dimensions and name != "submission":
+        if name in dimensions and name not in ("submission", "end", "start"):
             raise click.ClickException(
                 f"duplicate dimension {name!r} for table {table!r}"
             )
