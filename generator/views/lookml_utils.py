@@ -114,7 +114,10 @@ def _generate_dimensions(client: bigquery.Client, table: str) -> List[Dict[str, 
         name = dimension["name"]
         # overwrite duplicate "submission", "end", "start" dimension group, thus picking the
         # last value sorted by field name, which is submission_timestamp
-        if name in dimensions and name not in ("submission", "end", "start"):
+        # See also https://github.com/mozilla/lookml-generator/issues/471
+        if name in dimensions and (
+            name != "submission" or name.endswith("end") or name.endswith("start")
+        ):
             raise click.ClickException(
                 f"duplicate dimension {name!r} for table {table!r}"
             )
