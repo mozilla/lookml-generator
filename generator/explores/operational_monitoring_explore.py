@@ -1,7 +1,6 @@
 """Operational Monitoring Explore type."""
 from __future__ import annotations
 
-from copy import deepcopy
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional
 
@@ -66,25 +65,6 @@ class OperationalMonitoringExplore(Explore):
             if "default" in info:
                 filters.append({f"{base_view_name}.{dimension}": info["default"]})
 
-        aggregate_tables = []
-        for probe in self.probes:
-            filters_copy = deepcopy(filters)
-            filters_copy.append({f"{base_view_name}.probe": probe})
-            aggregate_tables.append(
-                {
-                    "name": f"rollup_{probe}",
-                    "query": {
-                        "dimensions": [self.xaxis, "branch"],
-                        "measures": ["low", "high", "percentile"],
-                        "filters": filters_copy,
-                    },
-                    "materialization": {
-                        # Reload the table at 9am when ETL should have been completed
-                        "sql_trigger_value": "SELECT CAST(TIMESTAMP_SUB(CURRENT_TIMESTAMP, INTERVAL 9 HOUR) AS DATE)"
-                    },
-                }
-            )
-
         defn: List[Dict[str, Any]] = [
             {
                 "name": self.views["base_view"],
@@ -93,7 +73,6 @@ class OperationalMonitoringExplore(Explore):
                         {"branch": self.branches},
                     ]
                 },
-                "aggregate_table": aggregate_tables,
             },
         ]
 
@@ -141,31 +120,9 @@ class OperationalMonitoringAlertingExplore(Explore):
         bq_client: bigquery.Client,
         v1_name: Optional[str],
     ) -> List[Dict[str, Any]]:
-        aggregate_tables = []
-        aggregate_tables.append(
-            {
-                "name": "rollup_alerts",
-                "query": {
-                    "dimensions": [
-                        "submission_date",
-                        "branch",
-                        "percentile",
-                        "probe",
-                        "message",
-                    ],
-                    "measures": ["errors"],
-                },
-                "materialization": {
-                    # Reload the table at 9am when ETL should have been completed
-                    "sql_trigger_value": "SELECT CAST(TIMESTAMP_SUB(CURRENT_TIMESTAMP, INTERVAL 9 HOUR) AS DATE)"
-                },
-            }
-        )
-
         defn: List[Dict[str, Any]] = [
             {
                 "name": self.views["base_view"],
-                "aggregate_table": aggregate_tables,
             },
         ]
 
