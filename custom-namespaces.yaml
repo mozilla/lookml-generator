@@ -98,6 +98,10 @@ search_private:
       type: table_view
       tables:
         - table: mozdata.search_terms_unsanitized_analysis.prototype_sanitation_job_metadata
+    sanitization_job_languages:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.search_terms.sanitization_job_languages
 search:
   glean_app: false
   owners:
