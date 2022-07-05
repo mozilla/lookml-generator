@@ -376,6 +376,7 @@ def test_dashboard_lookml(operational_monitoring_dashboard):
             Os: fission_histogram.os
           enabled: "#3FE1B0"
           disabled: "#0060E0"
+          defaults_version: 0
         - title: Gc Ms Content
           name: Gc Ms Content
           explore: fission_histogram
@@ -408,6 +409,7 @@ def test_dashboard_lookml(operational_monitoring_dashboard):
             Os: fission_histogram.os
           enabled: "#3FE1B0"
           disabled: "#0060E0"
+          defaults_version: 0
 
         filters:
         - name: Percentile

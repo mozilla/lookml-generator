@@ -40,6 +40,7 @@
     {%- for branch, color in element.series_colors.items() %}
     {{ branch }}: "{{ color }}"
     {%- endfor %}
+    defaults_version: 0
   {% endfor -%}
   {% if alerts is not none %}
   - title: Alerts
