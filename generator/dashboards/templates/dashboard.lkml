@@ -26,7 +26,7 @@
     col: {{element.col}}
     width: 12
     height: 8
-    field_x: {{element.explore}}.submission_date
+    field_x: {{element.explore}}.{{element.xaxis}}
     field_y: {{element.explore}}.percentile
     log_scale: false
     ci_lower: {{element.explore}}.low
@@ -48,10 +48,10 @@
     model: operational_monitoring
     explore: {{alerts.explore}}
     type: looker_grid
-    fields: [{{alerts.explore}}.submission_date,
+    fields: [{{alerts.explore}}.{{element.xaxis}},
       {{alerts.explore}}.probe, {{alerts.explore}}.percentile,
       {{alerts.explore}}.message, {{alerts.explore}}.branch, {{alerts.explore}}.errors]
-    sorts: [{{alerts.explore}}.submission_date
+    sorts: [{{alerts.explore}}.{{element.xaxis}}
         desc]
     limit: 500
     show_view_names: false

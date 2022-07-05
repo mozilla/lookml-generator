@@ -364,7 +364,7 @@ def test_dashboard_lookml(operational_monitoring_dashboard):
           col: 0
           width: 12
           height: 8
-          field_x: fission_histogram.submission_date
+          field_x: fission_histogram.build_id
           field_y: fission_histogram.percentile
           log_scale: false
           ci_lower: fission_histogram.low
@@ -397,7 +397,7 @@ def test_dashboard_lookml(operational_monitoring_dashboard):
           col: 12
           width: 12
           height: 8
-          field_x: fission_histogram.submission_date
+          field_x: fission_histogram.build_id
           field_y: fission_histogram.percentile
           log_scale: false
           ci_lower: fission_histogram.low
