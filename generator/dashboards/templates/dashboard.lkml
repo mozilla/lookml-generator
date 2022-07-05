@@ -48,10 +48,10 @@
     model: operational_monitoring
     explore: {{alerts.explore}}
     type: looker_grid
-    fields: [{{alerts.explore}}.{{element.xaxis}},
+    fields: [{{alerts.explore}}.submission_date,
       {{alerts.explore}}.probe, {{alerts.explore}}.percentile,
       {{alerts.explore}}.message, {{alerts.explore}}.branch, {{alerts.explore}}.errors]
-    sorts: [{{alerts.explore}}.{{element.xaxis}}
+    sorts: [{{alerts.explore}}.submission_date
         desc]
     limit: 500
     show_view_names: false
