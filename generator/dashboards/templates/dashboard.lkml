@@ -20,8 +20,10 @@
       {{element.explore}}.branch 
       {%- if group_by_dimension and element.title.endswith(group_by_dimension) %}, {{element.explore}}.{{group_by_dimension}} {% endif %}
     ]
+    {% if not compact_visualization -%}
     filters:
       {{element.explore}}.probe: {{element.metric}}
+    {% endif -%}
     row: {{element.row}}
     col: {{element.col}}
     width: 12
@@ -37,6 +39,9 @@
       {%- for dimension in dimensions %}
       {{dimension.title}}: {{element.explore}}.{{dimension.name}}
       {%- endfor %}
+      {% if compact_visualization -%}
+      Probe: {{element.explore}}.probe
+      {% endif -%}
     {%- for branch, color in element.series_colors.items() %}
     {{ branch }}: "{{ color }}"
     {%- endfor %}
@@ -121,6 +126,21 @@
       - '90'
       - '95'
       - '99'
+  {% if compact_visualization -%}
+  - name: Probe
+    title: Probe
+    type: field_filter
+    default_value: '{{ elements[0].metric }}'
+    allow_multiple_values: true
+    required: true
+    ui_config:
+      type: dropdown_menu
+      display: popover
+    model: operational_monitoring
+    explore: {{ elements[0].explore }}
+    listens_to_filters: []
+    field: {{ elements[0].explore }}.probe
+  {% endif -%}
 
   {% for dimension in dimensions -%}
   {% if dimension.name != group_by_dimension %}

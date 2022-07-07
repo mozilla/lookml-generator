@@ -27,7 +27,6 @@ PROBE_INFO_BASE_URI = "https://probeinfo.telemetry.mozilla.org"
 DEFAULT_SPOKE = "looker-spoke-default"
 OPMON_DATASET = "operational_monitoring"
 PROD_PROJECT = "moz-fx-data-shared-prod"
-DATA_TYPES = ["histogram", "scalar"]
 
 
 def _normalize_slug(name):
@@ -100,34 +99,30 @@ def _get_opmon(bq_client: bigquery.Client, namespaces: Dict[str, Any]):
         )
         branches = project.get("branches", ["enabled", "disabled"])
 
-        for data_type in DATA_TYPES:
-            # append view and explore for data type
-            project_data_type_id = f"{table_prefix}_{data_type}"
-            table = f"{PROD_PROJECT}.{OPMON_DATASET}.{table_prefix}_{data_type}"
-            dimensions = operational_monitoring_utils.get_dimension_defaults(
-                bq_client, table, project["dimensions"]
-            )
-
-            om_content["views"][project_data_type_id] = {
-                "type": f"operational_monitoring_{data_type}_view",
-                "tables": [
-                    {
-                        "table": table,
-                        "xaxis": project["xaxis"],
-                        "dimensions": dimensions,
-                    }
-                ],
-            }
-            om_content["explores"][project_data_type_id] = {
-                "type": "operational_monitoring_explore",
-                "views": {"base_view": f"{table_prefix}_{data_type}"},
-                "branches": branches,
-                "xaxis": project["xaxis"],
-                "dimensions": dimensions,
-                "probes": [
-                    p["name"] for p in project["probes"] if p["agg_type"] == data_type
-                ],
-            }
+        # append view and explore for data type
+        project_data_type_id = f"{table_prefix}"
+        table = f"{PROD_PROJECT}.{OPMON_DATASET}.{table_prefix}"
+        dimensions = operational_monitoring_utils.get_dimension_defaults(
+            bq_client, table, project["dimensions"]
+        )
+        om_content["views"][project_data_type_id] = {
+            "type": "operational_monitoring_view",
+            "tables": [
+                {
+                    "table": table,
+                    "xaxis": project["xaxis"],
+                    "dimensions": dimensions,
+                }
+            ],
+        }
+        om_content["explores"][project_data_type_id] = {
+            "type": "operational_monitoring_explore",
+            "views": {"base_view": f"{table_prefix}"},
+            "branches": branches,
+            "xaxis": project["xaxis"],
+            "dimensions": dimensions,
+            "probes": [p["name"] for p in project["probes"]],
+        }
 
         if "alerting" in project and project["alerting"]:
             # create an alerting view if available
@@ -149,19 +144,17 @@ def _get_opmon(bq_client: bigquery.Client, namespaces: Dict[str, Any]):
             "title": project_name,
             "tables": [
                 {
-                    "explore": f"{table_prefix}_{data_type}",
-                    "table": f"{PROD_PROJECT}.{OPMON_DATASET}.{table_prefix}_{data_type}",
+                    "explore": f"{table_prefix}",
+                    "table": f"{PROD_PROJECT}.{OPMON_DATASET}.{table_prefix}",
                     "branches": branches,
                     "xaxis": project["xaxis"],
+                    "compact_visualization": project.get(
+                        "compact_visualization", False
+                    ),
                     "dimensions": dimensions,
                     "group_by_dimension": project.get("group_by_dimension", None),
-                    "probes": [
-                        p["name"]
-                        for p in project["probes"]
-                        if p["agg_type"] == data_type
-                    ],
+                    "probes": [p["name"] for p in project["probes"]],
                 }
-                for data_type in DATA_TYPES
             ],
         }
 

@@ -30,6 +30,7 @@ class OperationalMonitoringDashboard(Dashboard):
         """Get an instance of a Operational Monitoring Dashboard."""
         self.dimensions = defn[0].get("dimensions", {})
         self.xaxis = defn[0]["xaxis"]
+        self.compact_visualization = defn[0].get("compact_visualization", False)
         self.group_by_dimension = defn[0].get("group_by_dimension", None)
 
         super().__init__(title, name, layout, namespace, defn)
@@ -69,6 +70,7 @@ class OperationalMonitoringDashboard(Dashboard):
             "dimensions": [],
             "group_by_dimension": self.group_by_dimension,
             "alerts": None,
+            "compact_visualization": self.compact_visualization,
         }
 
         includes = []
@@ -100,7 +102,11 @@ class OperationalMonitoringDashboard(Dashboard):
                     table_defn["branches"], explore
                 )
                 for metric in table_defn.get("probes", []):
-                    title = lookml_utils.slug_to_title(metric)
+                    if self.compact_visualization:
+                        title = "Probe"
+                    else:
+                        title = lookml_utils.slug_to_title(metric)
+
                     kwargs["elements"].append(
                         {
                             "title": title,
@@ -127,6 +133,10 @@ class OperationalMonitoringDashboard(Dashboard):
                             }
                         )
                         graph_index += 1
+
+                    if self.compact_visualization:
+                        # compact visualization only needs a single tile for all probes
+                        break
 
         if "alerts" in kwargs and kwargs["alerts"] is not None:
             kwargs["alerts"]["row"] = int(graph_index / 2) * 10

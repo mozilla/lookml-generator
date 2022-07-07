@@ -34,10 +34,7 @@ class OperationalMonitoringExplore(Explore):
     def from_views(views: List[View]) -> Iterator[Explore]:
         """Generate an Operational Monitoring explore for this namespace."""
         for view in views:
-            if view.view_type in {
-                "operational_monitoring_histogram_view",
-                "operational_monitoring_scalar_view",
-            }:
+            if view.view_type == "operational_monitoring_view":
                 yield OperationalMonitoringExplore(
                     "operational_monitoring",
                     {"base_view": view.name},
@@ -73,6 +70,7 @@ class OperationalMonitoringExplore(Explore):
                         {"branch": self.branches},
                     ]
                 },
+                "hidden": "yes",
             },
         ]
 
@@ -121,9 +119,7 @@ class OperationalMonitoringAlertingExplore(Explore):
         v1_name: Optional[str],
     ) -> List[Dict[str, Any]]:
         defn: List[Dict[str, Any]] = [
-            {
-                "name": self.views["base_view"],
-            },
+            {"name": self.views["base_view"], "hidden": "yes"},
         ]
 
         return defn
