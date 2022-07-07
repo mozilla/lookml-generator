@@ -243,6 +243,7 @@ def test_explore_lookml(operational_monitoring_explore):
         {
             "always_filter": {"filters": [{"branch": "enabled, disabled"}]},
             "name": "fission",
+            "hidden": "yes",
         }
     ]
 
@@ -290,6 +291,7 @@ def test_dashboard_lookml(operational_monitoring_dashboard):
       Percentile: fission.percentile_conf
       Cores Count: fission.cores_count
       Os: fission.os
+
     enabled: "#3FE1B0"
     disabled: "#0060E0"
     defaults_version: 0
@@ -323,6 +325,7 @@ def test_dashboard_lookml(operational_monitoring_dashboard):
       Percentile: fission.percentile_conf
       Cores Count: fission.cores_count
       Os: fission.os
+
     enabled: "#3FE1B0"
     disabled: "#0060E0"
     defaults_version: 0
@@ -382,6 +385,5 @@ def test_dashboard_lookml(operational_monitoring_dashboard):
     """
     )
     actual = operational_monitoring_dashboard.to_lookml(mock_bq_client)
-    print(actual)
 
     print_and_test(expected=expected, actual=dedent(actual))
