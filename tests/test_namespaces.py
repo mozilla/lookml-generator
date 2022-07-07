@@ -257,8 +257,8 @@ def test_namespaces_full(
 
             expected = {
                 "custom": {
-                    "glean_app": False,
                     "connection": "bigquery-oauth",
+                    "glean_app": False,
                     "owners": ["custom-owner@allizom.com", "custom-owner2@allizom.com"],
                     "pretty_name": "Custom",
                     "spoke": "looker-spoke-default",
@@ -309,6 +309,19 @@ def test_namespaces_full(
                     "pretty_name": "Glean App",
                     "spoke": "looker-spoke-default",
                     "views": {
+                        "baseline": {
+                            "tables": [
+                                {
+                                    "channel": "release",
+                                    "table": "mozdata.glean_app.baseline",
+                                },
+                                {
+                                    "channel": "beta",
+                                    "table": "mozdata.glean_app_beta.baseline",
+                                },
+                            ],
+                            "type": "glean_ping_view",
+                        },
                         "baseline_clients_daily_table": {
                             "tables": [
                                 {
@@ -330,7 +343,7 @@ def test_namespaces_full(
                                 },
                                 {
                                     "channel": "beta",
-                                    "table": "mozdata.glean_app_beta.baseline_clients_last_seen",  # noqa: E501
+                                    "table": "mozdata.glean_app_beta.baseline_clients_last_seen",
                                 },
                             ],
                             "type": "table_view",
@@ -347,19 +360,6 @@ def test_namespaces_full(
                                 },
                             ],
                             "type": "table_view",
-                        },
-                        "baseline": {
-                            "tables": [
-                                {
-                                    "channel": "release",
-                                    "table": "mozdata.glean_app.baseline",
-                                },
-                                {
-                                    "channel": "beta",
-                                    "table": "mozdata.glean_app_beta.baseline",
-                                },
-                            ],
-                            "type": "glean_ping_view",
                         },
                         "client_counts": {
                             "tables": [
@@ -382,72 +382,43 @@ def test_namespaces_full(
                         "op_mon": {
                             "tables": [
                                 {
-                                    "explore": "op_mon_histogram",
-                                    "table": "moz-fx-data-shared-prod.operational_monitoring.op_mon_histogram",
                                     "branches": ["enabled", "disabled"],
+                                    "compact_visualization": False,
                                     "dimensions": {
                                         "cores_count": {
                                             "default": "4",
                                             "options": ["4", "1"],
                                         }
                                     },
-                                    "xaxis": "submission_date",
+                                    "explore": "op_mon",
+                                    "group_by_dimension": None,
                                     "probes": ["GC_MS", "GC_MS_CONTENT"],
-                                    "group_by_dimension": None,
-                                },
-                                {
-                                    "explore": "op_mon_scalar",
-                                    "table": "moz-fx-data-shared-prod.operational_monitoring.op_mon_scalar",
-                                    "branches": ["enabled", "disabled"],
-                                    "dimensions": {
-                                        "cores_count": {
-                                            "default": "4",
-                                            "options": ["4", "1"],
-                                        }
-                                    },
+                                    "table": "moz-fx-data-shared-prod.operational_monitoring.op_mon",
                                     "xaxis": "submission_date",
-                                    "probes": [],
-                                    "group_by_dimension": None,
-                                },
+                                }
                             ],
                             "title": "Opmon",
                             "type": "operational_monitoring_dashboard",
                         }
                     },
                     "explores": {
-                        "op_mon_histogram": {
+                        "op_mon": {
                             "branches": ["enabled", "disabled"],
-                            "type": "operational_monitoring_explore",
-                            "views": {"base_view": "op_mon_histogram"},
                             "dimensions": {
-                                "cores_count": {
-                                    "default": "4",
-                                    "options": ["4", "1"],
-                                }
+                                "cores_count": {"default": "4", "options": ["4", "1"]}
                             },
-                            "xaxis": "submission_date",
                             "probes": ["GC_MS", "GC_MS_CONTENT"],
-                        },
-                        "op_mon_scalar": {
-                            "branches": ["enabled", "disabled"],
                             "type": "operational_monitoring_explore",
-                            "views": {"base_view": "op_mon_scalar"},
-                            "dimensions": {
-                                "cores_count": {
-                                    "default": "4",
-                                    "options": ["4", "1"],
-                                }
-                            },
+                            "views": {"base_view": "op_mon"},
                             "xaxis": "submission_date",
-                            "probes": [],
-                        },
+                        }
                     },
                     "glean_app": False,
                     "owners": ["opmon-owner@allizom.com"],
                     "pretty_name": "Operational Monitoring",
                     "spoke": "looker-spoke-default",
                     "views": {
-                        "op_mon_histogram": {
+                        "op_mon": {
                             "tables": [
                                 {
                                     "dimensions": {
@@ -456,42 +427,28 @@ def test_namespaces_full(
                                             "options": ["4", "1"],
                                         }
                                     },
-                                    "table": "moz-fx-data-shared-prod.operational_monitoring.op_mon_histogram",
+                                    "table": "moz-fx-data-shared-prod.operational_monitoring.op_mon",
                                     "xaxis": "submission_date",
                                 }
                             ],
-                            "type": "operational_monitoring_histogram_view",
-                        },
-                        "op_mon_scalar": {
-                            "tables": [
-                                {
-                                    "dimensions": {
-                                        "cores_count": {
-                                            "default": "4",
-                                            "options": ["4", "1"],
-                                        }
-                                    },
-                                    "table": "moz-fx-data-shared-prod.operational_monitoring.op_mon_scalar",
-                                    "xaxis": "submission_date",
-                                }
-                            ],
-                            "type": "operational_monitoring_scalar_view",
-                        },
+                            "type": "operational_monitoring_view",
+                        }
                     },
                 },
                 "private": {
                     "glean_app": False,
-                    "spoke": "looker-spoke-private",
                     "owners": ["private-owner@allizom.com"],
                     "pretty_name": "Private",
+                    "spoke": "looker-spoke-private",
                     "views": {
                         "events": {
-                            "type": "ping_view",
                             "tables": [{"table": "mozdata.private.events"}],
+                            "type": "ping_view",
                         }
                     },
                 },
             }
+
             actual = yaml.load(
                 Path("namespaces.yaml").read_text(), Loader=yaml.FullLoader
             )
@@ -651,9 +608,7 @@ def test_get_funnel_explore(glean_apps, tmp_path):
     expected = {
         "funnel_analysis": {
             "type": "funnel_analysis_explore",
-            "views": {
-                "base_view": "funnel_analysis",
-            },
+            "views": {"base_view": "funnel_analysis"},
         }
     }
 

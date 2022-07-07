@@ -121,6 +121,9 @@
       - '90'
       - '95'
       - '99'
+  {% if compact_visualization -%}
+  
+  {% endif -%}
 
   {% for dimension in dimensions -%}
   {% if dimension.name != group_by_dimension %}
