@@ -70,6 +70,7 @@ class OperationalMonitoringExplore(Explore):
                         {"branch": self.branches},
                     ]
                 },
+                "hidden": "yes",
             },
         ]
 
@@ -118,9 +119,7 @@ class OperationalMonitoringAlertingExplore(Explore):
         v1_name: Optional[str],
     ) -> List[Dict[str, Any]]:
         defn: List[Dict[str, Any]] = [
-            {
-                "name": self.views["base_view"],
-            },
+            {"name": self.views["base_view"], "hidden": "yes"},
         ]
 
         return defn
