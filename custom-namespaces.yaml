@@ -523,8 +523,8 @@ firefox_desktop:
           table: mozdata.telemetry.events
     newtab_interactions_table:
       type: table_view
-      tables: # TODO: Replace https://github.com/mozilla/bigquery-etl/pull/3073
-        - table: mozdata.analysis.newtab_interactions
+      tables:
+        - table: mozdata.telemetry.newtab_interactions
   explores:
     client_counts:
       type: client_counts_explore
