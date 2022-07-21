@@ -97,7 +97,7 @@ search_private:
     search_term_sanitization_job_metadata_daily:
       type: table_view
       tables:
-        - table: mozdata.search_terms_unsanitized_analysis.prototype_sanitation_job_metadata
+        - table: mozdata.search_terms_unsanitized_analysis.prototype_sanitation_job_metadata_v2
     sanitization_job_languages:
       type: table_view
       tables:
