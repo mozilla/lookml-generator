@@ -744,9 +744,9 @@ tomli==1.1.0 \
     #   build
     #   pep517
     #   pytest
-types-pyyaml==6.0.10 \
-    --hash=sha256:18985a382c93fb12187daae6f57ce7787e3651cd590291c907d3e757919689ff \
-    --hash=sha256:a1676caeb098096833fe2f1472e7ea8debf7663222964fa90545cfaafebf3385
+types-pyyaml==6.0.11 \
+    --hash=sha256:7f7da2fd11e9bc1e5e9eb3ea1be84f4849747017a59fc2eee0ea34ed1147c2e0 \
+    --hash=sha256:8f890028123607379c63550179ddaec4517dc751f4c527a52bb61934bf495989
     # via -r requirements.in
 typing-extensions==4.1.1 \
     --hash=sha256:1a9462dcc3347a79b1f1c0271fbe79e844580bb598bafa1ed208b94da3cdcd42 \
