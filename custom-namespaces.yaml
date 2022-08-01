@@ -333,6 +333,10 @@ firefox_accounts:
       type: table_view
       tables:
         - table: mozdata.firefox_accounts.fxa_users_services_daily
+    fxa_users_services_daily_summary_table:
+      type: table_view
+      tables:
+        - table: mozdata.firefox_accounts.fxa_users_services_daily_summary
     fxa_log_device_command_events:
       type: table_view
       tables:
