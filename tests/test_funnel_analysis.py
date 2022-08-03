@@ -100,23 +100,36 @@ def test_view_lookml(funnel_analysis_view):
                         "name": "completed_step_1",
                         "description": "Whether the user completed step 1 on the associated day.",
                         "type": "yesno",
-                        "sql": (
-                            "REGEXP_CONTAINS(${TABLE}.events, mozfun.event_analysis.create_funnel_regex(["
-                            "${step_1.match_string}],"
-                            "True))"
+                        "sql": "\n".join(
+                            (
+                                "REGEXP_CONTAINS(",
+                                "  ${TABLE}.events, mozfun.event_analysis.create_funnel_regex(",
+                                "    [",
+                                "      ${step_1.match_string}",
+                                "    ],",
+                                "    True",
+                                "  )",
+                                ")"
+                            )
                         ),
                     },
                     {
                         "name": "completed_step_2",
                         "description": "Whether the user completed step 2 on the associated day.",
                         "type": "yesno",
-                        "sql": (
-                            "REGEXP_CONTAINS(${TABLE}.events, mozfun.event_analysis.create_funnel_regex(["
-                            "${step_1.match_string},"
-                            "${step_2.match_string}"
-                            "],"
-                            "True))"
-                        ),
+                        "sql": "\n".join(
+                            (
+                                "REGEXP_CONTAINS(",
+                                "  ${TABLE}.events, mozfun.event_analysis.create_funnel_regex(",
+                                "    [",
+                                "      ${step_1.match_string},",
+                                "      ${step_2.match_string}",
+                                "    ],",
+                                "    True",
+                                "  )",
+                                ")"
+                            )
+                        )
                     },
                 ],
                 "measures": [

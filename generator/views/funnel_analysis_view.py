@@ -104,19 +104,22 @@ class FunnelAnalysisView(View):
                 "name": f"completed_step_{n}",
                 "type": "yesno",
                 "description": f"Whether the user completed step {n} on the associated day.",
-                "sql": "".join(
+                "sql": "\n".join(
                     (
-                        "REGEXP_CONTAINS(${TABLE}.events, mozfun.event_analysis.create_funnel_regex([",
-                        ",".join(
-                            [f"${{step_{ni}.match_string}}" for ni in range(1, n + 1)]
-                        ),
-                        "],",
-                        "True))",
+                        "REGEXP_CONTAINS(",
+                        "  ${TABLE}.events, mozfun.event_analysis.create_funnel_regex(",
+                        "    [",
+                        ",\n".join([f'      ${{step_{ni}.match_string}}' for ni in range(1, n + 1)]),
+                        "    ],",
+                        "    True",
+                        "  )",
+                        ")"
                     )
                 ),
             }
             for n in range(1, self.n_events() + 1)
         ]
+
         count_measures: List[Dict[str, Any]] = [
             {
                 "name": f"count_completed_step_{n}",
@@ -130,6 +133,7 @@ class FunnelAnalysisView(View):
             }
             for n in range(1, self.n_events() + 1)
         ]
+
         fractional_measures: List[Dict[str, Any]] = [
             {
                 "name": f"fraction_completed_step_{n}",
