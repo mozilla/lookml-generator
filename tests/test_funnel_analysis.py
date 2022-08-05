@@ -178,8 +178,10 @@ def test_view_lookml(funnel_analysis_view):
                         SELECT
                           mozfun.event_analysis.aggregate_match_strings(
                             ARRAY_AGG(
-                              CONCAT(
+                              DISTINCT CONCAT(
+                                {% if _filters['property_name'] or _filters['property_value'] -%}
                                 COALESCE(mozfun.event_analysis.escape_metachars(property_value.value), ''),
+                                {% endif -%}
                                 mozfun.event_analysis.event_index_to_match_string(et.index)
                               )
                             )
