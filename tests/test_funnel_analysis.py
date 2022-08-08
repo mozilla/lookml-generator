@@ -173,20 +173,29 @@ def test_view_lookml(funnel_analysis_view):
             {
                 "name": "event_types",
                 "derived_table": {
-                    "sql": (
-                        "SELECT "
-                        "mozfun.event_analysis.aggregate_match_strings( "
-                        "ARRAY_AGG(CONCAT(COALESCE(mozfun.event_analysis.escape_metachars(property_value.value), ''),"
-                        "mozfun.event_analysis.event_index_to_match_string(et.index)))) AS match_string "
-                        "FROM "
-                        "`mozdata.glean_app.event_types` as et "
-                        "LEFT JOIN UNNEST(COALESCE(event_properties, [])) AS properties "
-                        "LEFT JOIN UNNEST(properties.value) AS property_value "
-                        "WHERE "
-                        "{% condition category %} category {% endcondition %} "
-                        "AND {% condition event %} event {% endcondition %} "
-                        "AND {% condition property_name %} properties.key {% endcondition %} "
-                        "AND {% condition property_value %} property_value.key {% endcondition %}"
+                    "sql": dedent(
+                        """
+                        SELECT
+                          mozfun.event_analysis.aggregate_match_strings(
+                            ARRAY_AGG(
+                              CONCAT(
+                                COALESCE(mozfun.event_analysis.escape_metachars(property_value.value), ''),
+                                mozfun.event_analysis.event_index_to_match_string(et.index)
+                              )
+                            )
+                          ) AS match_string
+                        FROM
+                          `mozdata.glean_app.event_types` AS et
+                        LEFT JOIN
+                          UNNEST(COALESCE(event_properties, [])) AS properties
+                        LEFT JOIN
+                          UNNEST(properties.value) AS property_value
+                        WHERE
+                          {% condition category %} category {% endcondition %}
+                          AND {% condition event %} event {% endcondition %}
+                          AND {% condition property_name %} properties.key {% endcondition %}
+                          AND {% condition property_value %} property_value.key {% endcondition %}
+                        """
                     )
                 },
                 "filters": [
