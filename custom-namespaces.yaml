@@ -753,11 +753,11 @@ kpi:
       tables:
         - table: mozdata.telemetry.unified_metrics
     automated_kpi_forecasts:
-      type: ping_view
+      type: table_view
       tables:
         - table: moz-fx-data-shared-prod.telemetry_derived.kpi_automated_forecast_v1
     automated_kpi_confidence_intervals:
-      type: ping_view
+      type: table_view
       tables:
         - table: moz-fx-data-shared-prod.telemetry_derived.kpi_automated_forecast_confidences_v1
   explores:
@@ -765,14 +765,6 @@ kpi:
       type: ping_explore
       views:
         base_view: unified_metrics
-    automated_kpi_forecasts:
-      type: ping_explore
-      views:
-        base_view: automated_kpi_forecasts
-    automated_kpi_confidence_intervals:
-      type: ping_explore
-      views:
-        base_view: automated_kpi_confidence_intervals
 fpa:
   glean_app: false
   connection: bigquery-oauth
