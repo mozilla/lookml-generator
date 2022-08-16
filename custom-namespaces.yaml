@@ -623,6 +623,10 @@ monitoring:
       type: ping_view
       tables:
         - table: mozdata.monitoring.stable_table_sizes
+    stable_and_derived_table_sizes:
+      type: ping_view
+      tables:
+        - table: mozdata.monitoring.stable_and_derived_table_sizes
     stable_table_column_counts:
       type: ping_view
       tables:
@@ -684,6 +688,10 @@ monitoring:
       type: ping_explore
       views:
         base_view: stable_table_sizes
+    stable_and_dervied_table_sizes:
+      type: ping_explore
+      views:
+        base_view: stable_and_derived_table_sizes
     stable_table_column_counts:
       type: ping_explore
       views:
