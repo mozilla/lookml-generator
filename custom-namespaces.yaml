@@ -120,6 +120,10 @@ search:
       type: ping_view
       tables:
         - table: mozdata.search.mobile_search_clients_engines_sources_daily
+    firefox_products_search_clients_engines_sources_daily:
+      type: ping_view
+      tables:
+        - table: mozdata.search.firefox_products_search_clients_engines_sources_daily
     desktop_search_alert_records:
       type: ping_view
       tables:
