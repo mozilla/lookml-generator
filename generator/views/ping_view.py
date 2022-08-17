@@ -43,8 +43,8 @@ class PingView(View):
                 if channel.get("channel") is not None:
                     table["channel"] = channel["channel"]
                 if (
-                    len(references) != 1
-                    or references[0][-2] != channel["source_dataset"]
+                    len(set(r[-1] for r in references)) != 1
+                    or channel["source_dataset"] not in [r[-2] for r in references]
                 ):
                     continue  # This view is only for ping tables
 
