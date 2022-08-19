@@ -850,4 +850,4 @@ marketing:
     firefox_for_families_forecasted_expectations:
       type: table_view
       tables:
-      - table: mozdata.analysis.marketing_firefox_for_families_forecasted_expectations
+        - table: mozdata.analysis.marketing_firefox_for_families_forecasted_expectations
