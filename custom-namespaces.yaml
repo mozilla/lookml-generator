@@ -847,3 +847,7 @@ marketing:
       type: table_view
       tables:
         - table: moz-fx-data-marketing-prod.acoustic.raw_recipient_v1
+    firefox_for_families_forecasted_expectations:
+      type: table_view
+      tables:
+        - table: mozdata.analysis.marketing_firefox_for_families_forecasted_expectations
