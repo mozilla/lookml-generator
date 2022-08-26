@@ -66,6 +66,9 @@
                         <li>
                                 <a class="function" href="#View.get_client_id">get_client_id</a>
                         </li>
+                        <li>
+                                <a class="function" href="#View.get_document_id">get_document_id</a>
+                        </li>
                 </ul>
 
             </li>
@@ -206,6 +209,18 @@
 </span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">client_id_fields</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
 </span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>            <span class="k">raise</span> <span class="n">ClickException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Duplicate client_id dimension in </span><span class="si">{</span><span class="n">table</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
 </span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a>        <span class="k">return</span> <span class="n">client_id_fields</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>
+</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>    <span class="k">def</span> <span class="nf">get_document_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span> <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a>        <span class="sd">&quot;&quot;&quot;Return the first field that looks like a document_id.&quot;&quot;&quot;</span>
+</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>        <span class="n">document_id_fields</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dimensions</span> <span class="k">if</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;document_id&quot;</span><span class="p">}</span>
+</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a>        <span class="p">]</span>
+</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">document_id_fields</span><span class="p">:</span>
+</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a>            <span class="c1"># Some pings purposely disinclude client_ids, e.g. firefox installer</span>
+</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a>            <span class="k">return</span> <span class="kc">None</span>
+</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">document_id_fields</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a>            <span class="k">raise</span> <span class="n">ClickException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Duplicate document_id dimension in </span><span class="si">{</span><span class="n">table</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a>        <span class="k">return</span> <span class="n">document_id_fields</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 </span></pre></div>
 
 
@@ -372,6 +387,18 @@
 </span><span id="View-113"><a href="#View-113"><span class="linenos">113</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">client_id_fields</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
 </span><span id="View-114"><a href="#View-114"><span class="linenos">114</span></a>            <span class="k">raise</span> <span class="n">ClickException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Duplicate client_id dimension in </span><span class="si">{</span><span class="n">table</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
 </span><span id="View-115"><a href="#View-115"><span class="linenos">115</span></a>        <span class="k">return</span> <span class="n">client_id_fields</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span><span id="View-116"><a href="#View-116"><span class="linenos">116</span></a>
+</span><span id="View-117"><a href="#View-117"><span class="linenos">117</span></a>    <span class="k">def</span> <span class="nf">get_document_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span> <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span id="View-118"><a href="#View-118"><span class="linenos">118</span></a>        <span class="sd">&quot;&quot;&quot;Return the first field that looks like a document_id.&quot;&quot;&quot;</span>
+</span><span id="View-119"><a href="#View-119"><span class="linenos">119</span></a>        <span class="n">document_id_fields</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="View-120"><a href="#View-120"><span class="linenos">120</span></a>            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dimensions</span> <span class="k">if</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;document_id&quot;</span><span class="p">}</span>
+</span><span id="View-121"><a href="#View-121"><span class="linenos">121</span></a>        <span class="p">]</span>
+</span><span id="View-122"><a href="#View-122"><span class="linenos">122</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">document_id_fields</span><span class="p">:</span>
+</span><span id="View-123"><a href="#View-123"><span class="linenos">123</span></a>            <span class="c1"># Some pings purposely disinclude client_ids, e.g. firefox installer</span>
+</span><span id="View-124"><a href="#View-124"><span class="linenos">124</span></a>            <span class="k">return</span> <span class="kc">None</span>
+</span><span id="View-125"><a href="#View-125"><span class="linenos">125</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">document_id_fields</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+</span><span id="View-126"><a href="#View-126"><span class="linenos">126</span></a>            <span class="k">raise</span> <span class="n">ClickException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Duplicate document_id dimension in </span><span class="si">{</span><span class="n">table</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="View-127"><a href="#View-127"><span class="linenos">127</span></a>        <span class="k">return</span> <span class="n">document_id_fields</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 </span></pre></div>
 
 
@@ -595,6 +622,36 @@ a list.</p>
 
 
             <div class="docstring"><p>Return the first field that looks like a client identifier.</p>
+</div>
+
+
+                            </div>
+                            <div id="View.get_document_id" class="classattr">
+                                        <input id="View.get_document_id-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">get_document_id</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">dimensions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span>, </span><span class="param"><span class="n">table</span><span class="p">:</span> <span class="nb">str</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span>:</span></span>
+
+                <label class="view-source-button" for="View.get_document_id-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#View.get_document_id"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="View.get_document_id-117"><a href="#View.get_document_id-117"><span class="linenos">117</span></a>    <span class="k">def</span> <span class="nf">get_document_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span> <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span id="View.get_document_id-118"><a href="#View.get_document_id-118"><span class="linenos">118</span></a>        <span class="sd">&quot;&quot;&quot;Return the first field that looks like a document_id.&quot;&quot;&quot;</span>
+</span><span id="View.get_document_id-119"><a href="#View.get_document_id-119"><span class="linenos">119</span></a>        <span class="n">document_id_fields</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="View.get_document_id-120"><a href="#View.get_document_id-120"><span class="linenos">120</span></a>            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dimensions</span> <span class="k">if</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;document_id&quot;</span><span class="p">}</span>
+</span><span id="View.get_document_id-121"><a href="#View.get_document_id-121"><span class="linenos">121</span></a>        <span class="p">]</span>
+</span><span id="View.get_document_id-122"><a href="#View.get_document_id-122"><span class="linenos">122</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">document_id_fields</span><span class="p">:</span>
+</span><span id="View.get_document_id-123"><a href="#View.get_document_id-123"><span class="linenos">123</span></a>            <span class="c1"># Some pings purposely disinclude client_ids, e.g. firefox installer</span>
+</span><span id="View.get_document_id-124"><a href="#View.get_document_id-124"><span class="linenos">124</span></a>            <span class="k">return</span> <span class="kc">None</span>
+</span><span id="View.get_document_id-125"><a href="#View.get_document_id-125"><span class="linenos">125</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">document_id_fields</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+</span><span id="View.get_document_id-126"><a href="#View.get_document_id-126"><span class="linenos">126</span></a>            <span class="k">raise</span> <span class="n">ClickException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Duplicate document_id dimension in </span><span class="si">{</span><span class="n">table</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="View.get_document_id-127"><a href="#View.get_document_id-127"><span class="linenos">127</span></a>        <span class="k">return</span> <span class="n">document_id_fields</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Return the first field that looks like a document_id.</p>
 </div>
 
 
