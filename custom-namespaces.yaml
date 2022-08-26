@@ -102,6 +102,10 @@ search_private:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.search_terms.sanitization_job_languages
+    search_term_data_validation_reports:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.search_terms_derived.search_term_data_validation_reports_v1
 search:
   glean_app: false
   owners:
