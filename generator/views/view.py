@@ -112,3 +112,15 @@ class View(object):
         if len(client_id_fields) > 1:
             raise ClickException(f"Duplicate client_id dimension in {table!r}")
         return client_id_fields[0]
+
+    def get_document_id(self, dimensions: List[dict], table: str) -> Optional[str]:
+        """Return the first field that looks like a document_id."""
+        document_id_fields = [
+            d["name"] for d in dimensions if d["name"] in {"document_id"}
+        ]
+        if not document_id_fields:
+            # Some pings purposely disinclude client_ids, e.g. firefox installer
+            return None
+        if len(document_id_fields) > 1:
+            raise ClickException(f"Duplicate document_id dimension in {table!r}")
+        return document_id_fields[0]
