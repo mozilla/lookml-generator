@@ -97,7 +97,7 @@ search_private:
     search_term_sanitization_job_metadata_daily:
       type: table_view
       tables:
-        - table: mozdata.search_terms_unsanitized_analysis.prototype_sanitation_job_metadata
+        - table: moz-fx-data-shared-prod.search_terms_derived.sanitization_job_metadata_v2
     sanitization_job_languages:
       type: table_view
       tables:
@@ -124,6 +124,10 @@ search:
       type: ping_view
       tables:
         - table: mozdata.search.mobile_search_clients_engines_sources_daily
+    desktop_mobile_search_clients_monthly:
+      type: table_view
+      tables:
+        - table: mozdata.search.desktop_mobile_search_clients_monthly
     desktop_search_alert_records:
       type: ping_view
       tables:
@@ -183,6 +187,15 @@ contextual_services:
         - channel: nightly
           table: mozdata.org_mozilla_fenix.topsites_impression
       type: ping_view
+    topsites_impression_firefox_ios:
+      tables:
+        - channel: release
+          table: mozdata.org_mozilla_ios_firefox.topsites_impression
+        - channel: beta
+          table: mozdata.org_mozilla_ios_firefoxbeta.topsites_impression
+        - channel: nightly
+          table: mozdata.org_mozilla_ios_fennec.topsites_impression
+      type: ping_view
   explores:
     event_aggregates:
       type: ping_explore
@@ -208,6 +221,10 @@ contextual_services:
       type: ping_explore
       views:
         base_view: topsites_impression_fenix
+    topsites_impressions_firefox_ios:
+      type: ping_explore
+      views:
+        base_view: topsites_impression_firefox_ios
 mozilla_vpn_private:
   glean_app: false
   connection: bigquery-oauth
@@ -610,6 +627,10 @@ monitoring:
       type: ping_view
       tables:
         - table: mozdata.monitoring.stable_table_sizes
+    stable_and_derived_table_sizes:
+      type: ping_view
+      tables:
+        - table: mozdata.monitoring.stable_and_derived_table_sizes
     stable_table_column_counts:
       type: ping_view
       tables:
@@ -671,6 +692,10 @@ monitoring:
       type: ping_explore
       views:
         base_view: stable_table_sizes
+    stable_and_dervied_table_sizes:
+      type: ping_explore
+      views:
+        base_view: stable_and_derived_table_sizes
     stable_table_column_counts:
       type: ping_explore
       views:
@@ -743,6 +768,14 @@ kpi:
       type: ping_view
       tables:
         - table: mozdata.telemetry.unified_metrics
+    automated_kpi_forecasts:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.telemetry_derived.kpi_automated_forecast_v1
+    automated_kpi_confidence_intervals:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.telemetry_derived.kpi_automated_forecast_confidences_v1
   explores:
     unified_metrics:
       type: ping_explore
@@ -818,3 +851,7 @@ marketing:
       type: table_view
       tables:
         - table: moz-fx-data-marketing-prod.acoustic.raw_recipient_v1
+    firefox_for_families_forecasted_expectations:
+      type: table_view
+      tables:
+        - table: mozdata.analysis.marketing_firefox_for_families_forecasted_expectations

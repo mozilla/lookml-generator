@@ -42,11 +42,16 @@ class PingView(View):
 
                 if channel.get("channel") is not None:
                     table["channel"] = channel["channel"]
+
+                # Only include those that select from a single ping source table
+                # or union together multiple ping source tables of the same name.
+                reference_table_names = set(r[-1] for r in references)
+                reference_dataset_names = set(r[-2] for r in references)
                 if (
-                    len(references) != 1
-                    or references[0][-2] != channel["source_dataset"]
+                    len(reference_table_names) != 1
+                    or channel["source_dataset"] not in reference_dataset_names
                 ):
-                    continue  # This view is only for ping tables
+                    continue
 
                 views[view_id].append(table)
 

@@ -21,6 +21,7 @@ e.g. `completed_funnel_step_N`. We can then count those users across dimensions.
 """
 from __future__ import annotations
 
+from textwrap import dedent
 from typing import Any, Dict, Iterator, List, Optional
 
 from .view import View, ViewDict
@@ -104,19 +105,22 @@ class FunnelAnalysisView(View):
                 "name": f"completed_step_{n}",
                 "type": "yesno",
                 "description": f"Whether the user completed step {n} on the associated day.",
-                "sql": "".join(
-                    (
-                        "REGEXP_CONTAINS(${TABLE}.events, mozfun.event_analysis.create_funnel_regex([",
-                        ",".join(
-                            [f"${{step_{ni}.match_string}}" for ni in range(1, n + 1)]
-                        ),
-                        "],",
-                        "True))",
+                "sql": dedent(
+                    f"""
+                    REGEXP_CONTAINS(
+                        ${{TABLE}}.events, mozfun.event_analysis.create_funnel_regex(
+                            [{", ".join([
+                                f'${{step_{ni}.match_string}}' for ni in range(1, n + 1)
+                            ])}],
+                            True
+                        )
                     )
+                    """
                 ),
             }
             for n in range(1, self.n_events() + 1)
         ]
+
         count_measures: List[Dict[str, Any]] = [
             {
                 "name": f"count_completed_step_{n}",
@@ -130,6 +134,7 @@ class FunnelAnalysisView(View):
             }
             for n in range(1, self.n_events() + 1)
         ]
+
         fractional_measures: List[Dict[str, Any]] = [
             {
                 "name": f"fraction_completed_step_{n}",
@@ -155,22 +160,32 @@ class FunnelAnalysisView(View):
                 {
                     "name": "event_types",
                     "derived_table": {
-                        "sql": (
-                            "SELECT "
-                            "mozfun.event_analysis.aggregate_match_strings( "
-                            "ARRAY_AGG(CONCAT(COALESCE("
-                            "mozfun.event_analysis.escape_metachars(property_value.value), ''),"
-                            "mozfun.event_analysis.event_index_to_match_string(et.index)))) AS match_string "
-                            "FROM "
-                            f"{self.tables[0]['event_types']} as et "
-                            "LEFT JOIN UNNEST(COALESCE(event_properties, [])) AS properties "
-                            "LEFT JOIN UNNEST(properties.value) AS property_value "
-                            "WHERE "
-                            "{% condition category %} category {% endcondition %} "
-                            "AND {% condition event %} event {% endcondition %} "
-                            "AND {% condition property_name %} properties.key {% endcondition %} "
-                            "AND {% condition property_value %} property_value.key {% endcondition %}"
-                        )
+                        "sql": dedent(
+                            f"""
+                            SELECT
+                              mozfun.event_analysis.aggregate_match_strings(
+                                ARRAY_AGG(
+                                  DISTINCT CONCAT(
+                                    {{% if _filters['property_name'] or _filters['property_value'] -%}}
+                                    COALESCE(mozfun.event_analysis.escape_metachars(property_value.value), ''),
+                                    {{% endif -%}}
+                                    mozfun.event_analysis.event_index_to_match_string(et.index)
+                                  )
+                                )
+                              ) AS match_string
+                            FROM
+                              {self.tables[0]['event_types']} AS et
+                            LEFT JOIN
+                              UNNEST(COALESCE(event_properties, [])) AS properties
+                            LEFT JOIN
+                              UNNEST(properties.value) AS property_value
+                            WHERE
+                              {{% condition category %}} category {{% endcondition %}}
+                              AND {{% condition event %}} event {{% endcondition %}}
+                              AND {{% condition property_name %}} properties.key {{% endcondition %}}
+                              AND {{% condition property_value %}} property_value.key {{% endcondition %}}
+                            """
+                        ),
                     },
                     "filters": [
                         {
