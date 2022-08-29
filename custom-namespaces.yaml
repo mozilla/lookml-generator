@@ -51,6 +51,10 @@ duet:
       tables:
         - channel: release
           table: mozdata.telemetry.new_profile
+    fenix_marketing_metrics:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.fenix.marketing_attributable_metrics
 activity_stream:
   glean_app: false
   owners:
