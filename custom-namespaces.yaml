@@ -140,6 +140,10 @@ search:
       type: table_view
       tables:
         - table: mozdata.analysis.desktop_search_alert_latest_daily
+    desktop_crashes_daily:
+      type: table_view
+      tables:
+        - table: mozdata.telemetry.crashes_daily
   explores:
     desktop_search_counts:
       type: ping_explore
