@@ -7,7 +7,7 @@ lkml==1.2.0
 looker-sdk==22.10.0
 mozilla-schema-generator==0.5.1
 pip-tools==6.8.0
-pandas==1.4.3
+pandas==1.4.4
 pre-commit==2.20.0
 pyarrow==8.0.0
 pytest-black==0.3.12
