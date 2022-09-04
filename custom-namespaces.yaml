@@ -820,6 +820,41 @@ monitoring:
       type: ping_explore
       views:
         base_view: telemetry_missing_columns
+monitoring_airflow:
+  glean_app: false
+  owners:
+    - kignasiak@mozilla.com
+  pretty_name: Monitoring (Airflow)
+  views:
+    dag:
+      type: table_view
+      tables:
+        - table: mozdata.monitoring_airflow.dag
+    dag_run:
+      type: table_view
+      tables:
+        - table: mozdata.monitoring_airflow.dag_run
+    dag_tag:
+      type: table_view
+      tables:
+        - table: mozdata.monitoring_airflow.dag_tag
+    slot_pool:
+      type: table_view
+      tables:
+        - table: mozdata.monitoring_airflow.slot_pool
+    task_fail:
+      type: table_view
+      tables:
+        - table: mozdata.monitoring_airflow.task_fail
+    task_reschedule:
+      type: table_view
+      tables:
+        - table: mozdata.monitoring_airflow.task_reschedule
+    user:
+      type: table_view
+      tables:
+        - table: mozdata.monitoring_airflow.user
+
 accessibility:
   glean_app: false
   owners:
