@@ -203,9 +203,7 @@ is the following:</p>
 should run using <code>make build &amp;&amp; make run</code>, with changes reflected in LookML repos.</li>
 <li>Once merged, the changes should run on stage. They will run automatically after schema deploys,
 but they can be run manually by clearing the <code>lookml_generator_staging</code> task in <a href="https://workflow.telemetry.mozilla.org/tree?dag_id=probe_scraper">Airflow</a>.</li>
-<li>Once the changes are confirmed in stage, we first tag a new release here. Add a description with
-what the new release includes. Finally, change the Airflow variable <code>lookml_generator_release_str</code>
-to the version string you created when cutting the release. Re-run the DAG and the changes
+<li>Once the changes are merged and a new release has been pushed, re-run the DAG and the changes
 should take effect.</li>
 </ol>
 
