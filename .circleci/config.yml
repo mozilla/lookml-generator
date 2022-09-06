@@ -133,32 +133,14 @@ workflows:
   version: 2
   build-and-deploy:
     jobs:
-      - unit-tests:
-          filters:
-            tags:
-              only: /.*/
-
+      - unit-tests
       - integration-tests:
           context: data-eng-circleci-tests
-          filters:
-            tags:
-              only: /.*/
 
-      - verify-requirements:
-          filters:
-            tags:
-              only: /.*/
-
-      - build-container:
-          filters:
-            tags:
-              only: /.*/
-
-      - docs-build:
-          filters:
-            tags:
-              only: /.*/
-
+      - verify-requirements
+      - build-container
+      - docs-build
+      
       - docs-deploy:
           requires:
             - docs-build
@@ -178,9 +160,18 @@ workflows:
             - integration-tests
             - build-container
           image: lookml-generator
-          tag: ${CIRCLE_TAG:-latest}
           filters:
-            tags:
-              only: /.*/
+            branches:
+              only: main
+      
+      - gcp-gcr/add-image-tag:
+          name: Add commit hash as docker image tag
+          context: data-eng-airflow-gcr
+          requires:
+            - Build and push lookml-generator
+          image: lookml-generator
+          source-tag: latest
+          target-tag: $CIRCLE_SHA1
+          filters:
             branches:
               only: main

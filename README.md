@@ -119,7 +119,5 @@ is the following:
    should run using `make build && make run`, with changes reflected in LookML repos.
 2. Once merged, the changes should run on stage. They will run automatically after schema deploys,
    but they can be run manually by clearing the `lookml_generator_staging` task in [Airflow](https://workflow.telemetry.mozilla.org/tree?dag_id=probe_scraper).
-3. Once the changes are confirmed in stage, we first tag a new release here. Add a description with
-   what the new release includes. Finally, change the Airflow variable `lookml_generator_release_str`
-   to the version string you created when cutting the release. Re-run the DAG and the changes
+3. Once the changes are merged and a new release has been pushed, re-run the DAG and the changes
    should take effect.
