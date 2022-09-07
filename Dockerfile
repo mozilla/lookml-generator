@@ -13,9 +13,9 @@ RUN groupadd --gid ${USER_ID} ${GROUP_ID} && \
 RUN apt-get update -qqy && \
     apt-get install -qqy python-dev build-essential git curl software-properties-common
 
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
-RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key C99B11DEB97541F0
-RUN apt-add-repository https://cli.github.com/packages
+RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
+    && chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null
 RUN apt update
 RUN apt install -y gh
 
