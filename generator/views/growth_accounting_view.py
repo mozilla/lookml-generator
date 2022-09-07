@@ -13,7 +13,6 @@ class GrowthAccountingView(View):
     """A view for growth accounting measures."""
 
     type: str = "growth_accounting_view"
-    primary_key_field: Optional[str] = "client_id"
 
     other_dimensions: List[Dict[str, str]] = [
         {
@@ -22,40 +21,6 @@ class GrowthAccountingView(View):
             "type": "yesno",
             "hidden": "yes",
         }
-    ]
-
-    default_dimensions: List[Dict[str, str]] = [
-        {
-            "name": "active_this_week",
-            "sql": "mozfun.bits28.active_in_range(days_seen_bits, -6, 7)",
-            "type": "yesno",
-            "hidden": "yes",
-        },
-        {
-            "name": "active_last_week",
-            "sql": "mozfun.bits28.active_in_range(days_seen_bits, -13, 7)",
-            "type": "yesno",
-            "hidden": "yes",
-        },
-        {
-            "name": "new_this_week",
-            "sql": "DATE_DIFF(${submission_date}, first_run_date, DAY) BETWEEN 0 AND 6",
-            "type": "yesno",
-            "hidden": "yes",
-        },
-        {
-            "name": "new_last_week",
-            "sql": "DATE_DIFF(${submission_date}, first_run_date, DAY) BETWEEN 7 AND 13",
-            "type": "yesno",
-            "hidden": "yes",
-        },
-        {
-            "name": f"{primary_key_field}_day",
-            "sql": f"CONCAT(CAST(${{submission_date}} AS STRING), ${{{primary_key_field}}})",
-            "type": "string",
-            "hidden": "yes",
-            "primary_key": "yes",
-        },
     ]
 
     default_measures: List[Dict[str, Union[str, List[Dict[str, str]]]]] = [
@@ -223,12 +188,49 @@ class GrowthAccountingView(View):
         )
 
     @classmethod
+    def _get_default_dimensions(klass, primary_key_field: str) -> List[Dict[str, str]]:
+        return [
+            {
+                "name": "active_this_week",
+                "sql": "mozfun.bits28.active_in_range(days_seen_bits, -6, 7)",
+                "type": "yesno",
+                "hidden": "yes",
+            },
+            {
+                "name": "active_last_week",
+                "sql": "mozfun.bits28.active_in_range(days_seen_bits, -13, 7)",
+                "type": "yesno",
+                "hidden": "yes",
+            },
+            {
+                "name": "new_this_week",
+                "sql": "DATE_DIFF(${submission_date}, first_run_date, DAY) BETWEEN 0 AND 6",
+                "type": "yesno",
+                "hidden": "yes",
+            },
+            {
+                "name": "new_last_week",
+                "sql": "DATE_DIFF(${submission_date}, first_run_date, DAY) BETWEEN 7 AND 13",
+                "type": "yesno",
+                "hidden": "yes",
+            },
+            {
+                "name": f"{primary_key_field}_day",
+                "sql": f"CONCAT(CAST(${{TABLE}}.submission_date AS STRING), ${{{primary_key_field}}})",
+                "type": "string",
+                "hidden": "yes",
+                "primary_key": "yes",
+            },
+        ]
+
+    @classmethod
     def from_db_views(
         klass,
         namespace: str,
         is_glean: bool,
         channels: List[Dict[str, str]],
         db_views: dict,
+        primary_key_field: str = "client_id",
     ) -> Iterator[GrowthAccountingView]:
         """Get Growth Accounting Views from db views and app variants."""
         dataset = next(
@@ -239,7 +241,7 @@ class GrowthAccountingView(View):
         for view_id, references in db_views[dataset].items():
             if view_id == "baseline_clients_last_seen":
                 yield GrowthAccountingView(
-                    namespace, [{"table": f"mozdata.{dataset}.{view_id}"}]
+                    namespace, [{"table": f"mozdata.{dataset}.{view_id}"}], primary_key_field=primary_key_field
                 )
 
     @classmethod
@@ -247,7 +249,7 @@ class GrowthAccountingView(View):
         klass, namespace: str, name: str, _dict: ViewDict
     ) -> GrowthAccountingView:
         """Get a view from a name and dict definition."""
-        return GrowthAccountingView(namespace, _dict["tables"])
+        return GrowthAccountingView(namespace, _dict["tables"], primary_key_field=_dict.get("primary_key_field", "client_id"))
 
     def to_lookml(self, bq_client, v1_name: Optional[str]) -> Dict[str, Any]:
         """Generate LookML for this view."""
@@ -256,7 +258,7 @@ class GrowthAccountingView(View):
 
         # add dimensions and dimension groups
         dimensions = lookml_utils._generate_dimensions(bq_client, table) + deepcopy(
-            GrowthAccountingView.default_dimensions
+            GrowthAccountingView._get_default_dimensions(primary_key_field=self.primary_key_field)
         )
 
         view_defn["dimensions"] = list(
