@@ -13,6 +13,8 @@ class GrowthAccountingView(View):
     """A view for growth accounting measures."""
 
     type: str = "growth_accounting_view"
+    primary_key_field: Optional[str] = "client_id"
+
     other_dimensions: List[Dict[str, str]] = [
         {
             "name": "first",
@@ -48,8 +50,8 @@ class GrowthAccountingView(View):
             "hidden": "yes",
         },
         {
-            "name": "client_id_day",
-            "sql": "CONCAT(CAST(${TABLE}.submission_date AS STRING), client_id)",
+            "name": f"{primary_key_field}_day",
+            "sql": f"CONCAT(CAST(${{submission_date}} AS STRING), ${{{primary_key_field}}})",
             "type": "string",
             "hidden": "yes",
             "primary_key": "yes",
@@ -212,8 +214,10 @@ class GrowthAccountingView(View):
         },
     ]
 
-    def __init__(self, namespace: str, tables: List[Dict[str, str]]):
+    def __init__(self, namespace: str, tables: List[Dict[str, str]], primary_key_field: str = "client_id"):
         """Get an instance of a GrowthAccountingView."""
+        self.primary_key_field = primary_key_field
+
         super().__init__(
             namespace, "growth_accounting", GrowthAccountingView.type, tables
         )
