@@ -179,7 +179,12 @@ class GrowthAccountingView(View):
         },
     ]
 
-    def __init__(self, namespace: str, tables: List[Dict[str, str]], primary_key_field: str = "client_id"):
+    def __init__(
+        self,
+        namespace: str,
+        tables: List[Dict[str, str]],
+        primary_key_field: str = "client_id",
+    ):
         """Get an instance of a GrowthAccountingView."""
         self.primary_key_field = primary_key_field
 
@@ -241,7 +246,9 @@ class GrowthAccountingView(View):
         for view_id, references in db_views[dataset].items():
             if view_id == "baseline_clients_last_seen":
                 yield GrowthAccountingView(
-                    namespace, [{"table": f"mozdata.{dataset}.{view_id}"}], primary_key_field=primary_key_field
+                    namespace,
+                    [{"table": f"mozdata.{dataset}.{view_id}"}],
+                    primary_key_field=primary_key_field,
                 )
 
     @classmethod
@@ -249,7 +256,11 @@ class GrowthAccountingView(View):
         klass, namespace: str, name: str, _dict: ViewDict
     ) -> GrowthAccountingView:
         """Get a view from a name and dict definition."""
-        return GrowthAccountingView(namespace, _dict["tables"], primary_key_field=_dict.get("primary_key_field", "client_id"))
+        return GrowthAccountingView(
+            namespace,
+            _dict["tables"],
+            primary_key_field=str(_dict.get("primary_key_field", "client_id")),
+        )
 
     def to_lookml(self, bq_client, v1_name: Optional[str]) -> Dict[str, Any]:
         """Generate LookML for this view."""
@@ -258,7 +269,9 @@ class GrowthAccountingView(View):
 
         # add dimensions and dimension groups
         dimensions = lookml_utils._generate_dimensions(bq_client, table) + deepcopy(
-            GrowthAccountingView._get_default_dimensions(primary_key_field=self.primary_key_field)
+            GrowthAccountingView._get_default_dimensions(
+                primary_key_field=self.primary_key_field
+            )
         )
 
         view_defn["dimensions"] = list(
