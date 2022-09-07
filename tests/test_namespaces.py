@@ -55,7 +55,7 @@ def custom_namespaces(tmp_path):
               views:
                 growth_accounting:
                   type: growth_accounting_view
-                  primary_key_field: user_id
+                  identifier_field: user_id
                   tables:
                   - table: mozdata.firefox_accounts.fxa_users_last_seen
             custom:
@@ -304,7 +304,7 @@ def test_namespaces_full(
                     "views": {
                         "growth_accounting": {
                             "type": "growth_accounting_view",
-                            "primary_key_field": "user_id",
+                            "identifier_field": "user_id",
                             "tables": [
                                 {
                                     "table": "mozdata.firefox_accounts.fxa_users_last_seen",

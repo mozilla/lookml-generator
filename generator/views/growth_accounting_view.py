@@ -13,7 +13,7 @@ class GrowthAccountingView(View):
     """A view for growth accounting measures."""
 
     type: str = "growth_accounting_view"
-    DEFAULT_PRIMARY_FIELD: str = "client_id"
+    DEFAULT_IDENTIFIER_FIELD: str = "client_id"
 
     other_dimensions: List[Dict[str, str]] = [
         {
@@ -184,10 +184,10 @@ class GrowthAccountingView(View):
         self,
         namespace: str,
         tables: List[Dict[str, str]],
-        primary_key_field: str = DEFAULT_PRIMARY_FIELD,
+        identifier_field: str = DEFAULT_IDENTIFIER_FIELD,
     ):
         """Get an instance of a GrowthAccountingView."""
-        self.primary_key_field = primary_key_field
+        self.identifier_field = identifier_field
 
         super().__init__(
             namespace, "growth_accounting", GrowthAccountingView.type, tables
@@ -195,7 +195,7 @@ class GrowthAccountingView(View):
 
     @classmethod
     def get_default_dimensions(
-        klass, primary_key_field: str = DEFAULT_PRIMARY_FIELD
+        klass, identifier_field: str = DEFAULT_IDENTIFIER_FIELD
     ) -> List[Dict[str, str]]:
         """Get dimensions to be added to GrowthAccountingView by default."""
         return [
@@ -224,8 +224,8 @@ class GrowthAccountingView(View):
                 "hidden": "yes",
             },
             {
-                "name": f"{primary_key_field}_day",
-                "sql": f"CONCAT(CAST(${{TABLE}}.submission_date AS STRING), ${{{primary_key_field}}})",
+                "name": f"{identifier_field}_day",
+                "sql": f"CONCAT(CAST(${{TABLE}}.submission_date AS STRING), ${{{identifier_field}}})",
                 "type": "string",
                 "hidden": "yes",
                 "primary_key": "yes",
@@ -239,7 +239,7 @@ class GrowthAccountingView(View):
         is_glean: bool,
         channels: List[Dict[str, str]],
         db_views: dict,
-        primary_key_field: str = DEFAULT_PRIMARY_FIELD,
+        identifier_field: str = DEFAULT_IDENTIFIER_FIELD,
     ) -> Iterator[GrowthAccountingView]:
         """Get Growth Accounting Views from db views and app variants."""
         dataset = next(
@@ -252,7 +252,7 @@ class GrowthAccountingView(View):
                 yield GrowthAccountingView(
                     namespace,
                     [{"table": f"mozdata.{dataset}.{view_id}"}],
-                    primary_key_field=primary_key_field,
+                    identifier_field=identifier_field,
                 )
 
     @classmethod
@@ -263,9 +263,9 @@ class GrowthAccountingView(View):
         return GrowthAccountingView(
             namespace,
             _dict["tables"],
-            primary_key_field=str(
+            identifier_field=str(
                 _dict.get(
-                    "primary_key_field", GrowthAccountingView.DEFAULT_PRIMARY_FIELD
+                    "identifier_field", GrowthAccountingView.DEFAULT_IDENTIFIER_FIELD
                 )
             ),
         )
@@ -278,7 +278,7 @@ class GrowthAccountingView(View):
         # add dimensions and dimension groups
         dimensions = lookml_utils._generate_dimensions(bq_client, table) + deepcopy(
             GrowthAccountingView.get_default_dimensions(
-                primary_key_field=self.primary_key_field
+                identifier_field=self.identifier_field
             )
         )
 
