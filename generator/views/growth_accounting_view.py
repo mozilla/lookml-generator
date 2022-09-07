@@ -13,6 +13,7 @@ class GrowthAccountingView(View):
     """A view for growth accounting measures."""
 
     type: str = "growth_accounting_view"
+    DEFAULT_PRIMARY_FIELD: str = "client_id"
 
     other_dimensions: List[Dict[str, str]] = [
         {
@@ -183,7 +184,7 @@ class GrowthAccountingView(View):
         self,
         namespace: str,
         tables: List[Dict[str, str]],
-        primary_key_field: str = "client_id",
+        primary_key_field: str = DEFAULT_PRIMARY_FIELD,
     ):
         """Get an instance of a GrowthAccountingView."""
         self.primary_key_field = primary_key_field
@@ -193,7 +194,10 @@ class GrowthAccountingView(View):
         )
 
     @classmethod
-    def _get_default_dimensions(klass, primary_key_field: str) -> List[Dict[str, str]]:
+    def get_default_dimensions(
+        klass, primary_key_field: str = DEFAULT_PRIMARY_FIELD
+    ) -> List[Dict[str, str]]:
+        """Get dimensions to be added to GrowthAccountingView by default."""
         return [
             {
                 "name": "active_this_week",
@@ -235,7 +239,7 @@ class GrowthAccountingView(View):
         is_glean: bool,
         channels: List[Dict[str, str]],
         db_views: dict,
-        primary_key_field: str = "client_id",
+        primary_key_field: str = DEFAULT_PRIMARY_FIELD,
     ) -> Iterator[GrowthAccountingView]:
         """Get Growth Accounting Views from db views and app variants."""
         dataset = next(
@@ -259,7 +263,11 @@ class GrowthAccountingView(View):
         return GrowthAccountingView(
             namespace,
             _dict["tables"],
-            primary_key_field=str(_dict.get("primary_key_field", "client_id")),
+            primary_key_field=str(
+                _dict.get(
+                    "primary_key_field", GrowthAccountingView.DEFAULT_PRIMARY_FIELD
+                )
+            ),
         )
 
     def to_lookml(self, bq_client, v1_name: Optional[str]) -> Dict[str, Any]:
@@ -269,7 +277,7 @@ class GrowthAccountingView(View):
 
         # add dimensions and dimension groups
         dimensions = lookml_utils._generate_dimensions(bq_client, table) + deepcopy(
-            GrowthAccountingView._get_default_dimensions(
+            GrowthAccountingView.get_default_dimensions(
                 primary_key_field=self.primary_key_field
             )
         )
