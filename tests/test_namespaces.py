@@ -47,6 +47,17 @@ def custom_namespaces(tmp_path):
                   projects:
                     tables:
                     - table: mozdata.operational_monitoring.projects
+            firefox_accounts:
+              pretty_name: Firefox Accounts
+              glean_app: false
+              owners:
+              - custom-owner@allizom.com
+              views:
+                growth_accounting:
+                  type: growth_accounting_view
+                  primary_key_field: user_id
+                  tables:
+                  - table: mozdata.firefox_accounts.fxa_users_last_seen
             custom:
               connection: bigquery-oauth
               glean_app: false
@@ -281,6 +292,25 @@ def test_namespaces_full(
                             ],
                             "type": "table_view",
                         },
+                    },
+                },
+                "firefox_accounts": {
+                    "glean_app": False,
+                    "owners": [
+                        "custom-owner@allizom.com",
+                    ],
+                    "pretty_name": "Firefox Accounts",
+                    "spoke": "looker-spoke-default",
+                    "views": {
+                        "growth_accounting": {
+                            "type": "growth_accounting_view",
+                            "primary_key_field": "user_id",
+                            "tables": [
+                                {
+                                    "table": "mozdata.firefox_accounts.fxa_users_last_seen",
+                                }
+                            ],
+                        }
                     },
                 },
                 "glean-app": {
