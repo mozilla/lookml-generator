@@ -1564,7 +1564,7 @@ def test_lookml_actual_growth_accounting_view(
                             "sql": "${TABLE}.document_id",
                         },
                     ]
-                    + GrowthAccountingView.default_dimensions,
+                    + GrowthAccountingView.get_default_dimensions(),
                     "measures": GrowthAccountingView.default_measures,
                 }
             ]
