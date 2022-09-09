@@ -122,13 +122,12 @@ is the following:
 3. Once the changes are merged and a new release has been pushed, re-run the DAG and the changes
    should take effect.
 
-## Generate Command Explained
-_high level explanation_
+## `generate` Command Explained - High Level Explanation
 
-When `make run` is executed a docker container is spinned up using the latest `lookml-generator` docker image on your machine and runs the `generate` script (can be found [here](bin/generate)) using configuration defined on the top of the script unless [overwritten using environment variables](./docker-compose.yml#L13-L25) - see the `Container Development` section above.
+When `make run` is executed a Docker container is spun up using the latest `lookml-generator` Docker image on your machine and runs the [`generate` script](bin/generate) using configuration defined at the top of the script unless [overridden using environment variables](./docker-compose.yml#L13-L25) (see the [Container Development](#container-development) section above).
 
-Next, the process authenticates into git and clone the `looker-hub` repository, creates the branch defined in the `HUB_BRANCH_PUBLISH` config variable both locally and in the remote. Then it proceeds to checkout into the `base` branch (looker-hub) and pulls it from the remote.
+Next, the process authenticates with GitHub, clones the [`looker-hub` repository](https://github.com/mozilla/looker-hub), and creates the branch defined in the `HUB_BRANCH_PUBLISH` config variable both locally and in the remote. Then it proceeds to checkout into the looker-hub `base` branch and pulls it from the remote.
 
-Once the setup is done, the process generated `namespaces.yaml` and uses it to generate lookml code. A git diff is executed to ensure that the files that already exist in the `base` branch are not being modified. If changes are detected then the process exists with an error code. Otherwise, it proceeds to create a commit and push it to the remote dev branch created earlier.
+Once the setup is done, the process generates `namespaces.yaml` and uses it to generate LookML code. A git diff is executed to ensure that the files that already exist in the `base` branch are not being modified. If changes are detected then the process exists with an error code. Otherwise, it proceeds to create a commit and push it to the remote dev branch created earlier.
 
-The entire process results in a new branch in `looker-hub` with brand new generated lookml code which can be tested by going to Looker, switching to the `development mode` and selecting dev the branch just created/updated by this command. This will result in Looker using the brand new lookml code just generated.
+When following the `Container Development` steps, the entire process results in a dev branch in `looker-hub` with brand new generated LookML code which can be tested by going to Looker, switching to the "development mode" and selecting the dev branch just created/updated by this command. This will result in Looker using the brand new LookML code just generated. Otherwise, changes merged into `main` in this repo will become available on looker-hub `main` when the scheduled Airflow job runs.
