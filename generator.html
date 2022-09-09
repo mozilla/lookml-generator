@@ -32,6 +32,7 @@
     <li><a href="#testing-generation-locally">Testing generation locally</a></li>
     <li><a href="#container-development">Container Development</a></li>
     <li><a href="#deploying-new-lookml-generator-changes">Deploying new <code>lookml-generator</code> changes</a></li>
+    <li><a href="#generate-command-explained-high-level-explanation"><code>generate</code> Command Explained - High Level Explanation</a></li>
   </ul></li>
   <li><a href="#namespacesyaml"><code>namespaces.yaml</code></a>
   <ul>
@@ -206,6 +207,16 @@ but they can be run manually by clearing the <code>lookml_generator_staging</cod
 <li>Once the changes are merged and a new release has been pushed, re-run the DAG and the changes
 should take effect.</li>
 </ol>
+
+<h2 id="generate-command-explained-high-level-explanation"><code>generate</code> Command Explained - High Level Explanation</h2>
+
+<p>When <code>make run</code> is executed a Docker container is spun up using the latest <code>lookml-generator</code> Docker image on your machine and runs the <a href="bin/generate"><code>generate</code> script</a> using configuration defined at the top of the script unless <a href="./docker-compose.yml#L13-L25">overridden using environment variables</a> (see the <a href="#container-development">Container Development</a> section above).</p>
+
+<p>Next, the process authenticates with GitHub, clones the <a href="https://github.com/mozilla/looker-hub"><code>looker-hub</code> repository</a>, and creates the branch defined in the <code>HUB_BRANCH_PUBLISH</code> config variable both locally and in the remote. Then it proceeds to checkout into the looker-hub <code>base</code> branch and pulls it from the remote.</p>
+
+<p>Once the setup is done, the process generates <code>namespaces.yaml</code> and uses it to generate LookML code. A git diff is executed to ensure that the files that already exist in the <code>base</code> branch are not being modified. If changes are detected then the process exists with an error code. Otherwise, it proceeds to create a commit and push it to the remote dev branch created earlier.</p>
+
+<p>When following the <code>Container Development</code> steps, the entire process results in a dev branch in <code>looker-hub</code> with brand new generated LookML code which can be tested by going to Looker, switching to the "development mode" and selecting the dev branch just created/updated by this command. This will result in Looker using the brand new LookML code just generated. Otherwise, changes merged into <code>main</code> in this repo will become available on looker-hub <code>main</code> when the scheduled Airflow job runs.</p>
 
 <h1 id="namespacesyaml"><code>namespaces.yaml</code></h1>
 
