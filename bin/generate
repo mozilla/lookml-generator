@@ -107,8 +107,8 @@ function setup_hub() {
     git clone "$HUB_REPO_URL"
     cd looker-hub
     git fetch --all
-    # If publish branch doesn't exist, create it from source
-    git checkout "$HUB_BRANCH_PUBLISH" || (git checkout "$HUB_BRANCH_SOURCE" && git checkout -b "$HUB_BRANCH_PUBLISH")
+    # If publish branch doesn't exist, create it from main
+    git checkout "$HUB_BRANCH_PUBLISH" || (git checkout main && git checkout -b "$HUB_BRANCH_PUBLISH")
     git checkout "$HUB_BRANCH_SOURCE"
 
     popd
