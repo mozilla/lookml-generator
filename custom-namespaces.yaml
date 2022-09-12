@@ -342,6 +342,10 @@ firefox_accounts:
       tables:
         - channel: release
           table: mozdata.firefox_accounts.fxa_users_first_seen
+    fxa_users_services_first_seen_table:
+      type: table_view
+      tables:
+        table: mozdata.firefox_accounts.fxa_users_services_first_seen
     fxa_users_services_daily_table:
       type: table_view
       tables:
