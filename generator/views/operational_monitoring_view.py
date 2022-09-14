@@ -1,7 +1,6 @@
 """Class to describe an Operational Monitoring View."""
 from __future__ import annotations
 
-from textwrap import dedent
 from typing import Any, Dict, List, Optional
 
 from . import lookml_utils
@@ -10,9 +9,12 @@ from .view import ViewDict
 
 ALLOWED_DIMENSIONS = {
     "branch",
-    "probe",
-    "value__VALUES__key",
-    "value__VALUES__value",
+    "metric",
+    "statistic",
+    "point",
+    "parameter",
+    "upper",
+    "lower",
 }
 
 
@@ -20,7 +22,6 @@ class OperationalMonitoringView(PingView):
     """A view on a operational monitoring table."""
 
     type: str = "operational_monitoring_view"
-    percentile_ci_labels = ["percentile", "low", "high"]
 
     def __init__(self, namespace: str, name: str, tables: List[Dict[str, Any]]):
         """Create instance of a OperationalMonitoringView."""
@@ -40,34 +41,6 @@ class OperationalMonitoringView(PingView):
                 "sql": xaxis_to_sql_mapping[xaxis],
             }
         ]
-        self.parameters: List[Dict[str, str]] = [
-            {
-                "name": "percentile_conf",
-                "type": "number",
-                "label": "Percentile",
-                "default_value": "50.0",
-            }
-        ]
-
-    def _percentile_measure(self, percentile_ci_label) -> Dict[str, str]:
-        return {
-            "name": percentile_ci_label,
-            "type": "number",
-            "sql": dedent(
-                f"""
-                `moz-fx-data-shared-prod`.udf_js.jackknife_percentile_ci(
-                    {{% parameter percentile_conf %}},
-                    STRUCT(
-                        mozfun.hist.merge(
-                          ARRAY_AGG(
-                            ${{TABLE}}.value IGNORE NULLS
-                          )
-                        ).values AS values
-                    )
-                ).{percentile_ci_label}
-            """
-            ),
-        }
 
     @classmethod
     def from_dict(
@@ -98,11 +71,6 @@ class OperationalMonitoringView(PingView):
                     "name": self.name,
                     "sql_table_name": reference_table,
                     "dimensions": self.dimensions,
-                    "parameters": self.parameters,
-                    "measures": [
-                        self._percentile_measure(label)
-                        for label in self.percentile_ci_labels
-                    ],
                 }
             ]
         }

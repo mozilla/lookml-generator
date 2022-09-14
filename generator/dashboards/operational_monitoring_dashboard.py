@@ -12,13 +12,6 @@ class OperationalMonitoringDashboard(Dashboard):
 
     type: str = "operational_monitoring_dashboard"
 
-    OPMON_DASH_EXCLUDED_FIELDS: List[str] = [
-        "branch",
-        "probe",
-        "histogram__VALUES__key",
-        "histogram__VALUES__value",
-    ]
-
     def __init__(
         self,
         title: str,
@@ -101,16 +94,17 @@ class OperationalMonitoringDashboard(Dashboard):
                 series_colors = self._map_series_to_colours(
                     table_defn["branches"], explore
                 )
-                for metric in table_defn.get("probes", []):
+                for summary in table_defn.get("summaries", []):
                     if self.compact_visualization:
-                        title = "Probe"
+                        title = "Metric"
                     else:
-                        title = lookml_utils.slug_to_title(metric)
+                        title = lookml_utils.slug_to_title(summary["metric"])
 
                     kwargs["elements"].append(
                         {
                             "title": title,
-                            "metric": metric,
+                            "metric": summary["metric"],
+                            "statistic": summary["statistic"],
                             "explore": explore,
                             "series_colors": series_colors,
                             "xaxis": self.xaxis,
@@ -124,7 +118,8 @@ class OperationalMonitoringDashboard(Dashboard):
                         kwargs["elements"].append(
                             {
                                 "title": f"{title} - By {self.group_by_dimension}",
-                                "metric": metric,
+                                "metric": summary["metric"],
+                                "statistic": summary["statistic"],
                                 "explore": explore,
                                 "series_colors": series_colors,
                                 "xaxis": self.xaxis,
