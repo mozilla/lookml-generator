@@ -100,12 +100,11 @@ def _get_opmon(bq_client: bigquery.Client, namespaces: Dict[str, Any]):
         branches = project.get("branches", ["enabled", "disabled"])
 
         # append view and explore for data type
-        project_data_type_id = f"{table_prefix}"
-        table = f"{PROD_PROJECT}.{OPMON_DATASET}.{table_prefix}"
+        table = f"{PROD_PROJECT}.{OPMON_DATASET}.{table_prefix}_statistics"
         dimensions = operational_monitoring_utils.get_dimension_defaults(
             bq_client, table, project["dimensions"]
         )
-        om_content["views"][project_data_type_id] = {
+        om_content["views"][table_prefix] = {
             "type": "operational_monitoring_view",
             "tables": [
                 {
@@ -115,13 +114,13 @@ def _get_opmon(bq_client: bigquery.Client, namespaces: Dict[str, Any]):
                 }
             ],
         }
-        om_content["explores"][project_data_type_id] = {
+        om_content["explores"][table_prefix] = {
             "type": "operational_monitoring_explore",
             "views": {"base_view": f"{table_prefix}"},
             "branches": branches,
             "xaxis": project["xaxis"],
             "dimensions": dimensions,
-            "probes": [p["name"] for p in project["probes"]],
+            "summaries": project["summaries"],
         }
 
         if "alerting" in project and project["alerting"]:
@@ -145,7 +144,7 @@ def _get_opmon(bq_client: bigquery.Client, namespaces: Dict[str, Any]):
             "tables": [
                 {
                     "explore": f"{table_prefix}",
-                    "table": f"{PROD_PROJECT}.{OPMON_DATASET}.{table_prefix}",
+                    "table": f"{PROD_PROJECT}.{OPMON_DATASET}.{table_prefix}_statistics",
                     "branches": branches,
                     "xaxis": project["xaxis"],
                     "compact_visualization": project.get(
@@ -153,7 +152,7 @@ def _get_opmon(bq_client: bigquery.Client, namespaces: Dict[str, Any]):
                     ),
                     "dimensions": dimensions,
                     "group_by_dimension": project.get("group_by_dimension", None),
-                    "probes": [p["name"] for p in project["probes"]],
+                    "summaries": project["summaries"],
                 }
             ],
         }

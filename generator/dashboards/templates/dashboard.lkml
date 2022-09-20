@@ -6,15 +6,24 @@
   elements:
   {% for element in elements -%}
   - title: {{element.title}}
-    name: {{element.title}}
+    name: {{element.title}}_{{element.statistic}}
+    note_state: expanded
+    note_display: above
+    note_text: {{element.statistic.title()}}
     explore: {{element.explore}}
+    {% if element.statistic == "percentile" -%}
     type: "ci-line-chart"
+    {% else -%}
+    type: looker_line
+    {% endif -%}
     fields: [
       {{element.explore}}.{{element.xaxis}},
       {{element.explore}}.branch,
-      {{element.explore}}.high,
-      {{element.explore}}.low,
-      {{element.explore}}.percentile
+      {% if element.statistic == "percentile" -%}
+      {{element.explore}}.upper,
+      {{element.explore}}.lower,
+      {% endif -%}
+      {{element.explore}}.point
     ]
     pivots: [
       {{element.explore}}.branch 
@@ -22,25 +31,28 @@
     ]
     {% if not compact_visualization -%}
     filters:
-      {{element.explore}}.probe: {{element.metric}}
+      {{element.explore}}.metric: {{element.metric}}
+      {{element.explore}}.statistic: {{element.statistic}}
     {% endif -%}
     row: {{element.row}}
     col: {{element.col}}
     width: 12
     height: 8
     field_x: {{element.explore}}.{{element.xaxis}}
-    field_y: {{element.explore}}.percentile
+    field_y: {{element.explore}}.point
     log_scale: false
-    ci_lower: {{element.explore}}.low
-    ci_upper: {{element.explore}}.high
+    ci_lower: {{element.explore}}.lower
+    ci_upper: {{element.explore}}.upper
     show_grid: true
     listen:
-      Percentile: {{element.explore}}.percentile_conf
+      {%- if element.statistic == "percentile" %}
+      Percentile: {{element.explore}}.parameter
+      {%- endif %}
       {%- for dimension in dimensions %}
       {{dimension.title}}: {{element.explore}}.{{dimension.name}}
       {%- endfor %}
       {% if compact_visualization -%}
-      Probe: {{element.explore}}.probe
+      Metric: {{element.explore}}.metric
       {% endif -%}
     {%- for branch, color in element.series_colors.items() %}
     {{ branch }}: "{{ color }}"
@@ -54,7 +66,7 @@
     explore: {{alerts.explore}}
     type: looker_grid
     fields: [{{alerts.explore}}.submission_date,
-      {{alerts.explore}}.probe, {{alerts.explore}}.percentile,
+      {{alerts.explore}}.metric, {{alerts.explore}}.statistic, {{alerts.explore}}.percentile,
       {{alerts.explore}}.message, {{alerts.explore}}.branch, {{alerts.explore}}.errors]
     sorts: [{{alerts.explore}}.submission_date
         desc]
@@ -107,31 +119,24 @@
   filters:
   - name: Percentile
     title: Percentile
-    type: number_filter
+    type: field_filter
     default_value: '50'
     allow_multiple_values: false
     required: true
     ui_config:
-      type: dropdown_menu
+      type: slider
       display: inline
-      options:
-      - '10'
-      - '20'
-      - '30'
-      - '40'
-      - '50'
-      - '60'
-      - '70'
-      - '80'
-      - '90'
-      - '95'
-      - '99'
+      options: []
+    model: operational_monitoring
+    explore: {{ elements[0].explore }}
+    listens_to_filters: []
+    field: {{ elements[0].explore }}.parameter
   {% if compact_visualization -%}
-  - name: Probe
-    title: Probe
+  - name: Metric
+    title: Metric
     type: field_filter
     default_value: '{{ elements[0].metric }}'
-    allow_multiple_values: true
+    allow_multiple_values: false
     required: true
     ui_config:
       type: dropdown_menu
@@ -139,7 +144,20 @@
     model: operational_monitoring
     explore: {{ elements[0].explore }}
     listens_to_filters: []
-    field: {{ elements[0].explore }}.probe
+    field: {{ elements[0].explore }}.metric
+  - name: Statistic
+    title: Statistic
+    type: field_filter
+    default_value: '{{ elements[0].statistic }}'
+    allow_multiple_values: false
+    required: true
+    ui_config:
+      type: dropdown_menu
+      display: popover
+    model: operational_monitoring
+    explore: {{ elements[0].explore }}
+    listens_to_filters: []
+    field: {{ elements[0].explore }}.statistic
   {% endif -%}
 
   {% for dimension in dimensions -%}
@@ -171,5 +189,5 @@
       {% for option in dimension.options | sort -%}
       - '{{option}}'
       {% endfor %}
-    {% endif %}
+  {% endif %}
   {% endfor -%}

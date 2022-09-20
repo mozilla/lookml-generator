@@ -166,9 +166,9 @@ class MockClient:
                             "name": "OpMon",
                             "branches": ["enabled", "disabled"],
                             "xaxis": "submission_date",
-                            "probes": [
-                                {"name": "GC_MS", "agg_type": "histogram"},
-                                {"name": "GC_MS_CONTENT", "agg_type": "histogram"},
+                            "summaries": [
+                                {"metric": "GC_MS", "statistic": "mean"},
+                                {"metric": "GC_MS_CONTENT", "statistic": "percentile"},
                             ],
                             "dimensions": {
                                 "cores_count": {"default": "4", "options": ["4", "1"]}
@@ -422,8 +422,14 @@ def test_namespaces_full(
                                     },
                                     "explore": "op_mon",
                                     "group_by_dimension": None,
-                                    "probes": ["GC_MS", "GC_MS_CONTENT"],
-                                    "table": "moz-fx-data-shared-prod.operational_monitoring.op_mon",
+                                    "summaries": [
+                                        {"metric": "GC_MS", "statistic": "mean"},
+                                        {
+                                            "metric": "GC_MS_CONTENT",
+                                            "statistic": "percentile",
+                                        },
+                                    ],
+                                    "table": "moz-fx-data-shared-prod.operational_monitoring.op_mon_statistics",
                                     "xaxis": "submission_date",
                                 }
                             ],
@@ -437,7 +443,10 @@ def test_namespaces_full(
                             "dimensions": {
                                 "cores_count": {"default": "4", "options": ["4", "1"]}
                             },
-                            "probes": ["GC_MS", "GC_MS_CONTENT"],
+                            "summaries": [
+                                {"metric": "GC_MS", "statistic": "mean"},
+                                {"metric": "GC_MS_CONTENT", "statistic": "percentile"},
+                            ],
                             "type": "operational_monitoring_explore",
                             "views": {"base_view": "op_mon"},
                             "xaxis": "submission_date",
@@ -457,7 +466,7 @@ def test_namespaces_full(
                                             "options": ["4", "1"],
                                         }
                                     },
-                                    "table": "moz-fx-data-shared-prod.operational_monitoring.op_mon",
+                                    "table": "moz-fx-data-shared-prod.operational_monitoring.op_mon_statistics",
                                     "xaxis": "submission_date",
                                 }
                             ],
