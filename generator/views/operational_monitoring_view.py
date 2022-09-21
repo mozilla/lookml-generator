@@ -1,7 +1,7 @@
 """Class to describe an Operational Monitoring View."""
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from . import lookml_utils
 from .ping_view import PingView
@@ -11,10 +11,7 @@ ALLOWED_DIMENSIONS = {
     "branch",
     "metric",
     "statistic",
-    "point",
     "parameter",
-    "upper",
-    "lower",
 }
 
 
@@ -71,6 +68,19 @@ class OperationalMonitoringView(PingView):
                     "name": self.name,
                     "sql_table_name": reference_table,
                     "dimensions": self.dimensions,
+                    "measures": self.get_measures(
+                        self.dimensions, reference_table, v1_name
+                    ),
                 }
             ]
         }
+
+    def get_measures(
+        self, dimensions: List[dict], table: str, v1_name: Optional[str]
+    ) -> List[Dict[str, Union[str, List[Dict[str, str]]]]]:
+        """Get OpMon measures."""
+        return [
+            {"name": "point", "type": "sum", "sql": "${TABLE}.point"},
+            {"name": "upper", "type": "sum", "sql": "${TABLE}.upper"},
+            {"name": "lower", "type": "sum", "sql": "${TABLE}.lower"},
+        ]

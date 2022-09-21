@@ -198,7 +198,6 @@ def test_view_lookml(operational_monitoring_view):
                         "sql": "${TABLE}.cores_count",
                         "type": "string",
                     },
-                    {"name": "lower", "sql": "${TABLE}.lower", "type": "number"},
                     {"name": "metric", "sql": "${TABLE}.metric", "type": "string"},
                     {"name": "os", "sql": "${TABLE}.os", "type": "string"},
                     {
@@ -206,16 +205,19 @@ def test_view_lookml(operational_monitoring_view):
                         "sql": "${TABLE}.parameter",
                         "type": "number",
                     },
-                    {"name": "point", "sql": "${TABLE}.point", "type": "number"},
                     {
                         "name": "statistic",
                         "sql": "${TABLE}.statistic",
                         "type": "string",
                     },
-                    {"name": "upper", "sql": "${TABLE}.upper", "type": "number"},
                 ],
                 "name": "fission",
                 "sql_table_name": "moz-fx-data-shared-prod.operational_monitoring.bug_123_test_statistics",
+                "measures": [
+                    {"name": "point", "sql": "${TABLE}.point", "type": "sum"},
+                    {"name": "upper", "sql": "${TABLE}.upper", "type": "sum"},
+                    {"name": "lower", "sql": "${TABLE}.lower", "type": "sum"},
+                ],
             }
         ]
     }
