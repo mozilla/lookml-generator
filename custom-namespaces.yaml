@@ -559,6 +559,10 @@ firefox_desktop:
       type: table_view
       tables:
         - table: mozdata.telemetry.crashes_daily
+    default_browser:
+      type: ping_view
+      tables:
+        - table: mozdata.default_browser_agent.default_browser
   explores:
     client_counts:
       type: client_counts_explore
@@ -578,6 +582,10 @@ firefox_desktop:
       views:
         base_view: events
         extended_view: desktop_events_table
+    default_browser:
+      type: ping_explore
+      views:
+        base_view: default_browser
 pocket:
   glean_app: false
   owners:
