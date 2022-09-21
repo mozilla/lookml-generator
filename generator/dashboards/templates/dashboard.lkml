@@ -7,9 +7,11 @@
   {% for element in elements -%}
   - title: {{element.title}}
     name: {{element.title}}_{{element.statistic}}
+    {% if not compact_visualization -%}
     note_state: expanded
     note_display: above
     note_text: {{element.statistic.title()}}
+    {% endif -%}
     explore: {{element.explore}}
     {% if element.statistic == "percentile" -%}
     type: "ci-line-chart"
@@ -53,6 +55,7 @@
       {%- endfor %}
       {% if compact_visualization -%}
       Metric: {{element.explore}}.metric
+      Statistic: {{element.explore}}.statistic
       {% endif -%}
     {%- for branch, color in element.series_colors.items() %}
     {{ branch }}: "{{ color }}"
@@ -66,7 +69,7 @@
     explore: {{alerts.explore}}
     type: looker_grid
     fields: [{{alerts.explore}}.submission_date,
-      {{alerts.explore}}.metric, {{alerts.explore}}.statistic, {{alerts.explore}}.percentile,
+      {{alerts.explore}}.metric, {{alerts.explore}}.statistic, {{alerts.explore}}.parameter,
       {{alerts.explore}}.message, {{alerts.explore}}.branch, {{alerts.explore}}.errors]
     sorts: [{{alerts.explore}}.submission_date
         desc]
@@ -156,7 +159,7 @@
       display: popover
     model: operational_monitoring
     explore: {{ elements[0].explore }}
-    listens_to_filters: []
+    listens_to_filters: [Metric]
     field: {{ elements[0].explore }}.statistic
   {% endif -%}
 
