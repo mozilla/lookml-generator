@@ -127,9 +127,8 @@
     allow_multiple_values: false
     required: true
     ui_config:
-      type: slider
-      display: inline
-      options: []
+      type: advanced
+      display: popover
     model: operational_monitoring
     explore: {{ elements[0].explore }}
     listens_to_filters: []
