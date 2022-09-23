@@ -68,7 +68,10 @@
     model: operational_monitoring
     explore: {{alerts.explore}}
     type: looker_grid
-    fields: [{{alerts.explore}}.submission_date,
+    fields: [{{alerts.explore}}.submission_date, {{alerts.explore}}.build_id,
+      {%- for dimension in dimensions %}
+      {{alerts.explore}}.{{dimension.name}},
+      {%- endfor %}
       {{alerts.explore}}.metric, {{alerts.explore}}.statistic, {{alerts.explore}}.parameter,
       {{alerts.explore}}.message, {{alerts.explore}}.branch, {{alerts.explore}}.errors]
     sorts: [{{alerts.explore}}.submission_date
