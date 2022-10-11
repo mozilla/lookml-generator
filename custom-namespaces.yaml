@@ -504,6 +504,14 @@ experimentation:
       tables:
         - channel: release
           table: moz-fx-data-shared-prod.telemetry_derived.experiment_search_aggregates_live_v1
+    mr_2022_weekly_statistics_desktop_existing_users:
+      type: table_view
+      tables:
+        - table: moz-fx-data-experiments.mozanalysis.statistics_106_major_release_firefox_existing_user_experience_weekly
+    mr_2022_weekly_statistic_desktop_new_users:
+      type: table_view
+      tables:
+        - table: moz-fx-data-experiments.mozanalysis.statistics_106_major_release_firefox_new_user_weekly
 firefox_desktop:
   glean_app: true
   views:
