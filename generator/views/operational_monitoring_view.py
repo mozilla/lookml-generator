@@ -36,6 +36,8 @@ class OperationalMonitoringView(PingView):
                 "name": xaxis,
                 "type": "date",
                 "sql": xaxis_to_sql_mapping[xaxis],
+                "datatype": "date",
+                "convert_tz": "no",
             }
         ]
 

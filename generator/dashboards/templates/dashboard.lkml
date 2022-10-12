@@ -28,7 +28,7 @@
       {{element.explore}}.point
     ]
     pivots: [
-      {{element.explore}}.branch 
+      {{element.explore}}.branch
       {%- if group_by_dimension and element.title.endswith(group_by_dimension) %}, {{element.explore}}.{{group_by_dimension}} {% endif %}
     ]
     {% if not compact_visualization -%}
@@ -47,6 +47,7 @@
     ci_upper: {{element.explore}}.upper
     show_grid: true
     listen:
+      Date: {{element.explore}}.{{element.xaxis}}
       {%- if element.statistic == "percentile" %}
       Percentile: {{element.explore}}.parameter
       {%- endif %}
@@ -116,13 +117,27 @@
     interpolation: linear
     defaults_version: 1
     series_types: {}
-    listen: {}
+    listen:
+      Date: {{alerts.explore}}.{{alerts.date}}
     row: {{ alerts.row }}
     col: {{ alerts.col }}
     width: 24
     height: 6
   {% endif %}
   filters:
+  - name: Date
+    title: Date
+    type: field_filter
+    allow_multiple_values: true
+    required: false
+    ui_config:
+      type: advanced
+      display: popover
+    model: operational_monitoring
+    explore: {{elements[0].explore}}
+    listens_to_filters: []
+    field: {{elements[0].explore}}.{{elements[0].xaxis}}
+
   - name: Percentile
     title: Percentile
     type: field_filter

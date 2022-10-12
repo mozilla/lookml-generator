@@ -28,6 +28,19 @@ class OperationalMonitoringAlertingView(OperationalMonitoringView):
                 "name": "submission_date",
                 "type": "date",
                 "sql": "${TABLE}.submission_date",
+                "datatype": "date",
+                "convert_tz": "no",
+            }
+        )
+
+        dimensions.append(
+            {
+                "name": "build_id_date",
+                "type": "date",
+                "hidden": "yes",
+                "sql": "PARSE_DATE('%Y%m%d', CAST(${TABLE}.build_id AS STRING))",
+                "datatype": "date",
+                "convert_tz": "no",
             }
         )
 
