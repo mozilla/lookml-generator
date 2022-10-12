@@ -78,6 +78,9 @@ class OperationalMonitoringDashboard(Dashboard):
                 kwargs["alerts"] = {
                     "explore": explore,
                     "col": 0,
+                    "date": (
+                        f"{self.xaxis}_date" if self.xaxis == "build_id" else self.xaxis
+                    ),
                 }
             else:
                 if len(kwargs["dimensions"]) == 0:

@@ -191,6 +191,8 @@ def test_view_lookml(operational_monitoring_view):
                         "sql": "PARSE_DATE('%Y%m%d', "
                         "CAST(${TABLE}.build_id AS STRING))",
                         "type": "date",
+                        "datatype": "date",
+                        "convert_tz": "no",
                     },
                     {"name": "branch", "sql": "${TABLE}.branch", "type": "string"},
                     {
@@ -280,6 +282,7 @@ def test_dashboard_lookml(operational_monitoring_dashboard):
     ci_upper: fission.upper
     show_grid: true
     listen:
+      Date: fission.build_id
       Cores Count: fission.cores_count
       Os: fission.os
 
@@ -317,6 +320,7 @@ def test_dashboard_lookml(operational_monitoring_dashboard):
     ci_upper: fission.upper
     show_grid: true
     listen:
+      Date: fission.build_id
       Percentile: fission.parameter
       Cores Count: fission.cores_count
       Os: fission.os
@@ -326,6 +330,19 @@ def test_dashboard_lookml(operational_monitoring_dashboard):
     defaults_version: 0
 
   filters:
+  - name: Date
+    title: Date
+    type: field_filter
+    allow_multiple_values: true
+    required: false
+    ui_config:
+      type: advanced
+      display: popover
+    model: operational_monitoring
+    explore: fission
+    listens_to_filters: []
+    field: fission.build_id
+
   - name: Percentile
     title: Percentile
     type: field_filter
