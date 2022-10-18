@@ -545,6 +545,10 @@ firefox_desktop:
       type: table_view
       tables:
         - table: mozdata.telemetry.clients_daily
+    clients_daily_joined_table:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.telemetry_derived.clients_daily_joined_v1
     client_counts:
       type: client_counts_view
       tables:
