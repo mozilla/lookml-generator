@@ -29,6 +29,15 @@ ALLOWED_TYPES = DISTRIBUTION_TYPES | {
     "rate",
     "timespan",
     "uuid",
+    "url",
+}
+
+# Bug 1737656 - some metric types are exposed under different names
+# We need to map to the new name when building dimensions.
+RENAMED_METRIC_TYPES = {
+    "jwe": "jwe2",
+    "text": "text2",
+    "url": "url2",
 }
 
 
@@ -241,7 +250,8 @@ class GleanPingView(PingView):
 
         sep = "" if not category else "_"
         label = name
-        looker_name = f"metrics__{metric.type}__{category}{sep}{name}"
+        type = RENAMED_METRIC_TYPES.get(metric.type, metric.type)
+        looker_name = f"metrics__{type}__{category}{sep}{name}"
         if suffix:
             label = f"{name}_{suffix}"
             looker_name = f"{looker_name}__{suffix}"

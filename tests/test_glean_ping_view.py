@@ -25,7 +25,12 @@ class MockClient:
                                 "string",
                                 "RECORD",
                                 fields=[SchemaField("fun_string_metric", "STRING")],
-                            )
+                            ),
+                            SchemaField(
+                                "url2",
+                                "RECORD",
+                                fields=[SchemaField("fun_url_metric", "STRING")],
+                            ),
                         ],
                     ),
                 ],
@@ -72,4 +77,44 @@ def test_kebab_case(mock_glean_ping):
     assert (
         lookml["views"][0]["dimensions"][0]["name"]
         == "metrics__string__fun_string_metric"
+    )
+
+
+@patch("generator.views.glean_ping_view.GleanPing")
+def test_url_metric(mock_glean_ping):
+    """
+    Tests that we handle URL metrics
+    """
+    mock_glean_ping.get_repos.return_value = [{"name": "glean-app"}]
+    glean_app = Mock()
+    glean_app.get_probes.return_value = [
+        GleanProbe(
+            "fun.url_metric",
+            {
+                "type": "url",
+                "history": [
+                    {
+                        "send_in_pings": ["dash-name"],
+                        "dates": {
+                            "first": "2020-01-01 00:00:00",
+                            "last": "2020-01-02 00:00:00",
+                        },
+                    }
+                ],
+                "name": "url_metric",
+            },
+        ),
+    ]
+    mock_glean_ping.return_value = glean_app
+    mock_bq_client = MockClient()
+    view = GleanPingView(
+        "glean_app",
+        "dash_name",
+        [{"channel": "release", "table": "mozdata.glean_app.dash_name"}],
+    )
+    lookml = view.to_lookml(mock_bq_client, "glean-app")
+    assert len(lookml["views"]) == 1
+    assert len(lookml["views"][0]["dimensions"]) == 1
+    assert (
+        lookml["views"][0]["dimensions"][0]["name"] == "metrics__url2__fun_url_metric"
     )
