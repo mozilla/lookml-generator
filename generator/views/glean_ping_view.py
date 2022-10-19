@@ -20,16 +20,19 @@ DISTRIBUTION_TYPES = {
 
 ALLOWED_TYPES = DISTRIBUTION_TYPES | {
     "boolean",
+    "labeled_boolean",
     "counter",
     "labeled_counter",
     "datetime",
     "jwe",
     "quantity",
     "string",
+    "labeled_string",
     "rate",
     "timespan",
     "uuid",
     "url",
+    "text",
 }
 
 # Bug 1737656 - some metric types are exposed under different names
