@@ -239,7 +239,7 @@ class MockClient:
                                 fields=[SchemaField("test_datetime", "STRING")],
                             ),
                             SchemaField(
-                                "jwe",
+                                "jwe2",
                                 "RECORD",
                                 fields=[SchemaField("test_jwe", "STRING")],
                             ),
@@ -398,6 +398,11 @@ class MockClient:
                                 "uuid",
                                 "RECORD",
                                 fields=[SchemaField("test_uuid", "STRING")],
+                            ),
+                            SchemaField(
+                                "url2",
+                                "RECORD",
+                                fields=[SchemaField("test_url", "STRING")],
                             ),
                         ],
                     ),
@@ -641,6 +646,15 @@ def msg_glean_probes():
                 "type": "uuid",
                 "history": history,
                 "name": "test.uuid",
+                "in-source": True,
+            },
+        ),
+        GleanProbe(
+            "test.url",
+            {
+                "type": "url",
+                "history": history,
+                "name": "test.url",
                 "in-source": True,
             },
         ),
@@ -1133,9 +1147,9 @@ def test_lookml_actual_metrics_view(
                         {
                             "group_item_label": "Jwe",
                             "group_label": "Test",
-                            "name": "metrics__jwe__test_jwe",
+                            "name": "metrics__jwe2__test_jwe",
                             "label": "Test Jwe",
-                            "sql": "${TABLE}.metrics.jwe.test_jwe",
+                            "sql": "${TABLE}.metrics.jwe2.test_jwe",
                             "type": "string",
                             "hidden": "no",
                             "links": [
@@ -1271,6 +1285,22 @@ def test_lookml_actual_metrics_view(
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
                                     "label": "Glean Dictionary reference for Test Uuid",
                                     "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/test_uuid",  # noqa: E501
+                                }
+                            ],
+                        },
+                        {
+                            "group_item_label": "Url",
+                            "group_label": "Test",
+                            "name": "metrics__url2__test_url",
+                            "label": "Test Url",
+                            "sql": "${TABLE}.metrics.url2.test_url",
+                            "type": "string",
+                            "hidden": "no",
+                            "links": [
+                                {
+                                    "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
+                                    "label": "Glean Dictionary reference for Test Url",
+                                    "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/test_url",  # noqa: E501
                                 }
                             ],
                         },
