@@ -296,9 +296,9 @@ jsonschema==3.2.0 \
     --hash=sha256:4e5b3cf8216f577bee9ce139cbe72eca3ea4f292ec60928ff24758ce626cd163 \
     --hash=sha256:c8a85b28d377cc7737e46e2d9f2b4f44ee3c0e1deac6bf46ddefc7187d30797a
     # via mozilla-schema-generator
-lkml==1.2.0 \
-    --hash=sha256:20b126e5a4ecef2217f9c21ff47e5354f672d76995038b039984ae5deb3e95ca \
-    --hash=sha256:ba31ca4749a0f749604331ff5fc29c586c9d9240251dd3232e46e283edde1d33
+lkml==1.3.0 \
+    --hash=sha256:05bf0717a2f2733a6b7681dc0f2cfc256a90ac64e979b3f6bf98f809dd279981 \
+    --hash=sha256:2452bbf763afd268bc371e05af46c3b8072830bf33ee55900b8b087c29267b1d
     # via -r requirements.in
 looker-sdk==22.18.0 \
     --hash=sha256:1c4e7f0227aac18c0bb026e6558c05288e463f66e428ca910b18b3b6302bc33c \
