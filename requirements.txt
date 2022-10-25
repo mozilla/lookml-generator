@@ -300,9 +300,9 @@ lkml==1.2.0 \
     --hash=sha256:20b126e5a4ecef2217f9c21ff47e5354f672d76995038b039984ae5deb3e95ca \
     --hash=sha256:ba31ca4749a0f749604331ff5fc29c586c9d9240251dd3232e46e283edde1d33
     # via -r requirements.in
-looker-sdk==22.16.0 \
-    --hash=sha256:8bca75c097beb7cdcbd520d57666f19a148449e8d23189ff60f7179f5be4d0fb \
-    --hash=sha256:ee31eea1c8cde4c10648a5cf0546a2df6686f2138828c966b838c5a5ae77f902
+looker-sdk==22.18.0 \
+    --hash=sha256:1c4e7f0227aac18c0bb026e6558c05288e463f66e428ca910b18b3b6302bc33c \
+    --hash=sha256:b52fbc41ec16c8ff34180e44365f32a179ccc458ffa82e8021298afb03148ff0
     # via -r requirements.in
 markupsafe==2.0.1 \
     --hash=sha256:01a9b8ea66f1658938f65b93a85ebe8bc016e6769611be228d797c9d998dd298 \
