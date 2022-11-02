@@ -1,6 +1,5 @@
 """Generate namespaces.yaml."""
 import fnmatch
-import gzip
 import json
 import re
 import tarfile
@@ -179,7 +178,7 @@ def _get_glean_apps(
     get_app_name = itemgetter("app_name")
     with urllib.request.urlopen(app_listings_uri) as f:
         # groupby requires input be sorted by key to produce one result per key
-        app_listings = sorted(json.loads(gzip.decompress(f.read())), key=get_app_name)
+        app_listings = sorted(json.loads(f.read()), key=get_app_name)
 
     apps = []
     for app_name, group in groupby(app_listings, get_app_name):
