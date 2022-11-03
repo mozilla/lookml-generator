@@ -269,7 +269,7 @@ def test_dashboard_lookml(operational_monitoring_dashboard):
       fission.branch
     ]
     filters:
-      fission.metric: GC_MS
+      fission.metric: 'GC_MS'
       fission.statistic: mean
     row: 0
     col: 0
@@ -307,7 +307,7 @@ def test_dashboard_lookml(operational_monitoring_dashboard):
       fission.branch
     ]
     filters:
-      fission.metric: GC_MS_CONTENT
+      fission.metric: 'GC_MS_CONTENT'
       fission.statistic: percentile
     row: 0
     col: 12
