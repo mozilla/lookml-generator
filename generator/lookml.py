@@ -31,7 +31,8 @@ def _generate_views(
         )
         path = out_dir / f"{view.name}.view.lkml"
         lookml = view.to_lookml(client, v1_name)
-        path.write_text(FILE_HEADER + lkml.dump(lookml))
+        # lkml.dump may return None, in which case write an empty file
+        path.write_text(FILE_HEADER + (lkml.dump(lookml) or ""))
         yield path
 
 
@@ -59,7 +60,8 @@ def _generate_explores(
             "explores": explore.to_lookml(client, v1_name),
         }
         path = out_dir / (explore_name + ".explore.lkml")
-        path.write_text(FILE_HEADER + lkml.dump(file_lookml))
+        # lkml.dump may return None, in which case write an empty file
+        path.write_text(FILE_HEADER + (lkml.dump(file_lookml) or ""))
         yield path
 
 
