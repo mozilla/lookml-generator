@@ -5,7 +5,8 @@ import re
 import tarfile
 import urllib.request
 import warnings
-from collections import Mapping, defaultdict
+from collections import defaultdict
+from collections.abc import Mapping
 from datetime import datetime
 from io import BytesIO
 from itertools import groupby
