@@ -2,7 +2,7 @@
 operational_monitoring:
   glean_app: false
   owners:
-    - msamuel@mozilla.com
+    - ascholtz@mozilla.com
   pretty_name: Operational Monitoring
   views:
     projects:
