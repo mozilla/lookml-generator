@@ -114,7 +114,7 @@ class OperationalMonitoringDashboard(Dashboard):
                         summary_metric_groups.append(None)
 
                     for metric_group in summary_metric_groups:
-                        if metric_group in seen_metric_groups:
+                        if (metric_group, summary["statistic"]) in seen_metric_groups:
                             continue
 
                         if self.compact_visualization:
@@ -143,7 +143,9 @@ class OperationalMonitoringDashboard(Dashboard):
                             }
                         )
                         if metric_group is not None:
-                            seen_metric_groups.append(metric_group)
+                            seen_metric_groups.append(
+                                (metric_group, summary["statistic"])
+                            )
                         graph_index += 1
 
                         if self.group_by_dimension:
