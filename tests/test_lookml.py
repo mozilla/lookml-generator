@@ -145,12 +145,6 @@ class MockClient:
                                 "RECORD",
                                 fields=[
                                     SchemaField("test_boolean", "BOOLEAN"),
-                                ],
-                            ),
-                            SchemaField(
-                                "boolean",
-                                "RECORD",
-                                fields=[
                                     SchemaField(
                                         "test_boolean_not_in_source", "BOOLEAN"
                                     ),
@@ -170,19 +164,25 @@ class MockClient:
                             SchemaField(
                                 "labeled_counter",
                                 "RECORD",
-                                "REPEATED",
                                 fields=[
-                                    SchemaField("key", "STRING"),
-                                    SchemaField("value", "INTEGER"),
-                                ],
-                            ),
-                            SchemaField(
-                                "labeled_counter_not_in_source",
-                                "RECORD",
-                                "REPEATED",
-                                fields=[
-                                    SchemaField("key", "STRING"),
-                                    SchemaField("value", "INTEGER"),
+                                    SchemaField(
+                                        "test_labeled_counter",
+                                        "RECORD",
+                                        "REPEATED",
+                                        fields=[
+                                            SchemaField("key", "STRING"),
+                                            SchemaField("value", "INTEGER"),
+                                        ],
+                                    ),
+                                    SchemaField(
+                                        "test_labeled_counter_not_in_source",
+                                        "RECORD",
+                                        "REPEATED",
+                                        fields=[
+                                            SchemaField("key", "STRING"),
+                                            SchemaField("value", "INTEGER"),
+                                        ],
+                                    ),
                                 ],
                             ),
                             SchemaField(
@@ -532,7 +532,7 @@ def msg_glean_probes():
             "test.labeled_counter",
             {
                 "type": "labeled_counter",
-                "history": history_with_descr,
+                "history": history,
                 "name": "test.labeled_counter",
                 "in-source": True,
             },
@@ -541,7 +541,7 @@ def msg_glean_probes():
             "test.labeled_counter_not_in_source",
             {
                 "type": "labeled_counter",
-                "history": history_with_descr,
+                "history": history,
                 "name": "test.labeled_counter_not_in_source",
                 "in-source": False,
             },
@@ -1075,6 +1075,36 @@ def test_lookml_actual_metrics_view(
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
                                     "label": "Glean Dictionary reference for Test Counter",
                                     "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/test_counter",  # noqa: E501
+                                }
+                            ],
+                        },
+                        {
+                            "group_item_label": "Labeled Counter",
+                            "group_label": "Test",
+                            "name": "metrics__labeled_counter__test_labeled_counter",
+                            "label": "Test Labeled Counter",
+                            "sql": "${TABLE}.metrics.labeled_counter.test_labeled_counter",
+                            "hidden": "yes",
+                            "links": [
+                                {
+                                    "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
+                                    "label": "Glean Dictionary reference for Test Labeled Counter",
+                                    "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/test_labeled_counter",  # noqa: E501
+                                }
+                            ],
+                        },
+                        {
+                            "group_item_label": "Labeled Counter Not In Source",
+                            "group_label": "Test",
+                            "name": "metrics__labeled_counter__test_labeled_counter_not_in_source",
+                            "label": "Test Labeled Counter Not In Source",
+                            "sql": "${TABLE}.metrics.labeled_counter.test_labeled_counter_not_in_source",  # noqa: E501
+                            "hidden": "yes",
+                            "links": [
+                                {
+                                    "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
+                                    "label": "Glean Dictionary reference for Test Labeled Counter Not In Source",  # noqa: E501
+                                    "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/test_labeled_counter_not_in_source",  # noqa: E501
                                 }
                             ],
                         },
