@@ -162,6 +162,14 @@ contextual_services:
     - rburwei@mozilla.com
   spoke: looker-spoke-private
   views:
+    event_aggregates_spons_tiles:
+      type: ping_view
+      tables:
+        - table: mozdata.contextual_services.event_aggregates_spons_tiles
+    event_aggregates_suggest:
+      type: ping_view
+      tables:
+        - table: mozdata.contextual_services.event_aggregates_suggest
     event_aggregates:
       type: ping_view
       tables:
@@ -201,6 +209,14 @@ contextual_services:
           table: mozdata.org_mozilla_ios_fennec.topsites_impression
       type: ping_view
   explores:
+    event_aggregates_spons_tiles:
+      type: ping_explore
+      views:
+        base_view: event_aggregates_spons_tiles
+    event_aggregates_suggest:
+      type: ping_explore
+      views:
+        base_view: event_aggregates_suggest
     event_aggregates:
       type: ping_explore
       views:
@@ -553,6 +569,14 @@ firefox_desktop:
       type: client_counts_view
       tables:
         - table: mozdata.telemetry.clients_daily
+    sponsored_tiles_clients_daily:
+      type: client_counts_view
+      tables:
+        - table: mozdata.telemetry.sponsored_tiles_clients_daily
+    suggest_clients_daily:
+      type: client_counts_view
+      tables:
+        - table: mozdata.telemetry.suggest_clients_daily
     funnel_analysis:
       type: funnel_analysis_view
       tables:
@@ -595,6 +619,14 @@ firefox_desktop:
       views:
         base_view: client_counts
         extended_view: clients_daily_table
+    sponsored_tiles_clients_daily:
+      type: client_counts_explore
+      views:
+        base_view: sponsored_tiles_clients_daily
+    suggest_clients_daily:
+      type: client_counts_explore
+      views:
+        base_view: suggest_clients_daily
     funnel_analysis:
       type: funnel_analysis_explore
       views:
