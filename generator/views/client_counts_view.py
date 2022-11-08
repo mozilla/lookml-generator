@@ -67,9 +67,14 @@ class ClientCountsView(View):
         }
     ]
 
-    def __init__(self, namespace: str, tables: List[Dict[str, str]]):
+    def __init__(
+        self,
+        namespace: str,
+        tables: List[Dict[str, str]],
+        name: str = "client_counts",
+    ):
         """Get an instance of a ClientCountsView."""
-        super().__init__(namespace, "client_counts", ClientCountsView.type, tables)
+        super().__init__(namespace, name, ClientCountsView.type, tables)
 
     @classmethod
     def from_db_views(
@@ -99,7 +104,7 @@ class ClientCountsView(View):
         klass, namespace: str, name: str, _dict: ViewDict
     ) -> ClientCountsView:
         """Get a view from a name and dict definition."""
-        return ClientCountsView(namespace, _dict["tables"])
+        return ClientCountsView(namespace, _dict["tables"], name)
 
     def to_lookml(self, bq_client, v1_name: Optional[str]) -> Dict[str, Any]:
         """Generate LookML for this view."""
