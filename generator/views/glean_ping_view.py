@@ -78,14 +78,17 @@ class GleanPingView(PingView):
             self.tables[0],
         )["table"]
         dimensions = self.get_dimensions(bq_client, table, v1_name)
+        dimension_names = {dimension["name"] for dimension in dimensions}
 
         client_id_field = self.get_client_id(dimensions, table)
 
         view_definitions = []
         metrics = self._get_glean_metrics(v1_name)
         for metric in metrics:
+            looker_name = self._to_looker_name(metric)
+            if looker_name not in dimension_names:
+                continue  # skip metrics with no matching dimension
             if metric.type == "labeled_counter":
-                looker_name = self._to_looker_name(metric)
                 view_name = f"{self.name}__{looker_name}"
                 suggest_name = f"suggest__{view_name}"
 
