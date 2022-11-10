@@ -574,7 +574,7 @@ firefox_desktop:
       tables:
         - table: mozdata.telemetry.sponsored_tiles_clients_daily
     sponsored_tiles_clients_daily:
-      type: client_counts_view
+      type: table_view
       tables:
         - table: mozdata.telemetry.sponsored_tiles_clients_daily
     suggest_clients_daily_table:
@@ -582,7 +582,7 @@ firefox_desktop:
       tables:
         - table: mozdata.telemetry.suggest_clients_daily
     suggest_clients_daily:
-      type: client_counts_view
+      type: table_view
       tables:
         - table: mozdata.telemetry.suggest_clients_daily
     funnel_analysis:
@@ -627,16 +627,6 @@ firefox_desktop:
       views:
         base_view: client_counts
         extended_view: clients_daily_table
-    sponsored_tiles_clients_daily:
-      type: client_counts_explore
-      views:
-        base_view: sponsored_tiles_clients_daily
-        extended_view: sponsored_tiles_clients_daily_table
-    suggest_clients_daily:
-      type: client_counts_explore
-      views:
-        base_view: suggest_clients_daily
-        extended_view: suggest_clients_daily_table
     funnel_analysis:
       type: funnel_analysis_explore
       views:
