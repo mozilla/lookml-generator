@@ -425,7 +425,7 @@ revenue_private:
     revenue_budget_2022:
       type: table_view
       tables:
-        - table: mozdata.revenue_cat3_analysis.budget_complete_2022       
+        - table: mozdata.revenue_cat3_analysis.budget_complete_2022
 firefox_ios:
   owners:
     - athomas@mozilla.com
@@ -680,12 +680,29 @@ monitoring:
     - anicholson@mozilla.com
     - mhirose@mozilla.com
     - kignasiak@mozilla.com
+    - wichan@mozilla.com
   pretty_name: Monitoring (Data Pipeline)
   views:
     average_ping_sizes:
       type: ping_view
       tables:
         - table: mozdata.monitoring.average_ping_sizes
+    bigquery_tables_inventory:
+      tables:
+        - table: moz-fx-data-shared-prod.monitoring.bigquery_tables_inventory
+      type: table_view
+    bigquery_table_storage:
+      tables:
+        - table: moz-fx-data-shared-prod.monitoring.bigquery_table_storage
+      type: table_view
+    bigquery_table_storage_timeline_daily:
+      tables:
+        - table: moz-fx-data-shared-prod.monitoring.bigquery_table_storage_timeline_daily
+      type: table_view
+    bigquery_usage:
+      tables:
+        - table: moz-fx-data-shared-prod.monitoring.bigquery_usage
+      type: table_view
     column_size:
       type: ping_view
       tables:
