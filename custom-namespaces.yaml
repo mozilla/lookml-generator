@@ -182,6 +182,10 @@ contextual_services:
       type: ping_view
       tables:
         - table: mozdata.contextual_services.quicksuggest_impression
+    search_terms_daily:
+      type: ping_view
+      tables:
+        - table: mozdata.search_terms.search_terms_daily
     topsites_click:
       type: ping_view
       tables:
@@ -229,6 +233,10 @@ contextual_services:
       type: ping_explore
       views:
         base_view: quicksuggest_impression
+    search_terms_daily:
+      type: ping_explore
+      views:
+        base_view: search_terms_daily
     topsites_clicks:
       type: ping_explore
       views:
