@@ -736,9 +736,9 @@ tomli==1.1.0 \
     # via
     #   -r requirements.in
     #   pep517
-types-pyyaml==6.0.12.1 \
-    --hash=sha256:70ccaafcf3fb404d57bffc1529fdd86a13e8b4f2cf9fc3ee81a6408ce0ad59d2 \
-    --hash=sha256:aaf5e51444c13bd34104695a89ad9c48412599a4f615d65a60e649109714f608
+types-pyyaml==6.0.12.2 \
+    --hash=sha256:1e94e80aafee07a7e798addb2a320e32956a373f376655128ae20637adb2655b \
+    --hash=sha256:6840819871c92deebe6a2067fb800c11b8a063632eb4e3e755914e7ab3604e83
     # via -r requirements.in
 typing-extensions==4.1.1 \
     --hash=sha256:1a9462dcc3347a79b1f1c0271fbe79e844580bb598bafa1ed208b94da3cdcd42 \
