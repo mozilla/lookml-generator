@@ -771,6 +771,35 @@ monitoring:
       type: table_view
       tables:
         - table: mozdata.static.monitoring_schema_errors_notes_v1
+    # views for accessing Airflow metadata
+    dag:
+      type: table_view
+      tables:
+        - table: mozdata.monitoring.airflow_dag
+    dag_run:
+      type: table_view
+      tables:
+        - table: mozdata.monitoring.airflow_dag_run
+    dag_tag:
+      type: table_view
+      tables:
+        - table: mozdata.monitoring.airflow_dag_tag
+    slot_pool:
+      type: table_view
+      tables:
+        - table: mozdata.monitoring.airflow_slot_pool
+    task_fail:
+      type: table_view
+      tables:
+        - table: mozdata.monitoring.airflow_task_fail
+    task_reschedule:
+      type: table_view
+      tables:
+        - table: mozdata.monitoring.airflow_task_reschedule
+    user:
+      type: table_view
+      tables:
+        - table: mozdata.monitoring.airflow_user
   explores:
     average_ping_sizes:
       type: ping_explore
