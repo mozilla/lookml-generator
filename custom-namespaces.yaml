@@ -217,6 +217,10 @@ contextual_services:
           table: mozdata.org_mozilla_ios_fennec.topsites_impression
       type: ping_view
   explores:
+    final_adM_forecasts:
+      type: ping_explore
+      views:
+        base_view: final_adM_forecasts
     event_aggregates_spons_tiles:
       type: ping_explore
       views:
