@@ -699,6 +699,10 @@ monitoring:
       tables:
         - table: moz-fx-data-shared-prod.monitoring.bigquery_tables_inventory
       type: table_view
+    bigquery_tables_last_modified:
+      tables:
+        - table: moz-fx-data-shared-prod.monitoring.bigquery_tables_last_modified
+      type: table_view
     bigquery_table_storage:
       tables:
         - table: moz-fx-data-shared-prod.monitoring.bigquery_table_storage
