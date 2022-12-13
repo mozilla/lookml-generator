@@ -162,6 +162,10 @@ contextual_services:
     - rburwei@mozilla.com
   spoke: looker-spoke-private
   views:
+    final_adM_forecasts:
+      type: ping_view
+      tables:
+        - table: moz-fx-data-shared-prod.revenue_derived.final_adm_revenue_forecast
     event_aggregates_spons_tiles:
       type: ping_view
       tables:
