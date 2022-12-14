@@ -163,7 +163,7 @@ contextual_services:
   spoke: looker-spoke-private
   views:
     final_adM_forecasts:
-      type: ping_view
+      type: table_view
       tables:
         - table: moz-fx-data-shared-prod.revenue_derived.final_adm_revenue_forecast
     event_aggregates_spons_tiles:
