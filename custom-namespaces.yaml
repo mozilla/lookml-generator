@@ -662,7 +662,7 @@ firefox_desktop:
       views:
         base_view: events
         extended_view: desktop_events_table
-    glean_events:
+    glean_event_counts:
       type: events_explore
       views:
         base_view: events
