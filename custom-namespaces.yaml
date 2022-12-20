@@ -623,18 +623,13 @@ firefox_desktop:
     glean_events:
       type: events_view
       tables:
-        - events_table_view: glean_events_table
-          base_table: mozdata.firefox_desktop.events
+        - events_table_view: events_unnested_table
+          base_table: mozdata.firefox_desktop.events_unnested
     desktop_events_table:
       type: table_view
       tables:
         - channel: release
           table: mozdata.telemetry.events
-    glean_events_table:
-      type: table_view
-      tables:
-        - channel: release
-          table: mozdata.firefox_desktop.events
     newtab_interactions_table:
       type: table_view
       tables:
@@ -665,8 +660,8 @@ firefox_desktop:
     glean_event_counts:
       type: events_explore
       views:
-        base_view: events
-        extended_view: glean_events_table
+        base_view: glean_events
+        extended_view: events_unnested_table
     default_browser:
       type: ping_explore
       views:
