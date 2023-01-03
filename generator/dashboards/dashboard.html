@@ -77,7 +77,7 @@
 </span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a>
 </span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a><span class="nd">@dataclass</span>
 </span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="k">class</span> <span class="nc">Dashboard</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>    <span class="sd">&quot;&quot;&quot;A generic Looker Dashboard.&quot;&quot;&quot;</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;A generic Looker Dashboard.&quot;&quot;&quot;</span>
 </span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>
 </span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span>
 </span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
@@ -87,7 +87,7 @@
 </span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>    <span class="nb">type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>
 </span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>        <span class="sd">&quot;&quot;&quot;Dashboard instance represented as a dict.&quot;&quot;&quot;</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Dashboard instance represented as a dict.&quot;&quot;&quot;</span>
 </span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>        <span class="k">return</span> <span class="p">{</span>
 </span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="p">{</span>
 </span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>                <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
@@ -99,7 +99,7 @@
 </span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a>        <span class="p">}</span>
 </span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a>
 </span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a>    <span class="k">def</span> <span class="nf">to_lookml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">):</span>
-</span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a>        <span class="sd">&quot;&quot;&quot;Generate Lookml for this dashboard.&quot;&quot;&quot;</span>
+</span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate Lookml for this dashboard.&quot;&quot;&quot;</span>
 </span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Only implemented in subclass.&quot;</span><span class="p">)</span>
 </span></pre></div>
 
@@ -117,7 +117,7 @@
     </div>
     <a class="headerlink" href="#Dashboard"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="Dashboard-10"><a href="#Dashboard-10"><span class="linenos">10</span></a><span class="k">class</span> <span class="nc">Dashboard</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-</span><span id="Dashboard-11"><a href="#Dashboard-11"><span class="linenos">11</span></a>    <span class="sd">&quot;&quot;&quot;A generic Looker Dashboard.&quot;&quot;&quot;</span>
+</span><span id="Dashboard-11"><a href="#Dashboard-11"><span class="linenos">11</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;A generic Looker Dashboard.&quot;&quot;&quot;</span>
 </span><span id="Dashboard-12"><a href="#Dashboard-12"><span class="linenos">12</span></a>
 </span><span id="Dashboard-13"><a href="#Dashboard-13"><span class="linenos">13</span></a>    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span>
 </span><span id="Dashboard-14"><a href="#Dashboard-14"><span class="linenos">14</span></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
@@ -127,7 +127,7 @@
 </span><span id="Dashboard-18"><a href="#Dashboard-18"><span class="linenos">18</span></a>    <span class="nb">type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </span><span id="Dashboard-19"><a href="#Dashboard-19"><span class="linenos">19</span></a>
 </span><span id="Dashboard-20"><a href="#Dashboard-20"><span class="linenos">20</span></a>    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-</span><span id="Dashboard-21"><a href="#Dashboard-21"><span class="linenos">21</span></a>        <span class="sd">&quot;&quot;&quot;Dashboard instance represented as a dict.&quot;&quot;&quot;</span>
+</span><span id="Dashboard-21"><a href="#Dashboard-21"><span class="linenos">21</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Dashboard instance represented as a dict.&quot;&quot;&quot;</span>
 </span><span id="Dashboard-22"><a href="#Dashboard-22"><span class="linenos">22</span></a>        <span class="k">return</span> <span class="p">{</span>
 </span><span id="Dashboard-23"><a href="#Dashboard-23"><span class="linenos">23</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="p">{</span>
 </span><span id="Dashboard-24"><a href="#Dashboard-24"><span class="linenos">24</span></a>                <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
@@ -139,7 +139,7 @@
 </span><span id="Dashboard-30"><a href="#Dashboard-30"><span class="linenos">30</span></a>        <span class="p">}</span>
 </span><span id="Dashboard-31"><a href="#Dashboard-31"><span class="linenos">31</span></a>
 </span><span id="Dashboard-32"><a href="#Dashboard-32"><span class="linenos">32</span></a>    <span class="k">def</span> <span class="nf">to_lookml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">):</span>
-</span><span id="Dashboard-33"><a href="#Dashboard-33"><span class="linenos">33</span></a>        <span class="sd">&quot;&quot;&quot;Generate Lookml for this dashboard.&quot;&quot;&quot;</span>
+</span><span id="Dashboard-33"><a href="#Dashboard-33"><span class="linenos">33</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate Lookml for this dashboard.&quot;&quot;&quot;</span>
 </span><span id="Dashboard-34"><a href="#Dashboard-34"><span class="linenos">34</span></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Only implemented in subclass.&quot;</span><span class="p">)</span>
 </span></pre></div>
 
@@ -172,7 +172,7 @@
     </div>
     <a class="headerlink" href="#Dashboard.to_dict"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="Dashboard.to_dict-20"><a href="#Dashboard.to_dict-20"><span class="linenos">20</span></a>    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-</span><span id="Dashboard.to_dict-21"><a href="#Dashboard.to_dict-21"><span class="linenos">21</span></a>        <span class="sd">&quot;&quot;&quot;Dashboard instance represented as a dict.&quot;&quot;&quot;</span>
+</span><span id="Dashboard.to_dict-21"><a href="#Dashboard.to_dict-21"><span class="linenos">21</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Dashboard instance represented as a dict.&quot;&quot;&quot;</span>
 </span><span id="Dashboard.to_dict-22"><a href="#Dashboard.to_dict-22"><span class="linenos">22</span></a>        <span class="k">return</span> <span class="p">{</span>
 </span><span id="Dashboard.to_dict-23"><a href="#Dashboard.to_dict-23"><span class="linenos">23</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="p">{</span>
 </span><span id="Dashboard.to_dict-24"><a href="#Dashboard.to_dict-24"><span class="linenos">24</span></a>                <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
@@ -202,7 +202,7 @@
     </div>
     <a class="headerlink" href="#Dashboard.to_lookml"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="Dashboard.to_lookml-32"><a href="#Dashboard.to_lookml-32"><span class="linenos">32</span></a>    <span class="k">def</span> <span class="nf">to_lookml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">):</span>
-</span><span id="Dashboard.to_lookml-33"><a href="#Dashboard.to_lookml-33"><span class="linenos">33</span></a>        <span class="sd">&quot;&quot;&quot;Generate Lookml for this dashboard.&quot;&quot;&quot;</span>
+</span><span id="Dashboard.to_lookml-33"><a href="#Dashboard.to_lookml-33"><span class="linenos">33</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate Lookml for this dashboard.&quot;&quot;&quot;</span>
 </span><span id="Dashboard.to_lookml-34"><a href="#Dashboard.to_lookml-34"><span class="linenos">34</span></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Only implemented in subclass.&quot;</span><span class="p">)</span>
 </span></pre></div>
 

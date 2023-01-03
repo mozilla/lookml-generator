@@ -78,14 +78,14 @@
 </span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>
 </span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>
 </span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a><span class="k">class</span> <span class="nc">ClientCountsExplore</span><span class="p">(</span><span class="n">Explore</span><span class="p">):</span>
-</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>    <span class="sd">&quot;&quot;&quot;A Client Counts Explore, from Baseline Clients Last Seen.&quot;&quot;&quot;</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;A Client Counts Explore, from Baseline Clients Last Seen.&quot;&quot;&quot;</span>
 </span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>
 </span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>    <span class="nb">type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;client_counts_explore&quot;</span>
 </span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>
 </span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>    <span class="k">def</span> <span class="nf">_to_lookml</span><span class="p">(</span>
 </span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span> <span class="n">v1_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 </span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
-</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>        <span class="sd">&quot;&quot;&quot;Generate LookML to represent this explore.&quot;&quot;&quot;</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate LookML to represent this explore.&quot;&quot;&quot;</span>
 </span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a>        <span class="n">queries</span> <span class="o">=</span> <span class="p">[]</span>
 </span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>        <span class="k">if</span> <span class="n">time_partitioning_group</span> <span class="o">:=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_view_time_partitioning_group</span><span class="p">(</span>
 </span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">views</span><span class="p">[</span><span class="s2">&quot;extended_view&quot;</span><span class="p">]</span>
@@ -132,7 +132,7 @@
 </span><span id="L-65"><a href="#L-65"><span class="linenos">65</span></a>
 </span><span id="L-66"><a href="#L-66"><span class="linenos">66</span></a>    <span class="nd">@staticmethod</span>
 </span><span id="L-67"><a href="#L-67"><span class="linenos">67</span></a>    <span class="k">def</span> <span class="nf">from_views</span><span class="p">(</span><span class="n">views</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">View</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">ClientCountsExplore</span><span class="p">]:</span>
-</span><span id="L-68"><a href="#L-68"><span class="linenos">68</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-68"><a href="#L-68"><span class="linenos">68</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-69"><a href="#L-69"><span class="linenos">69</span></a><span class="sd">        If possible, generate a Client Counts explore for this namespace.</span>
 </span><span id="L-70"><a href="#L-70"><span class="linenos">70</span></a>
 </span><span id="L-71"><a href="#L-71"><span class="linenos">71</span></a><span class="sd">        Client counts explores are only created for client_counts views.</span>
@@ -149,7 +149,7 @@
 </span><span id="L-82"><a href="#L-82"><span class="linenos">82</span></a>
 </span><span id="L-83"><a href="#L-83"><span class="linenos">83</span></a>    <span class="nd">@staticmethod</span>
 </span><span id="L-84"><a href="#L-84"><span class="linenos">84</span></a>    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">defn</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">views_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ClientCountsExplore</span><span class="p">:</span>
-</span><span id="L-85"><a href="#L-85"><span class="linenos">85</span></a>        <span class="sd">&quot;&quot;&quot;Get an instance of this explore from a dictionary definition.&quot;&quot;&quot;</span>
+</span><span id="L-85"><a href="#L-85"><span class="linenos">85</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get an instance of this explore from a dictionary definition.&quot;&quot;&quot;</span>
 </span><span id="L-86"><a href="#L-86"><span class="linenos">86</span></a>        <span class="k">return</span> <span class="n">ClientCountsExplore</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">defn</span><span class="p">[</span><span class="s2">&quot;views&quot;</span><span class="p">],</span> <span class="n">views_path</span><span class="p">)</span>
 </span></pre></div>
 
@@ -167,14 +167,14 @@
     </div>
     <a class="headerlink" href="#ClientCountsExplore"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="ClientCountsExplore-14"><a href="#ClientCountsExplore-14"><span class="linenos">14</span></a><span class="k">class</span> <span class="nc">ClientCountsExplore</span><span class="p">(</span><span class="n">Explore</span><span class="p">):</span>
-</span><span id="ClientCountsExplore-15"><a href="#ClientCountsExplore-15"><span class="linenos">15</span></a>    <span class="sd">&quot;&quot;&quot;A Client Counts Explore, from Baseline Clients Last Seen.&quot;&quot;&quot;</span>
+</span><span id="ClientCountsExplore-15"><a href="#ClientCountsExplore-15"><span class="linenos">15</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;A Client Counts Explore, from Baseline Clients Last Seen.&quot;&quot;&quot;</span>
 </span><span id="ClientCountsExplore-16"><a href="#ClientCountsExplore-16"><span class="linenos">16</span></a>
 </span><span id="ClientCountsExplore-17"><a href="#ClientCountsExplore-17"><span class="linenos">17</span></a>    <span class="nb">type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;client_counts_explore&quot;</span>
 </span><span id="ClientCountsExplore-18"><a href="#ClientCountsExplore-18"><span class="linenos">18</span></a>
 </span><span id="ClientCountsExplore-19"><a href="#ClientCountsExplore-19"><span class="linenos">19</span></a>    <span class="k">def</span> <span class="nf">_to_lookml</span><span class="p">(</span>
 </span><span id="ClientCountsExplore-20"><a href="#ClientCountsExplore-20"><span class="linenos">20</span></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span> <span class="n">v1_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 </span><span id="ClientCountsExplore-21"><a href="#ClientCountsExplore-21"><span class="linenos">21</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
-</span><span id="ClientCountsExplore-22"><a href="#ClientCountsExplore-22"><span class="linenos">22</span></a>        <span class="sd">&quot;&quot;&quot;Generate LookML to represent this explore.&quot;&quot;&quot;</span>
+</span><span id="ClientCountsExplore-22"><a href="#ClientCountsExplore-22"><span class="linenos">22</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate LookML to represent this explore.&quot;&quot;&quot;</span>
 </span><span id="ClientCountsExplore-23"><a href="#ClientCountsExplore-23"><span class="linenos">23</span></a>        <span class="n">queries</span> <span class="o">=</span> <span class="p">[]</span>
 </span><span id="ClientCountsExplore-24"><a href="#ClientCountsExplore-24"><span class="linenos">24</span></a>        <span class="k">if</span> <span class="n">time_partitioning_group</span> <span class="o">:=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_view_time_partitioning_group</span><span class="p">(</span>
 </span><span id="ClientCountsExplore-25"><a href="#ClientCountsExplore-25"><span class="linenos">25</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">views</span><span class="p">[</span><span class="s2">&quot;extended_view&quot;</span><span class="p">]</span>
@@ -221,7 +221,7 @@
 </span><span id="ClientCountsExplore-66"><a href="#ClientCountsExplore-66"><span class="linenos">66</span></a>
 </span><span id="ClientCountsExplore-67"><a href="#ClientCountsExplore-67"><span class="linenos">67</span></a>    <span class="nd">@staticmethod</span>
 </span><span id="ClientCountsExplore-68"><a href="#ClientCountsExplore-68"><span class="linenos">68</span></a>    <span class="k">def</span> <span class="nf">from_views</span><span class="p">(</span><span class="n">views</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">View</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">ClientCountsExplore</span><span class="p">]:</span>
-</span><span id="ClientCountsExplore-69"><a href="#ClientCountsExplore-69"><span class="linenos">69</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="ClientCountsExplore-69"><a href="#ClientCountsExplore-69"><span class="linenos">69</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="ClientCountsExplore-70"><a href="#ClientCountsExplore-70"><span class="linenos">70</span></a><span class="sd">        If possible, generate a Client Counts explore for this namespace.</span>
 </span><span id="ClientCountsExplore-71"><a href="#ClientCountsExplore-71"><span class="linenos">71</span></a>
 </span><span id="ClientCountsExplore-72"><a href="#ClientCountsExplore-72"><span class="linenos">72</span></a><span class="sd">        Client counts explores are only created for client_counts views.</span>
@@ -238,7 +238,7 @@
 </span><span id="ClientCountsExplore-83"><a href="#ClientCountsExplore-83"><span class="linenos">83</span></a>
 </span><span id="ClientCountsExplore-84"><a href="#ClientCountsExplore-84"><span class="linenos">84</span></a>    <span class="nd">@staticmethod</span>
 </span><span id="ClientCountsExplore-85"><a href="#ClientCountsExplore-85"><span class="linenos">85</span></a>    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">defn</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">views_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ClientCountsExplore</span><span class="p">:</span>
-</span><span id="ClientCountsExplore-86"><a href="#ClientCountsExplore-86"><span class="linenos">86</span></a>        <span class="sd">&quot;&quot;&quot;Get an instance of this explore from a dictionary definition.&quot;&quot;&quot;</span>
+</span><span id="ClientCountsExplore-86"><a href="#ClientCountsExplore-86"><span class="linenos">86</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get an instance of this explore from a dictionary definition.&quot;&quot;&quot;</span>
 </span><span id="ClientCountsExplore-87"><a href="#ClientCountsExplore-87"><span class="linenos">87</span></a>        <span class="k">return</span> <span class="n">ClientCountsExplore</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">defn</span><span class="p">[</span><span class="s2">&quot;views&quot;</span><span class="p">],</span> <span class="n">views_path</span><span class="p">)</span>
 </span></pre></div>
 
@@ -261,7 +261,7 @@
     <a class="headerlink" href="#ClientCountsExplore.from_views"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="ClientCountsExplore.from_views-67"><a href="#ClientCountsExplore.from_views-67"><span class="linenos">67</span></a>    <span class="nd">@staticmethod</span>
 </span><span id="ClientCountsExplore.from_views-68"><a href="#ClientCountsExplore.from_views-68"><span class="linenos">68</span></a>    <span class="k">def</span> <span class="nf">from_views</span><span class="p">(</span><span class="n">views</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">View</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">ClientCountsExplore</span><span class="p">]:</span>
-</span><span id="ClientCountsExplore.from_views-69"><a href="#ClientCountsExplore.from_views-69"><span class="linenos">69</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="ClientCountsExplore.from_views-69"><a href="#ClientCountsExplore.from_views-69"><span class="linenos">69</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="ClientCountsExplore.from_views-70"><a href="#ClientCountsExplore.from_views-70"><span class="linenos">70</span></a><span class="sd">        If possible, generate a Client Counts explore for this namespace.</span>
 </span><span id="ClientCountsExplore.from_views-71"><a href="#ClientCountsExplore.from_views-71"><span class="linenos">71</span></a>
 </span><span id="ClientCountsExplore.from_views-72"><a href="#ClientCountsExplore.from_views-72"><span class="linenos">72</span></a><span class="sd">        Client counts explores are only created for client_counts views.</span>
@@ -299,7 +299,7 @@
     <a class="headerlink" href="#ClientCountsExplore.from_dict"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="ClientCountsExplore.from_dict-84"><a href="#ClientCountsExplore.from_dict-84"><span class="linenos">84</span></a>    <span class="nd">@staticmethod</span>
 </span><span id="ClientCountsExplore.from_dict-85"><a href="#ClientCountsExplore.from_dict-85"><span class="linenos">85</span></a>    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">defn</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">views_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ClientCountsExplore</span><span class="p">:</span>
-</span><span id="ClientCountsExplore.from_dict-86"><a href="#ClientCountsExplore.from_dict-86"><span class="linenos">86</span></a>        <span class="sd">&quot;&quot;&quot;Get an instance of this explore from a dictionary definition.&quot;&quot;&quot;</span>
+</span><span id="ClientCountsExplore.from_dict-86"><a href="#ClientCountsExplore.from_dict-86"><span class="linenos">86</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get an instance of this explore from a dictionary definition.&quot;&quot;&quot;</span>
 </span><span id="ClientCountsExplore.from_dict-87"><a href="#ClientCountsExplore.from_dict-87"><span class="linenos">87</span></a>        <span class="k">return</span> <span class="n">ClientCountsExplore</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">defn</span><span class="p">[</span><span class="s2">&quot;views&quot;</span><span class="p">],</span> <span class="n">views_path</span><span class="p">)</span>
 </span></pre></div>
 

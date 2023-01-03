@@ -78,7 +78,7 @@
 </span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>    <span class="n">query_job</span> <span class="o">=</span> <span class="n">bq_client</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
 </span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>        <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
 </span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a><span class="s2">            SELECT DISTINCT </span><span class="si">{</span><span class="n">dimension</span><span class="si">}</span><span class="s2"> AS option, COUNT(*)</span>
-</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a><span class="s2">            FROM </span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2"></span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a><span class="s2">            FROM </span><span class="si">{</span><span class="n">table</span><span class="si">}</span>
 </span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a><span class="s2">            WHERE </span><span class="si">{</span><span class="n">dimension</span><span class="si">}</span><span class="s2"> IS NOT NULL</span>
 </span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a><span class="s2">            GROUP BY 1</span>
 </span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a><span class="s2">            ORDER BY 2 DESC</span>
@@ -99,7 +99,7 @@
 </span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a><span class="k">def</span> <span class="nf">get_dimension_defaults</span><span class="p">(</span>
 </span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a>    <span class="n">bq_client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span> <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 </span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a><span class="sd">    Find default values for certain dimensions.</span>
 </span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a>
 </span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a><span class="sd">    For a given Operational Monitoring dimension, find its default (most common)</span>
@@ -117,7 +117,7 @@
 </span><span id="L-53"><a href="#L-53"><span class="linenos">53</span></a>
 </span><span id="L-54"><a href="#L-54"><span class="linenos">54</span></a>
 </span><span id="L-55"><a href="#L-55"><span class="linenos">55</span></a><span class="k">def</span> <span class="nf">get_xaxis_val</span><span class="p">(</span><span class="n">bq_client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span> <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="L-56"><a href="#L-56"><span class="linenos">56</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-56"><a href="#L-56"><span class="linenos">56</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-57"><a href="#L-57"><span class="linenos">57</span></a><span class="sd">    Return whether the x-axis should be build_id or submission_date.</span>
 </span><span id="L-58"><a href="#L-58"><span class="linenos">58</span></a>
 </span><span id="L-59"><a href="#L-59"><span class="linenos">59</span></a><span class="sd">    This is based on which one is found in the table provided.</span>
@@ -133,7 +133,7 @@
 </span><span id="L-69"><a href="#L-69"><span class="linenos">69</span></a><span class="k">def</span> <span class="nf">get_projects</span><span class="p">(</span>
 </span><span id="L-70"><a href="#L-70"><span class="linenos">70</span></a>    <span class="n">bq_client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span> <span class="n">project_table</span><span class="p">:</span> <span class="nb">str</span>
 </span><span id="L-71"><a href="#L-71"><span class="linenos">71</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
-</span><span id="L-72"><a href="#L-72"><span class="linenos">72</span></a>    <span class="sd">&quot;&quot;&quot;Select all operational monitoring projects.&quot;&quot;&quot;</span>
+</span><span id="L-72"><a href="#L-72"><span class="linenos">72</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Select all operational monitoring projects.&quot;&quot;&quot;</span>
 </span><span id="L-73"><a href="#L-73"><span class="linenos">73</span></a>    <span class="k">try</span><span class="p">:</span>
 </span><span id="L-74"><a href="#L-74"><span class="linenos">74</span></a>        <span class="n">query_job</span> <span class="o">=</span> <span class="n">bq_client</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
 </span><span id="L-75"><a href="#L-75"><span class="linenos">75</span></a>            <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
@@ -164,7 +164,7 @@
             <div class="pdoc-code codehilite"><pre><span></span><span id="get_dimension_defaults-36"><a href="#get_dimension_defaults-36"><span class="linenos">36</span></a><span class="k">def</span> <span class="nf">get_dimension_defaults</span><span class="p">(</span>
 </span><span id="get_dimension_defaults-37"><a href="#get_dimension_defaults-37"><span class="linenos">37</span></a>    <span class="n">bq_client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span> <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 </span><span id="get_dimension_defaults-38"><a href="#get_dimension_defaults-38"><span class="linenos">38</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-</span><span id="get_dimension_defaults-39"><a href="#get_dimension_defaults-39"><span class="linenos">39</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="get_dimension_defaults-39"><a href="#get_dimension_defaults-39"><span class="linenos">39</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="get_dimension_defaults-40"><a href="#get_dimension_defaults-40"><span class="linenos">40</span></a><span class="sd">    Find default values for certain dimensions.</span>
 </span><span id="get_dimension_defaults-41"><a href="#get_dimension_defaults-41"><span class="linenos">41</span></a>
 </span><span id="get_dimension_defaults-42"><a href="#get_dimension_defaults-42"><span class="linenos">42</span></a><span class="sd">    For a given Operational Monitoring dimension, find its default (most common)</span>
@@ -202,7 +202,7 @@ value and its top 10 most common to be used as dropdown options.</p>
     </div>
     <a class="headerlink" href="#get_xaxis_val"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="get_xaxis_val-56"><a href="#get_xaxis_val-56"><span class="linenos">56</span></a><span class="k">def</span> <span class="nf">get_xaxis_val</span><span class="p">(</span><span class="n">bq_client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span> <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="get_xaxis_val-57"><a href="#get_xaxis_val-57"><span class="linenos">57</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="get_xaxis_val-57"><a href="#get_xaxis_val-57"><span class="linenos">57</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="get_xaxis_val-58"><a href="#get_xaxis_val-58"><span class="linenos">58</span></a><span class="sd">    Return whether the x-axis should be build_id or submission_date.</span>
 </span><span id="get_xaxis_val-59"><a href="#get_xaxis_val-59"><span class="linenos">59</span></a>
 </span><span id="get_xaxis_val-60"><a href="#get_xaxis_val-60"><span class="linenos">60</span></a><span class="sd">    This is based on which one is found in the table provided.</span>
@@ -237,7 +237,7 @@ value and its top 10 most common to be used as dropdown options.</p>
             <div class="pdoc-code codehilite"><pre><span></span><span id="get_projects-70"><a href="#get_projects-70"><span class="linenos">70</span></a><span class="k">def</span> <span class="nf">get_projects</span><span class="p">(</span>
 </span><span id="get_projects-71"><a href="#get_projects-71"><span class="linenos">71</span></a>    <span class="n">bq_client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span> <span class="n">project_table</span><span class="p">:</span> <span class="nb">str</span>
 </span><span id="get_projects-72"><a href="#get_projects-72"><span class="linenos">72</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
-</span><span id="get_projects-73"><a href="#get_projects-73"><span class="linenos">73</span></a>    <span class="sd">&quot;&quot;&quot;Select all operational monitoring projects.&quot;&quot;&quot;</span>
+</span><span id="get_projects-73"><a href="#get_projects-73"><span class="linenos">73</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Select all operational monitoring projects.&quot;&quot;&quot;</span>
 </span><span id="get_projects-74"><a href="#get_projects-74"><span class="linenos">74</span></a>    <span class="k">try</span><span class="p">:</span>
 </span><span id="get_projects-75"><a href="#get_projects-75"><span class="linenos">75</span></a>        <span class="n">query_job</span> <span class="o">=</span> <span class="n">bq_client</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
 </span><span id="get_projects-76"><a href="#get_projects-76"><span class="linenos">76</span></a>            <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>

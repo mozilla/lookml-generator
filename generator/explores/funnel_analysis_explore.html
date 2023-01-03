@@ -78,14 +78,14 @@
 </span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>
 </span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>
 </span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a><span class="k">class</span> <span class="nc">FunnelAnalysisExplore</span><span class="p">(</span><span class="n">Explore</span><span class="p">):</span>
-</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>    <span class="sd">&quot;&quot;&quot;A Funnel Analysis Explore, from Baseline Clients Last Seen.&quot;&quot;&quot;</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;A Funnel Analysis Explore, from Baseline Clients Last Seen.&quot;&quot;&quot;</span>
 </span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>
 </span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>    <span class="nb">type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;funnel_analysis_explore&quot;</span>
 </span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>    <span class="n">n_funnel_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span>
 </span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>
 </span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>    <span class="nd">@staticmethod</span>
 </span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>    <span class="k">def</span> <span class="nf">from_views</span><span class="p">(</span><span class="n">views</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">View</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">FunnelAnalysisExplore</span><span class="p">]:</span>
-</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a><span class="sd">        If possible, generate a Funnel Analysis explore for this namespace.</span>
 </span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>
 </span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a><span class="sd">        Funnel analysis explores are only created for funnel_analysis views.</span>
@@ -99,7 +99,7 @@
 </span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a>
 </span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a>    <span class="nd">@staticmethod</span>
 </span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a>    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">defn</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">views_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FunnelAnalysisExplore</span><span class="p">:</span>
-</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a>        <span class="sd">&quot;&quot;&quot;Get an instance of this explore from a dictionary definition.&quot;&quot;&quot;</span>
+</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get an instance of this explore from a dictionary definition.&quot;&quot;&quot;</span>
 </span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a>        <span class="k">return</span> <span class="n">FunnelAnalysisExplore</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">defn</span><span class="p">[</span><span class="s2">&quot;views&quot;</span><span class="p">],</span> <span class="n">views_path</span><span class="p">)</span>
 </span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a>
 </span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a>    <span class="k">def</span> <span class="nf">_to_lookml</span><span class="p">(</span>
@@ -148,14 +148,14 @@
     </div>
     <a class="headerlink" href="#FunnelAnalysisExplore"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="FunnelAnalysisExplore-14"><a href="#FunnelAnalysisExplore-14"><span class="linenos">14</span></a><span class="k">class</span> <span class="nc">FunnelAnalysisExplore</span><span class="p">(</span><span class="n">Explore</span><span class="p">):</span>
-</span><span id="FunnelAnalysisExplore-15"><a href="#FunnelAnalysisExplore-15"><span class="linenos">15</span></a>    <span class="sd">&quot;&quot;&quot;A Funnel Analysis Explore, from Baseline Clients Last Seen.&quot;&quot;&quot;</span>
+</span><span id="FunnelAnalysisExplore-15"><a href="#FunnelAnalysisExplore-15"><span class="linenos">15</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;A Funnel Analysis Explore, from Baseline Clients Last Seen.&quot;&quot;&quot;</span>
 </span><span id="FunnelAnalysisExplore-16"><a href="#FunnelAnalysisExplore-16"><span class="linenos">16</span></a>
 </span><span id="FunnelAnalysisExplore-17"><a href="#FunnelAnalysisExplore-17"><span class="linenos">17</span></a>    <span class="nb">type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;funnel_analysis_explore&quot;</span>
 </span><span id="FunnelAnalysisExplore-18"><a href="#FunnelAnalysisExplore-18"><span class="linenos">18</span></a>    <span class="n">n_funnel_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span>
 </span><span id="FunnelAnalysisExplore-19"><a href="#FunnelAnalysisExplore-19"><span class="linenos">19</span></a>
 </span><span id="FunnelAnalysisExplore-20"><a href="#FunnelAnalysisExplore-20"><span class="linenos">20</span></a>    <span class="nd">@staticmethod</span>
 </span><span id="FunnelAnalysisExplore-21"><a href="#FunnelAnalysisExplore-21"><span class="linenos">21</span></a>    <span class="k">def</span> <span class="nf">from_views</span><span class="p">(</span><span class="n">views</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">View</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">FunnelAnalysisExplore</span><span class="p">]:</span>
-</span><span id="FunnelAnalysisExplore-22"><a href="#FunnelAnalysisExplore-22"><span class="linenos">22</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="FunnelAnalysisExplore-22"><a href="#FunnelAnalysisExplore-22"><span class="linenos">22</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="FunnelAnalysisExplore-23"><a href="#FunnelAnalysisExplore-23"><span class="linenos">23</span></a><span class="sd">        If possible, generate a Funnel Analysis explore for this namespace.</span>
 </span><span id="FunnelAnalysisExplore-24"><a href="#FunnelAnalysisExplore-24"><span class="linenos">24</span></a>
 </span><span id="FunnelAnalysisExplore-25"><a href="#FunnelAnalysisExplore-25"><span class="linenos">25</span></a><span class="sd">        Funnel analysis explores are only created for funnel_analysis views.</span>
@@ -169,7 +169,7 @@
 </span><span id="FunnelAnalysisExplore-33"><a href="#FunnelAnalysisExplore-33"><span class="linenos">33</span></a>
 </span><span id="FunnelAnalysisExplore-34"><a href="#FunnelAnalysisExplore-34"><span class="linenos">34</span></a>    <span class="nd">@staticmethod</span>
 </span><span id="FunnelAnalysisExplore-35"><a href="#FunnelAnalysisExplore-35"><span class="linenos">35</span></a>    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">defn</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">views_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FunnelAnalysisExplore</span><span class="p">:</span>
-</span><span id="FunnelAnalysisExplore-36"><a href="#FunnelAnalysisExplore-36"><span class="linenos">36</span></a>        <span class="sd">&quot;&quot;&quot;Get an instance of this explore from a dictionary definition.&quot;&quot;&quot;</span>
+</span><span id="FunnelAnalysisExplore-36"><a href="#FunnelAnalysisExplore-36"><span class="linenos">36</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get an instance of this explore from a dictionary definition.&quot;&quot;&quot;</span>
 </span><span id="FunnelAnalysisExplore-37"><a href="#FunnelAnalysisExplore-37"><span class="linenos">37</span></a>        <span class="k">return</span> <span class="n">FunnelAnalysisExplore</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">defn</span><span class="p">[</span><span class="s2">&quot;views&quot;</span><span class="p">],</span> <span class="n">views_path</span><span class="p">)</span>
 </span><span id="FunnelAnalysisExplore-38"><a href="#FunnelAnalysisExplore-38"><span class="linenos">38</span></a>
 </span><span id="FunnelAnalysisExplore-39"><a href="#FunnelAnalysisExplore-39"><span class="linenos">39</span></a>    <span class="k">def</span> <span class="nf">_to_lookml</span><span class="p">(</span>
@@ -223,7 +223,7 @@
     <a class="headerlink" href="#FunnelAnalysisExplore.from_views"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="FunnelAnalysisExplore.from_views-20"><a href="#FunnelAnalysisExplore.from_views-20"><span class="linenos">20</span></a>    <span class="nd">@staticmethod</span>
 </span><span id="FunnelAnalysisExplore.from_views-21"><a href="#FunnelAnalysisExplore.from_views-21"><span class="linenos">21</span></a>    <span class="k">def</span> <span class="nf">from_views</span><span class="p">(</span><span class="n">views</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">View</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">FunnelAnalysisExplore</span><span class="p">]:</span>
-</span><span id="FunnelAnalysisExplore.from_views-22"><a href="#FunnelAnalysisExplore.from_views-22"><span class="linenos">22</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="FunnelAnalysisExplore.from_views-22"><a href="#FunnelAnalysisExplore.from_views-22"><span class="linenos">22</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="FunnelAnalysisExplore.from_views-23"><a href="#FunnelAnalysisExplore.from_views-23"><span class="linenos">23</span></a><span class="sd">        If possible, generate a Funnel Analysis explore for this namespace.</span>
 </span><span id="FunnelAnalysisExplore.from_views-24"><a href="#FunnelAnalysisExplore.from_views-24"><span class="linenos">24</span></a>
 </span><span id="FunnelAnalysisExplore.from_views-25"><a href="#FunnelAnalysisExplore.from_views-25"><span class="linenos">25</span></a><span class="sd">        Funnel analysis explores are only created for funnel_analysis views.</span>
@@ -258,7 +258,7 @@
     <a class="headerlink" href="#FunnelAnalysisExplore.from_dict"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="FunnelAnalysisExplore.from_dict-34"><a href="#FunnelAnalysisExplore.from_dict-34"><span class="linenos">34</span></a>    <span class="nd">@staticmethod</span>
 </span><span id="FunnelAnalysisExplore.from_dict-35"><a href="#FunnelAnalysisExplore.from_dict-35"><span class="linenos">35</span></a>    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">defn</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">views_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FunnelAnalysisExplore</span><span class="p">:</span>
-</span><span id="FunnelAnalysisExplore.from_dict-36"><a href="#FunnelAnalysisExplore.from_dict-36"><span class="linenos">36</span></a>        <span class="sd">&quot;&quot;&quot;Get an instance of this explore from a dictionary definition.&quot;&quot;&quot;</span>
+</span><span id="FunnelAnalysisExplore.from_dict-36"><a href="#FunnelAnalysisExplore.from_dict-36"><span class="linenos">36</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get an instance of this explore from a dictionary definition.&quot;&quot;&quot;</span>
 </span><span id="FunnelAnalysisExplore.from_dict-37"><a href="#FunnelAnalysisExplore.from_dict-37"><span class="linenos">37</span></a>        <span class="k">return</span> <span class="n">FunnelAnalysisExplore</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">defn</span><span class="p">[</span><span class="s2">&quot;views&quot;</span><span class="p">],</span> <span class="n">views_path</span><span class="p">)</span>
 </span></pre></div>
 
