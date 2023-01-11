@@ -1,6 +1,5 @@
 """PyTest configuration."""
 
-import gzip
 import json
 
 import pytest
@@ -29,28 +28,26 @@ def app_listings_uri(tmp_path):
     """
     dest = tmp_path / "app-listings"
     dest.write_bytes(
-        gzip.compress(
-            json.dumps(
-                [
-                    {
-                        "app_name": "glean-app",
-                        "app_channel": "release",
-                        "canonical_app_name": "Glean App",
-                        "bq_dataset_family": "glean_app_release",
-                        "notification_emails": ["glean-app-owner@allizom.com"],
-                        "v1_name": "glean-app-release",
-                    },
-                    {
-                        "app_name": "glean-app",
-                        "app_channel": "beta",
-                        "canonical_app_name": "Glean App Beta",
-                        "bq_dataset_family": "glean_app_beta",
-                        "notification_emails": ["glean-app-owner-beta@allizom.com"],
-                        "v1_name": "glean-app-beta",
-                    },
-                ]
-            ).encode()
-        )
+        json.dumps(
+            [
+                {
+                    "app_name": "glean-app",
+                    "app_channel": "release",
+                    "canonical_app_name": "Glean App",
+                    "bq_dataset_family": "glean_app_release",
+                    "notification_emails": ["glean-app-owner@allizom.com"],
+                    "v1_name": "glean-app-release",
+                },
+                {
+                    "app_name": "glean-app",
+                    "app_channel": "beta",
+                    "canonical_app_name": "Glean App Beta",
+                    "bq_dataset_family": "glean_app_beta",
+                    "notification_emails": ["glean-app-owner-beta@allizom.com"],
+                    "v1_name": "glean-app-beta",
+                },
+            ]
+        ).encode()
     )
     return dest.absolute().as_uri()
 
@@ -60,18 +57,16 @@ def metrics_listings_file(tmp_path):
     """Mock metrics listings."""
     dest = tmp_path / "metrics-listings"
     dest.write_bytes(
-        gzip.compress(
-            json.dumps(
-                {
-                    "test.counter": {
-                        "type": "counter",
-                    },
-                    "glean_validation_metrics.ping_count": {
-                        "type": "counter",
-                    },
-                }
-            ).encode()
-        )
+        json.dumps(
+            {
+                "test.counter": {
+                    "type": "counter",
+                },
+                "glean_validation_metrics.ping_count": {
+                    "type": "counter",
+                },
+            }
+        ).encode()
     )
     return dest.absolute()
 

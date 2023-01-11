@@ -5,6 +5,7 @@
 .DS_Store
 .vscode
 .mypy_cache/
+.probe_cache
 venv/
 namespaces.yaml
 looker-hub/

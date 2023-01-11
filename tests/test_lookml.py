@@ -38,12 +38,12 @@ class MockClient:
             return bigquery.Table(
                 table_ref,
                 schema=[
-                    SchemaField("app_build", "STRING"),
-                    SchemaField("client_id", "STRING"),
-                    SchemaField("country", "STRING"),
+                    SchemaField(name="app_build", field_type="STRING"),
+                    SchemaField(name="client_id", field_type="STRING"),
+                    SchemaField(name="country", field_type="STRING"),
                     SchemaField(
-                        "document_id",
-                        "STRING",
+                        name="document_id",
+                        field_type="STRING",
                         description="The document ID specified in the URI when the client sent this message",
                     ),
                 ],
@@ -52,20 +52,20 @@ class MockClient:
             return bigquery.Table(
                 table_ref,
                 schema=[
-                    SchemaField("app_build", "STRING"),
-                    SchemaField("client_id", "STRING"),
-                    SchemaField("submission_date", "DATE"),
-                    SchemaField("country", "STRING"),
-                    SchemaField("document_id", "STRING"),
+                    SchemaField(name="app_build", field_type="STRING"),
+                    SchemaField(name="client_id", field_type="STRING"),
+                    SchemaField(name="submission_date", field_type="DATE"),
+                    SchemaField(name="country", field_type="STRING"),
+                    SchemaField(name="document_id", field_type="STRING"),
                 ],
             )
         if table_ref == "mozdata.glean_app.baseline_clients_last_seen":
             return bigquery.Table(
                 table_ref,
                 schema=[
-                    SchemaField("client_id", "STRING"),
-                    SchemaField("country", "STRING"),
-                    SchemaField("document_id", "STRING"),
+                    SchemaField(name="client_id", field_type="STRING"),
+                    SchemaField(name="country", field_type="STRING"),
+                    SchemaField(name="document_id", field_type="STRING"),
                 ],
             )
         if table_ref == "mozdata.glean_app.baseline":
@@ -73,56 +73,64 @@ class MockClient:
                 table_ref,
                 schema=[
                     SchemaField(
-                        "client_info",
-                        "RECORD",
+                        name="client_info",
+                        field_type="RECORD",
                         fields=[
-                            SchemaField("client_id", "STRING"),
-                            SchemaField("parsed_first_run_date", "DATE"),
-                        ],
-                    ),
-                    SchemaField(
-                        "metadata",
-                        "RECORD",
-                        fields=[
+                            SchemaField(name="client_id", field_type="STRING"),
                             SchemaField(
-                                "geo",
-                                "RECORD",
-                                fields=[
-                                    SchemaField("country", "STRING"),
-                                ],
-                            ),
-                            SchemaField(
-                                "header",
-                                "RECORD",
-                                fields=[
-                                    SchemaField("date", "STRING"),
-                                    SchemaField("parsed_date", "TIMESTAMP"),
-                                ],
+                                name="parsed_first_run_date", field_type="DATE"
                             ),
                         ],
                     ),
                     SchemaField(
-                        "metrics",
-                        "RECORD",
+                        name="metadata",
+                        field_type="RECORD",
                         fields=[
                             SchemaField(
-                                "counter",
-                                "RECORD",
-                                fields=[SchemaField("test_counter", "INTEGER")],
+                                name="geo",
+                                field_type="RECORD",
+                                fields=[
+                                    SchemaField(name="country", field_type="STRING"),
+                                ],
+                            ),
+                            SchemaField(
+                                name="header",
+                                field_type="RECORD",
+                                fields=[
+                                    SchemaField(name="date", field_type="STRING"),
+                                    SchemaField(
+                                        name="parsed_date", field_type="TIMESTAMP"
+                                    ),
+                                ],
+                            ),
+                        ],
+                    ),
+                    SchemaField(
+                        name="metrics",
+                        field_type="RECORD",
+                        fields=[
+                            SchemaField(
+                                name="counter",
+                                field_type="RECORD",
+                                fields=[
+                                    SchemaField(
+                                        name="test_counter", field_type="INTEGER"
+                                    )
+                                ],
                             )
                         ],
                     ),
-                    SchemaField("parsed_timestamp", "TIMESTAMP"),
-                    SchemaField("submission_timestamp", "TIMESTAMP"),
-                    SchemaField("submission_date", "DATE"),
-                    SchemaField("test_bignumeric", "BIGNUMERIC"),
-                    SchemaField("test_bool", "BOOLEAN"),
-                    SchemaField("test_bytes", "BYTES"),
-                    SchemaField("test_float64", "FLOAT"),
-                    SchemaField("test_int64", "INTEGER"),
-                    SchemaField("test_numeric", "NUMERIC"),
-                    SchemaField("test_string", "STRING"),
-                    SchemaField("additional_properties", "STRING"),
+                    SchemaField(name="parsed_timestamp", field_type="TIMESTAMP"),
+                    SchemaField(name="submission_timestamp", field_type="TIMESTAMP"),
+                    SchemaField(name="submission_date", field_type="DATE"),
+                    SchemaField(name="test_bignumeric", field_type="BIGNUMERIC"),
+                    SchemaField(name="test_bool", field_type="BOOLEAN"),
+                    SchemaField(name="test_bytes", field_type="BYTES"),
+                    SchemaField(name="test_float64", field_type="FLOAT"),
+                    SchemaField(name="test_int64", field_type="INTEGER"),
+                    SchemaField(name="test_numeric", field_type="NUMERIC"),
+                    SchemaField(name="test_string", field_type="STRING"),
+                    SchemaField(name="additional_properties", field_type="STRING"),
                 ],
             )
         if table_ref == "mozdata.glean_app.metrics":
@@ -130,274 +138,315 @@ class MockClient:
                 table_ref,
                 schema=[
                     SchemaField(
-                        "client_info",
-                        "RECORD",
+                        name="client_info",
+                        field_type="RECORD",
                         fields=[
-                            SchemaField("client_id", "STRING"),
+                            SchemaField(name="client_id", field_type="STRING"),
                         ],
                     ),
                     SchemaField(
-                        "metrics",
-                        "RECORD",
+                        name="metrics",
+                        field_type="RECORD",
                         fields=[
                             SchemaField(
-                                "boolean",
-                                "RECORD",
-                                fields=[
-                                    SchemaField("test_boolean", "BOOLEAN"),
-                                ],
-                            ),
-                            SchemaField(
-                                "boolean",
-                                "RECORD",
+                                name="boolean",
+                                field_type="RECORD",
                                 fields=[
                                     SchemaField(
-                                        "test_boolean_not_in_source", "BOOLEAN"
+                                        name="test_boolean", field_type="BOOLEAN"
+                                    ),
+                                    SchemaField(
+                                        name="test_boolean_not_in_source",
+                                        field_type="BOOLEAN",
                                     ),
                                 ],
                             ),
                             SchemaField(
-                                "counter",
-                                "RECORD",
+                                name="counter",
+                                field_type="RECORD",
                                 fields=[
-                                    SchemaField("test_counter", "INTEGER"),
                                     SchemaField(
-                                        "glean_validation_metrics_ping_count", "INTEGER"
+                                        name="test_counter", field_type="INTEGER"
                                     ),
-                                    SchemaField("no_category_counter", "INTEGER"),
+                                    SchemaField(
+                                        name="glean_validation_metrics_ping_count",
+                                        field_type="INTEGER",
+                                    ),
+                                    SchemaField(
+                                        name="no_category_counter", field_type="INTEGER"
+                                    ),
                                 ],
                             ),
                             SchemaField(
-                                "labeled_counter",
-                                "RECORD",
-                                "REPEATED",
-                                fields=[
-                                    SchemaField("key", "STRING"),
-                                    SchemaField("value", "INTEGER"),
-                                ],
-                            ),
-                            SchemaField(
-                                "labeled_counter_not_in_source",
-                                "RECORD",
-                                "REPEATED",
-                                fields=[
-                                    SchemaField("key", "STRING"),
-                                    SchemaField("value", "INTEGER"),
-                                ],
-                            ),
-                            SchemaField(
-                                "custom_distribution",
-                                "RECORD",
+                                name="labeled_counter",
+                                field_type="RECORD",
                                 fields=[
                                     SchemaField(
-                                        "test_custom_distribution",
-                                        "RECORD",
-                                        "NULLABLE",
-                                        None,
-                                        (
-                                            SchemaField(
-                                                "sum",
-                                                "INTEGER",
-                                                "NULLABLE",
-                                                None,
-                                                (),
-                                                None,
-                                            ),
-                                            SchemaField(
-                                                "values",
-                                                "RECORD",
-                                                "REPEATED",
-                                                None,
-                                                (
-                                                    SchemaField(
-                                                        "key",
-                                                        "STRING",
-                                                        "NULLABLE",
-                                                        None,
-                                                        (),
-                                                        None,
-                                                    ),
-                                                    SchemaField(
-                                                        "value",
-                                                        "INTEGER",
-                                                        "NULLABLE",
-                                                        None,
-                                                        (),
-                                                        None,
-                                                    ),
-                                                ),
-                                                None,
-                                            ),
-                                        ),
-                                        None,
-                                    )
-                                ],
-                            ),
-                            SchemaField(
-                                "datetime",
-                                "RECORD",
-                                fields=[SchemaField("test_datetime", "STRING")],
-                            ),
-                            SchemaField(
-                                "jwe",
-                                "RECORD",
-                                fields=[SchemaField("test_jwe", "STRING")],
-                            ),
-                            SchemaField(
-                                "memory_distribution",
-                                "RECORD",
-                                fields=[
-                                    SchemaField(
-                                        "test_memory_distribution",
-                                        "RECORD",
-                                        "NULLABLE",
-                                        None,
-                                        (
-                                            SchemaField(
-                                                "sum",
-                                                "INTEGER",
-                                                "NULLABLE",
-                                                None,
-                                                (),
-                                                None,
-                                            ),
-                                            SchemaField(
-                                                "values",
-                                                "RECORD",
-                                                "REPEATED",
-                                                None,
-                                                (
-                                                    SchemaField(
-                                                        "key",
-                                                        "STRING",
-                                                        "NULLABLE",
-                                                        None,
-                                                        (),
-                                                        None,
-                                                    ),
-                                                    SchemaField(
-                                                        "value",
-                                                        "INTEGER",
-                                                        "NULLABLE",
-                                                        None,
-                                                        (),
-                                                        None,
-                                                    ),
-                                                ),
-                                                None,
-                                            ),
-                                        ),
-                                        None,
-                                    )
-                                ],
-                            ),
-                            SchemaField(
-                                "quantity",
-                                "RECORD",
-                                fields=[SchemaField("test_quantity", "INTEGER")],
-                            ),
-                            SchemaField(
-                                "string",
-                                "RECORD",
-                                fields=[SchemaField("test_string", "STRING")],
-                            ),
-                            SchemaField(
-                                "timing_distribution",
-                                "RECORD",
-                                fields=[
-                                    SchemaField(
-                                        "test_timing_distribution",
-                                        "RECORD",
-                                        "NULLABLE",
-                                        None,
-                                        (
-                                            SchemaField(
-                                                "sum",
-                                                "INTEGER",
-                                                "NULLABLE",
-                                                None,
-                                                (),
-                                                None,
-                                            ),
-                                            SchemaField(
-                                                "values",
-                                                "RECORD",
-                                                "REPEATED",
-                                                None,
-                                                (
-                                                    SchemaField(
-                                                        "key",
-                                                        "STRING",
-                                                        "NULLABLE",
-                                                        None,
-                                                        (),
-                                                        None,
-                                                    ),
-                                                    SchemaField(
-                                                        "value",
-                                                        "INTEGER",
-                                                        "NULLABLE",
-                                                        None,
-                                                        (),
-                                                        None,
-                                                    ),
-                                                ),
-                                                None,
-                                            ),
-                                        ),
-                                        None,
-                                    )
-                                ],
-                            ),
-                            SchemaField(
-                                "rate",
-                                "RECORD",
-                                fields=[
-                                    SchemaField(
-                                        "test_rate",
-                                        "RECORD",
+                                        name="test_labeled_counter",
+                                        field_type="RECORD",
+                                        mode="REPEATED",
                                         fields=[
-                                            SchemaField("denominator", "INTEGER"),
-                                            SchemaField("numerator", "INTEGER"),
+                                            SchemaField(
+                                                name="key", field_type="STRING"
+                                            ),
+                                            SchemaField(
+                                                name="value", field_type="INTEGER"
+                                            ),
+                                        ],
+                                    ),
+                                    SchemaField(
+                                        name="test_labeled_counter_not_in_source",
+                                        field_type="RECORD",
+                                        mode="REPEATED",
+                                        fields=[
+                                            SchemaField(
+                                                name="key", field_type="STRING"
+                                            ),
+                                            SchemaField(
+                                                name="value", field_type="INTEGER"
+                                            ),
+                                        ],
+                                    ),
+                                ],
+                            ),
+                            SchemaField(
+                                name="custom_distribution",
+                                field_type="RECORD",
+                                fields=[
+                                    SchemaField(
+                                        name="test_custom_distribution",
+                                        field_type="RECORD",
+                                        mode="NULLABLE",
+                                        default_value_expression=None,
+                                        fields=(
+                                            SchemaField(
+                                                name="sum",
+                                                field_type="INTEGER",
+                                                mode="NULLABLE",
+                                                default_value_expression=None,
+                                                fields=(),
+                                                policy_tags=None,
+                                            ),
+                                            SchemaField(
+                                                name="values",
+                                                field_type="RECORD",
+                                                mode="REPEATED",
+                                                default_value_expression=None,
+                                                fields=(
+                                                    SchemaField(
+                                                        name="key",
+                                                        field_type="STRING",
+                                                        mode="NULLABLE",
+                                                        default_value_expression=None,
+                                                        fields=(),
+                                                        policy_tags=None,
+                                                    ),
+                                                    SchemaField(
+                                                        name="value",
+                                                        field_type="INTEGER",
+                                                        mode="NULLABLE",
+                                                        default_value_expression=None,
+                                                        fields=(),
+                                                        policy_tags=None,
+                                                    ),
+                                                ),
+                                                policy_tags=None,
+                                            ),
+                                        ),
+                                        policy_tags=None,
+                                    )
+                                ],
+                            ),
+                            SchemaField(
+                                name="datetime",
+                                field_type="RECORD",
+                                fields=[
+                                    SchemaField(
+                                        name="test_datetime", field_type="STRING"
+                                    )
+                                ],
+                            ),
+                            SchemaField(
+                                name="jwe2",
+                                field_type="RECORD",
+                                fields=[
+                                    SchemaField(name="test_jwe", field_type="STRING")
+                                ],
+                            ),
+                            SchemaField(
+                                name="memory_distribution",
+                                field_type="RECORD",
+                                fields=[
+                                    SchemaField(
+                                        name="test_memory_distribution",
+                                        field_type="RECORD",
+                                        mode="NULLABLE",
+                                        default_value_expression=None,
+                                        fields=(
+                                            SchemaField(
+                                                name="sum",
+                                                field_type="INTEGER",
+                                                mode="NULLABLE",
+                                                default_value_expression=None,
+                                                fields=(),
+                                                policy_tags=None,
+                                            ),
+                                            SchemaField(
+                                                name="values",
+                                                field_type="RECORD",
+                                                mode="REPEATED",
+                                                default_value_expression=None,
+                                                fields=(
+                                                    SchemaField(
+                                                        name="key",
+                                                        field_type="STRING",
+                                                        mode="NULLABLE",
+                                                        default_value_expression=None,
+                                                        fields=(),
+                                                        policy_tags=None,
+                                                    ),
+                                                    SchemaField(
+                                                        name="value",
+                                                        field_type="INTEGER",
+                                                        mode="NULLABLE",
+                                                        default_value_expression=None,
+                                                        fields=(),
+                                                        policy_tags=None,
+                                                    ),
+                                                ),
+                                                policy_tags=None,
+                                            ),
+                                        ),
+                                        policy_tags=None,
+                                    )
+                                ],
+                            ),
+                            SchemaField(
+                                name="quantity",
+                                field_type="RECORD",
+                                fields=[
+                                    SchemaField(
+                                        name="test_quantity", field_type="INTEGER"
+                                    )
+                                ],
+                            ),
+                            SchemaField(
+                                name="string",
+                                field_type="RECORD",
+                                fields=[
+                                    SchemaField(name="test_string", field_type="STRING")
+                                ],
+                            ),
+                            SchemaField(
+                                name="timing_distribution",
+                                field_type="RECORD",
+                                fields=[
+                                    SchemaField(
+                                        name="test_timing_distribution",
+                                        field_type="RECORD",
+                                        mode="NULLABLE",
+                                        default_value_expression=None,
+                                        fields=(
+                                            SchemaField(
+                                                name="sum",
+                                                field_type="INTEGER",
+                                                mode="NULLABLE",
+                                                default_value_expression=None,
+                                                fields=(),
+                                                policy_tags=None,
+                                            ),
+                                            SchemaField(
+                                                name="values",
+                                                field_type="RECORD",
+                                                mode="REPEATED",
+                                                default_value_expression=None,
+                                                fields=(
+                                                    SchemaField(
+                                                        name="key",
+                                                        field_type="STRING",
+                                                        mode="NULLABLE",
+                                                        default_value_expression=None,
+                                                        fields=(),
+                                                        policy_tags=None,
+                                                    ),
+                                                    SchemaField(
+                                                        name="value",
+                                                        field_type="INTEGER",
+                                                        mode="NULLABLE",
+                                                        default_value_expression=None,
+                                                        fields=(),
+                                                        policy_tags=None,
+                                                    ),
+                                                ),
+                                                policy_tags=None,
+                                            ),
+                                        ),
+                                        policy_tags=None,
+                                    )
+                                ],
+                            ),
+                            SchemaField(
+                                name="rate",
+                                field_type="RECORD",
+                                fields=[
+                                    SchemaField(
+                                        name="test_rate",
+                                        field_type="RECORD",
+                                        fields=[
+                                            SchemaField(
+                                                name="denominator", field_type="INTEGER"
+                                            ),
+                                            SchemaField(
+                                                name="numerator", field_type="INTEGER"
+                                            ),
                                         ],
                                     )
                                 ],
                             ),
                             SchemaField(
-                                "timespan",
-                                "RECORD",
+                                name="timespan",
+                                field_type="RECORD",
                                 fields=[
                                     SchemaField(
-                                        "test_timespan",
-                                        "RECORD",
-                                        "NULLABLE",
-                                        None,
-                                        (
+                                        name="test_timespan",
+                                        field_type="RECORD",
+                                        mode="NULLABLE",
+                                        default_value_expression=None,
+                                        fields=(
                                             SchemaField(
-                                                "time_unit",
-                                                "STRING",
-                                                "NULLABLE",
-                                                None,
-                                                (),
-                                                None,
+                                                name="time_unit",
+                                                field_type="STRING",
+                                                mode="NULLABLE",
+                                                default_value_expression=None,
+                                                fields=(),
+                                                policy_tags=None,
                                             ),
                                             SchemaField(
-                                                "value",
-                                                "INTEGER",
-                                                "NULLABLE",
-                                                None,
-                                                (),
-                                                None,
+                                                name="value",
+                                                field_type="INTEGER",
+                                                mode="NULLABLE",
+                                                default_value_expression=None,
+                                                fields=(),
+                                                policy_tags=None,
                                             ),
                                         ),
-                                        None,
+                                        policy_tags=None,
                                     )
                                 ],
                             ),
                             SchemaField(
-                                "uuid",
-                                "RECORD",
-                                fields=[SchemaField("test_uuid", "STRING")],
+                                name="uuid",
+                                field_type="RECORD",
+                                fields=[
+                                    SchemaField(name="test_uuid", field_type="STRING")
+                                ],
+                            ),
+                            SchemaField(
+                                name="url2",
+                                field_type="RECORD",
+                                fields=[
+                                    SchemaField(name="test_url", field_type="STRING")
+                                ],
                             ),
                         ],
                     ),
@@ -407,8 +456,8 @@ class MockClient:
             return bigquery.Table(
                 table_ref,
                 schema=[
-                    SchemaField("parsed_timestamp", "TIMESTAMP"),
-                    SchemaField("parsed_date", "DATE"),
+                    SchemaField(name="parsed_timestamp", field_type="TIMESTAMP"),
+                    SchemaField(name="parsed_date", field_type="DATE"),
                 ],
             )
         if table_ref == "mozdata.fail.duplicate_client":
@@ -416,35 +465,35 @@ class MockClient:
                 table_ref,
                 schema=[
                     SchemaField(
-                        "client_info",
-                        "RECORD",
+                        name="client_info",
+                        field_type="RECORD",
                         fields=[
-                            SchemaField("client_id", "STRING"),
+                            SchemaField(name="client_id", field_type="STRING"),
                         ],
                     ),
-                    SchemaField("client_id", "STRING"),
+                    SchemaField(name="client_id", field_type="STRING"),
                 ],
             )
         if table_ref == "mozdata.custom.context":
             return bigquery.Table(
                 table_ref,
                 schema=[
-                    SchemaField("submission_date", "DATE"),
-                    SchemaField("context_id", "STRING"),
+                    SchemaField(name="submission_date", field_type="DATE"),
+                    SchemaField(name="context_id", field_type="STRING"),
                     SchemaField(
-                        "contexts",
-                        "RECORD",
-                        "REPEATED",
+                        name="contexts",
+                        field_type="RECORD",
+                        mode="REPEATED",
                         fields=[
-                            SchemaField("key", "STRING"),
-                            SchemaField("value", "INTEGER"),
+                            SchemaField(name="key", field_type="STRING"),
+                            SchemaField(name="value", field_type="INTEGER"),
                             SchemaField(
-                                "position",
-                                "RECORD",
-                                "REPEATED",
+                                name="position",
+                                field_type="RECORD",
+                                mode="REPEATED",
                                 fields=[
-                                    SchemaField("key", "STRING"),
-                                    SchemaField("value", "INTEGER"),
+                                    SchemaField(name="key", field_type="STRING"),
+                                    SchemaField(name="value", field_type="INTEGER"),
                                 ],
                             ),
                         ],
@@ -455,19 +504,19 @@ class MockClient:
             return bigquery.Table(
                 table_ref,
                 schema=[
-                    SchemaField("client_id", "STRING"),
-                    SchemaField("submission_date", "DATE"),
-                    SchemaField("country", "STRING"),
-                    SchemaField("events", "STRING"),
+                    SchemaField(name="client_id", field_type="STRING"),
+                    SchemaField(name="submission_date", field_type="DATE"),
+                    SchemaField(name="country", field_type="STRING"),
+                    SchemaField(name="events", field_type="STRING"),
                 ],
             )
         if table_ref == "mozdata.glean_app.event_types":
             return bigquery.Table(
                 table_ref,
                 schema=[
-                    SchemaField("category", "STRING"),
-                    SchemaField("event", "STRING"),
-                    SchemaField("index", "STRING"),
+                    SchemaField(name="category", field_type="STRING"),
+                    SchemaField(name="event", field_type="STRING"),
+                    SchemaField(name="index", field_type="STRING"),
                 ],
             )
         raise ValueError(f"Table not found: {table_ref}")
@@ -527,7 +576,7 @@ def msg_glean_probes():
             "test.labeled_counter",
             {
                 "type": "labeled_counter",
-                "history": history_with_descr,
+                "history": history,
                 "name": "test.labeled_counter",
                 "in-source": True,
             },
@@ -536,7 +585,7 @@ def msg_glean_probes():
             "test.labeled_counter_not_in_source",
             {
                 "type": "labeled_counter",
-                "history": history_with_descr,
+                "history": history,
                 "name": "test.labeled_counter_not_in_source",
                 "in-source": False,
             },
@@ -641,6 +690,15 @@ def msg_glean_probes():
                 "type": "uuid",
                 "history": history,
                 "name": "test.uuid",
+                "in-source": True,
+            },
+        ),
+        GleanProbe(
+            "test.url",
+            {
+                "type": "url",
+                "history": history,
+                "name": "test.url",
                 "in-source": True,
             },
         ),
@@ -1065,6 +1123,36 @@ def test_lookml_actual_metrics_view(
                             ],
                         },
                         {
+                            "group_item_label": "Labeled Counter",
+                            "group_label": "Test",
+                            "name": "metrics__labeled_counter__test_labeled_counter",
+                            "label": "Test Labeled Counter",
+                            "sql": "${TABLE}.metrics.labeled_counter.test_labeled_counter",
+                            "hidden": "yes",
+                            "links": [
+                                {
+                                    "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
+                                    "label": "Glean Dictionary reference for Test Labeled Counter",
+                                    "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/test_labeled_counter",  # noqa: E501
+                                }
+                            ],
+                        },
+                        {
+                            "group_item_label": "Labeled Counter Not In Source",
+                            "group_label": "Test",
+                            "name": "metrics__labeled_counter__test_labeled_counter_not_in_source",
+                            "label": "Test Labeled Counter Not In Source",
+                            "sql": "${TABLE}.metrics.labeled_counter.test_labeled_counter_not_in_source",  # noqa: E501
+                            "hidden": "yes",
+                            "links": [
+                                {
+                                    "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
+                                    "label": "Glean Dictionary reference for Test Labeled Counter Not In Source",  # noqa: E501
+                                    "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/test_labeled_counter_not_in_source",  # noqa: E501
+                                }
+                            ],
+                        },
+                        {
                             "group_item_label": "No Category Counter",
                             "group_label": "Glean",
                             "hidden": "no",
@@ -1133,9 +1221,9 @@ def test_lookml_actual_metrics_view(
                         {
                             "group_item_label": "Jwe",
                             "group_label": "Test",
-                            "name": "metrics__jwe__test_jwe",
+                            "name": "metrics__jwe2__test_jwe",
                             "label": "Test Jwe",
-                            "sql": "${TABLE}.metrics.jwe.test_jwe",
+                            "sql": "${TABLE}.metrics.jwe2.test_jwe",
                             "type": "string",
                             "hidden": "no",
                             "links": [
@@ -1271,6 +1359,22 @@ def test_lookml_actual_metrics_view(
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
                                     "label": "Glean Dictionary reference for Test Uuid",
                                     "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/test_uuid",  # noqa: E501
+                                }
+                            ],
+                        },
+                        {
+                            "group_item_label": "Url",
+                            "group_label": "Test",
+                            "name": "metrics__url2__test_url",
+                            "label": "Test Url",
+                            "sql": "${TABLE}.metrics.url2.test_url",
+                            "type": "string",
+                            "hidden": "no",
+                            "links": [
+                                {
+                                    "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
+                                    "label": "Glean Dictionary reference for Test Url",
+                                    "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/test_url",  # noqa: E501
                                 }
                             ],
                         },
@@ -1564,7 +1668,7 @@ def test_lookml_actual_growth_accounting_view(
                             "sql": "${TABLE}.document_id",
                         },
                     ]
-                    + GrowthAccountingView.default_dimensions,
+                    + GrowthAccountingView.get_default_dimensions(),
                     "measures": GrowthAccountingView.default_measures,
                 }
             ]

@@ -6,41 +6,58 @@
   elements:
   {% for element in elements -%}
   - title: {{element.title}}
-    name: {{element.title}}
+    name: {{element.title}}_{{element.statistic}}
+    {% if not compact_visualization -%}
+    note_state: expanded
+    note_display: above
+    note_text: {{element.statistic.title()}}
+    {% endif -%}
     explore: {{element.explore}}
+    {% if element.statistic == "percentile" -%}
     type: "ci-line-chart"
+    {% else -%}
+    type: looker_line
+    {% endif -%}
     fields: [
       {{element.explore}}.{{element.xaxis}},
       {{element.explore}}.branch,
-      {{element.explore}}.high,
-      {{element.explore}}.low,
-      {{element.explore}}.percentile
+      {% if element.statistic == "percentile" -%}
+      {{element.explore}}.upper,
+      {{element.explore}}.lower,
+      {% endif -%}
+      {{element.explore}}.point
     ]
     pivots: [
-      {{element.explore}}.branch 
+      {{element.explore}}.branch
       {%- if group_by_dimension and element.title.endswith(group_by_dimension) %}, {{element.explore}}.{{group_by_dimension}} {% endif %}
+      {%- if element.is_metric_group %}, {{element.explore}}.metric {% endif %}
     ]
     {% if not compact_visualization -%}
     filters:
-      {{element.explore}}.probe: {{element.metric}}
+      {{element.explore}}.metric: '{{element.metric}}'
+      {{element.explore}}.statistic: {{element.statistic}}
     {% endif -%}
     row: {{element.row}}
     col: {{element.col}}
     width: 12
     height: 8
     field_x: {{element.explore}}.{{element.xaxis}}
-    field_y: {{element.explore}}.percentile
+    field_y: {{element.explore}}.point
     log_scale: false
-    ci_lower: {{element.explore}}.low
-    ci_upper: {{element.explore}}.high
+    ci_lower: {{element.explore}}.lower
+    ci_upper: {{element.explore}}.upper
     show_grid: true
     listen:
-      Percentile: {{element.explore}}.percentile_conf
+      Date: {{element.explore}}.{{element.xaxis}}
+      {%- if element.statistic == "percentile" %}
+      Percentile: {{element.explore}}.parameter
+      {%- endif %}
       {%- for dimension in dimensions %}
       {{dimension.title}}: {{element.explore}}.{{dimension.name}}
       {%- endfor %}
       {% if compact_visualization -%}
-      Probe: {{element.explore}}.probe
+      Metric: {{element.explore}}.metric
+      Statistic: {{element.explore}}.statistic
       {% endif -%}
     {%- for branch, color in element.series_colors.items() %}
     {{ branch }}: "{{ color }}"
@@ -53,8 +70,11 @@
     model: operational_monitoring
     explore: {{alerts.explore}}
     type: looker_grid
-    fields: [{{alerts.explore}}.submission_date,
-      {{alerts.explore}}.probe, {{alerts.explore}}.percentile,
+    fields: [{{alerts.explore}}.submission_date, {{alerts.explore}}.build_id,
+      {%- for dimension in dimensions %}
+      {{alerts.explore}}.{{dimension.name}},
+      {%- endfor %}
+      {{alerts.explore}}.metric, {{alerts.explore}}.statistic, {{alerts.explore}}.parameter,
       {{alerts.explore}}.message, {{alerts.explore}}.branch, {{alerts.explore}}.errors]
     sorts: [{{alerts.explore}}.submission_date
         desc]
@@ -98,40 +118,46 @@
     interpolation: linear
     defaults_version: 1
     series_types: {}
-    listen: {}
+    listen:
+      Date: {{alerts.explore}}.{{alerts.date}}
     row: {{ alerts.row }}
     col: {{ alerts.col }}
     width: 24
     height: 6
   {% endif %}
   filters:
+  - name: Date
+    title: Date
+    type: field_filter
+    allow_multiple_values: true
+    required: false
+    ui_config:
+      type: advanced
+      display: popover
+    model: operational_monitoring
+    explore: {{elements[0].explore}}
+    listens_to_filters: []
+    field: {{elements[0].explore}}.{{elements[0].xaxis}}
+
   - name: Percentile
     title: Percentile
-    type: number_filter
+    type: field_filter
     default_value: '50'
     allow_multiple_values: false
     required: true
     ui_config:
-      type: dropdown_menu
-      display: inline
-      options:
-      - '10'
-      - '20'
-      - '30'
-      - '40'
-      - '50'
-      - '60'
-      - '70'
-      - '80'
-      - '90'
-      - '95'
-      - '99'
+      type: advanced
+      display: popover
+    model: operational_monitoring
+    explore: {{ elements[0].explore }}
+    listens_to_filters: []
+    field: {{ elements[0].explore }}.parameter
   {% if compact_visualization -%}
-  - name: Probe
-    title: Probe
+  - name: Metric
+    title: Metric
     type: field_filter
     default_value: '{{ elements[0].metric }}'
-    allow_multiple_values: true
+    allow_multiple_values: false
     required: true
     ui_config:
       type: dropdown_menu
@@ -139,7 +165,20 @@
     model: operational_monitoring
     explore: {{ elements[0].explore }}
     listens_to_filters: []
-    field: {{ elements[0].explore }}.probe
+    field: {{ elements[0].explore }}.metric
+  - name: Statistic
+    title: Statistic
+    type: field_filter
+    default_value: '{{ elements[0].statistic }}'
+    allow_multiple_values: false
+    required: true
+    ui_config:
+      type: dropdown_menu
+      display: popover
+    model: operational_monitoring
+    explore: {{ elements[0].explore }}
+    listens_to_filters: [Metric]
+    field: {{ elements[0].explore }}.statistic
   {% endif -%}
 
   {% for dimension in dimensions -%}
@@ -171,5 +210,5 @@
       {% for option in dimension.options | sort -%}
       - '{{option}}'
       {% endfor %}
-    {% endif %}
+  {% endif %}
   {% endfor -%}

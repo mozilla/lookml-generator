@@ -47,6 +47,17 @@ def custom_namespaces(tmp_path):
                   projects:
                     tables:
                     - table: mozdata.operational_monitoring.projects
+            firefox_accounts:
+              pretty_name: Firefox Accounts
+              glean_app: false
+              owners:
+              - custom-owner@allizom.com
+              views:
+                growth_accounting:
+                  type: growth_accounting_view
+                  identifier_field: user_id
+                  tables:
+                  - table: mozdata.firefox_accounts.fxa_users_last_seen
             custom:
               connection: bigquery-oauth
               glean_app: false
@@ -155,9 +166,9 @@ class MockClient:
                             "name": "OpMon",
                             "branches": ["enabled", "disabled"],
                             "xaxis": "submission_date",
-                            "probes": [
-                                {"name": "GC_MS", "agg_type": "histogram"},
-                                {"name": "GC_MS_CONTENT", "agg_type": "histogram"},
+                            "summaries": [
+                                {"metric": "GC_MS", "statistic": "mean"},
+                                {"metric": "GC_MS_CONTENT", "statistic": "percentile"},
                             ],
                             "dimensions": {
                                 "cores_count": {"default": "4", "options": ["4", "1"]}
@@ -283,6 +294,25 @@ def test_namespaces_full(
                         },
                     },
                 },
+                "firefox_accounts": {
+                    "glean_app": False,
+                    "owners": [
+                        "custom-owner@allizom.com",
+                    ],
+                    "pretty_name": "Firefox Accounts",
+                    "spoke": "looker-spoke-default",
+                    "views": {
+                        "growth_accounting": {
+                            "type": "growth_accounting_view",
+                            "identifier_field": "user_id",
+                            "tables": [
+                                {
+                                    "table": "mozdata.firefox_accounts.fxa_users_last_seen",
+                                }
+                            ],
+                        }
+                    },
+                },
                 "glean-app": {
                     "explores": {
                         "baseline": {
@@ -392,8 +422,14 @@ def test_namespaces_full(
                                     },
                                     "explore": "op_mon",
                                     "group_by_dimension": None,
-                                    "probes": ["GC_MS", "GC_MS_CONTENT"],
-                                    "table": "moz-fx-data-shared-prod.operational_monitoring.op_mon",
+                                    "summaries": [
+                                        {"metric": "GC_MS", "statistic": "mean"},
+                                        {
+                                            "metric": "GC_MS_CONTENT",
+                                            "statistic": "percentile",
+                                        },
+                                    ],
+                                    "table": "moz-fx-data-shared-prod.operational_monitoring.op_mon_statistics",
                                     "xaxis": "submission_date",
                                 }
                             ],
@@ -407,7 +443,10 @@ def test_namespaces_full(
                             "dimensions": {
                                 "cores_count": {"default": "4", "options": ["4", "1"]}
                             },
-                            "probes": ["GC_MS", "GC_MS_CONTENT"],
+                            "summaries": [
+                                {"metric": "GC_MS", "statistic": "mean"},
+                                {"metric": "GC_MS_CONTENT", "statistic": "percentile"},
+                            ],
                             "type": "operational_monitoring_explore",
                             "views": {"base_view": "op_mon"},
                             "xaxis": "submission_date",
@@ -427,7 +466,7 @@ def test_namespaces_full(
                                             "options": ["4", "1"],
                                         }
                                     },
-                                    "table": "moz-fx-data-shared-prod.operational_monitoring.op_mon",
+                                    "table": "moz-fx-data-shared-prod.operational_monitoring.op_mon_statistics",
                                     "xaxis": "submission_date",
                                 }
                             ],

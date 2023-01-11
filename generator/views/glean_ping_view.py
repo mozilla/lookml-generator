@@ -20,15 +20,27 @@ DISTRIBUTION_TYPES = {
 
 ALLOWED_TYPES = DISTRIBUTION_TYPES | {
     "boolean",
+    "labeled_boolean",
     "counter",
     "labeled_counter",
     "datetime",
     "jwe",
     "quantity",
     "string",
+    "labeled_string",
     "rate",
     "timespan",
     "uuid",
+    "url",
+    "text",
+}
+
+# Bug 1737656 - some metric types are exposed under different names
+# We need to map to the new name when building dimensions.
+RENAMED_METRIC_TYPES = {
+    "jwe": "jwe2",
+    "text": "text2",
+    "url": "url2",
 }
 
 
@@ -66,14 +78,17 @@ class GleanPingView(PingView):
             self.tables[0],
         )["table"]
         dimensions = self.get_dimensions(bq_client, table, v1_name)
+        dimension_names = {dimension["name"] for dimension in dimensions}
 
         client_id_field = self.get_client_id(dimensions, table)
 
         view_definitions = []
         metrics = self._get_glean_metrics(v1_name)
         for metric in metrics:
+            looker_name = self._to_looker_name(metric)
+            if looker_name not in dimension_names:
+                continue  # skip metrics with no matching dimension
             if metric.type == "labeled_counter":
-                looker_name = self._to_looker_name(metric)
                 view_name = f"{self.name}__{looker_name}"
                 suggest_name = f"suggest__{view_name}"
 
@@ -241,7 +256,8 @@ class GleanPingView(PingView):
 
         sep = "" if not category else "_"
         label = name
-        looker_name = f"metrics__{metric.type}__{category}{sep}{name}"
+        type = RENAMED_METRIC_TYPES.get(metric.type, metric.type)
+        looker_name = f"metrics__{type}__{category}{sep}{name}"
         if suffix:
             label = f"{name}_{suffix}"
             looker_name = f"{looker_name}__{suffix}"

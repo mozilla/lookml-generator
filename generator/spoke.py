@@ -89,7 +89,8 @@ def generate_model(
     }
 
     path = spoke_path / name / f"{name}.model.lkml"
-    path.write_text(lkml.dump(model_defn))
+    # lkml.dump may return None, in which case write an empty file
+    path.write_text(lkml.dump(model_defn) or "")
 
     return path
 

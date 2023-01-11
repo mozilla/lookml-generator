@@ -2,7 +2,7 @@
 operational_monitoring:
   glean_app: false
   owners:
-    - msamuel@mozilla.com
+    - ascholtz@mozilla.com
   pretty_name: Operational Monitoring
   views:
     projects:
@@ -51,6 +51,10 @@ duet:
       tables:
         - channel: release
           table: mozdata.telemetry.new_profile
+    fenix_marketing_metrics:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.fenix.marketing_attributable_metrics
 activity_stream:
   glean_app: false
   owners:
@@ -97,7 +101,7 @@ search_private:
     search_term_sanitization_job_metadata_daily:
       type: table_view
       tables:
-        - table: mozdata.search_terms_unsanitized_analysis.prototype_sanitation_job_metadata
+        - table: moz-fx-data-shared-prod.search_terms_derived.sanitization_job_metadata_v2
     sanitization_job_languages:
       type: table_view
       tables:
@@ -124,6 +128,10 @@ search:
       type: ping_view
       tables:
         - table: mozdata.search.mobile_search_clients_engines_sources_daily
+    desktop_mobile_search_clients_monthly:
+      type: table_view
+      tables:
+        - table: mozdata.search.desktop_mobile_search_clients_monthly
     desktop_search_alert_records:
       type: ping_view
       tables:
@@ -154,6 +162,18 @@ contextual_services:
     - rburwei@mozilla.com
   spoke: looker-spoke-private
   views:
+    final_adM_forecasts:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.revenue_derived.final_adm_revenue_forecast
+    event_aggregates_spons_tiles:
+      type: ping_view
+      tables:
+        - table: mozdata.contextual_services.event_aggregates_spons_tiles
+    event_aggregates_suggest:
+      type: ping_view
+      tables:
+        - table: mozdata.contextual_services.event_aggregates_suggest
     event_aggregates:
       type: ping_view
       tables:
@@ -166,6 +186,10 @@ contextual_services:
       type: ping_view
       tables:
         - table: mozdata.contextual_services.quicksuggest_impression
+    search_terms_daily:
+      type: ping_view
+      tables:
+        - table: mozdata.search_terms.search_terms_daily
     topsites_click:
       type: ping_view
       tables:
@@ -183,7 +207,24 @@ contextual_services:
         - channel: nightly
           table: mozdata.org_mozilla_fenix.topsites_impression
       type: ping_view
+    topsites_impression_firefox_ios:
+      tables:
+        - channel: release
+          table: mozdata.org_mozilla_ios_firefox.topsites_impression
+        - channel: beta
+          table: mozdata.org_mozilla_ios_firefoxbeta.topsites_impression
+        - channel: nightly
+          table: mozdata.org_mozilla_ios_fennec.topsites_impression
+      type: ping_view
   explores:
+    event_aggregates_spons_tiles:
+      type: ping_explore
+      views:
+        base_view: event_aggregates_spons_tiles
+    event_aggregates_suggest:
+      type: ping_explore
+      views:
+        base_view: event_aggregates_suggest
     event_aggregates:
       type: ping_explore
       views:
@@ -196,6 +237,10 @@ contextual_services:
       type: ping_explore
       views:
         base_view: quicksuggest_impression
+    search_terms_daily:
+      type: ping_explore
+      views:
+        base_view: search_terms_daily
     topsites_clicks:
       type: ping_explore
       views:
@@ -208,6 +253,10 @@ contextual_services:
       type: ping_explore
       views:
         base_view: topsites_impression_fenix
+    topsites_impressions_firefox_ios:
+      type: ping_explore
+      views:
+        base_view: topsites_impression_firefox_ios
 mozilla_vpn_private:
   glean_app: false
   connection: bigquery-oauth
@@ -313,6 +362,7 @@ firefox_accounts:
           table: mozdata.firefox_accounts.events_daily
     growth_accounting:
       type: growth_accounting_view
+      identifier_field: user_id
       tables:
         - table: mozdata.firefox_accounts.fxa_users_last_seen
     fxa_first_seen_table:
@@ -320,6 +370,10 @@ firefox_accounts:
       tables:
         - channel: release
           table: mozdata.firefox_accounts.fxa_users_first_seen
+    fxa_users_services_first_seen_table:
+      type: table_view
+      tables:
+        - table: mozdata.firefox_accounts.fxa_users_services_first_seen
     fxa_users_services_daily_table:
       type: table_view
       tables:
@@ -370,6 +424,24 @@ revenue:
       type: table_view
       tables:
         - table: fenix_derived.google_ads_campaign_cost_breakdowns_v1
+revenue_private:
+  glean_app: false
+  connection: bigquery-oauth
+  pretty_name: Revenue Private
+  owners:
+    - akomarzewski@mozilla.com
+    - skahmann@mozilla.com
+    - xluo@mozilla.com
+  spoke: looker-spoke-private
+  views:
+    revenue_forecast_review_2022:
+      type: table_view
+      tables:
+        - table: mozdata.revenue_cat3_analysis.revenue_forecast_review_long
+    revenue_budget_2022:
+      type: table_view
+      tables:
+        - table: mozdata.revenue_cat3_analysis.budget_complete_2022
 firefox_ios:
   owners:
     - athomas@mozilla.com
@@ -482,6 +554,14 @@ experimentation:
       tables:
         - channel: release
           table: moz-fx-data-shared-prod.telemetry_derived.experiment_search_aggregates_live_v1
+    mr_2022_weekly_statistics_desktop_existing_users:
+      type: table_view
+      tables:
+        - table: moz-fx-data-experiments.mozanalysis.statistics_106_major_release_firefox_existing_user_experience_weekly
+    mr_2022_weekly_statistic_desktop_new_users:
+      type: table_view
+      tables:
+        - table: moz-fx-data-experiments.mozanalysis.statistics_106_major_release_firefox_new_user_weekly
 firefox_desktop:
   glean_app: true
   views:
@@ -497,10 +577,30 @@ firefox_desktop:
       type: table_view
       tables:
         - table: mozdata.telemetry.clients_daily
+    clients_daily_joined_table:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.telemetry_derived.clients_daily_joined_v1
     client_counts:
       type: client_counts_view
       tables:
         - table: mozdata.telemetry.clients_daily
+    sponsored_tiles_clients_daily_table:
+      type: table_view
+      tables:
+        - table: mozdata.telemetry.sponsored_tiles_clients_daily
+    sponsored_tiles_clients_daily:
+      type: table_view
+      tables:
+        - table: mozdata.telemetry.sponsored_tiles_clients_daily
+    suggest_clients_daily_table:
+      type: table_view
+      tables:
+        - table: mozdata.telemetry.suggest_clients_daily
+    suggest_clients_daily:
+      type: table_view
+      tables:
+        - table: mozdata.telemetry.suggest_clients_daily
     funnel_analysis:
       type: funnel_analysis_view
       tables:
@@ -524,6 +624,11 @@ firefox_desktop:
       tables:
         - events_table_view: desktop_events_table
           base_table: mozdata.telemetry.events
+    glean_events:
+      type: events_view
+      tables:
+        - events_table_view: events_unnested_table
+          base_table: mozdata.firefox_desktop.events_unnested
     desktop_events_table:
       type: table_view
       tables:
@@ -533,6 +638,10 @@ firefox_desktop:
       type: table_view
       tables:
         - table: mozdata.telemetry.newtab_interactions
+    default_browser:
+      type: ping_view
+      tables:
+        - table: mozdata.default_browser_agent.default_browser
   explores:
     client_counts:
       type: client_counts_explore
@@ -552,6 +661,15 @@ firefox_desktop:
       views:
         base_view: events
         extended_view: desktop_events_table
+    glean_event_counts:
+      type: events_explore
+      views:
+        base_view: glean_events
+        extended_view: events_unnested_table
+    default_browser:
+      type: ping_explore
+      views:
+        base_view: default_browser
 pocket:
   glean_app: false
   owners:
@@ -588,12 +706,29 @@ monitoring:
     - anicholson@mozilla.com
     - mhirose@mozilla.com
     - kignasiak@mozilla.com
+    - wichan@mozilla.com
   pretty_name: Monitoring (Data Pipeline)
   views:
     average_ping_sizes:
       type: ping_view
       tables:
         - table: mozdata.monitoring.average_ping_sizes
+    bigquery_tables_inventory:
+      tables:
+        - table: moz-fx-data-shared-prod.monitoring.bigquery_tables_inventory
+      type: table_view
+    bigquery_table_storage:
+      tables:
+        - table: moz-fx-data-shared-prod.monitoring.bigquery_table_storage
+      type: table_view
+    bigquery_table_storage_timeline_daily:
+      tables:
+        - table: moz-fx-data-shared-prod.monitoring.bigquery_table_storage_timeline_daily
+      type: table_view
+    bigquery_usage:
+      tables:
+        - table: moz-fx-data-shared-prod.monitoring.bigquery_usage
+      type: table_view
     column_size:
       type: ping_view
       tables:
@@ -614,6 +749,10 @@ monitoring:
       type: ping_view
       tables:
         - table: mozdata.monitoring.stable_table_sizes
+    stable_and_derived_table_sizes:
+      type: ping_view
+      tables:
+        - table: mozdata.monitoring.stable_and_derived_table_sizes
     stable_table_column_counts:
       type: ping_view
       tables:
@@ -650,6 +789,35 @@ monitoring:
       type: table_view
       tables:
         - table: mozdata.static.monitoring_schema_errors_notes_v1
+    # views for accessing Airflow metadata
+    dag:
+      type: table_view
+      tables:
+        - table: mozdata.monitoring.airflow_dag
+    dag_run:
+      type: table_view
+      tables:
+        - table: mozdata.monitoring.airflow_dag_run
+    dag_tag:
+      type: table_view
+      tables:
+        - table: mozdata.monitoring.airflow_dag_tag
+    slot_pool:
+      type: table_view
+      tables:
+        - table: mozdata.monitoring.airflow_slot_pool
+    task_fail:
+      type: table_view
+      tables:
+        - table: mozdata.monitoring.airflow_task_fail
+    task_reschedule:
+      type: table_view
+      tables:
+        - table: mozdata.monitoring.airflow_task_reschedule
+    user:
+      type: table_view
+      tables:
+        - table: mozdata.monitoring.airflow_user
   explores:
     average_ping_sizes:
       type: ping_explore
@@ -675,6 +843,10 @@ monitoring:
       type: ping_explore
       views:
         base_view: stable_table_sizes
+    stable_and_dervied_table_sizes:
+      type: ping_explore
+      views:
+        base_view: stable_and_derived_table_sizes
     stable_table_column_counts:
       type: ping_explore
       views:
@@ -747,6 +919,14 @@ kpi:
       type: ping_view
       tables:
         - table: mozdata.telemetry.unified_metrics
+    automated_kpi_forecasts:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.telemetry_derived.kpi_automated_forecast_v1
+    automated_kpi_confidence_intervals:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.telemetry_derived.kpi_automated_forecast_confidences_v1
   explores:
     unified_metrics:
       type: ping_explore
@@ -822,3 +1002,27 @@ marketing:
       type: table_view
       tables:
         - table: moz-fx-data-marketing-prod.acoustic.raw_recipient_v1
+    firefox_for_families_forecasted_expectations:
+      type: table_view
+      tables:
+        - table: mozdata.analysis.marketing_firefox_for_families_forecasted_expectations
+data_integrity_monitoring:
+  glean_app: false
+  owners:
+    - kignasiak@mozilla.com
+    - akommasani@mozilla.com
+  pretty_name: Data Integrity Monitoring (dim)
+  spoke: looker-spoke-default
+  views:
+    run_history:
+      tables:
+        - table: data-monitoring-dev.dim.dim_run_history
+      type: table_view
+    run_processing_info:
+      tables:
+        - table: data-monitoring-dev.dim.dim_run_processing_info
+      type: table_view
+    muted_alerts:
+      tables:
+        - table: data-monitoring-dev.dim.dim_muted_alerts
+      type: table_view

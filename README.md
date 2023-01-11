@@ -119,7 +119,15 @@ is the following:
    should run using `make build && make run`, with changes reflected in LookML repos.
 2. Once merged, the changes should run on stage. They will run automatically after schema deploys,
    but they can be run manually by clearing the `lookml_generator_staging` task in [Airflow](https://workflow.telemetry.mozilla.org/tree?dag_id=probe_scraper).
-3. Once the changes are confirmed in stage, we first tag a new release here. Add a description with
-   what the new release includes. Finally, change the Airflow variable `lookml_generator_release_str`
-   to the version string you created when cutting the release. Re-run the DAG and the changes
+3. Once the changes are merged and a new release has been pushed, re-run the DAG and the changes
    should take effect.
+
+## `generate` Command Explained - High Level Explanation
+
+When `make run` is executed a Docker container is spun up using the latest `lookml-generator` Docker image on your machine and runs the [`generate` script](bin/generate) using configuration defined at the top of the script unless [overridden using environment variables](./docker-compose.yml#L13-L25) (see the [Container Development](#container-development) section above).
+
+Next, the process authenticates with GitHub, clones the [`looker-hub` repository](https://github.com/mozilla/looker-hub), and creates the branch defined in the `HUB_BRANCH_PUBLISH` config variable both locally and in the remote. Then it proceeds to checkout into the looker-hub `base` branch and pulls it from the remote.
+
+Once the setup is done, the process generates `namespaces.yaml` and uses it to generate LookML code. A git diff is executed to ensure that the files that already exist in the `base` branch are not being modified. If changes are detected then the process exists with an error code. Otherwise, it proceeds to create a commit and push it to the remote dev branch created earlier.
+
+When following the `Container Development` steps, the entire process results in a dev branch in `looker-hub` with brand new generated LookML code which can be tested by going to Looker, switching to the "development mode" and selecting the dev branch just created/updated by this command. This will result in Looker using the brand new LookML code just generated. Otherwise, changes merged into `main` in this repo will become available on looker-hub `main` when the scheduled Airflow job runs.

@@ -73,6 +73,14 @@ class EventsView(View):
         )
         view_defn["measures"] = self.get_measures(dimensions)
 
+        # set document_id as primary key if it exists in the underlying table
+        # this will allow one_to_many joins
+        document_id_field = self.get_document_id(dimensions, "events")
+        if document_id_field is not None:
+            view_defn["dimensions"] = [
+                {"name": document_id_field, "primary_key": "yes"}
+            ]
+
         return {
             "includes": [f"{self.tables[0]['events_table_view']}.view.lkml"],
             "views": [view_defn],

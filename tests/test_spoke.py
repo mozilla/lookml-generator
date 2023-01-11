@@ -61,7 +61,7 @@ def custom_namespaces():
 def test_generate_directories(looker_sdk, namespaces, tmp_path):
     sdk = looker_sdk.init31()
     sdk.search_model_sets.return_value = [Mock(models=["model"], id=1)]
-    sdk.lookml_model.side_effect = _looker_sdk.error.SDKError
+    sdk.lookml_model.side_effect = _looker_sdk.error.SDKError("msg")
     looker_sdk.error = Mock(SDKError=_looker_sdk.error.SDKError)
 
     generate_directories(namespaces, tmp_path, True)
@@ -125,7 +125,7 @@ def test_existing_dir(looker_sdk, namespaces, tmp_path):
 def test_generate_model(looker_sdk, namespaces, tmp_path):
     sdk = looker_sdk.init31()
     sdk.search_model_sets.side_effect = [[Mock(models=["model"], id=1)]]
-    sdk.lookml_model.side_effect = _looker_sdk.error.SDKError
+    sdk.lookml_model.side_effect = _looker_sdk.error.SDKError("msg")
     looker_sdk.error = Mock(SDKError=_looker_sdk.error.SDKError)
 
     write_model = Mock()
@@ -161,7 +161,7 @@ def test_generate_model(looker_sdk, namespaces, tmp_path):
 def test_alternate_connection(looker_sdk, custom_namespaces, tmp_path):
     sdk = looker_sdk.init31()
     sdk.search_model_sets.return_value = [Mock(models=["model"], id=1)]
-    sdk.lookml_model.side_effect = _looker_sdk.error.SDKError
+    sdk.lookml_model.side_effect = _looker_sdk.error.SDKError("msg")
     looker_sdk.error = Mock(SDKError=_looker_sdk.error.SDKError)
 
     write_model = Mock()

@@ -12,13 +12,6 @@ class OperationalMonitoringDashboard(Dashboard):
 
     type: str = "operational_monitoring_dashboard"
 
-    OPMON_DASH_EXCLUDED_FIELDS: List[str] = [
-        "branch",
-        "probe",
-        "histogram__VALUES__key",
-        "histogram__VALUES__value",
-    ]
-
     def __init__(
         self,
         title: str,
@@ -85,6 +78,9 @@ class OperationalMonitoringDashboard(Dashboard):
                 kwargs["alerts"] = {
                     "explore": explore,
                     "col": 0,
+                    "date": (
+                        f"{self.xaxis}_date" if self.xaxis == "build_id" else self.xaxis
+                    ),
                 }
             else:
                 if len(kwargs["dimensions"]) == 0:
@@ -101,38 +97,80 @@ class OperationalMonitoringDashboard(Dashboard):
                 series_colors = self._map_series_to_colours(
                     table_defn["branches"], explore
                 )
-                for metric in table_defn.get("probes", []):
-                    if self.compact_visualization:
-                        title = "Probe"
-                    else:
-                        title = lookml_utils.slug_to_title(metric)
+                # determine metric groups
+                metric_groups = {}
+                for summary in table_defn.get("summaries", []):
+                    for metric_group in summary.get("metric_groups", []):
+                        if metric_group not in metric_groups:
+                            metric_groups[metric_group] = [summary["metric"]]
+                        elif summary["metric"] not in metric_groups[metric_group]:
+                            metric_groups[metric_group].append(summary["metric"])
 
-                    kwargs["elements"].append(
-                        {
-                            "title": title,
-                            "metric": metric,
-                            "explore": explore,
-                            "series_colors": series_colors,
-                            "xaxis": self.xaxis,
-                            "row": int(graph_index / 2) * 10,
-                            "col": 0 if graph_index % 2 == 0 else 12,
-                        }
-                    )
-                    graph_index += 1
+                seen_metric_groups = []
+                for summary in table_defn.get("summaries", []):
+                    summary_metric_groups = summary.get("metric_groups", [])
+                    if len(summary_metric_groups) == 0:
+                        # append a dummy entry if no metric group defined
+                        summary_metric_groups.append(None)
 
-                    if self.group_by_dimension:
+                    for metric_group in summary_metric_groups:
+                        if (metric_group, summary["statistic"]) in seen_metric_groups:
+                            continue
+
+                        if self.compact_visualization:
+                            title = "Metric"
+                        else:
+                            if metric_group is None:
+                                title = lookml_utils.slug_to_title(summary["metric"])
+                            else:
+                                title = lookml_utils.slug_to_title(metric_group)
+
                         kwargs["elements"].append(
                             {
-                                "title": f"{title} - By {self.group_by_dimension}",
-                                "metric": metric,
+                                "title": title,
+                                "metric": summary["metric"]
+                                if metric_group is None
+                                else ", ".join(
+                                    f'"{m}"' for m in metric_groups[metric_group]
+                                ),
+                                "statistic": summary["statistic"],
                                 "explore": explore,
                                 "series_colors": series_colors,
                                 "xaxis": self.xaxis,
                                 "row": int(graph_index / 2) * 10,
                                 "col": 0 if graph_index % 2 == 0 else 12,
+                                "is_metric_group": metric_group is not None,
                             }
                         )
+                        if metric_group is not None:
+                            seen_metric_groups.append(
+                                (metric_group, summary["statistic"])
+                            )
                         graph_index += 1
+
+                        if self.group_by_dimension:
+                            kwargs["elements"].append(
+                                {
+                                    "title": f"{title} - By {self.group_by_dimension}",
+                                    "metric": summary["metric"]
+                                    if metric_group is None
+                                    else ", ".join(
+                                        f'"{m}"' for m in metric_groups[metric_group]
+                                    ),
+                                    "statistic": summary["statistic"],
+                                    "explore": explore,
+                                    "series_colors": series_colors,
+                                    "xaxis": self.xaxis,
+                                    "row": int(graph_index / 2) * 10,
+                                    "col": 0 if graph_index % 2 == 0 else 12,
+                                    "is_metric_group": metric_group is not None,
+                                }
+                            )
+                            graph_index += 1
+
+                        if self.compact_visualization:
+                            # compact visualization only needs a single tile for all probes
+                            break
 
                     if self.compact_visualization:
                         # compact visualization only needs a single tile for all probes

@@ -1,10 +1,35 @@
 """Utils for operational monitoring."""
-from typing import Any, Dict, List
+from multiprocessing.pool import ThreadPool
+from typing import Any, Dict, List, Optional, Tuple
 
 from google.api_core import exceptions
 from google.cloud import bigquery
 
 from .views import lookml_utils
+
+
+def _default_helper(
+    bq_client: bigquery.Client, table: str, dimension: str
+) -> Tuple[Optional[str], dict]:
+    query_job = bq_client.query(
+        f"""
+            SELECT DISTINCT {dimension} AS option, COUNT(*)
+            FROM {table}
+            WHERE {dimension} IS NOT NULL
+            GROUP BY 1
+            ORDER BY 2 DESC
+            LIMIT 10
+        """
+    )
+
+    dimension_options = list(query_job.result())
+
+    if len(dimension_options) > 0:
+        return dimension, {
+            "default": dimension_options[0]["option"],
+            "options": [d["option"] for d in dimension_options],
+        }
+    return None, {}
 
 
 def get_dimension_defaults(
@@ -16,28 +41,15 @@ def get_dimension_defaults(
     For a given Operational Monitoring dimension, find its default (most common)
     value and its top 10 most common to be used as dropdown options.
     """
-    dimension_defaults = {}
-
-    for dimension in dimensions:
-        query_job = bq_client.query(
-            f"""
-                SELECT DISTINCT {dimension} AS option, COUNT(*)
-                FROM {table}
-                WHERE {dimension} IS NOT NULL
-                GROUP BY 1
-                ORDER BY 2 DESC
-            """
-        )
-
-        dimension_options = [dict(row) for row in query_job.result()]
-
-        if len(dimension_options) > 0:
-            dimension_defaults[dimension] = {
-                "default": dimension_options[0]["option"],
-                "options": [d["option"] for d in dimension_options[:10]],
-            }
-
-    return dimension_defaults
+    with ThreadPool(4) as pool:
+        return {
+            key: value
+            for key, value in pool.starmap(
+                _default_helper,
+                [[bq_client, table, dimension] for dimension in dimensions],
+            )
+            if key is not None
+        }
 
 
 def get_xaxis_val(bq_client: bigquery.Client, table: str) -> str:

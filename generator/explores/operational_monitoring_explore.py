@@ -28,7 +28,7 @@ class OperationalMonitoringExplore(Explore):
             self.branches = ", ".join(defn["branches"])
             self.xaxis = defn.get("xaxis")
             self.dimensions = defn.get("dimensions", {})
-            self.probes = defn.get("probes", [])
+            self.summaries = defn.get("summaries", [])
 
     @staticmethod
     def from_views(views: List[View]) -> Iterator[Explore]:
@@ -56,7 +56,6 @@ class OperationalMonitoringExplore(Explore):
 
         filters = [
             {f"{base_view_name}.branch": self.branches},
-            {f"{base_view_name}.percentile_conf": "50"},
         ]
         for dimension, info in self.dimensions.items():
             if "default" in info:

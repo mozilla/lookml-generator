@@ -14,10 +14,10 @@ VIEW_TYPES = {
     ClientCountsView.type: ClientCountsView,
     EventsView.type: EventsView,
     FunnelAnalysisView.type: FunnelAnalysisView,
+    OperationalMonitoringView.type: OperationalMonitoringView,
+    OperationalMonitoringAlertingView.type: OperationalMonitoringAlertingView,
     GleanPingView.type: GleanPingView,
     PingView.type: PingView,
     GrowthAccountingView.type: GrowthAccountingView,
-    OperationalMonitoringView.type: OperationalMonitoringView,
-    OperationalMonitoringAlertingView.type: OperationalMonitoringAlertingView,
     TableView.type: TableView,
 }
