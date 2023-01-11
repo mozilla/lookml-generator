@@ -1022,3 +1022,26 @@ data_integrity_monitoring:
       tables:
         - table: data-monitoring-dev.dim.dim_muted_alerts
       type: table_view
+relay:
+  glean_app: false
+  owners:
+    - srose@mozilla.com
+    - ysmith@mozilla.com
+  pretty_name: Firefox Relay
+  views:
+    subscriptions:
+      type: table_view
+      subscriptions:
+        - table: mozdata.relay.subscriptions
+    subscription_events:
+      type: table_view
+      tables:
+        - table: mozdata.relay.subscription_events
+    active_subscriptions:
+      type: table_view
+      tables:
+        - table: mozdata.relay.active_subscriptions
+    active_subscription_ids:
+      type: table_view
+      tables:
+        - table: mozdata.relay.active_subscription_ids
