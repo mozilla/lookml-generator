@@ -366,6 +366,10 @@ revenue:
       type: table_view
       tables:
         - table: mozdata.stripe.itemized_payout_reconciliation
+    ad_cost_breakdowns:
+      type: table_view
+      tables:
+        - table: fenix_derived.google_ads_campaign_cost_breakdowns_v1
 firefox_ios:
   owners:
     - athomas@mozilla.com
