@@ -11,3 +11,4 @@ namespaces.yaml
 looker-hub/
 .env
 .vscode
+.python-version
