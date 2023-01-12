@@ -1031,7 +1031,7 @@ relay:
   views:
     subscriptions:
       type: table_view
-      subscriptions:
+      tables:
         - table: mozdata.relay.subscriptions
     subscription_events:
       type: table_view
