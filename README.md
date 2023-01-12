@@ -113,14 +113,9 @@ make build && make run
 `lookml-generator` runs daily to update the `looker-hub` and `looker-spoke-default` code. Changes
 to the underlying tables should automatically propogate to their respective views and explores.
 
-However, changes to `lookml-generator` need to be tested on stage and deployed. The general process
-is the following:
-1. Create a PR, test on dev. It is not necessary to add Looker credentials, but the container changes
-   should run using `make build && make run`, with changes reflected in LookML repos.
-2. Once merged, the changes should run on stage. They will run automatically after schema deploys,
-   but they can be run manually by clearing the `lookml_generator_staging` task in [Airflow](https://workflow.telemetry.mozilla.org/tree?dag_id=probe_scraper).
-3. Once the changes are merged and a new release has been pushed, re-run the DAG and the changes
-   should take effect.
+Airflow updates the two repositories [each morning](https://github.com/mozilla/telemetry-airflow/blob/main/dags/probe_scraper.py#L320).
+If you need your changes deployed quickly, wait for the container to build after you merge to
+`main`, and re-run the task in Airflow (`lookml_generator`, in the `probe_scraper` DAG).
 
 ## `generate` Command Explained - High Level Explanation
 
