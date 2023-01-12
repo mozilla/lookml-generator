@@ -420,6 +420,10 @@ revenue:
       type: table_view
       tables:
         - table: mozdata.stripe.itemized_payout_reconciliation
+    ad_cost_breakdowns:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.fenix_derived.google_ads_campaign_cost_breakdowns_v1
 revenue_private:
   glean_app: false
   connection: bigquery-oauth
