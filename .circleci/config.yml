@@ -52,7 +52,7 @@ jobs:
           # of a package name and a version specifier"
           command: |
             pip install pip-tools --constraint requirements.in
-            pip-compile --quiet --allow-unsafe --generate-hashes
+            pip-compile --quiet --generate-hashes --unsafe-package=
             git diff --exit-code -G '^ *[^# ]' -- requirements.txt
   integration-tests:
     docker: *docker
@@ -140,7 +140,7 @@ workflows:
       - verify-requirements
       - build-container
       - docs-build
-      
+
       - docs-deploy:
           requires:
             - docs-build
@@ -163,7 +163,7 @@ workflows:
           filters:
             branches:
               only: main
-      
+
       - gcp-gcr/add-image-tag:
           name: Add commit hash as docker image tag
           context: data-eng-airflow-gcr
