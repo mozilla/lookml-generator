@@ -18,5 +18,5 @@ pytest-pydocstyle==2.3.2
 pytest==7.2.1
 PyYAML==6.0
 tomli  # for pytest on python<=3.10
-types-PyYaml==6.0.12.2
+types-PyYaml==6.0.12.3
 yamllint==1.29.0
