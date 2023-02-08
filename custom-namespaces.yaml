@@ -1057,3 +1057,13 @@ relay:
       type: table_view
       tables:
         - table: mozdata.relay.active_subscription_ids
+fivetran:
+  glean_app: false
+  owners:
+    - lschiestl@mozilla.com
+  pretty_name: Fivetran
+  views:
+    monthly_connector_costs:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.fivetran_costs.monthly_connector_costs
