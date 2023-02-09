@@ -1067,3 +1067,7 @@ fivetran:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.fivetran_costs.monthly_connector_costs
+    daily_active_rows:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.fivetran_costs.daily_active_rows
