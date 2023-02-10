@@ -420,6 +420,10 @@ revenue:
       type: table_view
       tables:
         - table: mozdata.stripe.itemized_payout_reconciliation
+    ad_cost_breakdowns:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.fenix_derived.google_ads_campaign_cost_breakdowns_v1
 revenue_private:
   glean_app: false
   connection: bigquery-oauth
@@ -979,6 +983,14 @@ websites:
       type: table_view
       tables:
         - table: moz-fx-data-marketing-prod.ga_derived.blogs_landing_page_summary_v1
+    www_site_events_metrics:
+      type: table_view
+      tables:
+        - table: moz-fx-data-marketing-prod.ga_derived.www_site_events_metrics_v1
+    firefox_whatsnew_summary:
+      type: table_view
+      tables:
+        - table: moz-fx-data-marketing-prod.ga_derived.firefox_whatsnew_summary_v1
 marketing:
   glean_app: false
   pretty_name: Marketing
@@ -1022,3 +1034,40 @@ data_integrity_monitoring:
       tables:
         - table: data-monitoring-dev.dim.dim_muted_alerts
       type: table_view
+relay:
+  glean_app: false
+  owners:
+    - srose@mozilla.com
+    - ysmith@mozilla.com
+  pretty_name: Firefox Relay
+  views:
+    subscriptions:
+      type: table_view
+      tables:
+        - table: mozdata.relay.subscriptions
+    subscription_events:
+      type: table_view
+      tables:
+        - table: mozdata.relay.subscription_events
+    active_subscriptions:
+      type: table_view
+      tables:
+        - table: mozdata.relay.active_subscriptions
+    active_subscription_ids:
+      type: table_view
+      tables:
+        - table: mozdata.relay.active_subscription_ids
+fivetran:
+  glean_app: false
+  owners:
+    - lschiestl@mozilla.com
+  pretty_name: Fivetran
+  views:
+    monthly_connector_costs:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.fivetran_costs.monthly_connector_costs
+    daily_active_rows:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.fivetran_costs.daily_active_rows

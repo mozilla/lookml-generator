@@ -52,7 +52,7 @@ jobs:
           # of a package name and a version specifier"
           command: |
             pip install pip-tools --constraint requirements.in
-            pip-compile --quiet --allow-unsafe --generate-hashes
+            pip-compile --allow-unsafe --generate-hashes --quiet
             git diff --exit-code -G '^ *[^# ]' -- requirements.txt
   integration-tests:
     docker: *docker
@@ -114,7 +114,7 @@ jobs:
             git config user.name "ci-build-docs"
       - add_ssh_keys:
           fingerprints:
-            - "0d:4a:6d:ec:a7:b9:cd:9e:be:39:9f:e2:06:34:13:73"
+            - "f6:e8:0c:dd:e4:16:0c:4f:1a:5d:da:56:82:9e:a3:61"
       - run:
           name: Deploy docs to gh-pages branch
           command: gh-pages --message "[skip ci] updates" --dist /tmp/_html
@@ -140,7 +140,7 @@ workflows:
       - verify-requirements
       - build-container
       - docs-build
-      
+
       - docs-deploy:
           requires:
             - docs-build
@@ -163,7 +163,7 @@ workflows:
           filters:
             branches:
               only: main
-      
+
       - gcp-gcr/add-image-tag:
           name: Add commit hash as docker image tag
           context: data-eng-airflow-gcr
