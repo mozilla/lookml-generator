@@ -319,7 +319,8 @@ def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri, disallowl
             client = bigquery.Client()
             opmon = _get_opmon(bq_client=client, namespaces=custom_namespaces)
             custom_namespaces["operational_monitoring"].update(opmon)
-            _merge_namespaces(namespaces, custom_namespaces)
+
+        _merge_namespaces(namespaces, custom_namespaces)
 
     disallowed_namespaces = yaml.safe_load(disallowlist.read()) or {}
     disallowed_regex = [
