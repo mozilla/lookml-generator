@@ -30,7 +30,7 @@ class PingView(View):
         if (klass.allow_glean and not is_glean) or (not klass.allow_glean and is_glean):
             return
 
-        views = defaultdict(list)
+        view_tables: Dict[str, Dict[str, Dict[str, str]]] = defaultdict(dict)
         for channel in channels:
             dataset = channel["dataset"]
 
@@ -38,8 +38,8 @@ class PingView(View):
                 if view_id in OMIT_VIEWS:
                     continue
 
-                table: Dict[str, str] = {"table": f"mozdata.{dataset}.{view_id}"}
-
+                table_id = f"mozdata.{dataset}.{view_id}"
+                table: Dict[str, str] = {"table": table_id}
                 if channel.get("channel") is not None:
                     table["channel"] = channel["channel"]
 
@@ -53,10 +53,10 @@ class PingView(View):
                 ):
                     continue
 
-                views[view_id].append(table)
+                view_tables[view_id][table_id] = table
 
-        for view_id, tables in views.items():
-            yield klass(namespace, view_id, tables)
+        for view_id, tables_by_id in view_tables.items():
+            yield klass(namespace, view_id, list(tables_by_id.values()))
 
     @classmethod
     def from_dict(klass, namespace: str, name: str, _dict: ViewDict) -> PingView:

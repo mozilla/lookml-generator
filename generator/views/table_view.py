@@ -29,7 +29,7 @@ class TableView(View):
         db_views: dict,
     ) -> Iterator[TableView]:
         """Get Looker views for a namespace."""
-        views = defaultdict(list)
+        view_tables: Dict[str, Dict[str, Dict[str, str]]] = defaultdict(dict)
         for channel in channels:
             dataset = channel["dataset"]
 
@@ -37,15 +37,15 @@ class TableView(View):
                 if view_id in OMIT_VIEWS:
                     continue
 
-                table: Dict[str, str] = {"table": f"mozdata.{dataset}.{view_id}"}
-
+                table_id = f"mozdata.{dataset}.{view_id}"
+                table: Dict[str, str] = {"table": table_id}
                 if "channel" in channel:
                     table["channel"] = channel["channel"]
 
-                views[view_id].append(table)
+                view_tables[view_id][table_id] = table
 
-        for view_id, tables in views.items():
-            yield TableView(namespace, f"{view_id}_table", tables)
+        for view_id, tables_by_id in view_tables.items():
+            yield TableView(namespace, f"{view_id}_table", list(tables_by_id.values()))
 
     @classmethod
     def from_dict(klass, namespace: str, name: str, _dict: ViewDict) -> TableView:
