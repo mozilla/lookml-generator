@@ -1,8 +1,13 @@
 """Utils for generating lookml."""
 import re
+import tarfile
+import urllib.request
+from collections import defaultdict
+from io import BytesIO
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 import click
+import yaml
 from google.cloud import bigquery
 from jinja2 import Environment, PackageLoader
 
@@ -209,3 +214,29 @@ def get_distinct_vals(bq_client: bigquery.Client, table: str, column: str):
 def slug_to_title(slug):
     """Convert a slug to title case."""
     return slug.replace("_", " ").title()
+
+
+# Map from view to qualified references {view: [[project, dataset, table],]}
+BQViewReferenceMap = Dict[str, List[List[str]]]
+
+
+def get_bigquery_view_reference_map(
+    generated_sql_uri: str,
+) -> Dict[str, BQViewReferenceMap]:
+    """Get a mapping from BigQuery datasets to views with references."""
+    with urllib.request.urlopen(generated_sql_uri) as f:
+        tarbytes = BytesIO(f.read())
+    views: Dict[str, BQViewReferenceMap] = defaultdict(dict)
+    with tarfile.open(fileobj=tarbytes, mode="r:gz") as tar:
+        for tarinfo in tar:
+            if tarinfo.name.endswith("/metadata.yaml"):
+                metadata = yaml.safe_load(tar.extractfile(tarinfo.name))  # type: ignore
+                references = metadata.get("references", {})
+                if "view.sql" not in references:
+                    continue
+                *_, project, dataset_id, view_id, _ = tarinfo.name.split("/")
+                if project == "moz-fx-data-shared-prod":
+                    views[dataset_id][view_id] = [
+                        ref.split(".") for ref in references["view.sql"]
+                    ]
+    return views
