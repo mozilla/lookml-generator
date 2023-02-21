@@ -219,14 +219,16 @@
 </span><span id="L-152"><a href="#L-152"><span class="linenos">152</span></a>        <span class="n">DEFAULT_GENERATED_SQL_URI</span>
 </span><span id="L-153"><a href="#L-153"><span class="linenos">153</span></a>    <span class="p">)</span>
 </span><span id="L-154"><a href="#L-154"><span class="linenos">154</span></a>
-</span><span id="L-155"><a href="#L-155"><span class="linenos">155</span></a>    <span class="n">datagroup_content</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="L-156"><a href="#L-156"><span class="linenos">156</span></a>        <span class="n">lookml</span>
-</span><span id="L-157"><a href="#L-157"><span class="linenos">157</span></a>        <span class="k">for</span> <span class="n">view</span> <span class="ow">in</span> <span class="n">views</span>
-</span><span id="L-158"><a href="#L-158"><span class="linenos">158</span></a>        <span class="k">if</span> <span class="p">(</span><span class="n">lookml</span> <span class="o">:=</span> <span class="n">_generate_view_datagroup_lkml</span><span class="p">(</span><span class="n">view</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">dataset_view_map</span><span class="p">))</span>
-</span><span id="L-159"><a href="#L-159"><span class="linenos">159</span></a>    <span class="p">]</span>
-</span><span id="L-160"><a href="#L-160"><span class="linenos">160</span></a>
-</span><span id="L-161"><a href="#L-161"><span class="linenos">161</span></a>    <span class="k">if</span> <span class="n">datagroup_content</span><span class="p">:</span>
-</span><span id="L-162"><a href="#L-162"><span class="linenos">162</span></a>        <span class="n">datagroups_lkml_path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">FILE_HEADER</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datagroup_content</span><span class="p">))</span>
+</span><span id="L-155"><a href="#L-155"><span class="linenos">155</span></a>    <span class="n">datagroup_content</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+</span><span id="L-156"><a href="#L-156"><span class="linenos">156</span></a>        <span class="nb">set</span><span class="p">(</span>
+</span><span id="L-157"><a href="#L-157"><span class="linenos">157</span></a>            <span class="n">lookml</span>
+</span><span id="L-158"><a href="#L-158"><span class="linenos">158</span></a>            <span class="k">for</span> <span class="n">view</span> <span class="ow">in</span> <span class="n">views</span>
+</span><span id="L-159"><a href="#L-159"><span class="linenos">159</span></a>            <span class="k">if</span> <span class="p">(</span><span class="n">lookml</span> <span class="o">:=</span> <span class="n">_generate_view_datagroup_lkml</span><span class="p">(</span><span class="n">view</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">dataset_view_map</span><span class="p">))</span>
+</span><span id="L-160"><a href="#L-160"><span class="linenos">160</span></a>        <span class="p">)</span>
+</span><span id="L-161"><a href="#L-161"><span class="linenos">161</span></a>    <span class="p">)</span>
+</span><span id="L-162"><a href="#L-162"><span class="linenos">162</span></a>
+</span><span id="L-163"><a href="#L-163"><span class="linenos">163</span></a>    <span class="k">if</span> <span class="n">datagroup_content</span><span class="p">:</span>
+</span><span id="L-164"><a href="#L-164"><span class="linenos">164</span></a>        <span class="n">datagroups_lkml_path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">FILE_HEADER</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datagroup_content</span><span class="p">))</span>
 </span></pre></div>
 
 
@@ -297,14 +299,16 @@
 </span><span id="generate_datagroups-153"><a href="#generate_datagroups-153"><span class="linenos">153</span></a>        <span class="n">DEFAULT_GENERATED_SQL_URI</span>
 </span><span id="generate_datagroups-154"><a href="#generate_datagroups-154"><span class="linenos">154</span></a>    <span class="p">)</span>
 </span><span id="generate_datagroups-155"><a href="#generate_datagroups-155"><span class="linenos">155</span></a>
-</span><span id="generate_datagroups-156"><a href="#generate_datagroups-156"><span class="linenos">156</span></a>    <span class="n">datagroup_content</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="generate_datagroups-157"><a href="#generate_datagroups-157"><span class="linenos">157</span></a>        <span class="n">lookml</span>
-</span><span id="generate_datagroups-158"><a href="#generate_datagroups-158"><span class="linenos">158</span></a>        <span class="k">for</span> <span class="n">view</span> <span class="ow">in</span> <span class="n">views</span>
-</span><span id="generate_datagroups-159"><a href="#generate_datagroups-159"><span class="linenos">159</span></a>        <span class="k">if</span> <span class="p">(</span><span class="n">lookml</span> <span class="o">:=</span> <span class="n">_generate_view_datagroup_lkml</span><span class="p">(</span><span class="n">view</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">dataset_view_map</span><span class="p">))</span>
-</span><span id="generate_datagroups-160"><a href="#generate_datagroups-160"><span class="linenos">160</span></a>    <span class="p">]</span>
-</span><span id="generate_datagroups-161"><a href="#generate_datagroups-161"><span class="linenos">161</span></a>
-</span><span id="generate_datagroups-162"><a href="#generate_datagroups-162"><span class="linenos">162</span></a>    <span class="k">if</span> <span class="n">datagroup_content</span><span class="p">:</span>
-</span><span id="generate_datagroups-163"><a href="#generate_datagroups-163"><span class="linenos">163</span></a>        <span class="n">datagroups_lkml_path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">FILE_HEADER</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datagroup_content</span><span class="p">))</span>
+</span><span id="generate_datagroups-156"><a href="#generate_datagroups-156"><span class="linenos">156</span></a>    <span class="n">datagroup_content</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+</span><span id="generate_datagroups-157"><a href="#generate_datagroups-157"><span class="linenos">157</span></a>        <span class="nb">set</span><span class="p">(</span>
+</span><span id="generate_datagroups-158"><a href="#generate_datagroups-158"><span class="linenos">158</span></a>            <span class="n">lookml</span>
+</span><span id="generate_datagroups-159"><a href="#generate_datagroups-159"><span class="linenos">159</span></a>            <span class="k">for</span> <span class="n">view</span> <span class="ow">in</span> <span class="n">views</span>
+</span><span id="generate_datagroups-160"><a href="#generate_datagroups-160"><span class="linenos">160</span></a>            <span class="k">if</span> <span class="p">(</span><span class="n">lookml</span> <span class="o">:=</span> <span class="n">_generate_view_datagroup_lkml</span><span class="p">(</span><span class="n">view</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">dataset_view_map</span><span class="p">))</span>
+</span><span id="generate_datagroups-161"><a href="#generate_datagroups-161"><span class="linenos">161</span></a>        <span class="p">)</span>
+</span><span id="generate_datagroups-162"><a href="#generate_datagroups-162"><span class="linenos">162</span></a>    <span class="p">)</span>
+</span><span id="generate_datagroups-163"><a href="#generate_datagroups-163"><span class="linenos">163</span></a>
+</span><span id="generate_datagroups-164"><a href="#generate_datagroups-164"><span class="linenos">164</span></a>    <span class="k">if</span> <span class="n">datagroup_content</span><span class="p">:</span>
+</span><span id="generate_datagroups-165"><a href="#generate_datagroups-165"><span class="linenos">165</span></a>        <span class="n">datagroups_lkml_path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">FILE_HEADER</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datagroup_content</span><span class="p">))</span>
 </span></pre></div>
 
 
