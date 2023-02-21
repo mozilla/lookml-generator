@@ -216,17 +216,17 @@ def slug_to_title(slug):
     return slug.replace("_", " ").title()
 
 
-# Map from view to qualified references {view: [[project, dataset, table],]}
-BQViewReferenceMap = Dict[str, List[List[str]]]
+# Map from view to qualified references {dataset: {view: [[project, dataset, table],]}}
+BQViewReferenceMap = Dict[str, Dict[str, List[List[str]]]]
 
 
 def get_bigquery_view_reference_map(
     generated_sql_uri: str,
-) -> Dict[str, BQViewReferenceMap]:
+) -> BQViewReferenceMap:
     """Get a mapping from BigQuery datasets to views with references."""
     with urllib.request.urlopen(generated_sql_uri) as f:
         tarbytes = BytesIO(f.read())
-    views: Dict[str, BQViewReferenceMap] = defaultdict(dict)
+    views: BQViewReferenceMap = defaultdict(dict)
     with tarfile.open(fileobj=tarbytes, mode="r:gz") as tar:
         for tarinfo in tar:
             if tarinfo.name.endswith("/metadata.yaml"):

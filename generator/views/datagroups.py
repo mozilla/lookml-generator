@@ -3,7 +3,7 @@
 import logging
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import List, Optional
 
 import lkml
 from google.api_core.exceptions import NotFound
@@ -68,7 +68,7 @@ def _get_datagroup_from_bigquery_table(table: bigquery.Table) -> Datagroup:
 def _get_datagroup_from_bigquery_view(
     view: bigquery.Table,
     client: bigquery.Client,
-    dataset_view_map: Dict[str, BQViewReferenceMap],
+    dataset_view_map: BQViewReferenceMap,
 ) -> Optional[Datagroup]:
     # Dataset view map only contains references for shared-prod views.
     if view.project not in ("moz-fx-data-shared-prod", "mozdata"):
@@ -108,7 +108,7 @@ def _get_datagroup_from_bigquery_view(
 def _generate_view_datagroup_lkml(
     view: View,
     client: bigquery.Client,
-    dataset_view_map: Dict[str, BQViewReferenceMap],
+    dataset_view_map: BQViewReferenceMap,
 ) -> str:
     """Generate the Datagroup LookML for a Looker View."""
     # Only generate datagroup for views that can be linked to a BigQuery table:
