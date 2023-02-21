@@ -2,13 +2,10 @@
 import fnmatch
 import json
 import re
-import tarfile
 import urllib.request
 import warnings
-from collections import defaultdict
 from collections.abc import Mapping
 from datetime import datetime
-from io import BytesIO
 from itertools import groupby
 from operator import itemgetter
 from pathlib import Path
@@ -22,6 +19,10 @@ from generator import operational_monitoring_utils
 
 from .explores import EXPLORE_TYPES
 from .views import VIEW_TYPES, View, lookml_utils
+
+DEFAULT_GENERATED_SQL_URI = (
+    "https://github.com/mozilla/bigquery-etl/archive/generated-sql.tar.gz"
+)
 
 PROBE_INFO_BASE_URI = "https://probeinfo.telemetry.mozilla.org"
 DEFAULT_SPOKE = "looker-spoke-default"
@@ -48,25 +49,6 @@ def _merge_namespaces(dct, merge_dct):
                 dct[k] += merge_dct[k]
             else:
                 dct[k] = merge_dct[k]
-
-
-def _get_db_views(uri):
-    with urllib.request.urlopen(uri) as f:
-        tarbytes = BytesIO(f.read())
-    views = defaultdict(dict)
-    with tarfile.open(fileobj=tarbytes, mode="r:gz") as tar:
-        for tarinfo in tar:
-            if tarinfo.name.endswith("/metadata.yaml"):
-                metadata = yaml.safe_load(tar.extractfile(tarinfo.name))
-                references = metadata.get("references", {})
-                if "view.sql" not in references:
-                    continue
-                *_, project, dataset_id, view_id, _ = tarinfo.name.split("/")
-                if project == "moz-fx-data-shared-prod":
-                    views[dataset_id][view_id] = [
-                        ref.split(".") for ref in references["view.sql"]
-                    ]
-    return views
 
 
 def _get_opmon(bq_client: bigquery.Client, namespaces: Dict[str, Any]):
@@ -276,7 +258,7 @@ def _get_explores(views: List[View]) -> dict:
 )
 @click.option(
     "--generated-sql-uri",
-    default="https://github.com/mozilla/bigquery-etl/archive/generated-sql.tar.gz",
+    default=DEFAULT_GENERATED_SQL_URI,
     help="URI of a tar archive of the bigquery-etl generated-sql branch, which is "
     "used to list views and determine whether they reference stable tables",
 )
@@ -295,7 +277,7 @@ def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri, disallowl
     """Generate namespaces.yaml."""
     warnings.filterwarnings("ignore", module="google.auth._default")
     glean_apps = _get_glean_apps(app_listings_uri)
-    db_views = _get_db_views(generated_sql_uri)
+    db_views = lookml_utils.get_bigquery_view_reference_map(generated_sql_uri)
 
     namespaces = {}
     for app in glean_apps:

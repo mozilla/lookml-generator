@@ -12,6 +12,7 @@ from .dashboards import DASHBOARD_TYPES
 from .explores import EXPLORE_TYPES
 from .namespaces import _get_glean_apps
 from .views import VIEW_TYPES, View, ViewDict
+from .views.datagroups import generate_datagroups
 
 FILE_HEADER = """
 # *Do not manually modify this file*
@@ -119,6 +120,9 @@ def _lookml(namespaces, glean_apps, target_dir):
         v1_name: Optional[str] = v1_mapping.get(namespace)
         for view_path in _generate_views(client, view_dir, views, v1_name):
             logging.info(f"    ...Generating {view_path}")
+
+        logging.info("  Generating datagroups")
+        generate_datagroups(views, target, namespace, client)
 
         explore_dir = target / namespace / "explores"
         explore_dir.mkdir(parents=True, exist_ok=True)

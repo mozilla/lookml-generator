@@ -11,7 +11,6 @@ import yaml
 from click.testing import CliRunner
 
 from generator.namespaces import (
-    _get_db_views,
     _get_explores,
     _get_glean_apps,
     _get_looker_views,
@@ -24,6 +23,7 @@ from generator.views import (
     GrowthAccountingView,
     TableView,
 )
+from generator.views.lookml_utils import get_bigquery_view_reference_map
 
 from .utils import print_and_test
 
@@ -500,7 +500,7 @@ def test_get_glean_apps(app_listings_uri, glean_apps):
 
 
 def test_get_looker_views(glean_apps, generated_sql_uri):
-    db_views = _get_db_views(generated_sql_uri)
+    db_views = get_bigquery_view_reference_map(generated_sql_uri)
     actual = _get_looker_views(glean_apps[0], db_views)
     namespace = glean_apps[0]["name"]
     expected = [
@@ -584,7 +584,7 @@ def test_get_funnel_view(glean_apps, tmp_path):
 
     sql_uri = paths_to_tar(dest, paths)
 
-    db_views = _get_db_views(sql_uri)
+    db_views = get_bigquery_view_reference_map(sql_uri)
     actual = _get_looker_views(glean_apps[0], db_views)
     namespace = glean_apps[0]["name"]
     expected = [
@@ -641,7 +641,7 @@ def test_get_funnel_explore(glean_apps, tmp_path):
 
     sql_uri = paths_to_tar(dest, paths)
 
-    db_views = _get_db_views(sql_uri)
+    db_views = get_bigquery_view_reference_map(sql_uri)
     views = _get_looker_views(glean_apps[0], db_views)
     actual = _get_explores(views)
     expected = {
