@@ -152,11 +152,13 @@ def generate_datagroups(
         DEFAULT_GENERATED_SQL_URI
     )
 
-    datagroup_content = [
-        lookml
-        for view in views
-        if (lookml := _generate_view_datagroup_lkml(view, client, dataset_view_map))
-    ]
+    datagroup_content = sorted(
+        set(
+            lookml
+            for view in views
+            if (lookml := _generate_view_datagroup_lkml(view, client, dataset_view_map))
+        )
+    )
 
     if datagroup_content:
         datagroups_lkml_path.write_text(FILE_HEADER + "\n\n".join(datagroup_content))

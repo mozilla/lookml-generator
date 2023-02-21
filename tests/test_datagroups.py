@@ -35,22 +35,22 @@ def test_generates_datagroups(reference_map_mock, client, table_1, table_2, runn
 # Using a datagroup in an Explore: https://cloud.google.com/looker/docs/reference/param-explore-persist-with
 # Using a datagroup in a derived table: https://cloud.google.com/looker/docs/reference/param-view-datagroup-trigger
 
-datagroup: test_table_last_updated {
-  label: "Test Table Last Updated"
-  sql_trigger: SELECT MAX(last_modified_time)
-    FROM `mozdata`.analysis.INFORMATION_SCHEMA.PARTITIONS
-    WHERE table_name = 'test_table' ;;
-  description: "Updates when mozdata:analysis.test_table is modified."
-  max_cache_age: "24 hours"
-  interval_trigger: 6 hours
-}
-
 datagroup: test_table_2_last_updated {
   label: "Test Table 2 Last Updated"
   sql_trigger: SELECT MAX(last_modified_time)
     FROM `mozdata`.analysis.INFORMATION_SCHEMA.PARTITIONS
     WHERE table_name = 'test_table_2' ;;
   description: "Updates when mozdata:analysis.test_table_2 is modified."
+  max_cache_age: "24 hours"
+  interval_trigger: 6 hours
+}
+
+datagroup: test_table_last_updated {
+  label: "Test Table Last Updated"
+  sql_trigger: SELECT MAX(last_modified_time)
+    FROM `mozdata`.analysis.INFORMATION_SCHEMA.PARTITIONS
+    WHERE table_name = 'test_table' ;;
+  description: "Updates when mozdata:analysis.test_table is modified."
   max_cache_age: "24 hours"
   interval_trigger: 6 hours
 }"""
@@ -233,3 +233,104 @@ def test_skips_non_table_views(client, runner):
         )
 
         assert not Path("looker-hub/test_namespace/datagroups.lkml").exists()
+
+
+@patch("google.cloud.bigquery.Table")
+@patch("google.cloud.bigquery.Table")
+@patch("google.cloud.bigquery.Table")
+@patch("google.cloud.bigquery.Client")
+@patch("generator.views.lookml_utils.get_bigquery_view_reference_map")
+def test_only_generates_one_datagroup_for_references_to_same_table(
+    reference_map_mock, client, view_1, view_2, view_source_table, runner
+):
+    expected = """# *Do not manually modify this file*
+
+# This file has been generated via https://github.com/mozilla/lookml-generator
+
+# Using a datagroup in an Explore: https://cloud.google.com/looker/docs/reference/param-explore-persist-with
+# Using a datagroup in a derived table: https://cloud.google.com/looker/docs/reference/param-view-datagroup-trigger
+
+datagroup: source_table_last_updated {
+  label: "Source Table Last Updated"
+  sql_trigger: SELECT MAX(last_modified_time)
+    FROM `moz-fx-data-shared-prod`.analysis.INFORMATION_SCHEMA.PARTITIONS
+    WHERE table_name = 'source_table' ;;
+  description: "Updates when moz-fx-data-shared-prod:analysis.source_table is modified."
+  max_cache_age: "24 hours"
+  interval_trigger: 6 hours
+}"""
+
+    views = [
+        TableView(
+            namespace="test_namespace",
+            name="view_1",
+            tables=[
+                {
+                    "table": "mozdata.analysis.view_1"
+                },  # View to moz-fx-data-shared-prod.analysis.view_1_source
+            ],
+        ),
+        TableView(
+            namespace="test_namespace",
+            name="test_view",
+            tables=[
+                {
+                    "table": "mozdata.analysis.view_2"
+                },  # View to moz-fx-data-shared-prod.analysis.view_1_source
+            ],
+        ),
+        TableView(
+            namespace="test_namespace",
+            name="test_table",
+            tables=[{"table": "moz-fx-data-shared-prod.analysis.source_table"}],
+        ),
+    ]
+
+    with runner.isolated_filesystem():
+        view_1.project = "mozdata"
+        view_1.dataset_id = "analysis"
+        view_1.table_type = "VIEW"
+        view_1.full_table_id = "mozdata:analysis.view_1"
+        view_1.table_id = "view_1"
+        view_1.friendly_name = "Test View"
+
+        view_2.project = "mozdata"
+        view_2.dataset_id = "analysis"
+        view_2.table_type = "VIEW"
+        view_2.full_table_id = "mozdata:analysis.test_view_2"
+        view_2.table_id = "view_2"
+        view_2.friendly_name = "Test View"
+
+        view_source_table.project = "moz-fx-data-shared-prod"
+        view_source_table.dataset_id = "analysis"
+        view_source_table.table_type = "TABLE"
+        view_source_table.full_table_id = (
+            "moz-fx-data-shared-prod:analysis.source_table"
+        )
+        view_source_table.table_id = "source_table"
+        view_source_table.friendly_name = "Source Table"
+
+        reference_map_mock.return_value = {
+            "analysis": {
+                "view_1": [["moz-fx-data-shared-prod", "analysis", "source_table"]],
+                "view_2": [["moz-fx-data-shared-prod", "analysis", "source_table"]],
+            }
+        }
+
+        tables = {
+            "mozdata.analysis.view_1": view_1,
+            "mozdata.analysis.view_2": view_2,
+            "moz-fx-data-shared-prod.analysis.source_table": view_source_table,
+        }
+        client.get_table = tables.get
+
+        Path("looker-hub/test_namespace").mkdir(parents=True)
+        generate_datagroups(
+            views,
+            target_dir=Path("looker-hub"),
+            namespace="test_namespace",
+            client=client,
+        )
+
+        assert Path("looker-hub/test_namespace/datagroups.lkml").exists()
+        assert Path("looker-hub/test_namespace/datagroups.lkml").read_text() == expected
