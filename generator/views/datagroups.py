@@ -1,7 +1,6 @@
 """Generate datagroup lkml files for each namespace."""
 
 import logging
-import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional
@@ -15,7 +14,6 @@ from generator.views import TableView, View, lookml_utils
 from generator.views.lookml_utils import BQViewReferenceMap
 
 DEFAULT_MAX_CACHE_AGE = "24 hours"
-DEFAULT_INTERVAL_TRIGGER = "6 hours"
 
 # Note: INFORMATION_SCHEMA.PARTITIONS has a row with a `last_modified_time` value even for non-partitioned tables.
 SQL_TRIGGER_TEMPLATE = """
@@ -43,14 +41,10 @@ class Datagroup:
     sql_trigger: str
     description: str
     max_cache_age: str = DEFAULT_MAX_CACHE_AGE
-    interval_trigger: str = DEFAULT_INTERVAL_TRIGGER
 
     def __str__(self) -> str:
         """Return the LookML string representation of a Datagroup."""
-        datagroup_str = lkml.dump({"datagroups": [self.__dict__]})
-        return re.sub(
-            r"interval_trigger: (.+)", r'interval_trigger: "\1"', datagroup_str  # type: ignore
-        )
+        return lkml.dump({"datagroups": [self.__dict__]})  # type: ignore
 
 
 def _get_datagroup_from_bigquery_table(table: bigquery.Table) -> Datagroup:

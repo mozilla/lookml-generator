@@ -42,7 +42,6 @@ datagroup: test_table_2_last_updated {
     WHERE table_name = 'test_table_2' ;;
   description: "Updates when mozdata:analysis.test_table_2 is modified."
   max_cache_age: "24 hours"
-  interval_trigger: "6 hours"
 }
 
 datagroup: test_table_last_updated {
@@ -52,7 +51,6 @@ datagroup: test_table_last_updated {
     WHERE table_name = 'test_table' ;;
   description: "Updates when mozdata:analysis.test_table is modified."
   max_cache_age: "24 hours"
-  interval_trigger: "6 hours"
 }"""
 
     views = [
@@ -126,7 +124,6 @@ datagroup: test_table_last_updated {
     WHERE table_name = 'test_table' ;;
   description: "Updates when mozdata:analysis.test_table is modified."
   max_cache_age: "24 hours"
-  interval_trigger: "6 hours"
 }
 
 datagroup: view_1_source_last_updated {
@@ -136,7 +133,6 @@ datagroup: view_1_source_last_updated {
     WHERE table_name = 'view_1_source' ;;
   description: "Updates when moz-fx-data-shared-prod:analysis.view_1_source is modified."
   max_cache_age: "24 hours"
-  interval_trigger: "6 hours"
 }"""
 
     views = [
@@ -257,7 +253,6 @@ datagroup: source_table_last_updated {
     WHERE table_name = 'source_table' ;;
   description: "Updates when moz-fx-data-shared-prod:analysis.source_table is modified."
   max_cache_age: "24 hours"
-  interval_trigger: "6 hours"
 }"""
 
     views = [
