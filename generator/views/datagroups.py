@@ -1,6 +1,7 @@
 """Generate datagroup lkml files for each namespace."""
 
 import logging
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional
@@ -46,7 +47,10 @@ class Datagroup:
 
     def __str__(self) -> str:
         """Return the LookML string representation of a Datagroup."""
-        return lkml.dump({"datagroups": [self.__dict__]})  # type: ignore
+        datagroup_str = lkml.dump({"datagroups": [self.__dict__]})
+        return re.sub(
+            r"interval_trigger: (.+)", r'interval_trigger: "\1"', datagroup_str  # type: ignore
+        )
 
 
 def _get_datagroup_from_bigquery_table(table: bigquery.Table) -> Datagroup:
