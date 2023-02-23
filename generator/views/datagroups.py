@@ -32,7 +32,7 @@ FILE_HEADER = """# *Do not manually modify this file*
 """
 
 
-@dataclass
+@dataclass(frozen=True, eq=True)
 class Datagroup:
     """Represents a Datagroup."""
 
@@ -45,6 +45,10 @@ class Datagroup:
     def __str__(self) -> str:
         """Return the LookML string representation of a Datagroup."""
         return lkml.dump({"datagroups": [self.__dict__]})  # type: ignore
+
+    def __lt__(self, other) -> bool:
+        """Make datagroups sortable."""
+        return self.name < other.name
 
 
 def _get_datagroup_from_bigquery_table(table: bigquery.Table) -> Datagroup:
@@ -103,15 +107,15 @@ def _get_datagroup_from_bigquery_view(
     return None
 
 
-def _generate_view_datagroup_lkml(
+def _generate_view_datagroup(
     view: View,
     client: bigquery.Client,
     dataset_view_map: BQViewReferenceMap,
-) -> str:
+) -> Optional[Datagroup]:
     """Generate the Datagroup LookML for a Looker View."""
     # Only generate datagroup for views that can be linked to a BigQuery table:
     if view.view_type != TableView.type:
-        return ""
+        return None
 
     # Use the release channel table or the first available table (usually the only one):
     view_table = next(
@@ -128,35 +132,40 @@ def _generate_view_datagroup_lkml(
 
     if "TABLE" == bq_table.table_type:
         datagroup: Optional[Datagroup] = _get_datagroup_from_bigquery_table(bq_table)
-        return str(datagroup)
+        return datagroup
     elif "VIEW" == bq_table.table_type:
         datagroup = _get_datagroup_from_bigquery_view(
             bq_table, client, dataset_view_map
         )
-        if datagroup is not None:
-            return str(datagroup)
+        return datagroup
 
-    return ""
+    return None
 
 
 def generate_datagroups(
     views: List[View], target_dir: Path, namespace: str, client: bigquery.Client
 ) -> None:
     """Generate and write a datagroups.lkml file to the namespace folder."""
-    datagroups_lkml_path = target_dir / namespace / "datagroups.lkml"
+    datagroups_folder_path = target_dir / namespace / "datagroups"
 
     # To map views to their underlying tables:
     dataset_view_map = lookml_utils.get_bigquery_view_reference_map(
         DEFAULT_GENERATED_SQL_URI
     )
 
-    datagroup_content = sorted(
+    datagroups = sorted(
         set(
-            lookml
+            datagroup
             for view in views
-            if (lookml := _generate_view_datagroup_lkml(view, client, dataset_view_map))
+            if (datagroup := _generate_view_datagroup(view, client, dataset_view_map))
+            is not None
         )
     )
 
-    if datagroup_content:
-        datagroups_lkml_path.write_text(FILE_HEADER + "\n\n".join(datagroup_content))
+    if datagroups:
+        datagroups_folder_path.mkdir(exist_ok=True)
+        for datagroup in datagroups:
+            datagroup_lkml_path = (
+                datagroups_folder_path / f"{datagroup.name}.datagroup.lkml"
+            )
+            datagroup_lkml_path.write_text(FILE_HEADER + str(datagroup))
