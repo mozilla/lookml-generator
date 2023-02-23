@@ -7,7 +7,7 @@ from click.testing import CliRunner
 from google.cloud import bigquery
 
 from generator.views import EventsView, TableView
-from generator.views.datagroups import generate_datagroups
+from generator.views.datagroups import FILE_HEADER, generate_datagroups
 
 
 @pytest.fixture
@@ -28,23 +28,9 @@ class MockTable(bigquery.Table):
 @patch("google.cloud.bigquery.Client")
 @patch("generator.views.lookml_utils.get_bigquery_view_reference_map")
 def test_generates_datagroups(reference_map_mock, client, table_1, table_2, runner):
-    expected = """# *Do not manually modify this file*
-
-# This file has been generated via https://github.com/mozilla/lookml-generator
-
-# Using a datagroup in an Explore: https://cloud.google.com/looker/docs/reference/param-explore-persist-with
-# Using a datagroup in a derived table: https://cloud.google.com/looker/docs/reference/param-view-datagroup-trigger
-
-datagroup: test_table_2_last_updated {
-  label: "Test Table 2 Last Updated"
-  sql_trigger: SELECT MAX(last_modified_time)
-    FROM `mozdata`.analysis.INFORMATION_SCHEMA.PARTITIONS
-    WHERE table_name = 'test_table_2' ;;
-  description: "Updates when mozdata:analysis.test_table_2 is modified."
-  max_cache_age: "24 hours"
-}
-
-datagroup: test_table_last_updated {
+    table_1_expected = (
+        FILE_HEADER
+        + """datagroup: test_table_last_updated {
   label: "Test Table Last Updated"
   sql_trigger: SELECT MAX(last_modified_time)
     FROM `mozdata`.analysis.INFORMATION_SCHEMA.PARTITIONS
@@ -52,6 +38,19 @@ datagroup: test_table_last_updated {
   description: "Updates when mozdata:analysis.test_table is modified."
   max_cache_age: "24 hours"
 }"""
+    )
+
+    table_2_expected = (
+        FILE_HEADER
+        + """datagroup: test_table_2_last_updated {
+  label: "Test Table 2 Last Updated"
+  sql_trigger: SELECT MAX(last_modified_time)
+    FROM `mozdata`.analysis.INFORMATION_SCHEMA.PARTITIONS
+    WHERE table_name = 'test_table_2' ;;
+  description: "Updates when mozdata:analysis.test_table_2 is modified."
+  max_cache_age: "24 hours"
+}"""
+    )
 
     views = [
         TableView(
@@ -89,7 +88,9 @@ datagroup: test_table_last_updated {
         }
         client.get_table = tables.get
 
-        Path("looker-hub/test_namespace").mkdir(parents=True)
+        namespace_dir = Path("looker-hub/test_namespace")
+        namespace_dir.mkdir(parents=True)
+
         reference_map_mock.return_value = {}
         generate_datagroups(
             views,
@@ -98,8 +99,27 @@ datagroup: test_table_last_updated {
             client=client,
         )
 
-        assert Path("looker-hub/test_namespace/datagroups.lkml").exists()
-        assert Path("looker-hub/test_namespace/datagroups.lkml").read_text() == expected
+        assert Path(namespace_dir / "datagroups").exists()
+        assert Path(
+            namespace_dir / f"datagroups/{table_1.table_id}_last_updated.datagroup.lkml"
+        ).exists()
+        assert (
+            Path(
+                namespace_dir
+                / f"datagroups/{table_1.table_id}_last_updated.datagroup.lkml"
+            ).read_text()
+            == table_1_expected
+        )
+        assert Path(
+            namespace_dir / f"datagroups/{table_2.table_id}_last_updated.datagroup.lkml"
+        ).exists()
+        assert (
+            Path(
+                namespace_dir
+                / f"datagroups/{table_2.table_id}_last_updated.datagroup.lkml"
+            ).read_text()
+            == table_2_expected
+        )
 
 
 @patch("google.cloud.bigquery.Table")
@@ -110,23 +130,21 @@ datagroup: test_table_last_updated {
 def test_generates_datagroups_with_tables_and_views(
     reference_map_mock, client, table_1, view_1, view_1_source_table, runner
 ):
-    expected = """# *Do not manually modify this file*
-
-# This file has been generated via https://github.com/mozilla/lookml-generator
-
-# Using a datagroup in an Explore: https://cloud.google.com/looker/docs/reference/param-explore-persist-with
-# Using a datagroup in a derived table: https://cloud.google.com/looker/docs/reference/param-view-datagroup-trigger
-
-datagroup: test_table_last_updated {
+    table_1_expected = (
+        FILE_HEADER
+        + """datagroup: test_table_last_updated {
   label: "Test Table Last Updated"
   sql_trigger: SELECT MAX(last_modified_time)
     FROM `mozdata`.analysis.INFORMATION_SCHEMA.PARTITIONS
     WHERE table_name = 'test_table' ;;
   description: "Updates when mozdata:analysis.test_table is modified."
   max_cache_age: "24 hours"
-}
+}"""
+    )
 
-datagroup: view_1_source_last_updated {
+    source_table_expected = (
+        FILE_HEADER
+        + """datagroup: view_1_source_last_updated {
   label: "View Source Table Last Updated"
   sql_trigger: SELECT MAX(last_modified_time)
     FROM `moz-fx-data-shared-prod`.analysis.INFORMATION_SCHEMA.PARTITIONS
@@ -134,6 +152,7 @@ datagroup: view_1_source_last_updated {
   description: "Updates when moz-fx-data-shared-prod:analysis.view_1_source is modified."
   max_cache_age: "24 hours"
 }"""
+    )
 
     views = [
         TableView(
@@ -191,7 +210,8 @@ datagroup: view_1_source_last_updated {
         }
         client.get_table = tables.get
 
-        Path("looker-hub/test_namespace").mkdir(parents=True)
+        namespace_dir = Path("looker-hub/test_namespace")
+        namespace_dir.mkdir(parents=True)
         generate_datagroups(
             views,
             target_dir=Path("looker-hub"),
@@ -199,8 +219,28 @@ datagroup: view_1_source_last_updated {
             client=client,
         )
 
-        assert Path("looker-hub/test_namespace/datagroups.lkml").exists()
-        assert Path("looker-hub/test_namespace/datagroups.lkml").read_text() == expected
+        assert Path("looker-hub/test_namespace/datagroups").exists()
+        assert Path(
+            namespace_dir / f"datagroups/{table_1.table_id}_last_updated.datagroup.lkml"
+        ).exists()
+        assert (
+            Path(
+                namespace_dir
+                / f"datagroups/{table_1.table_id}_last_updated.datagroup.lkml"
+            ).read_text()
+            == table_1_expected
+        )
+        assert Path(
+            namespace_dir
+            / f"datagroups/{view_1_source_table.table_id}_last_updated.datagroup.lkml"
+        ).exists()
+        assert (
+            Path(
+                namespace_dir
+                / f"datagroups/{view_1_source_table.table_id}_last_updated.datagroup.lkml"
+            ).read_text()
+            == source_table_expected
+        )
 
 
 @patch("google.cloud.bigquery.Client")
@@ -228,7 +268,7 @@ def test_skips_non_table_views(client, runner):
             client=client,
         )
 
-        assert not Path("looker-hub/test_namespace/datagroups.lkml").exists()
+        assert not Path("looker-hub/test_namespace/datagroups").exists()
 
 
 @patch("google.cloud.bigquery.Table")
@@ -239,14 +279,9 @@ def test_skips_non_table_views(client, runner):
 def test_only_generates_one_datagroup_for_references_to_same_table(
     reference_map_mock, client, view_1, view_2, view_source_table, runner
 ):
-    expected = """# *Do not manually modify this file*
-
-# This file has been generated via https://github.com/mozilla/lookml-generator
-
-# Using a datagroup in an Explore: https://cloud.google.com/looker/docs/reference/param-explore-persist-with
-# Using a datagroup in a derived table: https://cloud.google.com/looker/docs/reference/param-view-datagroup-trigger
-
-datagroup: source_table_last_updated {
+    expected = (
+        FILE_HEADER
+        + """datagroup: source_table_last_updated {
   label: "Source Table Last Updated"
   sql_trigger: SELECT MAX(last_modified_time)
     FROM `moz-fx-data-shared-prod`.analysis.INFORMATION_SCHEMA.PARTITIONS
@@ -254,6 +289,7 @@ datagroup: source_table_last_updated {
   description: "Updates when moz-fx-data-shared-prod:analysis.source_table is modified."
   max_cache_age: "24 hours"
 }"""
+    )
 
     views = [
         TableView(
@@ -319,7 +355,9 @@ datagroup: source_table_last_updated {
         }
         client.get_table = tables.get
 
-        Path("looker-hub/test_namespace").mkdir(parents=True)
+        namespace_dir = Path("looker-hub/test_namespace")
+        namespace_dir.mkdir(parents=True)
+
         generate_datagroups(
             views,
             target_dir=Path("looker-hub"),
@@ -327,5 +365,13 @@ datagroup: source_table_last_updated {
             client=client,
         )
 
-        assert Path("looker-hub/test_namespace/datagroups.lkml").exists()
-        assert Path("looker-hub/test_namespace/datagroups.lkml").read_text() == expected
+        assert Path(namespace_dir / "datagroups").exists()
+        assert len(list((namespace_dir / "datagroups").iterdir())) == 1
+        assert (
+            Path(
+                namespace_dir
+                / "datagroups"
+                / f"{view_source_table.table_id}_last_updated.datagroup.lkml"
+            ).read_text()
+            == expected
+        )
