@@ -121,11 +121,11 @@ search:
   pretty_name: Search
   views:
     search_clients_engines_sources_daily:
-      type: ping_view
+      type: table_view
       tables:
         - table: mozdata.search.search_clients_engines_sources_daily
     mobile_search_clients_engines_sources_daily:
-      type: ping_view
+      type: table_view
       tables:
         - table: mozdata.search.mobile_search_clients_engines_sources_daily
     desktop_mobile_search_clients_monthly:
