@@ -1071,3 +1071,25 @@ fivetran:
       type: table_view
       tables:
         - table: mozdata.fivetran_costs.daily_connector_costs
+hubs:
+  glean_app: false
+  owners:
+    - srose@mozilla.com
+  pretty_name: Hubs
+  views:
+    subscriptions:
+      type: table_view
+      tables:
+        - table: mozdata.hubs.subscriptions
+    subscription_events:
+      type: table_view
+      tables:
+        - table: mozdata.hubs.subscription_events
+    active_subscriptions:
+      type: table_view
+      tables:
+        - table: mozdata.hubs.active_subscriptions
+    active_subscription_ids:
+      type: table_view
+      tables:
+        - table: mozdata.hubs.active_subscription_ids
