@@ -182,6 +182,7 @@ class FunnelAnalysisView(View):
                             WHERE
                               {{% condition category %}} category {{% endcondition %}}
                               AND {{% condition event %}} event {{% endcondition %}}
+                              AND {{% condition event_name %}} category || ' - ' || event {{% endcondition %}}
                               AND {{% condition property_name %}} properties.key {{% endcondition %}}
                               AND {{% condition property_value %}} property_value.key {{% endcondition %}}
                             """
@@ -194,6 +195,7 @@ class FunnelAnalysisView(View):
                             "type": "string",
                             "suggest_explore": "event_names",
                             "suggest_dimension": "event_names.category",
+                            "hidden": "yes",
                         },
                         {
                             "name": "event",
@@ -201,6 +203,14 @@ class FunnelAnalysisView(View):
                             "type": "string",
                             "suggest_explore": "event_names",
                             "suggest_dimension": "event_names.event",
+                            "hidden": "yes",
+                        },
+                        {
+                            "name": "event_name",
+                            "description": "The full name of the category and event.",
+                            "type": "string",
+                            "suggest_explore": "event-names",
+                            "suggest_dimension": "event_names.event_name",
                         },
                         {
                             "name": "property_name",
@@ -240,6 +250,7 @@ class FunnelAnalysisView(View):
                         "sql": (
                             "SELECT category, "
                             "  event, "
+                            "  category || ' - ' || event AS event_name, "
                             "  property.key AS property_name, "
                             "  property_value.key AS property_value, "
                             "  property_value.index as property_index "
@@ -258,6 +269,11 @@ class FunnelAnalysisView(View):
                             "name": "event",
                             "type": "string",
                             "sql": "${TABLE}.event",
+                        },
+                        {
+                            "name": "event_name",
+                            "type": "string",
+                            "sql": "${TABLE}.event_name"
                         },
                         {
                             "name": "property_name",
