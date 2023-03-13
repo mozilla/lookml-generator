@@ -1028,15 +1028,15 @@ data_integrity_monitoring:
   views:
     run_history:
       tables:
-        - table: data-monitoring-dev.dim.dim_run_history
+        - table: data-monitoring-dev.dim_external.run_history
       type: table_view
     run_processing_info:
       tables:
-        - table: data-monitoring-dev.dim.dim_run_processing_info
+        - table: data-monitoring-dev.dim_external.run_processing_info
       type: table_view
     muted_alerts:
       tables:
-        - table: data-monitoring-dev.dim.dim_muted_alerts
+        - table: data-monitoring-dev.dim_external.muted_alerts
       type: table_view
 relay:
   glean_app: false
