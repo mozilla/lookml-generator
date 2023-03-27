@@ -1093,3 +1093,15 @@ hubs:
       type: table_view
       tables:
         - table: mozdata.hubs.active_subscription_ids
+subscription_platform:
+  glean_app: false
+  owners:
+    - srose@mozilla.com
+    - ysmith@mozilla.com
+  pretty_name: Subscription Platform
+  views:
+    stripe_subscription_history:
+      type: table_view
+      tables:
+        - table: mozdata.subscription_platform.stripe_subscriptions_history
+
