@@ -92,25 +92,19 @@ class PingView(View):
             bq_client.get_table(table).schema, self.name
         )
 
-        # parameterize table name
-        if len(self.tables) > 1:
-            view_defn["parameters"] = [
-                {
-                    "name": "channel",
-                    "type": "unquoted",
-                    "default_value": table,
-                    "allowed_values": [
-                        {
-                            "label": _table["channel"].title(),
-                            "value": _table["table"],
-                        }
-                        for _table in self.tables
-                    ],
-                }
-            ]
-            view_defn["sql_table_name"] = "`{% parameter channel %}`"
-        else:
-            view_defn["sql_table_name"] = f"`{table}`"
+        # Round-tripping through a dict to get an ordered deduped list.
+        suggestions = list(dict.fromkeys(_table["channel"] for _table in self.tables))
+
+        view_defn["filters"] = [
+            {
+                "name": "channel",
+                "type": "string",
+                "default_value": "release",
+                "suggestions": suggestions,
+            }
+        ]
+
+        view_defn["sql_table_name"] = f"`{table}`"
 
         return {"views": [view_defn] + nested_views}
 

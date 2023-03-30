@@ -145,17 +145,13 @@ class Explore:
         channel_params = [
             param
             for _view_defn in self.get_view_lookml(view)["views"]
-            for param in _view_defn.get("parameters", [])
+            for param in _view_defn.get("filters", [])
             if _view_defn["name"] == view and param["name"] == "channel"
         ]
 
         if channel_params:
-            allowed_values = channel_params[0]["allowed_values"]
-            default_value = next(
-                (value for value in allowed_values if value["label"] == "Release"),
-                allowed_values[0],
-            )["value"]
-
+            allowed_values = channel_params[0]["suggestions"]
+            default_value = allowed_values[0]
             return escape_filter_expr(default_value)
         return None
 
