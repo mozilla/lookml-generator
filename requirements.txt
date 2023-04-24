@@ -739,8 +739,9 @@ wheel==0.38.1 \
     --hash=sha256:7a95f9a8dc0924ef318bd55b616112c70903192f524d120acc614f59547a9e1f \
     --hash=sha256:ea041edf63f4ccba53ad6e035427997b3bb10ee88a4cd014ae82aeb9eea77bb9
     # via pip-tools
-yamllint==1.30.0 \
-    --hash=sha256:4f58f323aedda16189a489d183ecc25c66d7a9cc0fe88f61b650fef167b13190
+yamllint==1.31.0 \
+    --hash=sha256:15f4bdb645e6a4a0a22fe5415bc38b4a934c51419b30104896d2f3f95e329185 \
+    --hash=sha256:2d83f1d12f733e162a87e06b176149d7bb9c5bae4a9e5fce1c771d7f703f7a65
     # via -r requirements.in
 
 # The following packages are considered to be unsafe in a requirements file:
@@ -756,4 +757,3 @@ setuptools==67.1.0 \
     #   google-auth
     #   jsonschema
     #   pip-tools
-    #   yamllint
