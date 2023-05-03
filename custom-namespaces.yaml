@@ -162,6 +162,14 @@ contextual_services:
     - rburwei@mozilla.com
   spoke: looker-spoke-private
   views:
+    request_payload_tiles:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.contextual_services.request_payload_tiles
+    request_payload_suggest:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.contextual_services.request_payload_suggest
     final_adM_forecasts:
       type: table_view
       tables:
