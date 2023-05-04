@@ -55,6 +55,10 @@ duet:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.fenix.marketing_attributable_metrics
+    firefox_mobile_installs:
+      type: table_view
+      tables:
+        - table: moz-fx-data-marketing-prod.adjust_derived.firefox_mobile_installs_v1
 activity_stream:
   glean_app: false
   owners:
