@@ -165,11 +165,11 @@ contextual_services:
     request_payload_tiles:
       type: table_view
       tables:
-        - table: moz-fx-data-shared-prod.contextual_services.request_payload_tiles
+        - table: mozdata.contextual_services.request_payload_tiles
     request_payload_suggest:
       type: table_view
       tables:
-        - table: moz-fx-data-shared-prod.contextual_services.request_payload_suggest
+        - table: mozdata.contextual_services.request_payload_suggest
     final_adM_forecasts:
       type: table_view
       tables:
