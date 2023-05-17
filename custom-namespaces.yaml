@@ -98,7 +98,6 @@ search_private:
     - mmccorquodale@mozilla.com
     - xluo@mozilla.com
     - skahmann@mozilla.com
-    - wbrahic@mozilla.com
     - ctroy@mozilla.com
   spoke: looker-spoke-private
   views:
@@ -120,7 +119,6 @@ search:
     - mmccorquodale@mozilla.com
     - xluo@mozilla.com
     - skahmann@mozilla.com
-    - wbrahic@mozilla.com
     - ctroy@mozilla.com
   pretty_name: Search
   views:
@@ -275,13 +273,11 @@ mozilla_vpn_private:
   pretty_name: Mozilla VPN
   owners:
     - dthorn@mozilla.com
-    - sbird@mozilla.com
   spoke: looker-spoke-private
 mozilla_vpn:
   glean_app: true
   owners:
     - dthorn@mozilla.com
-    - sbird@mozilla.com
   pretty_name: Mozilla VPN
   views:
     devices:
@@ -478,7 +474,7 @@ newtab:
 awesome_bar:
   glean_app: false
   owners:
-    - tbrooks@mozilla.com
+    - ascholtz@mozilla.com
   pretty_name: Awesome Bar
   views:
     urlbar_clients_daily:
@@ -711,9 +707,7 @@ sync:
 monitoring:
   glean_app: false
   owners:
-    - jklukas@mozilla.com
     - ascholtz@mozilla.com
-    - wlach@mozilla.com
     - akomar@mozilla.com
     - anicholson@mozilla.com
     - mhirose@mozilla.com
