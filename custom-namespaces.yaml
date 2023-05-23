@@ -424,6 +424,10 @@ revenue:
     - skahmann@mozilla.com
   spoke: looker-spoke-private
   views:
+    revenue_google_top10_row_data:
+      type: table_view
+      tables:
+        - table: mozdata.revenue.revenue_google_top10_row_data
     stripe_itemized_payout_reconciliation:
       type: table_view
       tables:
