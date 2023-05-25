@@ -650,6 +650,10 @@ firefox_desktop:
       type: table_view
       tables:
         - table: mozdata.telemetry.newtab_interactions
+    newtab_visits_table:
+      type: table_view
+      tables:
+        - table: mozdata.telemetry.newtab_visits
     default_browser:
       type: ping_view
       tables:
