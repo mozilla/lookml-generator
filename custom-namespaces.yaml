@@ -162,6 +162,7 @@ contextual_services:
   owners:
     - mmccorquodale@mozilla.com
     - rburwei@mozilla.com
+    - mbowerman@mozilla.com
   spoke: looker-spoke-private
   views:
     request_payload_tiles:
