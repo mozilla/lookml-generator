@@ -10,6 +10,7 @@ from .operational_monitoring_explore import (
     OperationalMonitoringExplore,
 )
 from .ping_explore import PingExplore
+from .table_explore import TableExplore
 
 EXPLORE_TYPES = {
     ClientCountsExplore.type: ClientCountsExplore,
@@ -20,4 +21,5 @@ EXPLORE_TYPES = {
     GrowthAccountingExplore.type: GrowthAccountingExplore,
     OperationalMonitoringExplore.type: OperationalMonitoringExplore,
     OperationalMonitoringAlertingExplore.type: OperationalMonitoringAlertingExplore,
+    TableExplore.type: TableExplore,
 }
