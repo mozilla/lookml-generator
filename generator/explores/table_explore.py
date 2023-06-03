@@ -6,7 +6,7 @@ from typing import Any, Dict, Iterator, List, Optional
 
 from google.cloud import bigquery
 
-from ..views import TableView, View
+from ..views import View
 from . import Explore
 
 
@@ -32,10 +32,8 @@ class TableExplore(Explore):
 
     @staticmethod
     def from_views(views: List[View]) -> Iterator[TableExplore]:
-        """Generate all possible TableExplores from the views."""
-        for view in views:
-            if view.view_type == TableView.type:
-                yield TableExplore(view.name, {"base_view": view.name})
+        """Don't generate all possible TableExplores from the views."""
+        return iter([])
 
     @staticmethod
     def from_dict(name: str, defn: dict, views_path: Path) -> TableExplore:
