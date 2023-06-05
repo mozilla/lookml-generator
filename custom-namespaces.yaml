@@ -270,7 +270,6 @@ contextual_services_private:
         base_view: topsites_impression_firefox_ios
 contextual_services:
   glean_app: false
-  connection: bigquery-oauth
   pretty_name: Contextual Services
   owners:
     - mmccorquodale@mozilla.com
