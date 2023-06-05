@@ -93,7 +93,11 @@ class PingView(View):
         )
 
         # Round-tripping through a dict to get an ordered deduped list.
-        suggestions = list(dict.fromkeys(_table["channel"] for _table in self.tables))
+        suggestions = list(
+            dict.fromkeys(
+                _table["channel"] for _table in self.tables if "channel" in _table
+            )
+        )
 
         if len(suggestions) > 1:
             view_defn["filters"] = [
