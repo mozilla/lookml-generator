@@ -8,11 +8,12 @@ from click import ClickException
 OMIT_VIEWS: Set[str] = set()
 
 
-class ViewDict(TypedDict):
+class ViewDict(TypedDict, total=False):
     """Represent a view definition."""
 
     type: str
     tables: List[Dict[str, str]]
+    measures: Dict[str, Dict[str, Any]]
 
 
 class View(object):
