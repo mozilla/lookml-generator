@@ -155,7 +155,7 @@ search:
       type: ping_explore
       views:
         base_view: desktop_search_alert_records
-contextual_services:
+contextual_services_private:
   glean_app: false
   connection: bigquery-oauth
   pretty_name: Contextual Services
@@ -268,6 +268,19 @@ contextual_services:
       type: ping_explore
       views:
         base_view: topsites_impression_firefox_ios
+contextual_services:
+  glean_app: false
+  connection: bigquery-oauth
+  pretty_name: Contextual Services
+  owners:
+    - mmccorquodale@mozilla.com
+    - rburwei@mozilla.com
+    - mbowerman@mozilla.com
+  views:
+    sponsored_tiles_ad_request_fill:
+      type: table_view
+      tables:
+        - table: mozdata.telemetry.sponsored_tiles_ad_request_fill
 mozilla_vpn_private:
   glean_app: false
   connection: bigquery-oauth
