@@ -15,10 +15,18 @@ class TableView(View):
     """A view on any table."""
 
     type: str = "table_view"
+    measures: Optional[Dict[str, Dict[str, Any]]]
 
-    def __init__(self, namespace: str, name: str, tables: List[Dict[str, str]]):
+    def __init__(
+        self,
+        namespace: str,
+        name: str,
+        tables: List[Dict[str, str]],
+        measures: Optional[Dict[str, Dict[str, Any]]] = None,
+    ):
         """Create instance of a TableView."""
         super().__init__(namespace, name, TableView.type, tables)
+        self.measures = measures
 
     @classmethod
     def from_db_views(
@@ -50,7 +58,7 @@ class TableView(View):
     @classmethod
     def from_dict(klass, namespace: str, name: str, _dict: ViewDict) -> TableView:
         """Get a view from a name and dict definition."""
-        return TableView(namespace, name, _dict["tables"])
+        return TableView(namespace, name, _dict["tables"], _dict.get("measures"))
 
     def to_lookml(self, bq_client, v1_name: Optional[str]) -> Dict[str, Any]:
         """Generate LookML for this view."""
@@ -98,7 +106,11 @@ class TableView(View):
             bq_client.get_table(table).schema, self.name
         )
 
-        # Table views have no measures
+        if self.measures:
+            view_defn["measures"] = [
+                {"name": measure_name, **measure_parameters}
+                for measure_name, measure_parameters in self.measures.items()
+            ]
 
         # parameterize table name
         if len(self.tables) > 1:
