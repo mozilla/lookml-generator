@@ -132,23 +132,27 @@ def test_generate_model(looker_sdk, namespaces, tmp_path):
     looker_sdk.models.WriteModelSet.return_value = write_model
 
     generate_directories(namespaces, tmp_path, True)
-    expected = {
+    expected_dict = {
         "connection": "telemetry",
         "label": "Glean App",
-        "includes": [
-            "//looker-hub/glean-app/explores/*",
-            "//looker-hub/glean-app/dashboards/*",
-            "views/*",
-            "explores/*",
-            "dashboards/*",
-        ],
     }
-    actual = lkml.load(
-        (
-            tmp_path / "looker-spoke-default" / "glean-app" / "glean-app.model.lkml"
-        ).read_text()
-    )
-    assert expected == actual
+
+    expected_text = '''
+# Include files from looker-hub or spoke-default below. For example:
+# include: "//looker-hub/glean-app/explores/*"
+# include: "//looker-hub/glean-app/dashboards/*"
+# include: "//looker-hub/glean-app/views/*"
+# include: "views/*"
+# include: "explores/*"
+# include: "dashboards/*"
+connection: "telemetry"
+label: "Glean App"'''
+    actual_text = (
+        tmp_path / "looker-spoke-default" / "glean-app" / "glean-app.model.lkml"
+    ).read_text()
+    actual_dict = lkml.load(actual_text)
+    assert expected_text == actual_text
+    assert expected_dict == actual_dict
 
     looker_sdk.models.WriteModelSet.assert_any_call(models=["model", "glean-app"])
     assert looker_sdk.models.WriteModelSet.call_count == 1
@@ -180,21 +184,26 @@ def test_alternate_connection(looker_sdk, custom_namespaces, tmp_path):
         app_path / "custom.model.lkml",
     }
 
-    expected = {
+    expected_dict = {
         "connection": "bigquery-oauth",
         "label": "Custom",
-        "includes": [
-            "//looker-hub/custom/explores/*",
-            "//looker-hub/custom/dashboards/*",
-            "views/*",
-            "explores/*",
-            "dashboards/*",
-        ],
     }
-    actual = lkml.load(
-        (tmp_path / "looker-spoke-private" / "custom" / "custom.model.lkml").read_text()
-    )
-    print_and_test(expected, actual)
+    expected_text = '''
+# Include files from looker-hub or spoke-default below. For example:
+# include: "//looker-hub/custom/explores/*"
+# include: "//looker-hub/custom/dashboards/*"
+# include: "//looker-hub/custom/views/*"
+# include: "views/*"
+# include: "explores/*"
+# include: "dashboards/*"
+connection: "bigquery-oauth"
+label: "Custom"'''
+    actual_text = (
+        tmp_path / "looker-spoke-private" / "custom" / "custom.model.lkml"
+    ).read_text()
+    actual_dict = lkml.load(actual_text)
+    print_and_test(expected_text, actual_text)
+    print_and_test(expected_dict, actual_dict)
 
     looker_sdk.models.WriteLookmlModel.assert_called_with(
         allowed_db_connection_names=["bigquery-oauth"],
