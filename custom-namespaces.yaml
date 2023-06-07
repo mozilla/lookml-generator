@@ -63,7 +63,6 @@ duet:
       type: table_view
       tables:
         - table: mozdata.firefox_ios.ad_activation_performance
-        
 activity_stream:
   glean_app: false
   owners:
