@@ -83,7 +83,7 @@ def generate_model(
 
     path = spoke_path / name / f"{name}.model.lkml"
     # lkml.dump may return None, in which case write an empty file
-    header_text = f"""
+    footer_text = f"""
 # Include files from looker-hub or spoke-default below. For example:
 # include: "//looker-hub/{name}/explores/*"
 # include: "//looker-hub/{name}/dashboards/*"
@@ -96,7 +96,7 @@ def generate_model(
     if model_text is None:
         path.write_text("")
     else:
-        path.write_text(header_text + model_text)
+        path.write_text(model_text + footer_text)
 
     return path
 

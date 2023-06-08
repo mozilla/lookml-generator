@@ -137,7 +137,8 @@ def test_generate_model(looker_sdk, namespaces, tmp_path):
         "label": "Glean App",
     }
 
-    expected_text = '''
+    expected_text = """connection: "telemetry"
+label: "Glean App"
 # Include files from looker-hub or spoke-default below. For example:
 # include: "//looker-hub/glean-app/explores/*"
 # include: "//looker-hub/glean-app/dashboards/*"
@@ -145,8 +146,7 @@ def test_generate_model(looker_sdk, namespaces, tmp_path):
 # include: "views/*"
 # include: "explores/*"
 # include: "dashboards/*"
-connection: "telemetry"
-label: "Glean App"'''
+"""
     actual_text = (
         tmp_path / "looker-spoke-default" / "glean-app" / "glean-app.model.lkml"
     ).read_text()
@@ -188,7 +188,8 @@ def test_alternate_connection(looker_sdk, custom_namespaces, tmp_path):
         "connection": "bigquery-oauth",
         "label": "Custom",
     }
-    expected_text = '''
+    expected_text = """connection: "bigquery-oauth"
+label: "Custom"
 # Include files from looker-hub or spoke-default below. For example:
 # include: "//looker-hub/custom/explores/*"
 # include: "//looker-hub/custom/dashboards/*"
@@ -196,8 +197,7 @@ def test_alternate_connection(looker_sdk, custom_namespaces, tmp_path):
 # include: "views/*"
 # include: "explores/*"
 # include: "dashboards/*"
-connection: "bigquery-oauth"
-label: "Custom"'''
+"""
     actual_text = (
         tmp_path / "looker-spoke-private" / "custom" / "custom.model.lkml"
     ).read_text()
