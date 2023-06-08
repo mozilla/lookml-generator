@@ -79,18 +79,24 @@ def generate_model(
     model_defn = {
         "connection": db_connection,
         "label": namespace_defn["pretty_name"],
-        "includes": [
-            f"//looker-hub/{name}/explores/*",
-            f"//looker-hub/{name}/dashboards/*",
-            "views/*",
-            "explores/*",
-            "dashboards/*",
-        ],
     }
 
     path = spoke_path / name / f"{name}.model.lkml"
     # lkml.dump may return None, in which case write an empty file
-    path.write_text(lkml.dump(model_defn) or "")
+    footer_text = f"""
+# Include files from looker-hub or spoke-default below. For example:
+# include: "//looker-hub/{name}/explores/*"
+# include: "//looker-hub/{name}/dashboards/*"
+# include: "//looker-hub/{name}/views/*"
+# include: "views/*"
+# include: "explores/*"
+# include: "dashboards/*"
+"""
+    model_text = lkml.dump(model_defn)
+    if model_text is None:
+        path.write_text("")
+    else:
+        path.write_text(model_text + footer_text)
 
     return path
 
