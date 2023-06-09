@@ -441,6 +441,10 @@ revenue:
     - skahmann@mozilla.com
   spoke: looker-spoke-private
   views:
+    firefox_ltv:
+      type: table_view
+      tables:
+        - table: mozdata.revenue.firefox_ltv
     revenue_google_top10_row_data:
       type: table_view
       tables:
