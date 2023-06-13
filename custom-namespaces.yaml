@@ -338,6 +338,11 @@ firefox_accounts:
     - loines@mozilla.com
   pretty_name: Firefox Accounts
   views:
+    fxa_all_events:
+      type: events_view
+      tables:
+        - events_table_view: fxa_all_events_table
+          base_table: mozdata.firefox_accounts.fxa_all_events
     events:
       type: events_view
       tables:
@@ -409,6 +414,11 @@ firefox_accounts:
         - channel: release
           table: mozdata.firefox_accounts.fxa_log_device_command_events
   explores:
+    fxa_all_events:
+      type: events_explore
+      views:
+        base_view: events
+        extended_view: fxa_all_events_table
     event_counts:
       type: events_explore
       views:
