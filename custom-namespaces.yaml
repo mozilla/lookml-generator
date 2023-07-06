@@ -342,12 +342,12 @@ firefox_accounts:
     - loines@mozilla.com
   pretty_name: Firefox Accounts
   views:
-    all_events:
+    events:
       type: events_view
       tables:
         - events_table_view: all_events_table
           base_table: mozdata.firefox_accounts.fxa_all_events
-    all_events_table:
+    events_table:
       type: table_view
       tables:
         - table: mozdata.firefox_accounts.fxa_all_events
@@ -390,11 +390,11 @@ firefox_accounts:
         - channel: release
           table: mozdata.firefox_accounts.fxa_log_device_command_events
   explores:
-    all_event_counts:
+    event_counts:
       type: events_explore
       views:
-        base_view: all_events
-        extended_view: all_events_table
+        base_view: events
+        extended_view: events_table
     funnel_analysis:
       type: funnel_analysis_explore
       views:
