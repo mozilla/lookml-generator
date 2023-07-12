@@ -472,6 +472,10 @@ revenue:
       type: table_view
       tables:
         - table: mozdata.stripe.itemized_payout_reconciliation
+    stripe_itemized_tax_transactions:
+      type: table_view
+      tables:
+        - table: mozdata.stripe.itemized_tax_transactions
     ad_cost_breakdowns:
       type: table_view
       tables:
