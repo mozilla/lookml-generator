@@ -276,6 +276,10 @@ contextual_services_private:
       type: ping_explore
       views:
         base_view: topsites_impression_firefox_ios
+    suggest_revenue_levers_daily:
+      type: table_view
+      tables:
+        - table: mozdata.contextual_services.suggest_revenue_levers_daily
 contextual_services:
   glean_app: false
   pretty_name: Contextual Services
