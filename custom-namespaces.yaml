@@ -292,6 +292,10 @@ contextual_services:
       type: table_view
       tables:
         - table: mozdata.telemetry.sponsored_tiles_ad_request_fill
+    suggest_revenue_levers_daily:
+      type: table_view
+      tables:
+        - table: mozdata.contextual_services.suggest_revenue_levers_daily
 mozilla_vpn_private:
   glean_app: false
   connection: bigquery-oauth
