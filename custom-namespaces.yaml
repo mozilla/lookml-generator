@@ -185,6 +185,10 @@ contextual_services_private:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.revenue_derived.final_adm_revenue_forecast
+    suggest_revenue_levers_daily:
+      type: table_view
+      tables:
+        - table: mozdata.contextual_services.suggest_revenue_levers_daily
     event_aggregates_spons_tiles:
       type: ping_view
       tables:
@@ -276,10 +280,6 @@ contextual_services_private:
       type: ping_explore
       views:
         base_view: topsites_impression_firefox_ios
-    suggest_revenue_levers_daily:
-      type: table_view
-      tables:
-        - table: mozdata.contextual_services.suggest_revenue_levers_daily
 contextual_services:
   glean_app: false
   pretty_name: Contextual Services
@@ -292,10 +292,6 @@ contextual_services:
       type: table_view
       tables:
         - table: mozdata.telemetry.sponsored_tiles_ad_request_fill
-    suggest_revenue_levers_daily:
-      type: table_view
-      tables:
-        - table: mozdata.contextual_services.suggest_revenue_levers_daily
 mozilla_vpn_private:
   glean_app: false
   connection: bigquery-oauth
