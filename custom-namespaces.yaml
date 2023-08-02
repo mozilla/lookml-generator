@@ -1183,6 +1183,13 @@ subscription_platform:
       measures:
         count:
           type: count
+    active_subscriptions:
+      type: table_view
+      tables:
+        - table: mozdata.subscription_platform.active_subscriptions
+      measures:
+        count:
+          type: sum
   explores:
     # Using `_v1` explores to avoid breakages when v2 tables are deployed.
     apple_subscriptions_v1:
@@ -1197,3 +1204,7 @@ subscription_platform:
       type: table_explore
       views:
         base_view: stripe_subscriptions_v1
+    active_subscriptions:
+      type: table_explore
+      views:
+        base_view: active_subscriptions
