@@ -1190,6 +1190,7 @@ subscription_platform:
       measures:
         count:
           type: sum
+          sql: ${count}
   explores:
     # Using `_v1` explores to avoid breakages when v2 tables are deployed.
     apple_subscriptions_v1:
