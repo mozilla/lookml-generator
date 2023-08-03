@@ -1188,7 +1188,7 @@ subscription_platform:
       tables:
         - table: mozdata.subscription_platform.active_subscriptions
       measures:
-        count:
+        count_sum:
           type: sum
           sql: ${count}
   explores:
