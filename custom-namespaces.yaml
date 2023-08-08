@@ -63,6 +63,10 @@ duet:
       type: table_view
       tables:
         - table: mozdata.firefox_ios.ad_activation_performance
+    app_store_funnel_ios:
+      type: table_view
+      tables:
+        - table: mozdata.firefox_ios.app_store_funnel
     firefox_android_clients:
       type: table_view
       tables:
@@ -1188,7 +1192,7 @@ subscription_platform:
       tables:
         - table: mozdata.subscription_platform.active_subscriptions
       measures:
-        count:
+        count_sum:
           type: sum
           sql: ${count}
   explores:
