@@ -860,31 +860,63 @@ monitoring:
       tables:
         - table: mozdata.static.monitoring_schema_errors_notes_v1
     # views for accessing Airflow metadata
-    dag:
+    airflow_dag:
       type: table_view
       tables:
         - table: mozdata.monitoring.airflow_dag
-    dag_run:
+    airflow_dag_note:
+      type: table_view
+      tables:
+        - table: mozdata.monitoring.airflow_dag_note
+    airflow_dag_owner_attributes:
+      type: table_view
+      tables:
+        - table: mozdata.monitoring.airflow_dag_owner_attributes
+    airflow_dag_run:
       type: table_view
       tables:
         - table: mozdata.monitoring.airflow_dag_run
-    dag_tag:
+    airflow_dag_tag:
       type: table_view
       tables:
         - table: mozdata.monitoring.airflow_dag_tag
-    slot_pool:
+    airflow_dag_warning:
+      type: table_view
+      tables:
+        - table: mozdata.monitoring.airflow_dag_warning
+    airflow_import_error:
+      types: table_view
+      tables:
+        - table: mozdata.monitoring.airflow_import_error
+    airflow_job:
+      types: table_view
+      tables:
+        - table: mozdata.monitoring.airflow_job
+    airflow_slot_pool:
       type: table_view
       tables:
         - table: mozdata.monitoring.airflow_slot_pool
-    task_fail:
+    airflow_task_fail:
       type: table_view
       tables:
         - table: mozdata.monitoring.airflow_task_fail
-    task_reschedule:
+    airflow_task_instance:
+      type: table_view
+      tables:
+        - table: mozdata.monitoring.airflow_task_instance
+    airflow_task_instance_note:
+      type: table_view
+      tables:
+        - table: mozdata.monitoring.airflow_task_instance_note
+    airflow_task_reschedule:
       type: table_view
       tables:
         - table: mozdata.monitoring.airflow_task_reschedule
-    user:
+    airflow_trigger:
+      type: table_view
+      tables:
+        - table: mozdata.monitoring.airflow_trigger
+    airflow_user:
       type: table_view
       tables:
         - table: mozdata.monitoring.airflow_user
