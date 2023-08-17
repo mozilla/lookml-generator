@@ -885,11 +885,11 @@ monitoring:
       tables:
         - table: mozdata.monitoring.airflow_dag_warning
     airflow_import_error:
-      types: table_view
+      type: table_view
       tables:
         - table: mozdata.monitoring.airflow_import_error
     airflow_job:
-      types: table_view
+      type: table_view
       tables:
         - table: mozdata.monitoring.airflow_job
     airflow_slot_pool:
