@@ -1227,6 +1227,23 @@ subscription_platform:
         count_sum:
           type: sum
           sql: ${count}
+    # Logical subscriptions
+    logical_subscriptions:
+      type: table_view
+      tables:
+        - table: mozdata.subscription_platform.logical_subscriptions
+    logical_subscription_events:
+      type: table_view
+      tables:
+        - table: mozdata.subscription_platform.logical_subscription_events
+    daily_active_logical_subscriptions:
+      type: table_view
+      tables:
+        - table: mozdata.subscription_platform.daily_active_logical_subscriptions
+    monthly_active_logical_subscriptions:
+      type: table_view
+      tables:
+        - table: mozdata.subscription_platform.monthly_active_logical_subscriptions
   explores:
     # Using `_v1` explores to avoid breakages when v2 tables are deployed.
     apple_subscriptions_v1:
