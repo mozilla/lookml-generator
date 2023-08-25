@@ -506,6 +506,19 @@ revenue_private:
       type: table_view
       tables:
         - table: mozdata.revenue_cat3_analysis.budget_complete_2022
+ads:
+  glean_app: false
+  connection: bigquery-oauth
+  pretty_name: Ads
+  owners:
+    - cmorales@mozilla.com
+    - sbetancourt@mozilla.com
+  spoke: looker-spoke-private
+  views:
+    consolidated_ad_metrics:
+      type: table_view
+      tables:
+        - table: mozdata.ads.consolidated_ad_metrics
 firefox_ios:
   owners:
     - athomas@mozilla.com
