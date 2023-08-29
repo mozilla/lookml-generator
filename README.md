@@ -42,7 +42,7 @@ project, clicking the "Git Actions" icon, and finding your personal branch in th
 
 ## Setup
 
-Ensure Python 3.8+ is available on your machine (see [this guide](https://docs.python-guide.org/starting/install3/osx/) for instructions if you're on a mac and haven't installed anything other than the default system Python.)
+Ensure Python 3.10+ is available on your machine (see [this guide](https://docs.python-guide.org/starting/install3/osx/) for instructions if you're on a mac and haven't installed anything other than the default system Python.)
 
 You will also need the Google Cloud SDK with valid credentials.
 After setting up the Google Cloud SDK, run:
@@ -54,7 +54,7 @@ gcloud auth login --update-adc
 
 Install requirements in a Python venv
 ```bash
-python3.8 -m venv venv/
+python3.10 -m venv venv/
 venv/bin/pip install --no-deps -r requirements.txt
 ```
 

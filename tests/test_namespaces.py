@@ -198,7 +198,7 @@ def paths_to_tar(dest_path: Path, paths: Dict[str, str]) -> str:
 def generated_sql_uri(tmp_path):
     dest = tmp_path / "bigquery_etl.tar.gz"
     paths = {}
-    for (dataset, source_dataset) in (
+    for dataset, source_dataset in (
         ("glean_app", "glean_app_release"),
         ("glean_app_beta", "glean_app_beta_stable"),
     ):
