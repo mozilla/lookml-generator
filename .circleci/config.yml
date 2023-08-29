@@ -34,7 +34,7 @@ jobs:
         run:
           name: Build
           command: |
-            python3 -m venv venv/
+            python -m venv venv/
             venv/bin/pip install pip-tools --constraint requirements.in
             venv/bin/pip-sync
       - run:
