@@ -1,4 +1,4 @@
-FROM python:3.8.9-slim
+FROM python:3.10-slim
 
 LABEL maintainer="kignasiak@mozilla.com"
 
@@ -11,7 +11,7 @@ RUN groupadd --gid ${USER_ID} ${GROUP_ID} && \
 
 # For grpc https://github.com/grpc/grpc/issues/24556#issuecomment-751797589
 RUN apt-get update -qqy && \
-    apt-get install -qqy python-dev build-essential git curl software-properties-common
+    apt-get install -qqy python3 build-essential git curl software-properties-common
 
 RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
     && chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \

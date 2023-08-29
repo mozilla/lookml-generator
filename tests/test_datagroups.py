@@ -245,7 +245,6 @@ def test_generates_datagroups_with_tables_and_views(
 
 @patch("google.cloud.bigquery.Client")
 def test_skips_non_table_views(client, runner):
-
     views = [
         EventsView(
             namespace="test_namespace",

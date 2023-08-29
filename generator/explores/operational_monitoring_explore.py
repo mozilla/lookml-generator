@@ -19,8 +19,8 @@ class OperationalMonitoringExplore(Explore):
         self,
         name: str,
         views: Dict[str, str],
-        views_path: Path = None,
-        defn: Dict[str, Any] = None,
+        views_path: Optional[Path] = None,
+        defn: Optional[Dict[str, Any]] = None,
     ):
         """Initialize OperationalMonitoringExplore."""
         super().__init__(name, views, views_path)
@@ -85,8 +85,8 @@ class OperationalMonitoringAlertingExplore(Explore):
         self,
         name: str,
         views: Dict[str, str],
-        views_path: Path = None,
-        defn: Dict[str, Any] = None,
+        views_path: Optional[Path] = None,
+        defn: Optional[Dict[str, Any]] = None,
     ):
         """Initialize OperationalMonitoringExplore."""
         super().__init__(name, views, views_path)

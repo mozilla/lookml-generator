@@ -4,11 +4,18 @@ version: 2.1
 # See https://circleci.com/orbs/registry/orb/circleci/gcp-gcr
 orbs:
   gcp-gcr: circleci/gcp-gcr@0.13.0
+  docker: circleci/docker@1.5
+  python: circleci/python@2.1.1
+
+parameters:
+  python-version:
+    type: string
+    default: '3.10'
 
 jobs:
   unit-tests:
     docker: &docker
-      - image: python:3.8
+      - image: python:<< pipeline.parameters.python-version >>
     steps:
       - checkout
       - &restore_cache
@@ -17,17 +24,17 @@ jobs:
             # when lock files change, use increasingly general
             # patterns to restore cache
             - &cache_key # yamllint disable-line rule:line-length
-              python-3.8-packages-v1-{{ .Branch }}-{{ checksum "requirements.in" }}-{{ checksum "requirements.txt" }}
+              python-<< pipeline.parameters.python-version >>-packages-v1-{{ .Branch }}-{{ checksum "requirements.in" }}-{{ checksum "requirements.txt" }}
               # yamllint disable-line rule:line-length
-            - python-3.8-packages-v1-{{ .Branch }}-{{ checksum "requirements.in" }}-
-            - python-3.8-packages-v1-{{ .Branch }}-
-            - python-3.8-packages-v1-master-
-            - python-3.8-packages-v1-
+            - python-<< pipeline.parameters.python-version >>-packages-v1-{{ .Branch }}-{{ checksum "requirements.in" }}-
+            - python-<< pipeline.parameters.python-version >>-packages-v1-{{ .Branch }}-
+            - python-<< pipeline.parameters.python-version >>-packages-v1-master-
+            - python-<< pipeline.parameters.python-version >>-packages-v1-
       - &build
         run:
           name: Build
           command: |
-            python3.8 -m venv venv/
+            python3 -m venv venv/
             venv/bin/pip install pip-tools --constraint requirements.in
             venv/bin/pip-sync
       - run:
@@ -85,6 +92,7 @@ jobs:
             export GOOGLE_APPLICATION_CREDENTIALS="/tmp/gcp.json"
             echo "$GCLOUD_SERVICE_KEY" > "$GOOGLE_APPLICATION_CREDENTIALS"
             ./bin/generator namespaces
+            cat namespaces.yaml
   docs-build:
     docker: *docker
     steps:
@@ -121,12 +129,12 @@ jobs:
 
   build-container:
     docker:
-      - image: docker:20.10.2
+      - image: docker:20.10.14
     working_directory: ~/mozilla/lookml-generator
     steps:
       - checkout
       - setup_remote_docker:
-          version: 20.10.2
+          version: 20.10.14
       - run: docker build -t app:build .
 
 workflows:
