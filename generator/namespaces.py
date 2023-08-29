@@ -10,6 +10,7 @@ from itertools import groupby
 from operator import itemgetter
 from pathlib import Path
 from typing import Any, Dict, List, Union
+from metric_config_parser.config import ConfigCollection
 
 import click
 import yaml
@@ -248,6 +249,10 @@ def _get_explores(views: List[View]) -> dict:
 
     return explores
 
+def _get_metric_hub_data_sources() -> dict:
+    config_collection = ConfigCollection.from_github_repo()
+    return config_collection.get_data_source_definition()
+
 
 @click.command(help=__doc__)
 @click.option(
@@ -277,6 +282,7 @@ def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri, disallowl
     """Generate namespaces.yaml."""
     warnings.filterwarnings("ignore", module="google.auth._default")
     glean_apps = _get_glean_apps(app_listings_uri)
+    metric_hub_data_sources = _get_metric_hub_data_sources()
     db_views = lookml_utils.get_bigquery_view_reference_map(generated_sql_uri)
 
     namespaces = {}

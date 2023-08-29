@@ -5,6 +5,8 @@ from typing import Any, Dict, List, Optional, Tuple
 from google.api_core import exceptions
 from google.cloud import bigquery
 
+from metric_config_parser.config import ConfigCollection
+
 from .views import lookml_utils
 
 
