@@ -265,7 +265,7 @@
 <div class="attr class">
             
     <span class="def">class</span>
-    <span class="name">ViewDict</span><wbr>(<span class="base">builtins.dict</span>):
+    <span class="name">ViewDict</span><wbr>(<span class="base">typing.TypedDict</span>):
 
                 <label class="view-source-button" for="ViewDict-view-source"><span>View Source</span></label>
 
@@ -316,25 +316,6 @@
     
     
 
-                            </div>
-                            <div class="inherited">
-                                <h5>Inherited Members</h5>
-                                <dl>
-                                    <div><dt>builtins.dict</dt>
-                                <dd id="ViewDict.get" class="function">get</dd>
-                <dd id="ViewDict.setdefault" class="function">setdefault</dd>
-                <dd id="ViewDict.pop" class="function">pop</dd>
-                <dd id="ViewDict.popitem" class="function">popitem</dd>
-                <dd id="ViewDict.keys" class="function">keys</dd>
-                <dd id="ViewDict.items" class="function">items</dd>
-                <dd id="ViewDict.values" class="function">values</dd>
-                <dd id="ViewDict.update" class="function">update</dd>
-                <dd id="ViewDict.fromkeys" class="function">fromkeys</dd>
-                <dd id="ViewDict.clear" class="function">clear</dd>
-                <dd id="ViewDict.copy" class="function">copy</dd>
-
-            </div>
-                                </dl>
                             </div>
                 </section>
                 <section id="View">
@@ -645,7 +626,7 @@
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">get_dimensions</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">bq_client</span>,</span><span class="param">	<span class="n">table</span>,</span><span class="param">	<span class="n">v1_name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>:</span></span>
+        <span class="name">get_dimensions</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">bq_client</span>, </span><span class="param"><span class="n">table</span>, </span><span class="param"><span class="n">v1_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>:</span></span>
 
                 <label class="view-source-button" for="View.get_dimensions-view-source"><span>View Source</span></label>
 
@@ -669,7 +650,7 @@
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">to_lookml</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">bq_client</span>, </span><span class="param"><span class="n">v1_name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>:</span></span>
+        <span class="name">to_lookml</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">bq_client</span>, </span><span class="param"><span class="n">v1_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="View.to_lookml-view-source"><span>View Source</span></label>
 
@@ -701,7 +682,7 @@ a list.</p>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">get_client_id</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">dimensions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span>, </span><span class="param"><span class="n">table</span><span class="p">:</span> <span class="nb">str</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span>:</span></span>
+        <span class="name">get_client_id</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">dimensions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span>, </span><span class="param"><span class="n">table</span><span class="p">:</span> <span class="nb">str</span></span><span class="return-annotation">) -> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="View.get_client_id-view-source"><span>View Source</span></label>
 
@@ -733,7 +714,7 @@ a list.</p>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">get_document_id</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">dimensions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span>, </span><span class="param"><span class="n">table</span><span class="p">:</span> <span class="nb">str</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span>:</span></span>
+        <span class="name">get_document_id</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">dimensions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span>, </span><span class="param"><span class="n">table</span><span class="p">:</span> <span class="nb">str</span></span><span class="return-annotation">) -> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="View.get_document_id-view-source"><span>View Source</span></label>
 

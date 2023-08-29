@@ -378,7 +378,8 @@
                 <section id="Explore">
                             <input id="Explore-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr class">
-            
+                    <div class="decorator">@dataclass</div>
+
     <span class="def">class</span>
     <span class="name">Explore</span>:
 
@@ -386,7 +387,8 @@
 
     </div>
     <a class="headerlink" href="#Explore"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Explore-16"><a href="#Explore-16"><span class="linenos"> 16</span></a><span class="k">class</span> <span class="nc">Explore</span><span class="p">:</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Explore-15"><a href="#Explore-15"><span class="linenos"> 15</span></a><span class="nd">@dataclass</span>
+</span><span id="Explore-16"><a href="#Explore-16"><span class="linenos"> 16</span></a><span class="k">class</span> <span class="nc">Explore</span><span class="p">:</span>
 </span><span id="Explore-17"><a href="#Explore-17"><span class="linenos"> 17</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;A generic explore.&quot;&quot;&quot;</span>
 </span><span id="Explore-18"><a href="#Explore-18"><span class="linenos"> 18</span></a>
 </span><span id="Explore-19"><a href="#Explore-19"><span class="linenos"> 19</span></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
@@ -649,7 +651,7 @@
                             <div id="Explore.__init__" class="classattr">
                                 <div class="attr function">
             
-        <span class="name">Explore</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">name</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="n">views</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>,</span><span class="param">	<span class="n">views_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">defn</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span>)</span>
+        <span class="name">Explore</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">name</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="n">views</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>,</span><span class="param">	<span class="n">views_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">defn</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span></span>)</span>
 
         
     </div>
@@ -682,7 +684,7 @@
                             </div>
                             <div id="Explore.views_path" class="classattr">
                                 <div class="attr variable">
-            <span class="name">views_path</span><span class="annotation">: Union[pathlib.Path, NoneType]</span>        =
+            <span class="name">views_path</span><span class="annotation">: Optional[pathlib.Path]</span>        =
 <span class="default_value">None</span>
 
         
@@ -694,7 +696,7 @@
                             </div>
                             <div id="Explore.defn" class="classattr">
                                 <div class="attr variable">
-            <span class="name">defn</span><span class="annotation">: Union[Dict[str, str], NoneType]</span>        =
+            <span class="name">defn</span><span class="annotation">: Optional[Dict[str, str]]</span>        =
 <span class="default_value">None</span>
 
         
@@ -742,7 +744,7 @@
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">to_lookml</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">client</span><span class="p">:</span> <span class="n">google</span><span class="o">.</span><span class="n">cloud</span><span class="o">.</span><span class="n">bigquery</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">Client</span>,</span><span class="param">	<span class="n">v1_name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>:</span></span>
+        <span class="name">to_lookml</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">client</span><span class="p">:</span> <span class="n">google</span><span class="o">.</span><span class="n">cloud</span><span class="o">.</span><span class="n">bigquery</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">Client</span>,</span><span class="param">	<span class="n">v1_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>:</span></span>
 
                 <label class="view-source-button" for="Explore.to_lookml-view-source"><span>View Source</span></label>
 
@@ -973,7 +975,7 @@
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">get_view_time_partitioning_group</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">view</span><span class="p">:</span> <span class="nb">str</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span>:</span></span>
+        <span class="name">get_view_time_partitioning_group</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">view</span><span class="p">:</span> <span class="nb">str</span></span><span class="return-annotation">) -> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="Explore.get_view_time_partitioning_group-view-source"><span>View Source</span></label>
 

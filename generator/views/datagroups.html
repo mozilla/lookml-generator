@@ -305,7 +305,8 @@
                 <section id="Datagroup">
                             <input id="Datagroup-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr class">
-            
+                    <div class="decorator">@dataclass(frozen=True, eq=True)</div>
+
     <span class="def">class</span>
     <span class="name">Datagroup</span>:
 
@@ -313,7 +314,8 @@
 
     </div>
     <a class="headerlink" href="#Datagroup"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Datagroup-37"><a href="#Datagroup-37"><span class="linenos">37</span></a><span class="k">class</span> <span class="nc">Datagroup</span><span class="p">:</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Datagroup-36"><a href="#Datagroup-36"><span class="linenos">36</span></a><span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">eq</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="Datagroup-37"><a href="#Datagroup-37"><span class="linenos">37</span></a><span class="k">class</span> <span class="nc">Datagroup</span><span class="p">:</span>
 </span><span id="Datagroup-38"><a href="#Datagroup-38"><span class="linenos">38</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents a Datagroup.&quot;&quot;&quot;</span>
 </span><span id="Datagroup-39"><a href="#Datagroup-39"><span class="linenos">39</span></a>
 </span><span id="Datagroup-40"><a href="#Datagroup-40"><span class="linenos">40</span></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
