@@ -10,7 +10,6 @@ from itertools import groupby
 from operator import itemgetter
 from pathlib import Path
 from typing import Any, Dict, List, Union
-from metric_config_parser.config import ConfigCollection
 
 import click
 import yaml
@@ -19,8 +18,8 @@ from google.cloud import bigquery
 from generator import operational_monitoring_utils
 
 from .explores import EXPLORE_TYPES
-from .views import VIEW_TYPES, View, lookml_utils
 from .metrics_utils import MetricsConfigLoader
+from .views import VIEW_TYPES, View, lookml_utils
 
 DEFAULT_GENERATED_SQL_URI = (
     "https://github.com/mozilla/bigquery-etl/archive/generated-sql.tar.gz"
@@ -157,25 +156,35 @@ def _get_metric_hub_namespaces():
 
     metric_hub_namespaces = {}
     for namespace, metric_hub_data_sources in metric_hub_data_sources.items():
+        # each data source definition is represented by a view
         views = {
-            f"metrics_{data_source}": {"type": "metrics_view"}
+            f"metric_definitions_{data_source}": {"type": "metric_definitions_view"}
             for data_source in metric_hub_data_sources
         }
 
+        # there is a single explore per namespace that joins all the data source views
         explore_views = {}
-        for i, data_source in enumerate(metric_hub_data_sources):
+        for i, data_source in enumerate(sorted(metric_hub_data_sources)):
             if i == 0:
                 # first view is used as base view
-                explore_views["base_view"] = f"metrics_{data_source}"
-            else:
-                if "joined_views" not in explore_views:
-                    explore_views["joined_views"] = [f"metrics_{data_source}"]
-                else:
-                    explore_views["joined_views"].append(f"metrics_{data_source}")
+                # this view contains a date filter used across all other views
+                explore_views["base_view"] = f"metric_definitions_{data_source}"
 
-        explores = [
-            {f"metrics_{namespace}": {"type": "metrics_view", "views": explore_views}}
-        ]
+            # generate entries for views that need to be joined on
+            if "joined_views" not in explore_views:
+                explore_views["joined_views"] = [f"metric_definitions_{data_source}"]
+            else:
+                explore_views["joined_views"].append(
+                    f"metric_definitions_{data_source}"
+                )
+
+        explores = {
+            f"metric_definitions_{namespace}": {
+                "type": "metric_definitions_explore",
+                "views": explore_views,
+            }
+        }
+
         metric_hub_namespaces[namespace] = {
             "pretty_name": lookml_utils.slug_to_title(namespace),
             "views": views,
@@ -284,14 +293,25 @@ def _get_explores(views: List[View]) -> dict:
     return explores
 
 
-def _get_metric_hub_data_sources() -> dict:
-    data_sources_per_namespace = {}
+def _get_metric_hub_data_sources() -> Dict[str, List[str]]:
+    """Get data source definitions from metric-hub repository for each namespace."""
+    data_sources_per_namespace: Dict[str, List[str]] = {}
     for definition in MetricsConfigLoader.configs.definitions:
         for data_source_slug in definition.spec.data_sources.definitions.keys():
-            if definition.platform in data_sources_per_namespace:
-                data_sources_per_namespace[definition.platform].append(data_source_slug)
-            else:
-                data_sources_per_namespace[definition.platform] = [data_source_slug]
+            if (
+                len(
+                    MetricsConfigLoader.metrics_of_data_source(
+                        data_source_slug, definition.platform
+                    )
+                )
+                > 0  # ignore data sources that are not used for any metric definition
+            ):
+                if definition.platform in data_sources_per_namespace:
+                    data_sources_per_namespace[definition.platform].append(
+                        data_source_slug
+                    )
+                else:
+                    data_sources_per_namespace[definition.platform] = [data_source_slug]
 
     return data_sources_per_namespace
 

@@ -32,6 +32,9 @@ def _generate_views(
         )
         path = out_dir / f"{view.name}.view.lkml"
         lookml = view.to_lookml(client, v1_name)
+        if lookml == {}:
+            continue
+
         # lkml.dump may return None, in which case write an empty file
         path.write_text(FILE_HEADER + (lkml.dump(lookml) or ""))
         yield path

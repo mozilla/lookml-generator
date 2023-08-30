@@ -4,7 +4,7 @@ from .events_view import EventsView
 from .funnel_analysis_view import FunnelAnalysisView
 from .glean_ping_view import GleanPingView
 from .growth_accounting_view import GrowthAccountingView
-from .metrics_view import MetricsView
+from .metric_definitions_view import MetricDefinitionsView
 from .operational_monitoring_alerting_view import OperationalMonitoringAlertingView
 from .operational_monitoring_view import OperationalMonitoringView
 from .ping_view import PingView
@@ -17,7 +17,7 @@ VIEW_TYPES = {
     FunnelAnalysisView.type: FunnelAnalysisView,
     OperationalMonitoringView.type: OperationalMonitoringView,
     OperationalMonitoringAlertingView.type: OperationalMonitoringAlertingView,
-    MetricsView.type: MetricsView,
+    MetricDefinitionsView.type: MetricDefinitionsView,
     GleanPingView.type: GleanPingView,
     PingView.type: PingView,
     GrowthAccountingView.type: GrowthAccountingView,

@@ -77,11 +77,15 @@ class Explore:
 
     def get_dependent_views(self) -> List[str]:
         """Get views this explore is dependent on."""
-        return [
-            view
-            for _type, view in self.views.items()
-            if not _type.startswith("extended")
-        ]
+        dependent_views = []
+        for _type, views in self.views.items():
+            if _type.startswith("extended"):
+                continue
+            elif _type.startswith("joined"):
+                dependent_views += [view for view in views]
+            else:
+                dependent_views.append(views)
+        return dependent_views
 
     @staticmethod
     def from_dict(name: str, defn: dict, views_path: Path) -> Explore:

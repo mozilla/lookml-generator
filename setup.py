@@ -19,7 +19,7 @@ setup(
     author="Frank Bertsch",
     author_email="frank@mozilla.com",
     url="https://github.com/mozilla/lookml-generator",
-    packages=find_packages(include=["generator"]),
+    packages=find_packages(include=["generator", "generator.*"]),
     package_dir={"lookml-generator": "generator"},
     entry_points={
         "console_scripts": [

@@ -440,13 +440,13 @@ mccabe==0.6.1 \
     --hash=sha256:ab8a6258860da4b6677da4bd2fe5dc2c659cff31b3ee4f7f5d64e79735b80d42 \
     --hash=sha256:dd8d182285a0fe56bace7f45b5e7d1a6ebcbf524e8f3bd87eb0f125271b8831f
     # via flake8
-mozilla-metric-config-parser==2023.6.7 \
-    --hash=sha256:1f7b44ba7e4e86d817ee7dfe2b7420b35f4ee6c69d4a30d0e4bc2c48ab17adf9 \
-    --hash=sha256:5046da41212b3cfecdc70292dd4d0e3fc81916d10020e4869ccca08ee43c7109
+mozilla-metric-config-parser==2023.9.1 \
+    --hash=sha256:47796ea83bb59eabc5d0542b4e27b56ef2f063f86ff4994303578c138c7bfba2 \
+    --hash=sha256:5ca4e5789cb4ae376c96be4fab496671badee58ec5bf1b1b4203e7d1d11e07f9
     # via -r requirements.in
-mozilla-nimbus-schemas==2023.8.3 \
-    --hash=sha256:b1a3983e9faea0fc3010b952f11e8d983ab6244ba02d79e4b6c1001af400ccbc \
-    --hash=sha256:c96c61c02a6d725ca3ab25c46f66db975a02a8fe368133da46982696c7e58b20
+mozilla-nimbus-schemas==2023.8.4 \
+    --hash=sha256:49de0a77ef32dbc05f968bde1978b36aaae895f309c40f1401bcc06c4fa02ac5 \
+    --hash=sha256:f7fece3d9ca9b3d1635163022dab888042a3d5dd7e7b8b0b5c02533798c92b12
     # via
     #   -r requirements.in
     #   mozilla-metric-config-parser
