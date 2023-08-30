@@ -151,6 +151,39 @@ def _get_opmon(bq_client: bigquery.Client, namespaces: Dict[str, Any]):
     return om_content
 
 
+def _get_metric_hub_namespaces():
+    metric_hub_data_sources = _get_metric_hub_data_sources()
+
+    metric_hub_namespaces = {}
+    for namespace, metric_hub_data_sources in metric_hub_data_sources.items():
+        views = {
+            f"metrics_{data_source}": {"type": "metrics_view"}
+            for data_source in metric_hub_data_sources
+        }
+
+        explore_views = {}
+        for i, data_source in enumerate(metric_hub_data_sources):
+            if i == 0:
+                # first view is used as base view
+                explore_views["base_view"] = f"metrics_{data_source}"
+            else:
+                if "joined_views" not in explore_views:
+                    explore_views["joined_views"] = [f"metrics_{data_source}"]
+                else:
+                    explore_views["joined_views"].append(f"metrics_{data_source}")
+
+        explores = [
+            {f"metrics_{namespace}": {"type": "metrics_view", "views": explore_views}}
+        ]
+        metric_hub_namespaces[namespace] = {
+            "pretty_name": lookml_utils.slug_to_title(namespace),
+            "views": views,
+            "explores": explores,
+        }
+
+    return metric_hub_namespaces
+
+
 def _get_glean_apps(
     app_listings_uri: str,
 ) -> List[Dict[str, Union[str, List[Dict[str, str]]]]]:
@@ -249,9 +282,18 @@ def _get_explores(views: List[View]) -> dict:
 
     return explores
 
+
 def _get_metric_hub_data_sources() -> dict:
     config_collection = ConfigCollection.from_github_repo()
-    return config_collection.get_data_source_definition()
+    data_sources_per_namespace = {}
+    for definition in config_collection.definitions:
+        for data_source_slug in definition.spec.data_sources.definitions.keys():
+            if definition.platform in data_sources_per_namespace:
+                data_sources_per_namespace[definition.platform].append(data_source_slug)
+            else:
+                data_sources_per_namespace[definition.platform] = [data_source_slug]
+
+    return data_sources_per_namespace
 
 
 @click.command(help=__doc__)
@@ -282,7 +324,6 @@ def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri, disallowl
     """Generate namespaces.yaml."""
     warnings.filterwarnings("ignore", module="google.auth._default")
     glean_apps = _get_glean_apps(app_listings_uri)
-    metric_hub_data_sources = _get_metric_hub_data_sources()
     db_views = lookml_utils.get_bigquery_view_reference_map(generated_sql_uri)
 
     namespaces = {}
@@ -298,6 +339,8 @@ def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri, disallowl
             "explores": explores,
             "glean_app": True,
         }
+
+    _merge_namespaces(namespaces, _get_metric_hub_namespaces())
 
     if custom_namespaces is not None:
         custom_namespaces = yaml.safe_load(custom_namespaces.read()) or {}
