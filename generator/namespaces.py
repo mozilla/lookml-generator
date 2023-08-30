@@ -20,6 +20,7 @@ from generator import operational_monitoring_utils
 
 from .explores import EXPLORE_TYPES
 from .views import VIEW_TYPES, View, lookml_utils
+from .metrics_utils import MetricsConfigLoader
 
 DEFAULT_GENERATED_SQL_URI = (
     "https://github.com/mozilla/bigquery-etl/archive/generated-sql.tar.gz"
@@ -284,9 +285,8 @@ def _get_explores(views: List[View]) -> dict:
 
 
 def _get_metric_hub_data_sources() -> dict:
-    config_collection = ConfigCollection.from_github_repo()
     data_sources_per_namespace = {}
-    for definition in config_collection.definitions:
+    for definition in MetricsConfigLoader.configs.definitions:
         for data_source_slug in definition.spec.data_sources.definitions.keys():
             if definition.platform in data_sources_per_namespace:
                 data_sources_per_namespace[definition.platform].append(data_source_slug)

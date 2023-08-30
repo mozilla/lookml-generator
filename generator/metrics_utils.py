@@ -11,7 +11,7 @@ from metric_config_parser.data_source import DataSource
 METRIC_HUB_REPO = "https://github.com/mozilla/metric-hub"
 
 
-class MetricsConfigLoader:
+class _MetricsConfigLoader:
     """
     Loads metric config files from an external repository.
     """
@@ -30,3 +30,6 @@ class MetricsConfigLoader:
             )
         self._configs = self.config_collection
         return self._configs
+
+
+MetricsConfigLoader = _MetricsConfigLoader()
