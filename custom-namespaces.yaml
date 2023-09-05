@@ -506,6 +506,27 @@ revenue_private:
       type: table_view
       tables:
         - table: mozdata.revenue_cat3_analysis.budget_complete_2022
+ads:
+  glean_app: false
+  connection: bigquery-oauth
+  pretty_name: Ads
+  owners:
+    - cmorales@mozilla.com
+    - sbetancourt@mozilla.com
+  spoke: looker-spoke-private
+  views:
+    consolidated_ad_metrics:
+      type: table_view
+      tables:
+        - table: mozdata.ads.consolidated_ad_metrics
+    consolidated_ad_metrics_daily_pt:
+      type: table_view
+      tables:
+        - table: mozdata.ads.consolidated_ad_metrics_daily_pt
+    consolidated_ad_metrics_hourly:
+      type: table_view
+      tables:
+        - table: mozdata.ads.consolidated_ad_metrics_hourly
 firefox_ios:
   owners:
     - athomas@mozilla.com
@@ -894,11 +915,11 @@ monitoring:
       tables:
         - table: mozdata.monitoring.airflow_dag_warning
     airflow_import_error:
-      types: table_view
+      type: table_view
       tables:
         - table: mozdata.monitoring.airflow_import_error
     airflow_job:
-      types: table_view
+      type: table_view
       tables:
         - table: mozdata.monitoring.airflow_job
     airflow_slot_pool:
@@ -1236,6 +1257,31 @@ subscription_platform:
         count_sum:
           type: sum
           sql: ${count}
+    stripe_plans:
+      type: table_view
+      tables:
+        - table: mozdata.subscription_platform.stripe_plans
+    stripe_products:
+      type: table_view
+      tables:
+        - table: mozdata.subscription_platform.stripe_products
+    # Logical subscriptions
+    logical_subscriptions:
+      type: table_view
+      tables:
+        - table: mozdata.subscription_platform.logical_subscriptions
+    logical_subscription_events:
+      type: table_view
+      tables:
+        - table: mozdata.subscription_platform.logical_subscription_events
+    daily_active_logical_subscriptions:
+      type: table_view
+      tables:
+        - table: mozdata.subscription_platform.daily_active_logical_subscriptions
+    monthly_active_logical_subscriptions:
+      type: table_view
+      tables:
+        - table: mozdata.subscription_platform.monthly_active_logical_subscriptions
   explores:
     # Using `_v1` explores to avoid breakages when v2 tables are deployed.
     apple_subscriptions_v1:
