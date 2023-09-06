@@ -653,7 +653,7 @@ firefox_desktop:
     urlbar_events_table:
       type: table_view
       tables:
-        - table: mozdata.telemetry.urlbar_events
+        - table: mozdata.firefox_desktop.urlbar_events
     feature_usage_table:
       type: table_view
       tables:
