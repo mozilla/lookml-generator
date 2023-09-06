@@ -654,6 +654,11 @@ firefox_desktop:
       type: table_view
       tables:
         - table: mozdata.firefox_desktop.urlbar_events
+    urlbar_events:
+      type: events_view
+      tables:
+        - events_table_view: urlbar_events_table
+          base_table: mozdata.firefox_desktop.urlbar_events
     feature_usage_table:
       type: table_view
       tables:
