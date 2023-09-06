@@ -1,0 +1,100 @@
+[metrics]
+
+[metrics.uri_count]
+data_source = "baseline"
+select_expression = '{{agg_sum("metrics.counter.events_total_uri_count")}}'
+friendly_name = "URIs visited"
+description = "Counts the number of URIs each client visited"
+
+[metrics.active_hours]
+select_expression = "COALESCE(SUM(metrics.timespan.glean_baseline_duration.value), 0) / 3600.0"
+data_source = "baseline"
+friendly_name = "Active Hours"
+description = "Total time Firefox was active"
+
+
+[metrics.performance_pageload_dcl]
+data_source = "metrics"
+select_expression = "ARRAY_AGG(metrics.timing_distribution.performance_pageload_dcl IGNORE NULLS)"
+friendly_name = "Pageload DCL"
+description = "Time in milliseconds from navigationStart to domContentLoaded for the foreground http or https root content document."
+category = "performance"
+type = "histogram"
+
+[metrics.performance_pageload_dcl_responsestart]
+data_source = "metrics"
+select_expression = "ARRAY_AGG(metrics.timing_distribution.performance_pageload_dcl_responsestart IGNORE NULLS)"
+friendly_name = "Pageload DCL Response Start"
+description = "Time in milliseconds from responseStart to domContentLoaded for the foreground http or https root content document."
+category = "performance"
+type = "histogram"
+
+[metrics.performance_pageload_fcp]
+data_source = "metrics"
+select_expression = "ARRAY_AGG(metrics.timing_distribution.performance_pageload_fcp IGNORE NULLS)"
+friendly_name = "Pageload FCP"
+description = "The time between navigationStart and the first contentful paint of a foreground http or https root content document, in milliseconds. The contentful paint timestamp is taken during display list building and does not include rasterization or compositing of that paint."
+category = "performance"
+type = "histogram"
+
+
+[data_sources.baseline]
+from_expression = """(
+    SELECT
+        p.*,
+        DATE(p.submission_timestamp) AS submission_date
+    FROM `moz-fx-data-shared-prod.{dataset}.baseline` p
+)"""
+client_id_column = "client_info.client_id"
+experiments_column_type = "glean"
+default_dataset = "org_mozilla_firefox"
+friendly_name = "Baseline"
+description = "Baseline Ping"
+build_id_column = "REPLACE(CAST(DATE(mozfun.norm.fenix_build_to_datetime(client_info.app_build)) AS STRING), '-', '')"
+
+[data_sources.baseline_v2]
+from_expression = """(
+    SELECT
+        p.*,
+        DATE(p.submission_timestamp) AS submission_date
+    FROM `moz-fx-data-shared-prod.{dataset}.baseline` p
+)"""
+client_id_column = "client_info.client_id"
+submission_date_column = "DATE(submission_timestamp)"
+experiments_column_type = "glean"
+default_dataset = "fenix"
+friendly_name = "Baseline"
+description = "Baseline Ping"
+build_id_column = "REPLACE(CAST(DATE(mozfun.norm.fenix_build_to_datetime(client_info.app_build)) AS STRING), '-', '')"
+
+[data_sources.events]
+from_expression = """(
+    SELECT
+        p.* EXCEPT (events),
+        DATE(p.submission_timestamp) AS submission_date,
+        event
+    FROM
+        `moz-fx-data-shared-prod.{dataset}.events` p
+    CROSS JOIN
+        UNNEST(p.events) AS event
+)"""
+client_id_column = "client_info.client_id"
+experiments_column_type = "glean"
+default_dataset = "org_mozilla_firefox"
+friendly_name = "Events"
+description = "Events Ping"
+build_id_column = "REPLACE(CAST(DATE(mozfun.norm.fenix_build_to_datetime(client_info.app_build)) AS STRING), '-', '')"
+
+[data_sources.metrics]
+from_expression = """(
+    SELECT
+        p.*,
+        DATE(p.submission_timestamp) AS submission_date
+    FROM `moz-fx-data-shared-prod.{dataset}.metrics` p
+)"""
+client_id_column = "client_info.client_id"
+experiments_column_type = "glean"
+default_dataset = "org_mozilla_firefox"
+friendly_name = "Metrics"
+description = "Metrics Ping"
+build_id_column = "REPLACE(CAST(DATE(mozfun.norm.fenix_build_to_datetime(client_info.app_build)) AS STRING), '-', '')"

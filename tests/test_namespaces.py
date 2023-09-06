@@ -1,3 +1,4 @@
+import shutil
 import sys
 import tarfile
 from io import BytesIO
@@ -9,6 +10,7 @@ from unittest.mock import patch
 import pytest
 import yaml
 from click.testing import CliRunner
+from git import Repo
 
 from generator.namespaces import (
     _get_explores,
@@ -26,6 +28,8 @@ from generator.views import (
 from generator.views.lookml_utils import get_bigquery_view_reference_map
 
 from .utils import print_and_test
+
+TEST_DIR = Path(__file__).parent
 
 
 @pytest.fixture
@@ -241,9 +245,17 @@ def test_namespaces_full(
     generated_sql_uri,
     app_listings_uri,
     namespace_disallowlist,
+    tmp_path,
 ):
     with patch("google.cloud.bigquery.Client", MockClient):
         with runner.isolated_filesystem():
+            r = Repo.init(tmp_path)
+            r.config_writer().set_value("user", "name", "test").release()
+            r.config_writer().set_value("user", "email", "test@example.com").release()
+            shutil.copytree(TEST_DIR / "data", tmp_path, dirs_exist_ok=True)
+            r.git.add(".")
+            r.git.commit("-m", "commit", "--date", "Mon 25 Aug 2020 20:00:19 UTC")
+
             result = runner.invoke(
                 namespaces,
                 [
@@ -255,6 +267,8 @@ def test_namespaces_full(
                     app_listings_uri,
                     "--disallowlist",
                     namespace_disallowlist,
+                    "--metric-hub-repo",
+                    tmp_path / "metric-hub",
                 ],
             )
             sys.stdout.write(result.stdout)
@@ -291,6 +305,31 @@ def test_namespaces_full(
                                 }
                             ],
                             "type": "table_view",
+                        },
+                    },
+                },
+                "fenix": {
+                    "explores": {
+                        "metric_definitions_fenix": {
+                            "type": "metric_definitions_explore",
+                            "views": {
+                                "base_view": "metric_definitions_baseline",
+                                "joined_views": [
+                                    "metric_definitions_baseline",
+                                    "metric_definitions_metrics",
+                                ],
+                            },
+                        }
+                    },
+                    "glean_app": False,
+                    "pretty_name": "Fenix",
+                    "spoke": "looker-spoke-default",
+                    "views": {
+                        "metric_definitions_baseline": {
+                            "type": "metric_definitions_view"
+                        },
+                        "metric_definitions_metrics": {
+                            "type": "metric_definitions_view"
                         },
                     },
                 },

@@ -18,7 +18,7 @@ from google.cloud import bigquery
 from generator import operational_monitoring_utils
 
 from .explores import EXPLORE_TYPES
-from .metrics_utils import MetricsConfigLoader
+from .metrics_utils import METRIC_HUB_REPO, MetricsConfigLoader
 from .views import VIEW_TYPES, View, lookml_utils
 
 DEFAULT_GENERATED_SQL_URI = (
@@ -340,7 +340,18 @@ def _get_metric_hub_data_sources() -> Dict[str, List[str]]:
     default="namespaces-disallowlist.yaml",
     help="Path to namespace disallow list",
 )
-def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri, disallowlist):
+@click.option(
+    "--metric-hub-repo",
+    default=METRIC_HUB_REPO,
+    help="Repo to load metric configs from.",
+)
+def namespaces(
+    custom_namespaces,
+    generated_sql_uri,
+    app_listings_uri,
+    disallowlist,
+    metric_hub_repo,
+):
     """Generate namespaces.yaml."""
     warnings.filterwarnings("ignore", module="google.auth._default")
     glean_apps = _get_glean_apps(app_listings_uri)
@@ -359,6 +370,9 @@ def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri, disallowl
             "explores": explores,
             "glean_app": True,
         }
+
+    if metric_hub_repo:
+        MetricsConfigLoader.update_repos([metric_hub_repo])
 
     _merge_namespaces(namespaces, _get_metric_hub_namespaces())
 
