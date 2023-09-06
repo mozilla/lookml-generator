@@ -741,11 +741,6 @@ firefox_desktop:
       tables:
         - table: mozdata.default_browser_agent.default_browser
   explores:
-    urlbar_event_counts:
-      type: events_explore
-      views:
-        base_view: urlbar_events
-        extended_view: urlbar_events_table
     client_counts:
       type: client_counts_explore
       views:
