@@ -73,7 +73,7 @@ class MetricDefinitionsView(View):
             "sql": f"""
               SELECT
                 {",".join(metric_definitions)},
-                COALESCE({data_source_definition.client_id_column or "client_id"}, 'NULL') AS client_id,
+                {data_source_definition.client_id_column or "client_id"} AS client_id,
                 {data_source_definition.submission_date_column or "submission_date"} AS submission_date
               FROM
                 {
@@ -83,8 +83,8 @@ class MetricDefinitionsView(View):
                     ).format(dataset=self.namespace)
                 }
               WHERE {data_source_definition.submission_date_column} BETWEEN
-                SAFE_CAST({{% date_start {base_view_name}.date %}} AS DATE) AND
-                SAFE_CAST({{% date_end {base_view_name}.date %}} AS DATE)
+                SAFE_CAST({{% date_start {base_view_name}.submission_date %}} AS DATE) AND
+                SAFE_CAST({{% date_end {base_view_name}.submission_date %}} AS DATE)
               GROUP BY
                 client_id,
                 submission_date
@@ -93,17 +93,6 @@ class MetricDefinitionsView(View):
         view_defn["dimensions"] = self.get_dimensions()
         view_defn["dimension_groups"] = self.get_dimension_groups()
         view_defn["measures"] = []
-
-        # Custom filter injected into the derived table SQL to filter on the date partition.
-        # All metric definition views reference the date filter from the 'base_view'.
-        # This allows us to have a single filter in the explore that gets applied to all the views.
-        view_defn["filters"] = [
-            {
-                "name": "date",
-                "type": "date",
-                "description": "Date Range",
-            }
-        ]
         view_defn["sets"] = self._get_sets()
 
         return {"views": [view_defn]}
@@ -132,9 +121,9 @@ class MetricDefinitionsView(View):
         ):
             # for any view that is part of the current query, use the first available client_id
             joined_client_id_columns += f"""
-                {{% if  metric_definitions_{data_source}._in_query %}}
+                {{%- if  metric_definitions_{data_source}._in_query %}}
                 , SAFE_CAST(metric_definitions_{data_source}.client_id AS STRING)
-                {{% endif %}}
+                {{%- endif -%}}
             """
 
         return [
@@ -143,6 +132,7 @@ class MetricDefinitionsView(View):
                 "type": "string",
                 "sql": f"COALESCE({joined_client_id_columns})",
                 "label": "Client ID",
+                "primary_key": "yes",
                 "description": "Unique client identifier",
             },
         ] + [  # add a dimension for each metric definition
@@ -168,9 +158,9 @@ class MetricDefinitionsView(View):
         ):
             # for any view that is part of the current query, use the first available submission_date
             joined_submission_date_columns += f"""
-                {{% if  metric_definitions_{data_source}._in_query %}}
+                {{%- if  metric_definitions_{data_source}._in_query %}}
                 , CAST(metric_definitions_{data_source}.submission_date AS TIMESTAMP)
-                {{% endif %}}
+                {{%- endif -%}}
             """
 
         return [

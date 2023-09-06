@@ -151,7 +151,7 @@ def _get_opmon(bq_client: bigquery.Client, namespaces: Dict[str, Any]):
     return om_content
 
 
-def _get_metric_hub_namespaces():
+def _get_metric_hub_namespaces(existing_namespaces):
     metric_hub_data_sources = _get_metric_hub_data_sources()
 
     metric_hub_namespaces = {}
@@ -166,9 +166,18 @@ def _get_metric_hub_namespaces():
         explore_views = {}
         for i, data_source in enumerate(sorted(metric_hub_data_sources)):
             if i == 0:
-                # first view is used as base view
-                # this view contains a date filter used across all other views
-                explore_views["base_view"] = f"metric_definitions_{data_source}"
+                if (
+                    namespace in existing_namespaces
+                    and "client_counts" in existing_namespaces[namespace]["views"]
+                ):
+                    # If there is a client counts view in the namespace, use it as basis.
+                    # The advantage of this is that client counts is guaranteed to have
+                    # client_ids of all clients that were active on a given day and it exposes
+                    # some useful fields, like channel, users might want to filter on.
+                    explore_views["base_view"] = "client_counts"
+                else:
+                    # If no client_counts view exists, simply use first view as base view
+                    explore_views["base_view"] = f"metric_definitions_{data_source}"
 
             # generate entries for views that need to be joined on
             if "joined_views" not in explore_views:
@@ -374,7 +383,7 @@ def namespaces(
     if metric_hub_repo:
         MetricsConfigLoader.update_repos([metric_hub_repo])
 
-    _merge_namespaces(namespaces, _get_metric_hub_namespaces())
+    _merge_namespaces(namespaces, _get_metric_hub_namespaces(namespaces))
 
     if custom_namespaces is not None:
         custom_namespaces = yaml.safe_load(custom_namespaces.read()) or {}
