@@ -650,6 +650,15 @@ experimentation:
 firefox_desktop:
   glean_app: true
   views:
+    urlbar_events_table:
+      type: table_view
+      tables:
+        - table: mozdata.firefox_desktop.urlbar_events
+    urlbar_events:
+      type: events_view
+      tables:
+        - events_table_view: urlbar_events_table
+          base_table: mozdata.firefox_desktop.urlbar_events
     feature_usage_table:
       type: table_view
       tables:
@@ -1248,6 +1257,14 @@ subscription_platform:
         count_sum:
           type: sum
           sql: ${count}
+    stripe_plans:
+      type: table_view
+      tables:
+        - table: mozdata.subscription_platform.stripe_plans
+    stripe_products:
+      type: table_view
+      tables:
+        - table: mozdata.subscription_platform.stripe_products
     # Logical subscriptions
     logical_subscriptions:
       type: table_view
