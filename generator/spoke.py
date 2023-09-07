@@ -102,7 +102,7 @@ def generate_model(
 
 
 def configure_model(
-    sdk: looker_sdk.methods.Looker31SDK,
+    sdk: looker_sdk.methods40.Looker40SDK,
     model_name: str,
     db_connection: str,
     spoke_project: str,
