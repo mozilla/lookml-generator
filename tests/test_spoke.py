@@ -129,7 +129,7 @@ def test_generate_model(looker_sdk, namespaces, tmp_path):
     looker_sdk.error = Mock(SDKError=_looker_sdk.error.SDKError)
 
     write_model = Mock()
-    looker_sdk.models.WriteModelSet.return_value = write_model
+    looker_sdk.models40.WriteModelSet.return_value = write_model
 
     generate_directories(namespaces, tmp_path, True)
     expected_dict = {
@@ -154,8 +154,8 @@ label: "Glean App"
     assert expected_text == actual_text
     assert expected_dict == actual_dict
 
-    looker_sdk.models.WriteModelSet.assert_any_call(models=["model", "glean-app"])
-    assert looker_sdk.models.WriteModelSet.call_count == 1
+    looker_sdk.models40.WriteModelSet.assert_any_call(models=["model", "glean-app"])
+    assert looker_sdk.models40.WriteModelSet.call_count == 1
 
     sdk.update_model_set.assert_any_call(1, write_model)
 
@@ -169,7 +169,7 @@ def test_alternate_connection(looker_sdk, custom_namespaces, tmp_path):
     looker_sdk.error = Mock(SDKError=_looker_sdk.error.SDKError)
 
     write_model = Mock()
-    looker_sdk.models.WriteLookmlModel.return_value = write_model
+    looker_sdk.models40.WriteLookmlModel.return_value = write_model
 
     generate_directories(custom_namespaces, tmp_path, True)
     dirs = list((tmp_path / "looker-spoke-private").iterdir())
@@ -205,7 +205,7 @@ label: "Custom"
     print_and_test(expected_text, actual_text)
     print_and_test(expected_dict, actual_dict)
 
-    looker_sdk.models.WriteLookmlModel.assert_called_with(
+    looker_sdk.models40.WriteLookmlModel.assert_called_with(
         allowed_db_connection_names=["bigquery-oauth"],
         name="custom",
         project_name="spoke-private",

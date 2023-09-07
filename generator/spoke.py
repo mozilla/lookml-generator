@@ -119,7 +119,7 @@ def configure_model(
         pass
 
     sdk.create_lookml_model(
-        looker_sdk.models.WriteLookmlModel(
+        looker_sdk.models40.WriteLookmlModel(
             allowed_db_connection_names=[db_connection],
             name=model_name,
             project_name=spoke_project,
@@ -137,7 +137,7 @@ def configure_model(
             raise click.ClickException("Error: Missing models or name from model_set")
 
         sdk.update_model_set(
-            _id, looker_sdk.models.WriteModelSet(models=list(models) + [model_name])
+            _id, looker_sdk.models40.WriteModelSet(models=list(models) + [model_name])
         )
 
 
