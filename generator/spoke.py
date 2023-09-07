@@ -53,7 +53,7 @@ def setup_env_with_looker_creds() -> bool:
         return False
 
     os.environ["LOOKERSDK_BASE_URL"] = instance
-    os.environ["LOOKERSDK_API_VERSION"] = "3.1"
+    os.environ["LOOKERSDK_API_VERSION"] = "4.0"
     os.environ["LOOKERSDK_VERIFY_SSL"] = "true"
     os.environ["LOOKERSDK_TIMEOUT"] = "120"
     os.environ["LOOKERSDK_CLIENT_ID"] = client_id
@@ -165,8 +165,8 @@ def generate_directories(
 
         if sdk_setup:
             spoke_project = spoke.lstrip("looker-")
-            sdk = looker_sdk.init31()
-            logging.info("Looker SDK 3.1 initialized successfully.")
+            sdk = looker_sdk.init40()
+            logging.info("Looker SDK 4.0 initialized successfully.")
             configure_model(sdk, namespace, db_connection, spoke_project)
 
 

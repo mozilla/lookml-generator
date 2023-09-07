@@ -59,7 +59,7 @@ def custom_namespaces():
 @patch("generator.spoke.looker_sdk")
 @patch.dict(os.environ, {"LOOKER_INSTANCE_URI": "https://mozilladev.cloud.looker.com"})
 def test_generate_directories(looker_sdk, namespaces, tmp_path):
-    sdk = looker_sdk.init31()
+    sdk = looker_sdk.init40()
     sdk.search_model_sets.return_value = [Mock(models=["model"], id=1)]
     sdk.lookml_model.side_effect = _looker_sdk.error.SDKError("msg")
     looker_sdk.error = Mock(SDKError=_looker_sdk.error.SDKError)
@@ -83,7 +83,7 @@ def test_generate_directories(looker_sdk, namespaces, tmp_path):
 
 @patch("generator.spoke.looker_sdk")
 def test_generate_directories_no_sdk(looker_sdk, namespaces, tmp_path):
-    sdk = looker_sdk.init31()
+    sdk = looker_sdk.init40()
     sdk.search_model_sets.return_value = [Mock(models=["model"], id=1)]
 
     generate_directories(namespaces, tmp_path, False)
@@ -107,7 +107,7 @@ def test_generate_directories_no_sdk(looker_sdk, namespaces, tmp_path):
 @patch("generator.spoke.looker_sdk")
 @patch.dict(os.environ, {"LOOKER_INSTANCE_URI": "https://mozilladev.cloud.looker.com"})
 def test_existing_dir(looker_sdk, namespaces, tmp_path):
-    sdk = looker_sdk.init31()
+    sdk = looker_sdk.init40()
     sdk.search_model_sets.return_value = [Mock(models=["model"], id=1)]
 
     generate_directories(namespaces, tmp_path, True)
@@ -123,7 +123,7 @@ def test_existing_dir(looker_sdk, namespaces, tmp_path):
 @patch("generator.spoke.looker_sdk")
 @patch.dict(os.environ, {"LOOKER_INSTANCE_URI": "https://mozilla.cloud.looker.com"})
 def test_generate_model(looker_sdk, namespaces, tmp_path):
-    sdk = looker_sdk.init31()
+    sdk = looker_sdk.init40()
     sdk.search_model_sets.side_effect = [[Mock(models=["model"], id=1)]]
     sdk.lookml_model.side_effect = _looker_sdk.error.SDKError("msg")
     looker_sdk.error = Mock(SDKError=_looker_sdk.error.SDKError)
@@ -163,7 +163,7 @@ label: "Glean App"
 @patch("generator.spoke.looker_sdk")
 @patch.dict(os.environ, {"LOOKER_INSTANCE_URI": "https://mozilladev.cloud.looker.com"})
 def test_alternate_connection(looker_sdk, custom_namespaces, tmp_path):
-    sdk = looker_sdk.init31()
+    sdk = looker_sdk.init40()
     sdk.search_model_sets.return_value = [Mock(models=["model"], id=1)]
     sdk.lookml_model.side_effect = _looker_sdk.error.SDKError("msg")
     looker_sdk.error = Mock(SDKError=_looker_sdk.error.SDKError)
