@@ -12,3 +12,5 @@ looker-hub/
 .env
 .vscode
 .python-version
+
+build/*

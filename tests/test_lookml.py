@@ -1044,7 +1044,7 @@ def test_lookml_actual_baseline_view_parameterized(
 
 @patch("generator.views.glean_ping_view.GleanPing")
 @patch("generator.explores.glean_ping_explore.GleanPing")
-def test_lookml_actual_metrics_view(
+def test_lookml_actual_metric_definitions_view(
     mock_glean_ping_view,
     mock_glean_ping_explore,
     runner,

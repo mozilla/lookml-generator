@@ -18,6 +18,7 @@ from google.cloud import bigquery
 from generator import operational_monitoring_utils
 
 from .explores import EXPLORE_TYPES
+from .metrics_utils import METRIC_HUB_REPO, MetricsConfigLoader
 from .views import VIEW_TYPES, View, lookml_utils
 
 DEFAULT_GENERATED_SQL_URI = (
@@ -150,6 +151,58 @@ def _get_opmon(bq_client: bigquery.Client, namespaces: Dict[str, Any]):
     return om_content
 
 
+def _get_metric_hub_namespaces(existing_namespaces):
+    metric_hub_data_sources = _get_metric_hub_data_sources()
+
+    metric_hub_namespaces = {}
+    for namespace, metric_hub_data_sources in metric_hub_data_sources.items():
+        # each data source definition is represented by a view
+        views = {
+            f"metric_definitions_{data_source}": {"type": "metric_definitions_view"}
+            for data_source in metric_hub_data_sources
+        }
+
+        # there is a single explore per namespace that joins all the data source views
+        explore_views = {}
+        for i, data_source in enumerate(sorted(metric_hub_data_sources)):
+            if i == 0:
+                if (
+                    namespace in existing_namespaces
+                    and "client_counts" in existing_namespaces[namespace]["views"]
+                ):
+                    # If there is a client counts view in the namespace, use it as basis.
+                    # The advantage of this is that client counts is guaranteed to have
+                    # client_ids of all clients that were active on a given day and it exposes
+                    # some useful fields, like channel, users might want to filter on.
+                    explore_views["base_view"] = "client_counts"
+                else:
+                    # If no client_counts view exists, simply use first view as base view
+                    explore_views["base_view"] = f"metric_definitions_{data_source}"
+
+            # generate entries for views that need to be joined on
+            if "joined_views" not in explore_views:
+                explore_views["joined_views"] = [f"metric_definitions_{data_source}"]
+            else:
+                explore_views["joined_views"].append(
+                    f"metric_definitions_{data_source}"
+                )
+
+        explores = {
+            f"metric_definitions_{namespace}": {
+                "type": "metric_definitions_explore",
+                "views": explore_views,
+            }
+        }
+
+        metric_hub_namespaces[namespace] = {
+            "pretty_name": lookml_utils.slug_to_title(namespace),
+            "views": views,
+            "explores": explores,
+        }
+
+    return metric_hub_namespaces
+
+
 def _get_glean_apps(
     app_listings_uri: str,
 ) -> List[Dict[str, Union[str, List[Dict[str, str]]]]]:
@@ -249,6 +302,29 @@ def _get_explores(views: List[View]) -> dict:
     return explores
 
 
+def _get_metric_hub_data_sources() -> Dict[str, List[str]]:
+    """Get data source definitions from metric-hub repository for each namespace."""
+    data_sources_per_namespace: Dict[str, List[str]] = {}
+    for definition in MetricsConfigLoader.configs.definitions:
+        for data_source_slug in definition.spec.data_sources.definitions.keys():
+            if (
+                len(
+                    MetricsConfigLoader.metrics_of_data_source(
+                        data_source_slug, definition.platform
+                    )
+                )
+                > 0  # ignore data sources that are not used for any metric definition
+            ):
+                if definition.platform in data_sources_per_namespace:
+                    data_sources_per_namespace[definition.platform].append(
+                        data_source_slug
+                    )
+                else:
+                    data_sources_per_namespace[definition.platform] = [data_source_slug]
+
+    return data_sources_per_namespace
+
+
 @click.command(help=__doc__)
 @click.option(
     "--custom-namespaces",
@@ -273,7 +349,18 @@ def _get_explores(views: List[View]) -> dict:
     default="namespaces-disallowlist.yaml",
     help="Path to namespace disallow list",
 )
-def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri, disallowlist):
+@click.option(
+    "--metric-hub-repo",
+    default=METRIC_HUB_REPO,
+    help="Repo to load metric configs from.",
+)
+def namespaces(
+    custom_namespaces,
+    generated_sql_uri,
+    app_listings_uri,
+    disallowlist,
+    metric_hub_repo,
+):
     """Generate namespaces.yaml."""
     warnings.filterwarnings("ignore", module="google.auth._default")
     glean_apps = _get_glean_apps(app_listings_uri)
@@ -292,6 +379,11 @@ def namespaces(custom_namespaces, generated_sql_uri, app_listings_uri, disallowl
             "explores": explores,
             "glean_app": True,
         }
+
+    if metric_hub_repo:
+        MetricsConfigLoader.update_repos([metric_hub_repo])
+
+    _merge_namespaces(namespaces, _get_metric_hub_namespaces(namespaces))
 
     if custom_namespaces is not None:
         custom_namespaces = yaml.safe_load(custom_namespaces.read()) or {}
