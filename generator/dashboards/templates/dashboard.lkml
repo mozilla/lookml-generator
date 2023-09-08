@@ -70,7 +70,7 @@
     model: operational_monitoring
     explore: {{alerts.explore}}
     type: looker_grid
-    fields: [{{alerts.explore}}.submission_date, {{alerts.explore}}.build_id,
+    fields: [{{alerts.explore}}.{{elements[0].xaxis}},
       {%- for dimension in dimensions %}
       {{alerts.explore}}.{{dimension.name}},
       {%- endfor %}
