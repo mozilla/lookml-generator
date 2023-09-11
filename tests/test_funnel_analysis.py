@@ -189,6 +189,7 @@ def test_view_lookml(funnel_analysis_view):
                                 {% endif -%}
                                 mozfun.event_analysis.event_index_to_match_string(et.index)
                               )
+                              IGNORE NULLS
                             )
                           ) AS match_string
                         FROM

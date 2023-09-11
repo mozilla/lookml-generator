@@ -176,6 +176,7 @@ class FunnelAnalysisView(View):
                                     {{% endif -%}}
                                     mozfun.event_analysis.event_index_to_match_string(et.index)
                                   )
+                                  IGNORE NULLS
                                 )
                               ) AS match_string
                             FROM
