@@ -1,4 +1,4 @@
-click==8.1.6
+click==8.1.7
 flake8<5 # pytest-flake8 does not support flake8 5+
 exceptiongroup  # for pytest on python<=3.10
 google-cloud-bigquery==3.11.4
