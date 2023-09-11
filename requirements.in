@@ -20,7 +20,7 @@ pytest-mypy==0.10.3
 pytest-pydocstyle==2.3.2
 pytest==7.4.0
 PyYAML==6.0.1
-tomli==2.0.1  # for toml parsing on python<=3.11
+tomli==2.0.1  # for toml parsing on python<3.11
 types-PyYaml==6.0.12.11
 yamllint==1.32.0
 gitpython==3.1.31
