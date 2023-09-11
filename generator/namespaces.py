@@ -168,13 +168,20 @@ def _get_metric_hub_namespaces(existing_namespaces):
             if i == 0:
                 if (
                     namespace in existing_namespaces
-                    and "client_counts" in existing_namespaces[namespace]["views"]
+                    and "clients_daily_table" in existing_namespaces[namespace]["views"]
                 ):
-                    # If there is a client counts view in the namespace, use it as basis.
+                    # If there is a clients daily view in the namespace, use it as basis.
                     # The advantage of this is that client counts is guaranteed to have
                     # client_ids of all clients that were active on a given day and it exposes
                     # some useful fields, like channel, users might want to filter on.
-                    explore_views["base_view"] = "client_counts"
+                    explore_views["base_view"] = "clients_daily_table"
+                elif (
+                    namespace in existing_namespaces
+                    and "baseline_clients_daily_table"
+                    in existing_namespaces[namespace]["views"]
+                ):
+                    # for Glean it's baseline_clients_daily
+                    explore_views["base_view"] = "baseline_clients_daily_table"
                 else:
                     # If no client_counts view exists, simply use first view as base view
                     explore_views["base_view"] = f"metric_definitions_{data_source}"
