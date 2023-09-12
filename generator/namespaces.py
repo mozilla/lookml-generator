@@ -387,11 +387,6 @@ def namespaces(
             "glean_app": True,
         }
 
-    if metric_hub_repo:
-        MetricsConfigLoader.update_repos([metric_hub_repo])
-
-    _merge_namespaces(namespaces, _get_metric_hub_namespaces(namespaces))
-
     if custom_namespaces is not None:
         custom_namespaces = yaml.safe_load(custom_namespaces.read()) or {}
 
@@ -402,6 +397,11 @@ def namespaces(
             custom_namespaces["operational_monitoring"].update(opmon)
 
         _merge_namespaces(namespaces, custom_namespaces)
+
+    if metric_hub_repo:
+        MetricsConfigLoader.update_repos([metric_hub_repo])
+
+    _merge_namespaces(namespaces, _get_metric_hub_namespaces(namespaces))
 
     disallowed_namespaces = yaml.safe_load(disallowlist.read()) or {}
     disallowed_regex = [
