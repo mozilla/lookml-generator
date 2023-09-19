@@ -523,10 +523,6 @@ ads:
       type: table_view
       tables:
         - table: mozdata.ads.consolidated_ad_metrics_daily_pt
-    consolidated_ad_metrics_hourly:
-      type: table_view
-      tables:
-        - table: mozdata.ads.consolidated_ad_metrics_hourly
 firefox_ios:
   owners:
     - athomas@mozilla.com
