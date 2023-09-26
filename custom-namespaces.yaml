@@ -41,9 +41,10 @@ duet:
     - ascholtz@mozilla.com
   pretty_name: DUET
   explores:
-    type: table_explore
-    views:
-      base_view: gplay_installs_by_country
+    gplay_installs_by_country:
+      type: table_explore
+      views:
+        base_view: gplay_installs_by_country
   views:
     gplay_installs_by_country:
       type: table_view
