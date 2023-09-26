@@ -40,7 +40,25 @@ duet:
   owners:
     - ascholtz@mozilla.com
   pretty_name: DUET
+  explores:
+    type: table_explore
+    views:
+      base_view: gplay_installs_by_country
   views:
+    gplay_installs_by_country:
+      type: table_view
+      tables:
+        - table: mozdata.fenix.gplay_installs_by_country
+      measures:
+        total_installs:
+          type: sum
+          sql: "${install_count}"
+        total_uninstalls:
+          type: sum
+          sql: "${uninstall_count}"
+        total_updates:
+          type: sum
+          sql: "${update_count}"
     install:
       type: ping_view
       tables:
