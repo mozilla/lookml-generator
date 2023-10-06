@@ -551,9 +551,18 @@ ads:
       tables:
         - table: mozdata.ads.consolidated_ad_metrics_hourly
 firefox_ios:
+  pretty_name: Firefox iOS
   owners:
     - athomas@mozilla.com
     - darcese@mozilla.com
+    - kik@mozilla.com
+    - rbaffourawuah@mozilla.com
+    - vsabino@mozilla.com
+  views:
+    funnel_retention_week_4:
+      type: table_view
+      tables:
+        - table: mozdata.firefox_ios.funnel_retention_week_4
 fenix:
   owners:
     - vzare@mozilla.com
