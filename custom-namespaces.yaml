@@ -1062,6 +1062,17 @@ casa:
       type: table_view
       tables:
         - table: mozdata.casa.users
+reference:
+  glean_app: false
+  pretty_name: Reference
+  owners:
+    - cmorales@mozilla.com
+  spoke: looker-spoke-default
+  views:
+    macroeconomic_indices:
+      type: table_view
+      tables:
+        - table: mozdata.reference.macroeconomic_indices
 regrets_reporter:
   glean_app: false
   pretty_name: RegretsReporter
