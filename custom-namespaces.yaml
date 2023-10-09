@@ -1064,7 +1064,6 @@ casa:
         - table: mozdata.casa.users
 reference:
   glean_app: false
-  connection: bigquery-oauth
   pretty_name: Reference
   owners:
     - cmorales@mozilla.com
