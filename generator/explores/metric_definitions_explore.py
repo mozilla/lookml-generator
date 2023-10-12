@@ -51,7 +51,7 @@ class MetricDefinitionsExplore(Explore):
         exposed_fields = ["ALL_FIELDS*"]
         if (
             "baseline_clients_daily_table" != self.views["base_view"]
-            and "clients_daily_table" != self.views["base_view"]
+            and "client_counts" != self.views["base_view"]
         ):
             exposed_fields.append(f"-{self.views['base_view']}.metrics*")
 
