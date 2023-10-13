@@ -647,15 +647,22 @@ firefox_ios:
       tables:
         - table: mozdata.firefox_ios.funnel_retention_week_4
 fenix:
+  pretty_name: Firefox Android
   owners:
     - vzare@mozilla.com
     - ksiegler@mozilla.com
     - rbaffourawuah@mozilla.com
+    - kik@mozilla.com
+    - vsabino@mozilla.com
   views:
     android_store_performance:
       type: table_view
       tables:
         - table: moz-fx-data-marketing-prod.google_play_store.Store_Performance_country_v1
+    funnel_retention_week_4:
+      type: table_view
+      tables:
+        - table: mozdata.fenix.funnel_retention_week_4
 focus_ios:
   owners:
     - loines@mozilla.com
