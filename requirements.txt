@@ -445,9 +445,9 @@ mozilla-metric-config-parser==2023.10.2 \
     --hash=sha256:17ccf8b93e7c531acebb627467f3c481e55d2f68024bc83ae36d058ae1108520 \
     --hash=sha256:d862aac45c9cd1336d84fe77408b126cf143fbb101ccc577038d262ab9a75342
     # via -r requirements.in
-mozilla-nimbus-schemas==2023.10.1 \
-    --hash=sha256:39715dd0659e733447ffefd464f8035ff284e8e4abf691e22a2e371990b7bfda \
-    --hash=sha256:ea7dc0ea8d89a8825e27a08341d22c9d566d83f9eb09eedee5192bc7ad57490d
+mozilla-nimbus-schemas==2023.10.2 \
+    --hash=sha256:4815c1709bd045ef83f6fc992bbc3ea3414de4a150368a34e43b5916a5b06e60 \
+    --hash=sha256:84ff88c58b7d5bcb18d1d9bd197a9052ae2b9eec345991c1a8fb962205f89a33
     # via
     #   -r requirements.in
     #   mozilla-metric-config-parser
