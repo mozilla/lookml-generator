@@ -35,6 +35,25 @@ combined_browser_metrics:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.telemetry.cohort_daily_statistics
+review_checker_desktop:
+  glean_app: false
+  owners:
+    - betling@mozilla.com
+    - akommasani@mozilla.com
+  pretty_name: Review Checker Desktop
+  views:
+    clients:
+      type: table_view
+      tables:
+        - table: mozdata.firefox_desktop.review_checker_clients
+    events:
+      type: table_view
+      tables:
+        - table: mozdata.firefox_desktop.review_checker_events
+    microsurvey:
+      type: table_view
+      tables:
+        - table: mozdata.firefox_desktop.review_checker_microsurvey
 duet:
   glean_app: false
   owners:
