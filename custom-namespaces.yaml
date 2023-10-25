@@ -710,6 +710,15 @@ firefox_desktop:
       tables:
         - events_table_view: urlbar_events_table
           base_table: mozdata.firefox_desktop.urlbar_events
+    urlbar_events_table_temp_v2:
+      type: table_view
+      tables:
+        - table: mozdata.firefox_desktop.urlbar_events_temp_v2
+    urlbar_events_temp_v2:
+      type: events_view
+      tables:
+        - events_table_view: urlbar_events_table
+          base_table: mozdata.firefox_desktop.urlbar_events_temp_v2
     feature_usage_table:
       type: table_view
       tables:
