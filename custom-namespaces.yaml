@@ -586,6 +586,12 @@ fenix:
   owners:
     - vzare@mozilla.com
     - ksiegler@mozilla.com
+    - rbaffourawuah@mozilla.com
+  views:
+    android_store_performance:
+      type: table_view
+      tables:
+        - table: moz-fx-data-marketing-prod.google_play_store.Store_Performance_country_v1
 focus_ios:
   owners:
     - loines@mozilla.com
