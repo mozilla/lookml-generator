@@ -149,7 +149,6 @@ search_private:
   connection: bigquery-oauth
   pretty_name: Search Private
   owners:
-    - mmccorquodale@mozilla.com
     - xluo@mozilla.com
     - skahmann@mozilla.com
     - ctroy@mozilla.com
@@ -170,7 +169,6 @@ search_private:
 search:
   glean_app: false
   owners:
-    - mmccorquodale@mozilla.com
     - xluo@mozilla.com
     - skahmann@mozilla.com
     - ctroy@mozilla.com
@@ -214,7 +212,6 @@ contextual_services_private:
   connection: bigquery-oauth
   pretty_name: Contextual Services
   owners:
-    - mmccorquodale@mozilla.com
     - rburwei@mozilla.com
     - mbowerman@mozilla.com
   spoke: looker-spoke-private
@@ -330,7 +327,6 @@ contextual_services:
   glean_app: false
   pretty_name: Contextual Services
   owners:
-    - mmccorquodale@mozilla.com
     - rburwei@mozilla.com
     - mbowerman@mozilla.com
   views:
@@ -603,7 +599,8 @@ newtab:
   connection: bigquery-oauth
   pretty_name: New Tab
   owners:
-    - mmccorquodale@mozilla.com
+    - cmorales@mozilla.com
+    - mbowerman@mozilla.com
   spoke: looker-spoke-private
 awesome_bar:
   glean_app: false
