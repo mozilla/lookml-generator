@@ -1007,6 +1007,10 @@ monitoring:
       type: table_view
       tables:
         - table: mozdata.monitoring.airflow_user
+    event_monitoring_live:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.monitoring.event_monitoring_live
   explores:
     average_ping_sizes:
       type: ping_explore
