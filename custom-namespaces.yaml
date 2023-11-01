@@ -911,26 +911,14 @@ monitoring:
       type: ping_view
       tables:
         - table: mozdata.monitoring.stable_table_column_counts
-    structured_distinct_docids:
-      type: ping_view
-      tables:
-        - table: mozdata.monitoring.structured_distinct_docids
     structured_missing_columns:
       type: ping_view
       tables:
         - table: mozdata.monitoring.structured_missing_columns
-    telemetry_distinct_docids:
-      type: ping_view
-      tables:
-        - table: mozdata.monitoring.telemetry_distinct_docids
     telemetry_missing_columns:
       type: ping_view
       tables:
         - table: mozdata.monitoring.telemetry_missing_columns
-    distinct_docids_notes:
-      type: table_view
-      tables:
-        - table: mozdata.static.monitoring_distinct_docids_notes_v1
     missing_columns_notes:
       type: table_view
       tables:
@@ -1041,18 +1029,10 @@ monitoring:
       type: ping_explore
       views:
         base_view: stable_table_column_counts
-    structured_distinct_docids:
-      type: ping_explore
-      views:
-        base_view: structured_distinct_docids
     structured_missing_columns:
       type: ping_explore
       views:
         base_view: structured_missing_columns
-    telemetry_distinct_docids:
-      type: ping_explore
-      views:
-        base_view: telemetry_distinct_docids
     telemetry_missing_columns:
       type: ping_explore
       views:
