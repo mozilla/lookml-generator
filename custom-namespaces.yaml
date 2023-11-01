@@ -35,6 +35,25 @@ combined_browser_metrics:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.telemetry.cohort_daily_statistics
+review_checker_desktop:
+  glean_app: false
+  owners:
+    - betling@mozilla.com
+    - akommasani@mozilla.com
+  pretty_name: Review Checker Desktop
+  views:
+    clients:
+      type: table_view
+      tables:
+        - table: mozdata.firefox_desktop.review_checker_clients
+    events:
+      type: table_view
+      tables:
+        - table: mozdata.firefox_desktop.review_checker_events
+    microsurvey:
+      type: table_view
+      tables:
+        - table: mozdata.firefox_desktop.review_checker_microsurvey
 duet:
   glean_app: false
   owners:
@@ -130,7 +149,6 @@ search_private:
   connection: bigquery-oauth
   pretty_name: Search Private
   owners:
-    - mmccorquodale@mozilla.com
     - xluo@mozilla.com
     - skahmann@mozilla.com
     - ctroy@mozilla.com
@@ -151,7 +169,6 @@ search_private:
 search:
   glean_app: false
   owners:
-    - mmccorquodale@mozilla.com
     - xluo@mozilla.com
     - skahmann@mozilla.com
     - ctroy@mozilla.com
@@ -195,7 +212,6 @@ contextual_services_private:
   connection: bigquery-oauth
   pretty_name: Contextual Services
   owners:
-    - mmccorquodale@mozilla.com
     - rburwei@mozilla.com
     - mbowerman@mozilla.com
   spoke: looker-spoke-private
@@ -311,7 +327,6 @@ contextual_services:
   glean_app: false
   pretty_name: Contextual Services
   owners:
-    - mmccorquodale@mozilla.com
     - rburwei@mozilla.com
     - mbowerman@mozilla.com
   views:
@@ -567,6 +582,12 @@ fenix:
   owners:
     - vzare@mozilla.com
     - ksiegler@mozilla.com
+    - rbaffourawuah@mozilla.com
+  views:
+    android_store_performance:
+      type: table_view
+      tables:
+        - table: moz-fx-data-marketing-prod.google_play_store.Store_Performance_country_v1
 focus_ios:
   owners:
     - loines@mozilla.com
@@ -578,7 +599,8 @@ newtab:
   connection: bigquery-oauth
   pretty_name: New Tab
   owners:
-    - mmccorquodale@mozilla.com
+    - cmorales@mozilla.com
+    - mbowerman@mozilla.com
   spoke: looker-spoke-private
 awesome_bar:
   glean_app: false
@@ -970,6 +992,10 @@ monitoring:
       type: table_view
       tables:
         - table: mozdata.monitoring.airflow_user
+    event_monitoring_live:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.monitoring.event_monitoring_live
   explores:
     average_ping_sizes:
       type: ping_explore

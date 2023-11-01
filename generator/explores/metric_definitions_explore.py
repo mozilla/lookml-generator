@@ -54,6 +54,8 @@ class MetricDefinitionsExplore(Explore):
             and "client_counts" != self.views["base_view"]
         ):
             exposed_fields.append(f"-{self.views['base_view']}.metrics*")
+        elif self.views["base_view"] == "client_counts":
+            exposed_fields.append(f"-{self.name}.have_completed_period")
 
         explore_lookml: Dict[str, Any] = {
             "name": self.name,
