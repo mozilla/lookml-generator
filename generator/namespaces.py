@@ -170,11 +170,18 @@ def _get_metric_hub_namespaces(existing_namespaces):
                     namespace in existing_namespaces
                     and "client_counts" in existing_namespaces[namespace]["views"]
                 ):
-                    # If there is a client counts view in the namespace, use it as basis.
+                    # If there is a clients counts view in the namespace, use it as basis.
                     # The advantage of this is that client counts is guaranteed to have
                     # client_ids of all clients that were active on a given day and it exposes
                     # some useful fields, like channel, users might want to filter on.
                     explore_views["base_view"] = "client_counts"
+                elif (
+                    namespace in existing_namespaces
+                    and "baseline_clients_daily_table"
+                    in existing_namespaces[namespace]["views"]
+                ):
+                    # for Glean it's baseline_clients_daily
+                    explore_views["base_view"] = "baseline_clients_daily_table"
                 else:
                     # If no client_counts view exists, simply use first view as base view
                     explore_views["base_view"] = f"metric_definitions_{data_source}"
@@ -380,11 +387,6 @@ def namespaces(
             "glean_app": True,
         }
 
-    if metric_hub_repo:
-        MetricsConfigLoader.update_repos([metric_hub_repo])
-
-    _merge_namespaces(namespaces, _get_metric_hub_namespaces(namespaces))
-
     if custom_namespaces is not None:
         custom_namespaces = yaml.safe_load(custom_namespaces.read()) or {}
 
@@ -395,6 +397,11 @@ def namespaces(
             custom_namespaces["operational_monitoring"].update(opmon)
 
         _merge_namespaces(namespaces, custom_namespaces)
+
+    if metric_hub_repo:
+        MetricsConfigLoader.update_repos([metric_hub_repo])
+
+    _merge_namespaces(namespaces, _get_metric_hub_namespaces(namespaces))
 
     disallowed_namespaces = yaml.safe_load(disallowlist.read()) or {}
     disallowed_regex = [

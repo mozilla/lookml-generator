@@ -35,12 +35,50 @@ combined_browser_metrics:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.telemetry.cohort_daily_statistics
+review_checker_desktop:
+  glean_app: false
+  owners:
+    - betling@mozilla.com
+    - akommasani@mozilla.com
+  pretty_name: Review Checker Desktop
+  views:
+    clients:
+      type: table_view
+      tables:
+        - table: mozdata.firefox_desktop.review_checker_clients
+    events:
+      type: table_view
+      tables:
+        - table: mozdata.firefox_desktop.review_checker_events
+    microsurvey:
+      type: table_view
+      tables:
+        - table: mozdata.firefox_desktop.review_checker_microsurvey
 duet:
   glean_app: false
   owners:
     - ascholtz@mozilla.com
   pretty_name: DUET
+  explores:
+    gplay_installs_by_country:
+      type: table_explore
+      views:
+        base_view: gplay_installs_by_country
   views:
+    gplay_installs_by_country:
+      type: table_view
+      tables:
+        - table: mozdata.fenix.gplay_installs_by_country
+      measures:
+        total_installs:
+          type: sum
+          sql: "${install_count}"
+        total_uninstalls:
+          type: sum
+          sql: "${uninstall_count}"
+        total_updates:
+          type: sum
+          sql: "${update_count}"
     install:
       type: ping_view
       tables:
@@ -59,6 +97,10 @@ duet:
       type: table_view
       tables:
         - table: moz-fx-data-marketing-prod.adjust_derived.firefox_mobile_installs_v1
+    firefox_mobile_installs_adjust_deliverables:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.adjust_derived.adjust_deliverables_v1
     firefox_ios_campaign_performance:
       type: table_view
       tables:
@@ -107,7 +149,6 @@ search_private:
   connection: bigquery-oauth
   pretty_name: Search Private
   owners:
-    - mmccorquodale@mozilla.com
     - xluo@mozilla.com
     - skahmann@mozilla.com
     - ctroy@mozilla.com
@@ -128,7 +169,6 @@ search_private:
 search:
   glean_app: false
   owners:
-    - mmccorquodale@mozilla.com
     - xluo@mozilla.com
     - skahmann@mozilla.com
     - ctroy@mozilla.com
@@ -172,7 +212,6 @@ contextual_services_private:
   connection: bigquery-oauth
   pretty_name: Contextual Services
   owners:
-    - mmccorquodale@mozilla.com
     - rburwei@mozilla.com
     - mbowerman@mozilla.com
   spoke: looker-spoke-private
@@ -288,7 +327,6 @@ contextual_services:
   glean_app: false
   pretty_name: Contextual Services
   owners:
-    - mmccorquodale@mozilla.com
     - rburwei@mozilla.com
     - mbowerman@mozilla.com
   views:
@@ -498,6 +536,10 @@ revenue_private:
     - xluo@mozilla.com
   spoke: looker-spoke-private
   views:
+    search_revenue_levers_daily:
+      type: table_view
+      tables:
+        - table: mozdata.search.search_revenue_levers_daily
     revenue_forecast_review_2022:
       type: table_view
       tables:
@@ -515,10 +557,6 @@ ads:
     - sbetancourt@mozilla.com
   spoke: looker-spoke-private
   views:
-    consolidated_ad_metrics:
-      type: table_view
-      tables:
-        - table: mozdata.ads.consolidated_ad_metrics
     consolidated_ad_metrics_daily_pt:
       type: table_view
       tables:
@@ -528,13 +566,28 @@ ads:
       tables:
         - table: mozdata.ads.consolidated_ad_metrics_hourly
 firefox_ios:
+  pretty_name: Firefox iOS
   owners:
     - athomas@mozilla.com
     - darcese@mozilla.com
+    - kik@mozilla.com
+    - rbaffourawuah@mozilla.com
+    - vsabino@mozilla.com
+  views:
+    funnel_retention_week_4:
+      type: table_view
+      tables:
+        - table: mozdata.firefox_ios.funnel_retention_week_4
 fenix:
   owners:
     - vzare@mozilla.com
     - ksiegler@mozilla.com
+    - rbaffourawuah@mozilla.com
+  views:
+    android_store_performance:
+      type: table_view
+      tables:
+        - table: moz-fx-data-marketing-prod.google_play_store.Store_Performance_country_v1
 focus_ios:
   owners:
     - loines@mozilla.com
@@ -546,7 +599,8 @@ newtab:
   connection: bigquery-oauth
   pretty_name: New Tab
   owners:
-    - mmccorquodale@mozilla.com
+    - cmorales@mozilla.com
+    - mbowerman@mozilla.com
   spoke: looker-spoke-private
 awesome_bar:
   glean_app: false
@@ -857,26 +911,14 @@ monitoring:
       type: ping_view
       tables:
         - table: mozdata.monitoring.stable_table_column_counts
-    structured_distinct_docids:
-      type: ping_view
-      tables:
-        - table: mozdata.monitoring.structured_distinct_docids
     structured_missing_columns:
       type: ping_view
       tables:
         - table: mozdata.monitoring.structured_missing_columns
-    telemetry_distinct_docids:
-      type: ping_view
-      tables:
-        - table: mozdata.monitoring.telemetry_distinct_docids
     telemetry_missing_columns:
       type: ping_view
       tables:
         - table: mozdata.monitoring.telemetry_missing_columns
-    distinct_docids_notes:
-      type: table_view
-      tables:
-        - table: mozdata.static.monitoring_distinct_docids_notes_v1
     missing_columns_notes:
       type: table_view
       tables:
@@ -950,6 +992,10 @@ monitoring:
       type: table_view
       tables:
         - table: mozdata.monitoring.airflow_user
+    event_monitoring_live:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.monitoring.event_monitoring_live
   explores:
     average_ping_sizes:
       type: ping_explore
@@ -983,18 +1029,10 @@ monitoring:
       type: ping_explore
       views:
         base_view: stable_table_column_counts
-    structured_distinct_docids:
-      type: ping_explore
-      views:
-        base_view: structured_distinct_docids
     structured_missing_columns:
       type: ping_explore
       views:
         base_view: structured_missing_columns
-    telemetry_distinct_docids:
-      type: ping_explore
-      views:
-        base_view: telemetry_distinct_docids
     telemetry_missing_columns:
       type: ping_explore
       views:
@@ -1030,6 +1068,17 @@ casa:
       type: table_view
       tables:
         - table: mozdata.casa.users
+reference:
+  glean_app: false
+  pretty_name: Reference
+  owners:
+    - cmorales@mozilla.com
+  spoke: looker-spoke-default
+  views:
+    macroeconomic_indices:
+      type: table_view
+      tables:
+        - table: mozdata.reference.macroeconomic_indices
 regrets_reporter:
   glean_app: false
   pretty_name: RegretsReporter
@@ -1088,6 +1137,10 @@ shared:
       type: table_view
       tables:
         - table: mozdata.static.data_incidents_v1
+    applications:
+      type: table_view
+      tables:
+        - table: mozdata.telemetry.applications
 websites:
   glean_app: false
   pretty_name: Websites
