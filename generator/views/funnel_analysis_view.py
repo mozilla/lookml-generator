@@ -171,7 +171,7 @@ class FunnelAnalysisView(View):
                                         properties.index,
                                         property_value.value
                                       ),
-                                    {{% elif _filters['property_name'] -%}}
+                                    {{% elsif _filters['property_name'] -%}}
                                       mozfun.event_analysis.event_property_to_match_string(properties.index),
                                     {{% endif -%}}
                                     mozfun.event_analysis.event_index_to_match_string(et.index)
