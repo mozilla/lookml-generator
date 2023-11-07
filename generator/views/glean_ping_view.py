@@ -1,5 +1,6 @@
 """Class to describe a Glean Ping View."""
 import logging
+import re
 from collections import Counter
 from textwrap import dedent
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
@@ -293,6 +294,24 @@ class GleanPingView(PingView):
                 },
             ],
         }
+
+        if lookml["type"] == "time":
+            # Remove any _{type} suffix from the dimension group name because each timeframe
+            # will add a _{type} suffix to its individual dimension name.
+            lookml["name"] = re.sub("_(date|time(stamp)?)$", "", looker_name)
+            lookml["timeframes"] = [
+                "raw",
+                "time",
+                "date",
+                "week",
+                "month",
+                "quarter",
+                "year",
+            ]
+            # Dimension groups should not be nested (see issue #82).
+            lookml["label"] = f"{group_label}: {group_item_label}"
+            del lookml["group_label"]
+            del lookml["group_item_label"]
 
         # remove some elements from the definition if we're handling a labeled
         # counter, as an initial join dimension
