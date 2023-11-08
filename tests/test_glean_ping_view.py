@@ -184,6 +184,7 @@ def test_datetime_metric(mock_glean_ping):
     assert "timeframes" in lookml["views"][0]["dimension_groups"][0]
     assert "group_label" not in lookml["views"][0]["dimension_groups"][0]
     assert "group_item_label" not in lookml["views"][0]["dimension_groups"][0]
+    assert "links" not in lookml["views"][0]["dimension_groups"][0]
 
 
 @patch("generator.views.glean_ping_view.GleanPing")

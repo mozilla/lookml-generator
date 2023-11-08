@@ -311,6 +311,8 @@ class GleanPingView(PingView):
             # Dimension groups should not be nested (see issue #82).
             del lookml["group_label"]
             del lookml["group_item_label"]
+            # Links are not supported for dimension groups.
+            del lookml["links"]
 
         # remove some elements from the definition if we're handling a labeled
         # counter, as an initial join dimension
