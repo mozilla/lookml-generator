@@ -151,7 +151,7 @@
 </span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a>            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;number&quot;</span><span class="p">,</span>
 </span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a>            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;The number of clients, &quot;</span>
 </span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a>            <span class="s2">&quot;determined by whether they sent a baseline ping on the day in question.&quot;</span><span class="p">,</span>
-</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a>            <span class="s2">&quot;sql&quot;</span><span class="p">:</span> <span class="s2">&quot;COUNT(DISTINCT client_id)&quot;</span><span class="p">,</span>
+</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a>            <span class="s2">&quot;sql&quot;</span><span class="p">:</span> <span class="s2">&quot;COUNT(DISTINCT $</span><span class="si">{TABLE}</span><span class="s2">.client_id)&quot;</span><span class="p">,</span>
 </span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a>        <span class="p">}</span>
 </span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a>    <span class="p">]</span>
 </span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a>
@@ -295,7 +295,7 @@
 </span><span id="ClientCountsView-64"><a href="#ClientCountsView-64"><span class="linenos"> 64</span></a>            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;number&quot;</span><span class="p">,</span>
 </span><span id="ClientCountsView-65"><a href="#ClientCountsView-65"><span class="linenos"> 65</span></a>            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;The number of clients, &quot;</span>
 </span><span id="ClientCountsView-66"><a href="#ClientCountsView-66"><span class="linenos"> 66</span></a>            <span class="s2">&quot;determined by whether they sent a baseline ping on the day in question.&quot;</span><span class="p">,</span>
-</span><span id="ClientCountsView-67"><a href="#ClientCountsView-67"><span class="linenos"> 67</span></a>            <span class="s2">&quot;sql&quot;</span><span class="p">:</span> <span class="s2">&quot;COUNT(DISTINCT client_id)&quot;</span><span class="p">,</span>
+</span><span id="ClientCountsView-67"><a href="#ClientCountsView-67"><span class="linenos"> 67</span></a>            <span class="s2">&quot;sql&quot;</span><span class="p">:</span> <span class="s2">&quot;COUNT(DISTINCT $</span><span class="si">{TABLE}</span><span class="s2">.client_id)&quot;</span><span class="p">,</span>
 </span><span id="ClientCountsView-68"><a href="#ClientCountsView-68"><span class="linenos"> 68</span></a>        <span class="p">}</span>
 </span><span id="ClientCountsView-69"><a href="#ClientCountsView-69"><span class="linenos"> 69</span></a>    <span class="p">]</span>
 </span><span id="ClientCountsView-70"><a href="#ClientCountsView-70"><span class="linenos"> 70</span></a>
@@ -443,7 +443,7 @@
                                 <div class="attr variable">
             <span class="name">default_measures</span><span class="annotation">: List[Dict[str, Union[str, List[Dict[str, str]]]]]</span>        =
 <input id="ClientCountsView.default_measures-view-value" class="view-value-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-            <label class="view-value-button pdoc-button" for="ClientCountsView.default_measures-view-value"></label><span class="default_value">[{&#39;name&#39;: &#39;client_count&#39;, &#39;type&#39;: &#39;number&#39;, &#39;description&#39;: &#39;The number of clients, determined by whether they sent a baseline ping on the day in question.&#39;, &#39;sql&#39;: &#39;COUNT(DISTINCT client_id)&#39;}]</span>
+            <label class="view-value-button pdoc-button" for="ClientCountsView.default_measures-view-value"></label><span class="default_value">[{&#39;name&#39;: &#39;client_count&#39;, &#39;type&#39;: &#39;number&#39;, &#39;description&#39;: &#39;The number of clients, determined by whether they sent a baseline ping on the day in question.&#39;, &#39;sql&#39;: &#39;COUNT(DISTINCT ${TABLE}.client_id)&#39;}]</span>
 
         
     </div>
