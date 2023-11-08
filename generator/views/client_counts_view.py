@@ -63,7 +63,7 @@ class ClientCountsView(View):
             "type": "number",
             "description": "The number of clients, "
             "determined by whether they sent a baseline ping on the day in question.",
-            "sql": "COUNT(DISTINCT client_id)",
+            "sql": "COUNT(DISTINCT ${TABLE}.client_id)",
         }
     ]
 
