@@ -309,7 +309,6 @@ class GleanPingView(PingView):
                 "year",
             ]
             # Dimension groups should not be nested (see issue #82).
-            lookml["label"] = f"{group_label}: {group_item_label}"
             del lookml["group_label"]
             del lookml["group_item_label"]
 
