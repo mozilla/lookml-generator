@@ -768,6 +768,10 @@ experimentation:
 firefox_desktop:
   glean_app: true
   views:
+    desktop_acquisition_funnel_table:
+      type: table_view
+      tables:
+        - table: mozdata.analysis.gkabbz_sample_desktop_funnel
     urlbar_events_table:
       type: table_view
       tables:
