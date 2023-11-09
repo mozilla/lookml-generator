@@ -54,6 +54,70 @@ review_checker_desktop:
       type: table_view
       tables:
         - table: mozdata.firefox_desktop.review_checker_microsurvey
+review_checker:
+  glean_app: false
+  owners:
+    - betling@mozilla.com
+    - akommasani@mozilla.com
+  pretty_name: Review Checker
+  explores:
+    desktop_clients:
+      type: table_explore
+      views:
+        base_view: desktop_clients
+    desktop_events:
+      type: table_explore
+      views:
+        base_view: desktop_events
+    desktop_microsurvey:
+      type: table_explore
+      views:
+        base_view: desktop_microsurvey
+    android_clients:
+      type: table_explore
+      views:
+        base_view: android_clients
+    android_events:
+      type: table_explore
+      views:
+        base_view: android_events
+    ios_clients:
+      type: table_explore
+      views:
+        base_view: ios_clients
+    ios_events:
+      type: table_explore
+      views:
+        base_view: ios_events
+  views:
+    desktop_clients:
+      type: table_view
+      tables:
+        - table: mozdata.firefox_desktop.review_checker_clients
+    desktop_events:
+      type: table_view
+      tables:
+        - table: mozdata.firefox_desktop.review_checker_events
+    desktop_microsurvey:
+      type: table_view
+      tables:
+        - table: mozdata.firefox_desktop.review_checker_microsurvey
+    android_clients:
+      type: table_view
+      tables:
+        - table: mozdata.org_mozilla_fenix.review_checker_clients
+    android_events:
+      type: table_view
+      tables:
+        - table: mozdata.org_mozilla_fenix.review_checker_events
+    ios_clients:
+      type: table_view
+      tables:
+        - table: mozdata.org_mozilla_ios_firefox.review_checker_clients
+    ios_events:
+      type: table_view
+      tables:
+        - table: mozdata.org_mozilla_ios_firefox.review_checker_events
 duet:
   glean_app: false
   owners:
