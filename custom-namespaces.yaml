@@ -532,6 +532,10 @@ firefox_accounts:
       tables:
         - channel: release
           table: mozdata.firefox_accounts.fxa_log_device_command_events
+    login_funnels:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.firefox_accounts_derived.login_funnels_v1
   explores:
     all_event_counts:
       type: events_explore
