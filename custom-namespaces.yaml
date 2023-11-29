@@ -775,7 +775,7 @@ firefox_desktop:
     desktop_acquisition_funnel_table:
       type: table_view
       tables:
-        - table: mozdata.analysis.gkabbz_sample_desktop_funnel
+        - table: mozdata.telemetry.desktop_acquisition_funnel
     urlbar_events_table:
       type: table_view
       tables:
