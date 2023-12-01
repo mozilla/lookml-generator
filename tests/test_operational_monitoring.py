@@ -391,3 +391,190 @@ def test_dashboard_lookml(operational_monitoring_dashboard):
     actual = operational_monitoring_dashboard.to_lookml(mock_bq_client)
 
     print_and_test(expected=expected, actual=dedent(actual))
+
+
+@pytest.fixture()
+def operational_monitoring_dashboard_group_by_dimension():
+    return OperationalMonitoringDashboard(
+        "Fission",
+        "fission",
+        "newspaper",
+        "operational_monitoring",
+        [
+            {
+                "table": "moz-fx-data-shared-prod.operational_monitoring.bug_123_test_statistics",
+                "explore": "fission",
+                "branches": ["enabled", "disabled"],
+                "dimensions": {
+                    "cores_count": {
+                        "default": "4",
+                        "options": ["4", "1"],
+                    },
+                    "os": {
+                        "default": "Windows",
+                        "options": ["Windows", "Linux"],
+                    },
+                },
+                "group_by_dimension": "os",
+                "xaxis": "build_id",
+                "summaries": [
+                    {"metric": "GC_MS", "statistic": "mean"},
+                    {"metric": "GC_MS_CONTENT", "statistic": "percentile"},
+                ],
+            },
+        ],
+    )
+
+
+def test_dashboard_lookml_group_by_dimension(
+    operational_monitoring_dashboard_group_by_dimension,
+):
+    mock_bq_client = MockClient()
+    expected = dedent(
+        """\
+- dashboard: fission
+  title: Fission
+  layout: newspaper
+  preferred_viewer: dashboards-next
+
+  elements:
+  - title: Gc Ms - By os
+    name: Gc Ms - By os_mean
+    note_state: expanded
+    note_display: above
+    note_text: Mean
+    explore: fission
+    type: looker_line
+    fields: [
+      fission.build_id,
+      fission.branch,
+      fission.point
+    ]
+    pivots: [
+      fission.branch, fission.os
+    ]
+    filters:
+      fission.metric: 'GC_MS'
+      fission.statistic: mean
+    row: 0
+    col: 0
+    width: 12
+    height: 8
+    field_x: fission.build_id
+    field_y: fission.point
+    log_scale: false
+    ci_lower: fission.lower
+    ci_upper: fission.upper
+    show_grid: true
+    listen:
+      Date: fission.build_id
+      Cores Count: fission.cores_count
+      Os: fission.os
+
+    enabled: "#3FE1B0"
+    disabled: "#0060E0"
+    defaults_version: 0
+  - title: Gc Ms Content - By os
+    name: Gc Ms Content - By os_percentile
+    note_state: expanded
+    note_display: above
+    note_text: Percentile
+    explore: fission
+    type: "ci-line-chart"
+    fields: [
+      fission.build_id,
+      fission.branch,
+      fission.upper,
+      fission.lower,
+      fission.point
+    ]
+    pivots: [
+      fission.branch, fission.os
+    ]
+    filters:
+      fission.metric: 'GC_MS_CONTENT'
+      fission.statistic: percentile
+    row: 0
+    col: 12
+    width: 12
+    height: 8
+    field_x: fission.build_id
+    field_y: fission.point
+    log_scale: false
+    ci_lower: fission.lower
+    ci_upper: fission.upper
+    show_grid: true
+    listen:
+      Date: fission.build_id
+      Percentile: fission.parameter
+      Cores Count: fission.cores_count
+      Os: fission.os
+
+    enabled: "#3FE1B0"
+    disabled: "#0060E0"
+    defaults_version: 0
+
+  filters:
+  - name: Date
+    title: Date
+    type: field_filter
+    allow_multiple_values: true
+    required: false
+    ui_config:
+      type: advanced
+      display: popover
+    model: operational_monitoring
+    explore: fission
+    listens_to_filters: []
+    field: fission.build_id
+
+  - name: Percentile
+    title: Percentile
+    type: field_filter
+    default_value: '50'
+    allow_multiple_values: false
+    required: true
+    ui_config:
+      type: advanced
+      display: popover
+    model: operational_monitoring
+    explore: fission
+    listens_to_filters: []
+    field: fission.parameter
+
+  - title: Cores Count
+    name: Cores Count
+    type: string_filter
+    default_value: '4'
+    allow_multiple_values: false
+    required: true
+    ui_config:
+      type: dropdown_menu
+      display: inline
+      options:
+      - '4'
+      - '1'
+
+
+
+  - title: Os
+    name: Os
+    type: string_filter
+    default_value: 'Linux,Windows'
+    allow_multiple_values: true
+    required: true
+    ui_config:
+      type: advanced
+      display: inline
+      options:
+      - 'Linux'
+      - 'Windows'
+
+
+    """
+    )
+    actual = operational_monitoring_dashboard_group_by_dimension.to_lookml(
+        mock_bq_client
+    )
+
+    print_and_test(expected=expected, actual=dedent(actual))
