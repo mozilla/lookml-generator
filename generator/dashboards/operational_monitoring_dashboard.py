@@ -125,28 +125,29 @@ class OperationalMonitoringDashboard(Dashboard):
                             else:
                                 title = lookml_utils.slug_to_title(metric_group)
 
-                        kwargs["elements"].append(
-                            {
-                                "title": title,
-                                "metric": summary["metric"]
-                                if metric_group is None
-                                else ", ".join(
-                                    f'"{m}"' for m in metric_groups[metric_group]
-                                ),
-                                "statistic": summary["statistic"],
-                                "explore": explore,
-                                "series_colors": series_colors,
-                                "xaxis": self.xaxis,
-                                "row": int(graph_index / 2) * 10,
-                                "col": 0 if graph_index % 2 == 0 else 12,
-                                "is_metric_group": metric_group is not None,
-                            }
-                        )
-                        if metric_group is not None:
-                            seen_metric_groups.append(
-                                (metric_group, summary["statistic"])
+                        if not self.group_by_dimension:
+                            kwargs["elements"].append(
+                                {
+                                    "title": title,
+                                    "metric": summary["metric"]
+                                    if metric_group is None
+                                    else ", ".join(
+                                        f'"{m}"' for m in metric_groups[metric_group]
+                                    ),
+                                    "statistic": summary["statistic"],
+                                    "explore": explore,
+                                    "series_colors": series_colors,
+                                    "xaxis": self.xaxis,
+                                    "row": int(graph_index / 2) * 10,
+                                    "col": 0 if graph_index % 2 == 0 else 12,
+                                    "is_metric_group": metric_group is not None,
+                                }
                             )
-                        graph_index += 1
+                            if metric_group is not None:
+                                seen_metric_groups.append(
+                                    (metric_group, summary["statistic"])
+                                )
+                            graph_index += 1
 
                         if self.group_by_dimension:
                             kwargs["elements"].append(

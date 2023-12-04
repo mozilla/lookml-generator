@@ -29,8 +29,8 @@
     ]
     pivots: [
       {{element.explore}}.branch
-      {%- if group_by_dimension and element.title.endswith(group_by_dimension) %}, {{element.explore}}.{{group_by_dimension}} {% endif %}
-      {%- if element.is_metric_group %}, {{element.explore}}.metric {% endif %}
+      {%- if group_by_dimension and element.title.endswith(group_by_dimension) %}, {{element.explore}}.{{group_by_dimension}}{% endif %}
+      {%- if element.is_metric_group %}, {{element.explore}}.metric{% endif %}
     ]
     {% if not compact_visualization -%}
     filters:
