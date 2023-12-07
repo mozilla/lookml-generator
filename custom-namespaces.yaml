@@ -884,7 +884,7 @@ firefox_desktop:
     desktop_cohort_daily_retention:
       type: table_view
       tables:
-        - table: moz-fx-data-shared-prod.telemetry_derived.desktop_cohort_daily_retention_v1        
+        - table: moz-fx-data-shared-prod.telemetry_derived.desktop_cohort_daily_retention_v1
   explores:
     client_counts:
       type: client_counts_explore
