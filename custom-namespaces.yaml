@@ -873,6 +873,14 @@ firefox_desktop:
       type: ping_view
       tables:
         - table: mozdata.default_browser_agent.default_browser
+    clients_first_seen_28_days_later:
+      type: table_view
+      tables:
+        - table: mozdata.telemetry.clients_first_seen_28_days_later
+    clients_first_seen_v2:
+      type: table_view
+      tables:
+        - table: mozdata.telemetry.clients_first_seen_v2
   explores:
     client_counts:
       type: client_counts_explore
@@ -901,6 +909,10 @@ firefox_desktop:
       type: ping_explore
       views:
         base_view: default_browser
+    new_profiles:
+      type: table_explore
+      views:
+        base_view: clients_first_seen_28_days_later
 pocket:
   glean_app: false
   owners:
