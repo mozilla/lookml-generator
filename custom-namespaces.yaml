@@ -884,7 +884,7 @@ firefox_desktop:
     desktop_cohort_daily_retention:
       type: table_view
       tables:
-        - table: moz-fx-data-shared-prod.telemetry_derived.desktop_cohort_daily_retention_v1
+        - table: mozdata.telemetry.desktop_cohort_daily_retention
   explores:
     client_counts:
       type: client_counts_explore
@@ -913,10 +913,6 @@ firefox_desktop:
       type: ping_explore
       views:
         base_view: default_browser
-    new_profiles:
-      type: table_explore
-      views:
-        base_view: clients_first_seen_28_days_later
 pocket:
   glean_app: false
   owners:
