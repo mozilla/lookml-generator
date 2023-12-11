@@ -873,6 +873,14 @@ firefox_desktop:
       type: ping_view
       tables:
         - table: mozdata.default_browser_agent.default_browser
+    clients_first_seen_v2:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.telemetry_derived.clients_first_seen_v2
+    desktop_cohort_daily_retention:
+      type: table_view
+      tables:
+        - table: mozdata.telemetry.desktop_cohort_daily_retention
   explores:
     client_counts:
       type: client_counts_explore
