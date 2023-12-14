@@ -1393,6 +1393,10 @@ subscription_platform:
       measures:
         count:
           type: count
+    stripe_subscriptions:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.subscription_platform_derived.stripe_subscriptions_v2
     active_subscriptions:
       type: table_view
       tables:
