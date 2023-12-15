@@ -1290,26 +1290,6 @@ marketing:
       type: table_view
       tables:
         - table: mozdata.analysis.marketing_firefox_for_families_forecasted_expectations
-data_integrity_monitoring:
-  glean_app: false
-  owners:
-    - kignasiak@mozilla.com
-    - akommasani@mozilla.com
-  pretty_name: Data Integrity Monitoring (dim)
-  spoke: looker-spoke-default
-  views:
-    run_history:
-      tables:
-        - table: data-monitoring-dev.dim_external.run_history
-      type: table_view
-    run_processing_info:
-      tables:
-        - table: data-monitoring-dev.dim_external.run_processing_info
-      type: table_view
-    muted_alerts:
-      tables:
-        - table: data-monitoring-dev.dim_external.muted_alerts
-      type: table_view
 relay:
   glean_app: false
   owners:
