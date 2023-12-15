@@ -663,6 +663,10 @@ fenix:
       type: table_view
       tables:
         - table: mozdata.fenix.funnel_retention_week_4
+    android_onboarding:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.fenix_derived.android_onboarding_v1
 focus_ios:
   owners:
     - loines@mozilla.com
