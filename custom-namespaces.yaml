@@ -650,7 +650,7 @@ firefox_ios:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.firefox_ios.feature_usage_metrics
-    feature_usage_eventss:
+    feature_usage_events:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.firefox_ios.feature_usage_events
@@ -679,7 +679,7 @@ fenix:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.fenix.feature_usage_metrics
-    feature_usage_eventss:
+    feature_usage_events:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.fenix.feature_usage_events
