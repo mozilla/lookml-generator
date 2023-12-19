@@ -646,6 +646,14 @@ firefox_ios:
       type: table_view
       tables:
         - table: mozdata.firefox_ios.funnel_retention_week_4
+    feature_usage_metrics:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.firefox_ios.feature_usage_metrics
+    feature_usage_eventss:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.firefox_ios.feature_usage_events
 fenix:
   pretty_name: Firefox Android
   owners:
@@ -667,6 +675,14 @@ fenix:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.fenix_derived.android_onboarding_v1
+    feature_usage_metrics:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.fenix.feature_usage_metrics
+    feature_usage_eventss:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.fenix.feature_usage_events
 focus_ios:
   owners:
     - loines@mozilla.com
