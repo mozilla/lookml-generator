@@ -1470,3 +1470,21 @@ subscription_platform:
       type: table_explore
       views:
         base_view: active_subscriptions
+telemetry_dev_cycle:
+  pretty_name: Telemetry Dev Cycle
+  owners:
+    - leli@mozilla.com
+  glean_app: false
+  views:
+    experiments_stats:
+      type: table_view
+      tables:
+        - table: mozdata.telemetry_dev_cycle.experiments_stats
+    glean_metrics_stats:
+      type: table_view
+      tables:
+        - table: mozdata.telemetry_dev_cycle.glean_metric_stats
+    telemetry_probes_stats:
+      type: table_view
+      tables:
+        - table: mozdata.telemetry_dev_cycle.telemetry_probes_stats
