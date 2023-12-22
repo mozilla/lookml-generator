@@ -1483,7 +1483,7 @@ telemetry_dev_cycle:
     glean_metrics_stats:
       type: table_view
       tables:
-        - table: mozdata.telemetry_dev_cycle.glean_metric_stats
+        - table: mozdata.telemetry_dev_cycle.glean_metrics_stats
     telemetry_probes_stats:
       type: table_view
       tables:
