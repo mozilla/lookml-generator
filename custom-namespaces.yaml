@@ -544,7 +544,7 @@ firefox_accounts:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.accounts_db.accounts_aggregates
-    oauth_clients:
+    accounts_oauth_clients:
       type: table_view
       tables:
         - table: mox-fx-data-shared-prod.accounts_db.fxa_oauth_clients
@@ -581,8 +581,8 @@ firefox_accounts:
       type: accounts_aggregates_explore
       views:
         base_view: accounts_aggregates
-    oauth_clients:
-      type: oauth_clients_explore
+    accounts_oauth_clients:
+      type: accounts_oauth_clients_explore
       views:
         base_view: oauth_clients
 revenue:
