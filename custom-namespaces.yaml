@@ -582,7 +582,7 @@ firefox_accounts:
       views:
         base_view: accounts_aggregates
     accounts_oauth_clients:
-      type: accounts_oauth_clients_explore
+      type: table_explore
       views:
         base_view: oauth_clients
 revenue:
