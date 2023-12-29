@@ -578,7 +578,7 @@ firefox_accounts:
       views:
         base_view: growth_accounting
     accounts_aggregates:
-      type: accounts_aggregates_explore
+      type: table_explore
       views:
         base_view: accounts_aggregates
     accounts_oauth_clients:
