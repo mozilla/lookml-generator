@@ -547,7 +547,7 @@ firefox_accounts:
     accounts_oauth_clients:
       type: table_view
       tables:
-        - table: mox-fx-data-shared-prod.accounts_db.fxa_oauth_clients
+        - table: moz-fx-data-shared-prod.accounts_db.fxa_oauth_clients
   explores:
     all_event_counts:
       type: events_explore
@@ -584,7 +584,7 @@ firefox_accounts:
     accounts_oauth_clients:
       type: table_explore
       views:
-        base_view: oauth_clients
+        base_view: accounts_oauth_clients
 revenue:
   glean_app: false
   connection: bigquery-oauth
