@@ -73,39 +73,30 @@ class MetricDefinitionsExplore(Explore):
     def _get_joins(self):
         """Generate metric definition joins."""
         # Every metric definitions has a submission_date and client_id field that is used to
-        # join the different data source views.
-        joins = []
+        # join the data source views.
+        data_source_name = re.sub("^metric_definitions_", "", self.name)
+        data_source_definition = MetricsConfigLoader.configs.get_data_source_definition(
+            data_source_name, self.views_path.parent.name
+        )
 
-        for joined_view in self.views.get("joined_views", []):
-            data_source_name = re.sub("^metric_definitions_", "", joined_view)
-            data_source_definition = (
-                MetricsConfigLoader.configs.get_data_source_definition(
-                    data_source_name, self.views_path.parent.name
-                )
-            )
+        # only join on client_id if it is not explicity set to NULL,
+        # otherwise we are loosing data
+        join_fields = ["submission_date"]
 
-            # only join on client_id if it is not explicity set to NULL,
-            # otherwise we are loosing data
-            sql_on = f"""
-                  SAFE_CAST({self.name}.submission_date AS TIMESTAMP) =
-                  SAFE_CAST({joined_view}.submission_date AS TIMESTAMP)"""
+        if data_source_definition.client_id_column != "NULL":
+            join_fields.append("client_id")
 
-            if data_source_definition.client_id_column != "NULL":
-                sql_on += f""" AND SAFE_CAST({self.name}.client_id AS STRING) =
-                  SAFE_CAST({joined_view}.client_id AS STRING)"""
-
-            joins.append(
-                {
-                    "name": joined_view,
-                    "view_label": lookml_utils.slug_to_title(joined_view),
-                    "relationship": "many_to_many",
-                    "type": "full_outer",
-                    "fields": ["metrics*"],
-                    "sql_on": sql_on,
-                }
-            )
-
-        return joins
+        return [
+            {
+                "name": "metric_definitions",
+                "from": self.name,
+                "view_label": lookml_utils.slug_to_title(self.name),
+                "relationship": "many_to_many",
+                "type": "full_outer",
+                "fields": ["metrics*"],
+                "sql": f"FULL OUTER JOIN {self.name} AS metric_definitions USING({','.join(join_fields)})",
+            }
+        ]
 
     def get_view_time_partitioning_group(self, view: str) -> Optional[str]:
         """Override time partitioning."""

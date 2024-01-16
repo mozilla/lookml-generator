@@ -18,7 +18,7 @@ from google.cloud import bigquery
 from generator import operational_monitoring_utils
 
 from .explores import EXPLORE_TYPES
-from .metrics_utils import METRIC_HUB_REPO, MetricsConfigLoader
+from .metrics_utils import METRIC_HUB_REPO, MetricsConfigLoader, LOOKER_METRIC_HUB_REPO
 from .views import VIEW_TYPES, View, lookml_utils
 
 DEFAULT_GENERATED_SQL_URI = (
@@ -156,50 +156,63 @@ def _get_metric_hub_namespaces(existing_namespaces):
 
     metric_hub_namespaces = {}
     for namespace, metric_hub_data_sources in metric_hub_data_sources.items():
-        # each data source definition is represented by a view
-        views = {
-            f"metric_definitions_{data_source}": {"type": "metric_definitions_view"}
-            for data_source in metric_hub_data_sources
-        }
-
-        # there is a single explore per namespace that joins all the data source views
-        explore_views = {}
-        for i, data_source in enumerate(sorted(metric_hub_data_sources)):
-            if i == 0:
-                if (
-                    namespace in existing_namespaces
-                    and "client_counts" in existing_namespaces[namespace]["views"]
-                ):
-                    # If there is a clients counts view in the namespace, use it as basis.
-                    # The advantage of this is that client counts is guaranteed to have
-                    # client_ids of all clients that were active on a given day and it exposes
-                    # some useful fields, like channel, users might want to filter on.
-                    explore_views["base_view"] = "client_counts"
-                elif (
-                    namespace in existing_namespaces
-                    and "baseline_clients_daily_table"
-                    in existing_namespaces[namespace]["views"]
-                ):
-                    # for Glean it's baseline_clients_daily
-                    explore_views["base_view"] = "baseline_clients_daily_table"
-                else:
-                    # If no client_counts view exists, simply use first view as base view
-                    explore_views["base_view"] = f"metric_definitions_{data_source}"
-
-            # generate entries for views that need to be joined on
-            if "joined_views" not in explore_views:
-                explore_views["joined_views"] = [f"metric_definitions_{data_source}"]
-            else:
-                explore_views["joined_views"].append(
-                    f"metric_definitions_{data_source}"
-                )
-
-        explores = {
-            f"metric_definitions_{namespace}": {
-                "type": "metric_definitions_explore",
-                "views": explore_views,
+        # each data source definition is represented by a view and an explore
+        explores = {}
+        views = {}
+        for data_source in sorted(metric_hub_data_sources):
+            views[f"metric_definitions_{data_source}"] = {
+                "type": "metric_definitions_view"
             }
-        }
+
+            explores[f"metric_definitions_{data_source}"] = {
+                "type": "metric_definitions_explore",
+                "views": {
+                    "joined_views": [f"metric_definitions_{data_source}"]
+                },
+            }
+            if (
+                namespace in existing_namespaces
+                and "client_counts" in existing_namespaces[namespace]["views"]
+            ):
+                # If there is a clients counts view in the namespace, use it as basis.
+                # The advantage of this is that client counts is guaranteed to have
+                # client_ids of all clients that were active on a given day and it exposes
+                # some useful fields, like channel, users might want to filter on.
+                explores[f"metric_definitions_{data_source}"]["views"][
+                    "base_view"
+                ] = "client_counts"
+            elif (
+                namespace in existing_namespaces
+                and "baseline_clients_daily_table"
+                in existing_namespaces[namespace]["views"]
+            ):
+                # for Glean it's baseline_clients_daily
+                explores[f"metric_definitions_{data_source}"]["views"][
+                    "base_view"
+                ] = "baseline_clients_daily_table"
+
+            # if a datasource corresponds to an existing ping_explore, then join
+            if namespace in existing_namespaces:
+                data_source_name = re.sub(r".*(_v[0-9]+)", "", data_source)
+
+                if (
+                    data_source_name in existing_namespaces[namespace]["explores"]
+                    and existing_namespaces[namespace]["explores"][data_source_name][
+                        "type"
+                    ]
+                    == "glean_ping_explore"
+                ):
+                    glean_ping_explore = existing_namespaces[namespace]["explores"][
+                        data_source_name
+                    ]
+                    if "joined_views" in glean_ping_explore["views"]:
+                        glean_ping_explore["views"]["joined_views"].append(
+                            f"metric_definitions_{data_source}"
+                        )
+                    else:
+                        glean_ping_explore["views"]["joined_views"] = [
+                            f"metric_definitions_{data_source}"
+                        ]
 
         metric_hub_namespaces[namespace] = {
             "pretty_name": lookml_utils.slug_to_title(namespace),
@@ -357,16 +370,18 @@ def _get_metric_hub_data_sources() -> Dict[str, List[str]]:
     help="Path to namespace disallow list",
 )
 @click.option(
-    "--metric-hub-repo",
-    default=METRIC_HUB_REPO,
-    help="Repo to load metric configs from.",
+    "--metric-hub-repos",
+    "--metric_hub_repos",
+    multiple=True,
+    default=[METRIC_HUB_REPO, LOOKER_METRIC_HUB_REPO],
+    help="Repos to load metric configs from.",
 )
 def namespaces(
     custom_namespaces,
     generated_sql_uri,
     app_listings_uri,
     disallowlist,
-    metric_hub_repo,
+    metric_hub_repos,
 ):
     """Generate namespaces.yaml."""
     warnings.filterwarnings("ignore", module="google.auth._default")
@@ -398,8 +413,8 @@ def namespaces(
 
         _merge_namespaces(namespaces, custom_namespaces)
 
-    if metric_hub_repo:
-        MetricsConfigLoader.update_repos([metric_hub_repo])
+    if metric_hub_repos:
+        MetricsConfigLoader.update_repos(metric_hub_repos)
 
     _merge_namespaces(namespaces, _get_metric_hub_namespaces(namespaces))
 

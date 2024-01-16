@@ -129,9 +129,11 @@ def _generate_dimensions(client: bigquery.Client, table: str) -> List[Dict[str, 
             # workaround for `mozdata.firefox_desktop.desktop_installs`
             and not (name == "attribution_dltoken" and dimension["type"] == "time")
         ):
-            raise click.ClickException(
-                f"duplicate dimension {name!r} for table {table!r}"
-            )
+            print(f"duplicate dimension {name!r} for table {table!r}")
+            continue
+            # raise click.ClickException(
+            #     f"duplicate dimension {name!r} for table {table!r}"
+            # )
         dimensions[name] = dimension
     return list(dimensions.values())
 
