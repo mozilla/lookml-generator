@@ -18,7 +18,7 @@ pytest-flake8==1.1.1
 pytest-isort==3.1.0
 pytest-mypy==0.10.3
 pytest-pydocstyle==2.3.2
-pytest==7.4.3
+pytest==7.4.4
 PyYAML==6.0.1
 tomli==2.0.1  # for toml parsing on python<3.11
 types-PyYaml==6.0.12.12
