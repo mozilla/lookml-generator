@@ -125,6 +125,7 @@ def _generate_dimensions(client: bigquery.Client, table: str) -> List[Dict[str, 
             and name != "submission"
             and not name.endswith("end")
             and not name.endswith("start")
+            and not (name != "event" and dimension["type"] != "time")
         ):
             raise click.ClickException(
                 f"duplicate dimension {name!r} for table {table!r}"
