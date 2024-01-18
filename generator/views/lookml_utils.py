@@ -126,6 +126,8 @@ def _generate_dimensions(client: bigquery.Client, table: str) -> List[Dict[str, 
             and not name.endswith("end")
             and not name.endswith("start")
             and not (name == "event" and dimension["type"] == "time")
+            # workaround for `mozdata.firefox_desktop.desktop_installs`
+            and not (name == "attribution_dltoken" and dimension["type"] == "time")
         ):
             raise click.ClickException(
                 f"duplicate dimension {name!r} for table {table!r}"
