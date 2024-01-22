@@ -1032,10 +1032,6 @@ monitoring:
       type: ping_view
       tables:
         - table: mozdata.monitoring.column_size
-    payload_bytes_decoded_all:
-      type: ping_view
-      tables:
-        - table: mozdata.monitoring.payload_bytes_decoded_all
     payload_bytes_error_all:
       type: ping_view
       tables:
@@ -1154,10 +1150,6 @@ monitoring:
       type: ping_explore
       views:
         base_view: column_size
-    payload_bytes_decoded_all:
-      type: ping_explore
-      views:
-        base_view: payload_bytes_decoded_all
     payload_bytes_error_all:
       type: ping_explore
       views:
