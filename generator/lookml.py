@@ -10,10 +10,10 @@ from google.cloud import bigquery
 
 from .dashboards import DASHBOARD_TYPES
 from .explores import EXPLORE_TYPES
+from .metrics_utils import LOOKER_METRIC_HUB_REPO, METRIC_HUB_REPO, MetricsConfigLoader
 from .namespaces import _get_glean_apps
 from .views import VIEW_TYPES, View, ViewDict
 from .views.datagroups import generate_datagroups
-from .metrics_utils import METRIC_HUB_REPO, MetricsConfigLoader, LOOKER_METRIC_HUB_REPO
 
 FILE_HEADER = """
 # *Do not manually modify this file*

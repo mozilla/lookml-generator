@@ -167,7 +167,6 @@ function generate_hub_commit() {
   CUSTOM_NAMESPACES_FILENAME="/app/lookml-generator/custom-namespaces.yaml"
   GENERATED_SQL_URI="https://github.com/mozilla/bigquery-etl/archive/generated-sql.tar.gz"
   APP_LISTINGS_URI="https://probeinfo.telemetry.mozilla.org/v2/glean/app-listings"
-  GCLOUD_PROJECT=moz-fx-data-shared-prod
 
   # Generate namespaces.yaml and LookML
   lookml-generator namespaces \

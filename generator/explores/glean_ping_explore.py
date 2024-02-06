@@ -7,7 +7,7 @@ from typing import Any, Dict, Iterator, List, Optional
 from google.cloud import bigquery
 from mozilla_schema_generator.glean_ping import GleanPing
 
-from ..views import GleanPingView, View, lookml_utils
+from ..views import GleanPingView, View
 from .ping_explore import PingExplore
 
 
@@ -40,7 +40,6 @@ class GleanPingExplore(PingExplore):
         for view in views_lookml["views"][1:]:
             if view["name"].startswith("suggest__"):
                 continue
-
             view_name = view["name"]
             metric = "__".join(view["name"].split("__")[1:])
             joins.append(
@@ -53,24 +52,6 @@ class GleanPingExplore(PingExplore):
                     ),
                 }
             )
-
-        for joined_view in self.views.get("joined_views", []):
-            if joined_view.startswith("metric_definitions_"):
-                joins.append(
-                    {
-                        "name": joined_view,
-                        "view_label": lookml_utils.slug_to_title(joined_view),
-                        "relationship": "many_to_many",
-                        "type": "full_outer",
-                        "fields": ["metrics*"],
-                        "sql_on": (
-                            f"""SAFE_CAST({base_name}.submission_date AS TIMESTAMP) =
-                                SAFE_CAST({joined_view}.submission_date AS TIMESTAMP) AND
-                                AND SAFE_CAST({base_name}.client_info__client_id AS STRING) =
-                                SAFE_CAST({joined_view}.client_id AS STRING)"""
-                        ),
-                    }
-                )
 
         base_explore = {
             "name": self.name,
