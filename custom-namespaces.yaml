@@ -1324,7 +1324,7 @@ websites:
     ga4_moz_org_landing_page_metrics:
       type: table_view
       tables:
-      - table: moz-fx-data-marketing-prod.ga_derived.www_site_metrics_summary_v2
+      - table: moz-fx-data-marketing-prod.ga_derived.www_site_landing_page_metrics_v2
     moz_org_landing_page_metrics:
       type: table_view
       tables:
