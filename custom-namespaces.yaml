@@ -1349,6 +1349,10 @@ websites:
       type: table_view
       tables:
         - table: moz-fx-data-marketing-prod.ga_derived.firefox_whatsnew_summary_v1
+    ga4_firefox_whatsnew_summary:
+      type: table_view
+      tables:
+        - table: moz-fx-data-marketing-prod.ga_derived.firefox_whatsnew_summary_v2
 marketing:
   glean_app: false
   pretty_name: Marketing
