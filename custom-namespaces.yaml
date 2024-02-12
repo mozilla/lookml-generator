@@ -1329,6 +1329,10 @@ websites:
       type: table_view
       tables:
         - table: moz-fx-data-marketing-prod.ga_derived.www_site_landing_page_metrics_v1
+    ga4_blogs_sessions:
+      type: table_view
+      tables:
+        - table: moz-fx-data-marketing-prod.ga_derived.blogs_sessions_v2
     blogs_daily_summary:
       type: table_view
       tables:
