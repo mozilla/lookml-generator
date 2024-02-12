@@ -6,6 +6,7 @@ from metric_config_parser.config import ConfigCollection
 from metric_config_parser.metric import MetricDefinition
 
 METRIC_HUB_REPO = "https://github.com/mozilla/metric-hub"
+LOOKER_METRIC_HUB_REPO = "https://github.com/mozilla/metric-hub/tree/main/looker"
 
 
 class _MetricsConfigLoader:

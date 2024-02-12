@@ -10,6 +10,7 @@ from google.cloud import bigquery
 
 from .dashboards import DASHBOARD_TYPES
 from .explores import EXPLORE_TYPES
+from .metrics_utils import LOOKER_METRIC_HUB_REPO, METRIC_HUB_REPO, MetricsConfigLoader
 from .namespaces import _get_glean_apps
 from .views import VIEW_TYPES, View, ViewDict
 from .views.datagroups import generate_datagroups
@@ -164,7 +165,17 @@ def _lookml(namespaces, glean_apps, target_dir):
     type=click.Path(),
     help="Path to a directory where lookml will be written",
 )
-def lookml(namespaces, app_listings_uri, target_dir):
+@click.option(
+    "--metric-hub-repos",
+    "--metric-hub-repos",
+    multiple=True,
+    default=[METRIC_HUB_REPO, LOOKER_METRIC_HUB_REPO],
+    help="Repos to load metric configs from.",
+)
+def lookml(namespaces, app_listings_uri, target_dir, metric_hub_repos):
     """Generate lookml from namespaces."""
+    if metric_hub_repos:
+        MetricsConfigLoader.update_repos(metric_hub_repos)
+
     glean_apps = _get_glean_apps(app_listings_uri)
     return _lookml(namespaces, glean_apps, target_dir)
