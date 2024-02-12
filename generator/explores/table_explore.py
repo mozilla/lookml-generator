@@ -6,8 +6,10 @@ from typing import Any, Dict, Iterator, List, Optional
 
 from google.cloud import bigquery
 
-from ..views import View
+from ..views import TableView, View
 from . import Explore
+
+ALLOWED_VIEWS = {"events_stream_table"}
 
 
 class TableExplore(Explore):
@@ -32,8 +34,11 @@ class TableExplore(Explore):
 
     @staticmethod
     def from_views(views: List[View]) -> Iterator[TableExplore]:
-        """Don't generate all possible TableExplores from the views."""
-        return iter([])
+        """Don't generate all possible TableExplores from the views, only generate for ALLOWED_VIEWS."""
+        for view in views:
+            if view.view_type == TableView.type:
+                if view.name in ALLOWED_VIEWS:
+                    yield TableExplore(view.name, {"base_view": view.name})
 
     @staticmethod
     def from_dict(name: str, defn: dict, views_path: Path) -> TableExplore:
