@@ -1293,18 +1293,46 @@ websites:
   owners:
     - kignasiak@mozilla.com
   views:
+    ga4_www_site_downloads:
+      type: table_view
+      tables:
+        - table: moz-fx-data-marketing-prod.ga_derived.www_site_downloads_v2
+    ga4_sessions:
+      type: table_view
+      tables: 
+        - table: moz-fx-data-shared-prod.mozilla_org_derived.ga_sessions_v2
+    ga4_www_site_hits:
+      type: table_view
+      tables: 
+        - table: moz-fx-data-marketing-prod.ga_derived.www_site_hits_v2
+    ga4_moz_org_page_metrics:
+      type: table_view
+      tables:
+        - table: moz-fx-data-marketing-prod.ga_derived.www_site_page_metrics_v2
     moz_org_page_metrics:
       type: table_view
       tables:
         - table: moz-fx-data-marketing-prod.ga_derived.www_site_page_metrics_v1
+    ga4_moz_org_metrics_summary:
+      type: table_view
+      tables:
+        - table: moz-fx-data-marketing-prod.ga_derived.www_site_metrics_summary_v2
     moz_org_metrics_summary:
       type: table_view
       tables:
         - table: moz-fx-data-marketing-prod.ga_derived.www_site_metrics_summary_v1
+    ga4_moz_org_landing_page_metrics:
+      type: table_view
+      tables:
+        - table: moz-fx-data-marketing-prod.ga_derived.www_site_landing_page_metrics_v2
     moz_org_landing_page_metrics:
       type: table_view
       tables:
         - table: moz-fx-data-marketing-prod.ga_derived.www_site_landing_page_metrics_v1
+    ga4_blogs_sessions:
+      type: table_view
+      tables:
+        - table: moz-fx-data-marketing-prod.ga_derived.blogs_sessions_v2
     blogs_daily_summary:
       type: table_view
       tables:
@@ -1313,6 +1341,10 @@ websites:
       type: table_view
       tables:
         - table: moz-fx-data-marketing-prod.ga_derived.blogs_landing_page_summary_v1
+    ga4_www_site_events_metrics: 
+      type: table_view
+      tables:
+        - table: moz-fx-data-marketing-prod.ga_derived.www_site_events_metrics_v2
     www_site_events_metrics:
       type: table_view
       tables:
@@ -1321,6 +1353,10 @@ websites:
       type: table_view
       tables:
         - table: moz-fx-data-marketing-prod.ga_derived.firefox_whatsnew_summary_v1
+    ga4_firefox_whatsnew_summary:
+      type: table_view
+      tables:
+        - table: moz-fx-data-marketing-prod.ga_derived.firefox_whatsnew_summary_v2
 marketing:
   glean_app: false
   pretty_name: Marketing
