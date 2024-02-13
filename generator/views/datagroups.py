@@ -15,11 +15,11 @@ from generator.views.lookml_utils import BQViewReferenceMap
 
 DEFAULT_MAX_CACHE_AGE = "24 hours"
 
-# Note: INFORMATION_SCHEMA.PARTITIONS has a row with a `last_modified_time` value even for non-partitioned tables.
 SQL_TRIGGER_TEMPLATE = """
-    SELECT MAX(last_modified_time)
-    FROM `{project_id}`.{dataset_id}.INFORMATION_SCHEMA.PARTITIONS
-    WHERE table_name = '{table_id}'
+    SELECT MAX(storage_last_modified_time)
+    FROM `{project_id}`.`region-us`.INFORMATION_SCHEMA.TABLE_STORAGE
+    WHERE table_schema = '{dataset_id}'
+    AND table_name = '{table_id}'
 """
 
 FILE_HEADER = """# *Do not manually modify this file*
