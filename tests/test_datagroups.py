@@ -32,9 +32,10 @@ def test_generates_datagroups(reference_map_mock, client, table_1, table_2, runn
         FILE_HEADER
         + """datagroup: test_table_last_updated {
   label: "Test Table Last Updated"
-  sql_trigger: SELECT MAX(last_modified_time)
-    FROM `mozdata`.analysis.INFORMATION_SCHEMA.PARTITIONS
-    WHERE table_name = 'test_table' ;;
+  sql_trigger: SELECT MAX(storage_last_modified_time)
+    FROM `mozdata`.`region-us`.INFORMATION_SCHEMA.TABLE_STORAGE
+    WHERE table_schema = 'analysis'
+    AND table_name = 'test_table' ;;
   description: "Updates when mozdata:analysis.test_table is modified."
   max_cache_age: "24 hours"
 }"""
@@ -44,9 +45,10 @@ def test_generates_datagroups(reference_map_mock, client, table_1, table_2, runn
         FILE_HEADER
         + """datagroup: test_table_2_last_updated {
   label: "Test Table 2 Last Updated"
-  sql_trigger: SELECT MAX(last_modified_time)
-    FROM `mozdata`.analysis.INFORMATION_SCHEMA.PARTITIONS
-    WHERE table_name = 'test_table_2' ;;
+  sql_trigger: SELECT MAX(storage_last_modified_time)
+    FROM `mozdata`.`region-us`.INFORMATION_SCHEMA.TABLE_STORAGE
+    WHERE table_schema = 'analysis'
+    AND table_name = 'test_table_2' ;;
   description: "Updates when mozdata:analysis.test_table_2 is modified."
   max_cache_age: "24 hours"
 }"""
@@ -134,9 +136,10 @@ def test_generates_datagroups_with_tables_and_views(
         FILE_HEADER
         + """datagroup: test_table_last_updated {
   label: "Test Table Last Updated"
-  sql_trigger: SELECT MAX(last_modified_time)
-    FROM `mozdata`.analysis.INFORMATION_SCHEMA.PARTITIONS
-    WHERE table_name = 'test_table' ;;
+  sql_trigger: SELECT MAX(storage_last_modified_time)
+    FROM `mozdata`.`region-us`.INFORMATION_SCHEMA.TABLE_STORAGE
+    WHERE table_schema = 'analysis'
+    AND table_name = 'test_table' ;;
   description: "Updates when mozdata:analysis.test_table is modified."
   max_cache_age: "24 hours"
 }"""
@@ -146,9 +149,10 @@ def test_generates_datagroups_with_tables_and_views(
         FILE_HEADER
         + """datagroup: view_1_source_last_updated {
   label: "View Source Table Last Updated"
-  sql_trigger: SELECT MAX(last_modified_time)
-    FROM `moz-fx-data-shared-prod`.analysis.INFORMATION_SCHEMA.PARTITIONS
-    WHERE table_name = 'view_1_source' ;;
+  sql_trigger: SELECT MAX(storage_last_modified_time)
+    FROM `moz-fx-data-shared-prod`.`region-us`.INFORMATION_SCHEMA.TABLE_STORAGE
+    WHERE table_schema = 'analysis'
+    AND table_name = 'view_1_source' ;;
   description: "Updates when moz-fx-data-shared-prod:analysis.view_1_source is modified."
   max_cache_age: "24 hours"
 }"""
@@ -282,9 +286,10 @@ def test_only_generates_one_datagroup_for_references_to_same_table(
         FILE_HEADER
         + """datagroup: source_table_last_updated {
   label: "Source Table Last Updated"
-  sql_trigger: SELECT MAX(last_modified_time)
-    FROM `moz-fx-data-shared-prod`.analysis.INFORMATION_SCHEMA.PARTITIONS
-    WHERE table_name = 'source_table' ;;
+  sql_trigger: SELECT MAX(storage_last_modified_time)
+    FROM `moz-fx-data-shared-prod`.`region-us`.INFORMATION_SCHEMA.TABLE_STORAGE
+    WHERE table_schema = 'analysis'
+    AND table_name = 'source_table' ;;
   description: "Updates when moz-fx-data-shared-prod:analysis.source_table is modified."
   max_cache_age: "24 hours"
 }"""
