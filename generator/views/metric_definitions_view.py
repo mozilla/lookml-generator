@@ -1,4 +1,5 @@
 """Class to describe a view with metrics from metric-hub."""
+
 from __future__ import annotations
 
 import re
@@ -170,6 +171,7 @@ class MetricDefinitionsView(View):
         }
 
         view_defn["dimensions"] = self.get_dimensions()
+        view_defn["dimension_groups"] = self.get_dimension_groups()
 
         if base_view_lkml:
             for dimension in base_view_lkml["views"][0]["dimensions"]:
@@ -177,7 +179,11 @@ class MetricDefinitionsView(View):
                     dimension["group_label"] = "Base Fields"
                     view_defn["dimensions"].append(dimension)
 
-        view_defn["dimension_groups"] = self.get_dimension_groups()
+            for dimension_group in base_view_lkml["views"][0]["dimension_groups"]:
+                if dimension_group["name"] not in ignore_base_fields:
+                    dimension_group["group_label"] = "Base Fields"
+                    view_defn["dimension_groups"].append(dimension_group)
+
         view_defn["measures"] = self.get_measures(
             view_defn["dimensions"],
         )
