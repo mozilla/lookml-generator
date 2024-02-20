@@ -80,7 +80,7 @@ class MetricDefinitionsView(View):
             "client_id",
             "submission_date",
             "submission",
-            "first_run"
+            "first_run",
         ] + [
             metric_slug
             for metric_slug, metric in namespace_definitions.metrics.definitions.items()
