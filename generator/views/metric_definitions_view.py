@@ -76,7 +76,12 @@ class MetricDefinitionsView(View):
         # to allow for custom measures to be later defined in Looker that aggregate these per client metrics.
         view_defn: Dict[str, Any] = {"name": self.name}
 
-        ignore_base_fields = ["client_id", "submission_date", "submission"] + [
+        ignore_base_fields = [
+            "client_id",
+            "submission_date",
+            "submission",
+            "first_run",
+        ] + [
             metric_slug
             for metric_slug, metric in namespace_definitions.metrics.definitions.items()
             if metric.select_expression
