@@ -1,4 +1,5 @@
 """Class to describe a Glean Ping View."""
+
 import logging
 import re
 from collections import Counter
@@ -9,6 +10,7 @@ import click
 from mozilla_schema_generator.glean_ping import GleanPing
 from mozilla_schema_generator.probes import GleanProbe
 
+from . import lookml_utils
 from .lookml_utils import slug_to_title
 from .ping_view import PingView
 
@@ -177,7 +179,11 @@ class GleanPingView(PingView):
             {v["name"]: v for v in view_definitions}.values(), key=lambda x: x["name"]  # type: ignore
         )
 
-        lookml["views"] += view_definitions
+        nested_views = lookml_utils._generate_nested_dimension_views(
+            bq_client.get_table(table).schema, self.name
+        )
+
+        lookml["views"] += view_definitions + nested_views
 
         return lookml
 
