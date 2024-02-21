@@ -1,12 +1,14 @@
 """Class to describe a view with metrics from metric-hub."""
+
 from __future__ import annotations
 
 import re
-from typing import Any, Dict, Iterator, List, Optional
+from typing import Any, Dict, Iterator, List, Optional, Union
 
 from generator.metrics_utils import MetricsConfigLoader
 
 from . import lookml_utils
+from .table_view import TableView
 from .view import View, ViewDict
 
 
@@ -35,7 +37,7 @@ class MetricDefinitionsView(View):
         klass, namespace: str, name: str, definition: ViewDict
     ) -> MetricDefinitionsView:
         """Get a MetricDefinitionsView from a dict representation."""
-        return klass(namespace, name, [])
+        return klass(namespace, name, definition.get("tables", []))
 
     def to_lookml(self, bq_client, v1_name: Optional[str]) -> Dict[str, Any]:
         """Get this view as LookML."""
@@ -54,10 +56,15 @@ class MetricDefinitionsView(View):
         if data_source_definition is None:
             return {}
 
+        # todo: hide deprecated metrics?
         metric_definitions = [
-            f"{MetricsConfigLoader.configs.get_env().from_string(metric.select_expression).render()} AS {metric_slug}"
+            f"""{
+                MetricsConfigLoader.configs.get_env().from_string(metric.select_expression).render()
+            } AS {metric_slug},\n"""
             for metric_slug, metric in namespace_definitions.metrics.definitions.items()
-            if metric.select_expression and metric.data_source.name == data_source_name
+            if metric.select_expression
+            and metric.data_source.name == data_source_name
+            and metric.type != "histogram"
         ]
 
         if metric_definitions == []:
@@ -67,33 +74,126 @@ class MetricDefinitionsView(View):
         # A derived table is needed to do these aggregations, instead of defining them as measures
         # we want to have them available as dimensions (which don't allow aggregations in their definitions)
         # to allow for custom measures to be later defined in Looker that aggregate these per client metrics.
-        base_view_name = f"metric_definitions_{self.namespace}"
         view_defn: Dict[str, Any] = {"name": self.name}
+
+        ignore_base_fields = [
+            "client_id",
+            "submission_date",
+            "submission",
+            "first_run",
+        ] + [
+            metric_slug
+            for metric_slug, metric in namespace_definitions.metrics.definitions.items()
+            if metric.select_expression
+            and metric.data_source.name == data_source_name
+            and metric.type != "histogram"
+        ]
+        base_view_fields = []
+        base_view_lkml = None
+        join_base_view = ""
+        if len(self.tables) > 0:
+            base_table = self.tables[0]["table"]
+            base_view = TableView(
+                self.namespace,
+                "base_view",
+                [{"table": base_table, "channel": "release"}],
+            )
+            base_view_lkml = base_view.to_lookml(bq_client=bq_client, v1_name=None)
+
+            base_view_fields = [
+                f"{d['name']},\n"
+                for d in base_view_lkml["views"][0]["dimensions"]
+                if d["name"] not in ignore_base_fields
+            ]
+
+            join_base_view = f"""
+            INNER JOIN {base_table} base
+            ON
+                base.submission_date = m.{data_source_definition.submission_date_column or "submission_date"} AND
+                base.client_id = m.{data_source_definition.client_id_column or "client_id"}
+            WHERE base.submission_date BETWEEN
+                SAFE_CAST(
+                    {{% date_start {data_source_definition.submission_date_column or "submission_date"} %}} AS DATE
+                ) AND
+                SAFE_CAST(
+                    {{% date_end {data_source_definition.submission_date_column or "submission_date"} %}} AS DATE
+                )
+            """
+
         view_defn["derived_table"] = {
             "sql": f"""
-              SELECT
-                {",".join(metric_definitions)},
-                {data_source_definition.client_id_column or "client_id"} AS client_id,
-                {data_source_definition.submission_date_column or "submission_date"} AS submission_date
-              FROM
+            SELECT
+                {"".join(metric_definitions)}
+                {"base.".join(base_view_fields)}
+                m.{data_source_definition.client_id_column or "client_id"} AS client_id,
+                {{% if aggregate_metrics_by._parameter_value == 'day' %}}
+                m.{data_source_definition.submission_date_column or "submission_date"} AS analysis_basis
+                {{% elsif aggregate_metrics_by._parameter_value == 'week'  %}}
+                (FORMAT_DATE(
+                    '%F',
+                    DATE_TRUNC(m.{data_source_definition.submission_date_column or "submission_date"},
+                    WEEK(MONDAY)))
+                ) AS analysis_basis
+                {{% elsif aggregate_metrics_by._parameter_value == 'month'  %}}
+                (FORMAT_DATE(
+                    '%Y-%m',
+                    m.{data_source_definition.submission_date_column or "submission_date"})
+                ) AS analysis_basis
+                {{% elsif aggregate_metrics_by._parameter_value == 'quarter'  %}}
+                (FORMAT_DATE(
+                    '%Y-%m',
+                    DATE_TRUNC(m.{data_source_definition.submission_date_column or "submission_date"},
+                    QUARTER))
+                ) AS analysis_basis
+                {{% elsif aggregate_metrics_by._parameter_value == 'year'  %}}
+                (EXTRACT(
+                    YEAR FROM m.{data_source_definition.submission_date_column or "submission_date"})
+                ) AS analysis_basis
+                {{% else %}}
+                NULL as analysis_basis
+                {{% endif %}}
+            FROM
                 {
                     MetricsConfigLoader.configs.get_data_source_sql(
                         data_source_name,
                         self.namespace
                     ).format(dataset=self.namespace)
                 }
-              WHERE {data_source_definition.submission_date_column} BETWEEN
-                SAFE_CAST({{% date_start {base_view_name}.submission_date %}} AS DATE) AND
-                SAFE_CAST({{% date_end {base_view_name}.submission_date %}} AS DATE)
-              GROUP BY
+            AS m
+            {join_base_view}
+            {'AND' if join_base_view else 'WHERE'} m.submission_date BETWEEN
+                SAFE_CAST(
+                    {{% date_start {data_source_definition.submission_date_column or "submission_date"} %}} AS DATE
+                ) AND
+                SAFE_CAST(
+                    {{% date_end {data_source_definition.submission_date_column or "submission_date"} %}} AS DATE
+                )
+            GROUP BY
+                {"".join(base_view_fields)}
                 client_id,
-                submission_date
+                analysis_basis
             """
         }
+
         view_defn["dimensions"] = self.get_dimensions()
         view_defn["dimension_groups"] = self.get_dimension_groups()
-        view_defn["measures"] = []
+
+        if base_view_lkml:
+            for dimension in base_view_lkml["views"][0]["dimensions"]:
+                if dimension["name"] not in ignore_base_fields:
+                    dimension["group_label"] = "Base Fields"
+                    view_defn["dimensions"].append(dimension)
+
+            for dimension_group in base_view_lkml["views"][0]["dimension_groups"]:
+                if dimension_group["name"] not in ignore_base_fields:
+                    dimension_group["group_label"] = "Base Fields"
+                    view_defn["dimension_groups"].append(dimension_group)
+
+        view_defn["measures"] = self.get_measures(
+            view_defn["dimensions"],
+        )
         view_defn["sets"] = self._get_sets()
+        view_defn["parameters"] = self._get_parameters()
 
         return {"views": [view_defn]}
 
@@ -107,37 +207,20 @@ class MetricDefinitionsView(View):
         metric_definitions = namespace_definitions.metrics.definitions
         data_source_name = re.sub("^metric_definitions_", "", self.name)
 
-        # Each view has a client_id dimension.
-        # For every metric definition view, except the base view, this dimension won't be exposed.
-        # So the following logic only gets run for the base view.
-        # The client_id column can be overridden in metric-hub, or when joining metric definition
-        # view some client_ids might not be available in the base view, but in the view that gets joined.
-        # This would result in the selected client_id being set to null (since we always select the client_id)
-        # from the base view.
-        # The following logic selects the first available client_id from any view that is part of the join.
-        joined_client_id_columns = "SAFE_CAST(${TABLE}.client_id AS STRING)"
-        for data_source in MetricsConfigLoader.data_sources_of_namespace(
-            self.namespace
-        ):
-            # for any view that is part of the current query, use the first available client_id
-            joined_client_id_columns += f"""
-                {{%- if  metric_definitions_{data_source}._in_query %}}
-                , SAFE_CAST(metric_definitions_{data_source}.client_id AS STRING)
-                {{%- endif -%}}
-            """
-
         return [
             {
                 "name": "client_id",
                 "type": "string",
-                "sql": f"COALESCE({joined_client_id_columns})",
+                "sql": "SAFE_CAST(${TABLE}.client_id AS STRING)",
                 "label": "Client ID",
                 "primary_key": "yes",
+                "group_label": "Base Fields",
                 "description": "Unique client identifier",
             },
         ] + [  # add a dimension for each metric definition
             {
                 "name": metric_slug,
+                "group_label": "Metrics",
                 "label": metric.friendly_name
                 or lookml_utils.slug_to_title(metric_slug),
                 "description": metric.description or "",
@@ -145,29 +228,19 @@ class MetricDefinitionsView(View):
                 "sql": "${TABLE}." + metric_slug,
             }
             for metric_slug, metric in metric_definitions.items()
-            if metric.select_expression and metric.data_source.name == data_source_name
+            if metric.select_expression
+            and metric.data_source.name == data_source_name
+            and metric.type != "histogram"
         ]
 
     def get_dimension_groups(self) -> List[Dict[str, Any]]:
         """Get dimension groups for this view."""
-        # Similar to client_id (see above). When joining the views the base view submission_date
-        # can be NULL. Use the first submission_date available instead.
-        joined_submission_date_columns = "CAST(${TABLE}.submission_date AS TIMESTAMP)"
-        for data_source in MetricsConfigLoader.data_sources_of_namespace(
-            self.namespace
-        ):
-            # for any view that is part of the current query, use the first available submission_date
-            joined_submission_date_columns += f"""
-                {{%- if  metric_definitions_{data_source}._in_query %}}
-                , CAST(metric_definitions_{data_source}.submission_date AS TIMESTAMP)
-                {{%- endif -%}}
-            """
-
         return [
             {
                 "name": "submission",
                 "type": "time",
-                "sql": f"COALESCE({joined_submission_date_columns})",
+                "group_label": "Base Fields",
+                "sql": "CAST(${TABLE}.analysis_basis AS TIMESTAMP)",
                 "label": "Submission",
                 "timeframes": [
                     "raw",
@@ -184,6 +257,7 @@ class MetricDefinitionsView(View):
         """Generate metric sets."""
         # group all the metric dimensions into a set
         dimensions = self.get_dimensions()
+        measures = self.get_measures(dimensions)
 
         return [
             {
@@ -192,6 +266,63 @@ class MetricDefinitionsView(View):
                     dimension["name"]
                     for dimension in dimensions
                     if dimension["name"] != "client_id"
+                ]
+                + [measure["name"] for measure in measures],
+            }
+        ]
+
+    def _get_parameters(self):
+        return [
+            {
+                "name": "aggregate_metrics_by",
+                "label": "Aggregate Client Metrics Per",
+                "type": "unquoted",
+                "default_value": "day",
+                "allowed_values": [
+                    {"label": "Per Day", "value": "day"},
+                    {"label": "Per Week", "value": "week"},
+                    {"label": "Per Month", "value": "month"},
+                    {"label": "Per Quarter", "value": "quarter"},
+                    {"label": "Per Year", "value": "year"},
+                    {"label": "Overall", "value": "overall"},
                 ],
             }
         ]
+
+    def get_measures(
+        self, dimensions: List[dict]
+    ) -> List[Dict[str, Union[str, List[Dict[str, str]]]]]:
+        """Get statistics as measures."""
+        measures = []
+        for dimension in dimensions:
+            metric = MetricsConfigLoader.configs.get_metric_definition(
+                dimension["name"], self.namespace
+            )
+            if metric and metric.statistics:
+                for statistic_slug, _ in metric.statistics.items():
+                    if statistic_slug == "sum":
+                        measures.append(
+                            {
+                                "name": f"{dimension['name']}_{statistic_slug}",
+                                "type": "sum",
+                                "sql": "${TABLE}." + dimension["name"],
+                                "label": f"{dimension['label']} Sum",
+                                "group_label": "Statistics",
+                                "description": f"Sum of {dimension['label']}",
+                            }
+                        )
+                    elif statistic_slug == "client_count":
+                        measures.append(
+                            {
+                                "name": f"{dimension['name']}_{statistic_slug}",
+                                "type": "count_distinct",
+                                "label": f"{dimension['label']} Client Count",
+                                "group_label": "Statistics",
+                                "sql": "IF(SAFE_CAST(${TABLE}."
+                                + f"{dimension['name']} AS BOOL), "
+                                + "${TABLE}.client_id, SAFE_CAST(NULL AS STRING))",
+                                "description": f"Number of clients with {dimension['label']}",
+                            }
+                        )
+
+        return measures

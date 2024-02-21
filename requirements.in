@@ -10,8 +10,8 @@ mozilla-metric-config-parser==2023.11.1
 mozilla-nimbus-schemas==2023.10.23
 mozilla-schema-generator==0.5.1
 pandas==2.2.0
-pip-tools==7.3.0
-pre-commit==3.6.0
+pip-tools==7.4.0
+pre-commit==3.6.2
 pyarrow==15.0.0
 pytest-black==0.3.12
 pytest-flake8==1.1.1
@@ -22,5 +22,5 @@ pytest==7.4.4
 PyYAML==6.0.1
 tomli==2.0.1  # for toml parsing on python<3.11
 types-PyYaml==6.0.12.12
-yamllint==1.34.0
-gitpython==3.1.41
+yamllint==1.35.1
+gitpython==3.1.42
