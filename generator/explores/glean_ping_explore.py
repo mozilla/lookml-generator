@@ -1,4 +1,5 @@
 """Glean Ping explore type."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -42,16 +43,42 @@ class GleanPingExplore(PingExplore):
                 continue
             view_name = view["name"]
             metric = "__".join(view["name"].split("__")[1:])
-            joins.append(
-                {
-                    "name": view_name,
-                    "relationship": "one_to_many",
-                    "sql": (
-                        f"LEFT JOIN UNNEST(${{{base_name}.{metric}}}) AS {view_name} "
-                        f"ON ${{{base_name}.document_id}} = ${{{view_name}.document_id}}"
-                    ),
-                }
-            )
+
+            if "labeled_counter" in metric:
+                joins.append(
+                    {
+                        "name": view_name,
+                        "relationship": "one_to_many",
+                        "sql": (
+                            f"LEFT JOIN UNNEST(${{{base_name}.{metric}}}) AS {view_name} "
+                            f"ON ${{{base_name}.document_id}} = ${{{view_name}.document_id}}"
+                        ),
+                    }
+                )
+            else:
+                if metric.startswith("metrics__"):
+                    continue
+
+                try:
+                    # get repeated, nested fields that exist as separate views in lookml
+                    base_name, metric = self._get_base_name_and_metric(
+                        view_name=view_name,
+                        views=[v["name"] for v in views_lookml["views"]],
+                    )
+                    metric_name = view_name
+
+                    joins.append(
+                        {
+                            "name": view_name,
+                            "relationship": "one_to_many",
+                            "sql": (
+                                f"LEFT JOIN UNNEST(${{{base_name}.{metric}}}) AS {metric_name} "
+                            ),
+                        }
+                    )
+                except Exception:
+                    # ignore nested views that cannot be joined on to the base view
+                    continue
 
         base_explore = {
             "name": self.name,

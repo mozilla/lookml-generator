@@ -1612,6 +1612,27 @@ def test_lookml_actual_metric_definitions_view(
                     ],
                     "name": "suggest__metrics__metrics__labeled_counter__test_labeled_counter_not_in_source",
                 },
+                {
+                    "dimensions": [
+                        {"name": "key", "sql": "${TABLE}.key", "type": "string"},
+                        {"name": "value", "sql": "${TABLE}.value", "type": "number"},
+                    ],
+                    "name": "metrics__metrics__custom_distribution__test_custom_distribution__values",
+                },
+                {
+                    "dimensions": [
+                        {"name": "key", "sql": "${TABLE}.key", "type": "string"},
+                        {"name": "value", "sql": "${TABLE}.value", "type": "number"},
+                    ],
+                    "name": "metrics__metrics__memory_distribution__test_memory_distribution__values",
+                },
+                {
+                    "dimensions": [
+                        {"name": "key", "sql": "${TABLE}.key", "type": "string"},
+                        {"name": "value", "sql": "${TABLE}.value", "type": "number"},
+                    ],
+                    "name": "metrics__metrics__timing_distribution__test_timing_distribution__values",
+                },
             ]
         }
         print_and_test(
