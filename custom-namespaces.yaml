@@ -1008,10 +1008,6 @@ monitoring:
     - wichan@mozilla.com
   pretty_name: Monitoring (Data Pipeline)
   views:
-    average_ping_sizes:
-      type: ping_view
-      tables:
-        - table: mozdata.monitoring.average_ping_sizes
     bigquery_tables_inventory:
       tables:
         - table: moz-fx-data-shared-prod.monitoring.bigquery_tables_inventory
