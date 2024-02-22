@@ -1040,10 +1040,6 @@ monitoring:
       type: ping_view
       tables:
         - table: mozdata.monitoring.schema_error_counts
-    stable_table_sizes:
-      type: ping_view
-      tables:
-        - table: mozdata.monitoring.stable_table_sizes
     stable_and_derived_table_sizes:
       type: ping_view
       tables:
