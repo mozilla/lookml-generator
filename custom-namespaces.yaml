@@ -1134,10 +1134,6 @@ monitoring:
       tables:
         - table: moz-fx-data-shared-prod.monitoring_derived.event_error_monitoring_aggregates_v1
   explores:
-    average_ping_sizes:
-      type: ping_explore
-      views:
-        base_view: average_ping_sizes
     column_size:
       type: ping_explore
       views:
@@ -1150,10 +1146,6 @@ monitoring:
       type: ping_explore
       views:
         base_view: schema_error_counts
-    stable_table_sizes:
-      type: ping_explore
-      views:
-        base_view: stable_table_sizes
     stable_and_dervied_table_sizes:
       type: ping_explore
       views:
