@@ -660,9 +660,7 @@ ads:
 firefox_ios:
   pretty_name: Firefox iOS
   owners:
-    - athomas@mozilla.com
     - darcese@mozilla.com
-    - kik@mozilla.com
     - rbaffourawuah@mozilla.com
     - vsabino@mozilla.com
   views:
@@ -709,7 +707,6 @@ fenix:
     - vzare@mozilla.com
     - ksiegler@mozilla.com
     - rbaffourawuah@mozilla.com
-    - kik@mozilla.com
     - vsabino@mozilla.com
   views:
     android_store_performance:
