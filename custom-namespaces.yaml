@@ -1349,6 +1349,14 @@ websites:
       type: table_view
       tables:
         - table: moz-fx-data-marketing-prod.ga_derived.firefox_whatsnew_summary_v2
+    google_search_impressions_by_page:
+      type: table_view
+      tables:
+        - table: moz-fx-data-marketing-prod.google_search_console.search_impressions_by_page
+    google_search_impressions_by_site:
+      type: table_view
+      tables:
+        - table: moz-fx-data-marketing-prod.google_search_console.search_impressions_by_site
 marketing:
   glean_app: false
   pretty_name: Marketing
