@@ -91,7 +91,7 @@ class MetricDefinitionsView(View):
         base_view_fields = []
         base_view_lkml = None
         join_base_view = ""
-        if len(self.tables) > 0:
+        if len(self.tables) > 0 and data_source_definition.client_id_column != "NULL":
             base_table = self.tables[0]["table"]
             base_view = TableView(
                 self.namespace,
@@ -106,26 +106,37 @@ class MetricDefinitionsView(View):
                 if d["name"] not in ignore_base_fields
             ]
 
+            client_id_join = (
+                ""
+                if data_source_definition.client_id_column == " NULL"
+                else f' AND base.client_id = m.{data_source_definition.client_id_column or "client_id"}'
+            )
             join_base_view = f"""
             INNER JOIN {base_table} base
             ON
-                base.submission_date = m.{data_source_definition.submission_date_column or "submission_date"} AND
-                base.client_id = m.{data_source_definition.client_id_column or "client_id"}
+                base.submission_date = m.{data_source_definition.submission_date_column or "submission_date"}
+                {client_id_join}
             WHERE base.submission_date BETWEEN
                 SAFE_CAST(
                     {{% date_start {data_source_definition.submission_date_column or "submission_date"} %}} AS DATE
                 ) AND
                 SAFE_CAST(
                     {{% date_end {data_source_definition.submission_date_column or "submission_date"} %}} AS DATE
-                )
+                ) AND
+                base.sample_id < {{% parameter sampling %}}
             """
 
+        client_id_field = (
+            "NULL"
+            if data_source_definition.client_id_column == "NULL"
+            else f'm.{data_source_definition.client_id_column or "client_id"}'
+        )
         view_defn["derived_table"] = {
             "sql": f"""
             SELECT
                 {"".join(metric_definitions)}
                 {"base.".join(base_view_fields)}
-                m.{data_source_definition.client_id_column or "client_id"} AS client_id,
+                {client_id_field} AS client_id,
                 {{% if aggregate_metrics_by._parameter_value == 'day' %}}
                 m.{data_source_definition.submission_date_column or "submission_date"} AS analysis_basis
                 {{% elsif aggregate_metrics_by._parameter_value == 'week'  %}}
@@ -193,7 +204,7 @@ class MetricDefinitionsView(View):
             view_defn["dimensions"],
         )
         view_defn["sets"] = self._get_sets()
-        view_defn["parameters"] = self._get_parameters()
+        view_defn["parameters"] = self._get_parameters(view_defn["dimensions"])
 
         return {"views": [view_defn]}
 
@@ -271,7 +282,14 @@ class MetricDefinitionsView(View):
             }
         ]
 
-    def _get_parameters(self):
+    def _get_parameters(self, dimensions: List[dict]):
+        hide_sampling = "yes"
+
+        for dim in dimensions:
+            if dim["name"] == "sample_id":
+                hide_sampling = "no"
+                break
+
         return [
             {
                 "name": "aggregate_metrics_by",
@@ -286,7 +304,14 @@ class MetricDefinitionsView(View):
                     {"label": "Per Year", "value": "year"},
                     {"label": "Overall", "value": "overall"},
                 ],
-            }
+            },
+            {
+                "name": "sampling",
+                "label": "Sample of source data in %",
+                "type": "unquoted",
+                "default_value": "100",
+                "hidden": hide_sampling,
+            },
         ]
 
     def get_measures(
@@ -294,18 +319,41 @@ class MetricDefinitionsView(View):
     ) -> List[Dict[str, Union[str, List[Dict[str, str]]]]]:
         """Get statistics as measures."""
         measures = []
+        sampling = "1"
+
+        for dim in dimensions:
+            if dim["name"] == "sample_id":
+                sampling = "100 / {% parameter sampling %}"
+                break
+
         for dimension in dimensions:
             metric = MetricsConfigLoader.configs.get_metric_definition(
                 dimension["name"], self.namespace
             )
             if metric and metric.statistics:
-                for statistic_slug, _ in metric.statistics.items():
-                    if statistic_slug == "sum":
+                for statistic_slug, statistic_conf in metric.statistics.items():
+                    if statistic_slug in [
+                        "average",
+                        "max",
+                        "min",
+                        "median",
+                    ]:
+                        measures.append(
+                            {
+                                "name": f"{dimension['name']}_{statistic_slug}",
+                                "type": statistic_slug,
+                                "sql": "${TABLE}." + dimension["name"],
+                                "label": f"{dimension['label']} {statistic_slug.title()}",
+                                "group_label": "Statistics",
+                                "description": f"{statistic_slug.title()} of {dimension['label']}",
+                            }
+                        )
+                    elif statistic_slug == "sum":
                         measures.append(
                             {
                                 "name": f"{dimension['name']}_{statistic_slug}",
                                 "type": "sum",
-                                "sql": "${TABLE}." + dimension["name"],
+                                "sql": "${TABLE}." + dimension["name"] + "*" + sampling,
                                 "label": f"{dimension['label']} Sum",
                                 "group_label": "Statistics",
                                 "description": f"Sum of {dimension['label']}",
@@ -314,7 +362,9 @@ class MetricDefinitionsView(View):
                     elif statistic_slug == "client_count":
                         measures.append(
                             {
-                                "name": f"{dimension['name']}_{statistic_slug}",
+                                "name": f"{dimension['name']}_{statistic_slug}_sampled"
+                                if sampling
+                                else f"{dimension['name']}_{statistic_slug}",
                                 "type": "count_distinct",
                                 "label": f"{dimension['label']} Client Count",
                                 "group_label": "Statistics",
@@ -322,7 +372,91 @@ class MetricDefinitionsView(View):
                                 + f"{dimension['name']} AS BOOL), "
                                 + "${TABLE}.client_id, SAFE_CAST(NULL AS STRING))",
                                 "description": f"Number of clients with {dimension['label']}",
+                                "hidden": "yes" if sampling else "no",
                             }
                         )
+
+                        if sampling:
+                            measures.append(
+                                {
+                                    "name": f"{dimension['name']}_{statistic_slug}",
+                                    "type": "number",
+                                    "label": f"{dimension['label']} Client Count",
+                                    "group_label": "Statistics",
+                                    "sql": "${"
+                                    + f"{dimension['name']}_{statistic_slug}_sampled"
+                                    + "} *"
+                                    + sampling,
+                                    "description": f"Number of clients with {dimension['label']}",
+                                }
+                            )
+                    elif statistic_slug == "dau_proportion":
+                        if "numerator" in statistic_conf:
+                            [numerator, numerator_stat] = statistic_conf[
+                                "numerator"
+                            ].split(".")
+                            measures.append(
+                                {
+                                    "name": "DAU_sampled" if sampling else "DAU",
+                                    "type": "count_distinct",
+                                    "label": "DAU",
+                                    "group_label": "Statistics",
+                                    "sql": "${TABLE}.client_id",
+                                    "hidden": "yes",
+                                }
+                            )
+
+                            if sampling:
+                                measures.append(
+                                    {
+                                        "name": "DAU",
+                                        "type": "number",
+                                        "label": "DAU",
+                                        "group_label": "Statistics",
+                                        "sql": "${DAU_sampled} *" + sampling,
+                                        "hidden": "yes",
+                                    }
+                                )
+
+                            measures.append(
+                                {
+                                    "name": f"{dimension['name']}_{statistic_slug}",
+                                    "type": "number",
+                                    "label": f"{dimension['label']} DAU Proportion",
+                                    "sql": "SAFE_DIVIDE(${"
+                                    + f"{numerator}_{numerator_stat}"
+                                    + "}, ${DAU})",
+                                    "group_label": "Statistics",
+                                    "description": f"Proportion of daily active users with {dimension['name']}",
+                                }
+                            )
+                    elif statistic_slug == "ratio":
+                        if (
+                            "numerator" in statistic_conf
+                            and "denominator" in statistic_conf
+                        ):
+                            [numerator, numerator_stat] = statistic_conf[
+                                "numerator"
+                            ].split(".")
+                            [denominator, denominator_stat] = statistic_conf[
+                                "denominator"
+                            ].split(".")
+
+                            measures.append(
+                                {
+                                    "name": f"{dimension['name']}_{statistic_slug}",
+                                    "type": "number",
+                                    "label": f"{dimension['label']} Ratio",
+                                    "sql": "SAFE_DIVIDE(${"
+                                    + f"{numerator}_{numerator_stat}"
+                                    + "}, ${"
+                                    + f"{denominator}_{denominator_stat}"
+                                    + "})",
+                                    "group_label": "Statistics",
+                                    "description": f""""
+                                        Ratio between {statistic_conf['numerator']} and
+                                        {statistic_conf['denominator']}""",
+                                }
+                            )
 
         return measures
