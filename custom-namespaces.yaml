@@ -678,6 +678,10 @@ firefox_ios:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.firefox_ios.feature_usage_events
+    clients_activation:
+      type: table_view
+      tables:
+        - table: mozdata.firefox_ios.clients_activation
   explores:
     feature_usage_metrics:
       type: table_explore
@@ -687,6 +691,10 @@ firefox_ios:
       type: table_explore
       views:
         base_view: feature_usage_events
+    clients_activation:
+      type: table_explore
+      views:
+        base_view: clients_activation
 fenix:
   pretty_name: Firefox Android
   owners:
