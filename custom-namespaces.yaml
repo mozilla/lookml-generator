@@ -661,6 +661,7 @@ firefox_ios:
   pretty_name: Firefox iOS
   owners:
     - darcese@mozilla.com
+    - kignasiak@mozilla.com
     - rbaffourawuah@mozilla.com
     - vsabino@mozilla.com
   views:
