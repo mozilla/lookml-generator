@@ -990,6 +990,10 @@ firefox_desktop:
       type: ping_explore
       views:
         base_view: default_browser
+    urlbar_events_daily:
+      type: table_explore
+      views:
+        base_view: urlbar_events_daily_table
 pocket:
   glean_app: false
   owners:
