@@ -128,13 +128,11 @@ jobs:
           command: gh-pages --message "[skip ci] updates" --dist /tmp/_html
 
   build-container:
-    docker:
-      - image: docker:20.10.14
+    executor: docker/docker
     working_directory: ~/mozilla/lookml-generator
     steps:
       - checkout
-      - setup_remote_docker:
-          version: 20.10.14
+      - setup_remote_docker
       - run: docker build -t app:build .
 
 workflows:
