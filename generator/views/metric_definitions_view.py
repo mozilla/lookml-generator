@@ -89,6 +89,7 @@ class MetricDefinitionsView(View):
             and metric.type != "histogram"
         ]
         base_view_fields = []
+        base_view_fields_aliased = []
         base_view_lkml = None
         join_base_view = ""
         if len(self.tables) > 0 and data_source_definition.client_id_column != "NULL":
@@ -100,30 +101,49 @@ class MetricDefinitionsView(View):
             )
             base_view_lkml = base_view.to_lookml(bq_client=bq_client, v1_name=None)
 
+            base_view_fields_aliased = [
+                f"base_{d['name']} AS {d['name']},\n"
+                for d in base_view_lkml["views"][0]["dimensions"]
+                if d["name"] not in ignore_base_fields and "hidden" not in d
+            ]
+
             base_view_fields = [
                 f"{d['name']},\n"
                 for d in base_view_lkml["views"][0]["dimensions"]
-                if d["name"] not in ignore_base_fields
+                if d["name"] not in ignore_base_fields and "hidden" not in d
+            ]
+
+            selected_fields = [
+                f"{d['name'].replace('__', '.')} AS base_{d['name']},\n"
+                for d in base_view_lkml["views"][0]["dimensions"]
+                if d["name"] not in ignore_base_fields and "hidden" not in d
             ]
 
             client_id_join = (
                 ""
                 if data_source_definition.client_id_column == " NULL"
-                else f' AND base.client_id = m.{data_source_definition.client_id_column or "client_id"}'
+                else f' AND base.base_client_id = m.{data_source_definition.client_id_column or "client_id"}'
             )
             join_base_view = f"""
-            INNER JOIN {base_table} base
+            INNER JOIN (
+                SELECT
+                client_id AS base_client_id,
+                submission_date AS base_submission_date,
+                {"".join(selected_fields)}
+                FROM
+                {base_table}
+            ) base
             ON
-                base.submission_date = m.{data_source_definition.submission_date_column or "submission_date"}
+                base.base_submission_date = m.{data_source_definition.submission_date_column or "submission_date"}
                 {client_id_join}
-            WHERE base.submission_date BETWEEN
+            WHERE base.base_submission_date BETWEEN
                 SAFE_CAST(
                     {{% date_start {data_source_definition.submission_date_column or "submission_date"} %}} AS DATE
                 ) AND
                 SAFE_CAST(
                     {{% date_end {data_source_definition.submission_date_column or "submission_date"} %}} AS DATE
                 ) AND
-                base.sample_id < {{% parameter sampling %}}
+                base.base_sample_id < {{% parameter sampling %}}
             """
 
         client_id_field = (
@@ -135,7 +155,7 @@ class MetricDefinitionsView(View):
             "sql": f"""
             SELECT
                 {"".join(metric_definitions)}
-                {"base.".join(base_view_fields)}
+                {"base.".join(base_view_fields_aliased)}
                 {client_id_field} AS client_id,
                 {{% if aggregate_metrics_by._parameter_value == 'day' %}}
                 m.{data_source_definition.submission_date_column or "submission_date"} AS analysis_basis
@@ -368,8 +388,8 @@ class MetricDefinitionsView(View):
                                 "type": "count_distinct",
                                 "label": f"{dimension['label']} Client Count",
                                 "group_label": "Statistics",
-                                "sql": "IF(SAFE_CAST(${TABLE}."
-                                + f"{dimension['name']} AS BOOL), "
+                                "sql": "IF(${TABLE}."
+                                + f"{dimension['name']} > 0, "
                                 + "${TABLE}.client_id, SAFE_CAST(NULL AS STRING))",
                                 "description": f"Number of clients with {dimension['label']}",
                                 "hidden": "yes" if sampling else "no",
