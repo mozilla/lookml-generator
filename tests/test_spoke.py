@@ -135,12 +135,13 @@ def test_generate_model(looker_sdk, namespaces, tmp_path):
     expected_dict = {
         "connection": "telemetry",
         "label": "Glean App",
+        "includes": ["//looker-hub/glean-app/explores/*"],
     }
 
     expected_text = """connection: "telemetry"
 label: "Glean App"
 # Include files from looker-hub or spoke-default below. For example:
-# include: "//looker-hub/glean-app/explores/*"
+include: "//looker-hub/glean-app/explores/*"
 # include: "//looker-hub/glean-app/dashboards/*"
 # include: "//looker-hub/glean-app/views/*"
 # include: "views/*"

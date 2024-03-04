@@ -16,7 +16,7 @@ combined_browser_metrics:
     - lvargas@mozilla.com
     - mhirose@mozilla.com
     - anicholson@mozilla.com
-    - kignasiak@mozilla.com
+    - kik@mozilla.com
   pretty_name: Combined Browser Metrics
   views:
     active_users_aggregates:
@@ -660,7 +660,6 @@ ads:
 firefox_ios:
   pretty_name: Firefox iOS
   owners:
-    - athomas@mozilla.com
     - darcese@mozilla.com
     - kik@mozilla.com
     - rbaffourawuah@mozilla.com
@@ -678,6 +677,14 @@ firefox_ios:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.firefox_ios.feature_usage_events
+    clients_activation:
+      type: table_view
+      tables:
+        - table: mozdata.firefox_ios.clients_activation
+    firefox_ios_clients:
+      type: table_view
+      tables:
+        - table: mozdata.firefox_ios.firefox_ios_clients
   explores:
     feature_usage_metrics:
       type: table_explore
@@ -687,14 +694,22 @@ firefox_ios:
       type: table_explore
       views:
         base_view: feature_usage_events
+    clients_activation:
+      type: table_explore
+      views:
+        base_view: clients_activation
+    firefox_ios_clients:
+      type: table_explore
+      views:
+        base_view: firefox_ios_clients
 fenix:
   pretty_name: Firefox Android
   owners:
     - vzare@mozilla.com
     - ksiegler@mozilla.com
     - rbaffourawuah@mozilla.com
-    - kik@mozilla.com
     - vsabino@mozilla.com
+    - kik@mozilla.com
   views:
     android_store_performance:
       type: table_view
@@ -716,6 +731,10 @@ fenix:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.fenix.feature_usage_events
+    firefox_android_clients:
+      type: table_view
+      tables:
+        - table: mozdata.fenix.firefox_android_clients
   explores:
     feature_usage_metrics:
       type: table_explore
@@ -725,6 +744,10 @@ fenix:
       type: table_explore
       views:
         base_view: feature_usage_events
+    firefox_android_clients:
+      type: table_explore
+      views:
+        base_view: firefox_android_clients
 focus_ios:
   owners:
     - loines@mozilla.com
@@ -1004,7 +1027,7 @@ monitoring:
     - akomar@mozilla.com
     - anicholson@mozilla.com
     - mhirose@mozilla.com
-    - kignasiak@mozilla.com
+    - kik@mozilla.com
     - wichan@mozilla.com
   pretty_name: Monitoring (Data Pipeline)
   views:
@@ -1271,7 +1294,7 @@ websites:
   pretty_name: Websites
   spoke: looker-spoke-default
   owners:
-    - kignasiak@mozilla.com
+    - kik@mozilla.com
   views:
     ga4_www_site_downloads:
       type: table_view
@@ -1362,7 +1385,7 @@ marketing:
   pretty_name: Marketing
   spoke: looker-spoke-default
   owners:
-    - kignasiak@mozilla.com
+    - kik@mozilla.com
   views:
     acoustic_contact_change_events:
       type: table_view
