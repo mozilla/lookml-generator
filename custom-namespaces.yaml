@@ -16,7 +16,7 @@ combined_browser_metrics:
     - lvargas@mozilla.com
     - mhirose@mozilla.com
     - anicholson@mozilla.com
-    - kignasiak@mozilla.com
+    - kik@mozilla.com
   pretty_name: Combined Browser Metrics
   views:
     active_users_aggregates:
@@ -661,7 +661,7 @@ firefox_ios:
   pretty_name: Firefox iOS
   owners:
     - darcese@mozilla.com
-    - kignasiak@mozilla.com
+    - kik@mozilla.com
     - rbaffourawuah@mozilla.com
     - vsabino@mozilla.com
   views:
@@ -709,6 +709,7 @@ fenix:
     - ksiegler@mozilla.com
     - rbaffourawuah@mozilla.com
     - vsabino@mozilla.com
+    - kik@mozilla.com
   views:
     android_store_performance:
       type: table_view
@@ -1026,7 +1027,7 @@ monitoring:
     - akomar@mozilla.com
     - anicholson@mozilla.com
     - mhirose@mozilla.com
-    - kignasiak@mozilla.com
+    - kik@mozilla.com
     - wichan@mozilla.com
   pretty_name: Monitoring (Data Pipeline)
   views:
@@ -1293,7 +1294,7 @@ websites:
   pretty_name: Websites
   spoke: looker-spoke-default
   owners:
-    - kignasiak@mozilla.com
+    - kik@mozilla.com
   views:
     ga4_www_site_downloads:
       type: table_view
@@ -1384,7 +1385,7 @@ marketing:
   pretty_name: Marketing
   spoke: looker-spoke-default
   owners:
-    - kignasiak@mozilla.com
+    - kik@mozilla.com
   views:
     acoustic_contact_change_events:
       type: table_view
