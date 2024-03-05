@@ -846,10 +846,6 @@ newtab:
     - cmorales@mozilla.com
     - mbowerman@mozilla.com
   spoke: looker-spoke-private
-awesome_bar:
-  glean_app: false
-  owners:
-    - ascholtz@mozilla.com
 experimentation:
   glean_app: false
   owners:
