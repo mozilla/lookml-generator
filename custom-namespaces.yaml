@@ -618,6 +618,10 @@ revenue:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.fenix_derived.google_ads_campaign_cost_breakdowns_v1
+    search_revenue_levers_monthly:
+      type: table_view
+      tables:
+        - table: mozdata.revenue.search_revenue_levers_monthly
 revenue_private:
   glean_app: false
   connection: bigquery-oauth
