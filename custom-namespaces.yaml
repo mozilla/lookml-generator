@@ -544,6 +544,10 @@ firefox_accounts:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.accounts_db.fxa_oauth_clients
+    monitor_mozilla_accounts_funnels:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.accounts_frontend_derived.monitor_mozilla_accounts_funnels_v1
   explores:
     all_event_counts:
       type: events_explore
@@ -581,6 +585,10 @@ firefox_accounts:
       type: table_explore
       views:
         base_view: accounts_oauth_clients
+    monitor_mozilla_accounts_funnels:
+      type: table_explore
+      views:
+        base_view: monitor_mozilla_accounts_funnels
 revenue:
   glean_app: false
   connection: bigquery-oauth
