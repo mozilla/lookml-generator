@@ -869,6 +869,10 @@ firefox_desktop:
       tables:
         - events_table_view: urlbar_events_table
           base_table: mozdata.firefox_desktop.urlbar_events
+    urlbar_events_daily_table:
+      type: table_view
+      tables:
+        - table: mozdata.firefox_desktop.urlbar_events_daily
     feature_usage_table:
       type: table_view
       tables:
@@ -986,6 +990,10 @@ firefox_desktop:
       type: ping_explore
       views:
         base_view: default_browser
+    urlbar_events_daily:
+      type: table_explore
+      views:
+        base_view: urlbar_events_daily_table
 pocket:
   glean_app: false
   owners:
