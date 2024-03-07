@@ -177,10 +177,6 @@ duet:
       type: table_view
       tables:
         - table: mozdata.firefox_ios.app_store_funnel
-    firefox_android_clients:
-      type: table_view
-      tables:
-        - table: mozdata.fenix.firefox_android_clients
 activity_stream:
   glean_app: false
   owners:
@@ -702,10 +698,6 @@ firefox_ios:
       type: table_explore
       views:
         base_view: clients_activation
-    firefox_ios_clients:
-      type: table_explore
-      views:
-        base_view: firefox_ios_clients
 fenix:
   pretty_name: Firefox Android
   owners:
@@ -748,10 +740,6 @@ fenix:
       type: table_explore
       views:
         base_view: feature_usage_events
-    firefox_android_clients:
-      type: table_explore
-      views:
-        base_view: firefox_android_clients
 focus_ios:
   owners:
     - loines@mozilla.com
