@@ -1307,19 +1307,19 @@ websites:
     ga4_www_site_downloads:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.ga_derived.www_site_downloads_v2
+        - table: moz-fx-data-marketing-prod.ga.www_site_downloads
     ga4_sessions:
       type: table_view
       tables: 
-        - table: moz-fx-data-shared-prod.mozilla_org_derived.ga_sessions_v2
+        - table: moz-fx-data-shared-prod.mozilla_org.ga_sessions_v2
     ga4_www_site_hits:
       type: table_view
       tables: 
-        - table: moz-fx-data-marketing-prod.ga_derived.www_site_hits_v2
+        - table: moz-fx-data-marketing-prod.ga.www_site_hits
     ga4_moz_org_page_metrics:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.ga_derived.www_site_page_metrics_v2
+        - table: moz-fx-data-marketing-prod.ga.www_site_page_metrics
     moz_org_page_metrics:
       type: table_view
       tables:
@@ -1327,7 +1327,7 @@ websites:
     ga4_moz_org_metrics_summary:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.ga_derived.www_site_metrics_summary_v2
+        - table: moz-fx-data-marketing-prod.ga.www_site_metrics_summary
     moz_org_metrics_summary:
       type: table_view
       tables:
@@ -1335,7 +1335,7 @@ websites:
     ga4_moz_org_landing_page_metrics:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.ga_derived.www_site_landing_page_metrics_v2
+        - table: moz-fx-data-marketing-prod.ga.www_site_landing_page_metrics
     moz_org_landing_page_metrics:
       type: table_view
       tables:
@@ -1343,11 +1343,11 @@ websites:
     ga4_blogs_sessions:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.ga_derived.blogs_sessions_v2
+        - table: moz-fx-data-marketing-prod.ga.blogs_sessions
     ga4_blogs_goals:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.ga_derived.blogs_goals_v2
+        - table: moz-fx-data-marketing-prod.ga.blogs_goals
     blogs_daily_summary:
       type: table_view
       tables:
@@ -1355,7 +1355,7 @@ websites:
     ga4_blogs_daily_summary:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.ga_derived.blogs_daily_summary_v2
+        - table: moz-fx-data-marketing-prod.ga.blogs_daily_summary
     blogs_landing_page_summary:
       type: table_view
       tables:
@@ -1363,11 +1363,11 @@ websites:
     ga4_blogs_landing_page_summary:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.ga_derived.blogs_landing_page_summary_v2
+        - table: moz-fx-data-marketing-prod.ga.blogs_landing_page_summary
     ga4_www_site_events_metrics: 
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.ga_derived.www_site_events_metrics_v2
+        - table: moz-fx-data-marketing-prod.ga.www_site_events_metrics
     www_site_events_metrics:
       type: table_view
       tables:
@@ -1379,7 +1379,7 @@ websites:
     ga4_firefox_whatsnew_summary:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.ga_derived.firefox_whatsnew_summary_v2
+        - table: moz-fx-data-marketing-prod.ga.firefox_whatsnew_summary
     google_search_impressions_by_page:
       type: table_view
       tables:
