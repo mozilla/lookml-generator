@@ -436,6 +436,11 @@ mozilla_vpn:
       tables:
         - channel: release
           table: mozdata.mozilla_vpn.site_metrics_summary
+    ga4_site_metrics_summary:
+      type: table_view
+      tables:
+        - channel: release
+          table: mozdata.mozilla_vpn.site_metrics_summary_v2
     subscriptions:
       type: table_view
       tables:
@@ -1398,15 +1403,15 @@ marketing:
     acoustic_contact_change_events:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.acoustic.contact_v1
+        - table: mozdata.acoustic.contact
     acoustic_contact_current_snapshot:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.acoustic.contact_current_snapshot_v1
+        - table: mozdata.acoustic.contact_current_snapshot
     acoustic_email_events:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.acoustic.raw_recipient_v1
+        - table: mozdata.acoustic.raw_recipient
     firefox_for_families_forecasted_expectations:
       type: table_view
       tables:
