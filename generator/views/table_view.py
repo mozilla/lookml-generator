@@ -1,4 +1,5 @@
 """Class to describe a Table View."""
+
 from __future__ import annotations
 
 from collections import defaultdict

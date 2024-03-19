@@ -105,17 +105,29 @@ class MetricDefinitionsView(View):
                 f"base_{d['name']} AS {d['name']},\n"
                 for d in base_view_lkml["views"][0]["dimensions"]
                 if d["name"] not in ignore_base_fields and "hidden" not in d
+            ] + [
+                f"base_{d['sql'].replace('${TABLE}.', '')} AS {d['sql'].replace('${TABLE}.', '')},\n"
+                for d in base_view_lkml["views"][0]["dimension_groups"]
+                if d["name"] not in ignore_base_fields and "hidden" not in d
             ]
 
             base_view_fields = [
                 f"{d['name']},\n"
                 for d in base_view_lkml["views"][0]["dimensions"]
                 if d["name"] not in ignore_base_fields and "hidden" not in d
+            ] + [
+                f"{d['sql'].replace('${TABLE}.', '')},\n"
+                for d in base_view_lkml["views"][0]["dimension_groups"]
+                if d["name"] not in ignore_base_fields and "hidden" not in d
             ]
 
             selected_fields = [
                 f"{d['name'].replace('__', '.')} AS base_{d['name']},\n"
                 for d in base_view_lkml["views"][0]["dimensions"]
+                if d["name"] not in ignore_base_fields and "hidden" not in d
+            ] + [
+                f"{d['sql'].replace('${TABLE}.', '').replace('__', '.')} AS base_{d['sql'].replace('${TABLE}.', '')},\n"
+                for d in base_view_lkml["views"][0]["dimension_groups"]
                 if d["name"] not in ignore_base_fields and "hidden" not in d
             ]
 
@@ -132,17 +144,30 @@ class MetricDefinitionsView(View):
                 {"".join(selected_fields)}
                 FROM
                 {base_table}
+                WHERE
+                submission_date BETWEEN
+                COALESCE(
+                    SAFE_CAST(
+                    {{% date_start {data_source_definition.submission_date_column or "submission_date"} %}} AS DATE),
+                CURRENT_DATE()) AND
+                COALESCE(
+                    SAFE_CAST(
+                        {{% date_end {data_source_definition.submission_date_column or "submission_date"} %}} AS DATE
+                ), CURRENT_DATE())
             ) base
             ON
                 base.base_submission_date = m.{data_source_definition.submission_date_column or "submission_date"}
                 {client_id_join}
             WHERE base.base_submission_date BETWEEN
+            COALESCE(
                 SAFE_CAST(
                     {{% date_start {data_source_definition.submission_date_column or "submission_date"} %}} AS DATE
-                ) AND
+            ), CURRENT_DATE()) AND
+            COALESCE(
                 SAFE_CAST(
                     {{% date_end {data_source_definition.submission_date_column or "submission_date"} %}} AS DATE
-                ) AND
+                ), CURRENT_DATE())
+            AND
                 base.base_sample_id < {{% parameter sampling %}}
             """
 
@@ -192,13 +217,17 @@ class MetricDefinitionsView(View):
                 }
             AS m
             {join_base_view}
-            {'AND' if join_base_view else 'WHERE'} m.submission_date BETWEEN
+            {'AND' if join_base_view else 'WHERE'}
+            m.{data_source_definition.submission_date_column or "submission_date"}
+            BETWEEN
+            COALESCE(
                 SAFE_CAST(
                     {{% date_start {data_source_definition.submission_date_column or "submission_date"} %}} AS DATE
-                ) AND
+                ), CURRENT_DATE()) AND
+            COALESCE(
                 SAFE_CAST(
                     {{% date_end {data_source_definition.submission_date_column or "submission_date"} %}} AS DATE
-                )
+                ), CURRENT_DATE())
             GROUP BY
                 {"".join(base_view_fields)}
                 client_id,
@@ -382,9 +411,11 @@ class MetricDefinitionsView(View):
                     elif statistic_slug == "client_count":
                         measures.append(
                             {
-                                "name": f"{dimension['name']}_{statistic_slug}_sampled"
-                                if sampling
-                                else f"{dimension['name']}_{statistic_slug}",
+                                "name": (
+                                    f"{dimension['name']}_{statistic_slug}_sampled"
+                                    if sampling
+                                    else f"{dimension['name']}_{statistic_slug}"
+                                ),
                                 "type": "count_distinct",
                                 "label": f"{dimension['label']} Client Count",
                                 "group_label": "Statistics",

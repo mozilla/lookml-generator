@@ -1,4 +1,5 @@
 """Generate namespaces.yaml."""
+
 import fnmatch
 import json
 import re
@@ -241,12 +242,16 @@ def _get_glean_apps(
         channels = [
             {
                 "channel": channel.get("app_channel"),
-                "dataset": channel.get("app_name").replace("-", "_")
-                if channel.get("app_channel") == "release"
-                else channel.get("bq_dataset_family"),
-                "source_dataset": channel.get("bq_dataset_family")
-                if channel.get("app_channel") == "release"
-                else channel.get("bq_dataset_family") + "_stable",
+                "dataset": (
+                    channel.get("app_name").replace("-", "_")
+                    if channel.get("app_channel") == "release"
+                    else channel.get("bq_dataset_family")
+                ),
+                "source_dataset": (
+                    channel.get("bq_dataset_family")
+                    if channel.get("app_channel") == "release"
+                    else channel.get("bq_dataset_family") + "_stable"
+                ),
             }
             for channel in variants
             if not channel.get("deprecated")

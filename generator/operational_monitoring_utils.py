@@ -1,4 +1,5 @@
 """Utils for operational monitoring."""
+
 from multiprocessing.pool import ThreadPool
 from typing import Any, Dict, List, Optional, Tuple
 

@@ -1,6 +1,5 @@
 """Run lookml_generator cli."""
 
-
 from . import cli
 
 

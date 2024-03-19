@@ -19,6 +19,7 @@ That lets us find out whether the user completed those funnel steps:
 The `funnel_analysis` view has some nice dimensions to hide these details from the end user,
 e.g. `completed_funnel_step_N`. We can then count those users across dimensions.
 """
+
 from __future__ import annotations
 
 from textwrap import dedent

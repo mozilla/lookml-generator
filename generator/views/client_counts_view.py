@@ -1,4 +1,5 @@
 """Class to describe a Client Counts View."""
+
 from __future__ import annotations
 
 from copy import deepcopy

@@ -1,4 +1,5 @@
 """Class to describe a Ping View."""
+
 from __future__ import annotations
 
 from collections import defaultdict
