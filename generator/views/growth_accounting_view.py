@@ -1,4 +1,5 @@
 """Class to describe a Growth Accounting View."""
+
 from __future__ import annotations
 
 from copy import deepcopy

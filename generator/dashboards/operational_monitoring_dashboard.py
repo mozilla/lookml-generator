@@ -1,4 +1,5 @@
 """Class to describe Operational Monitoring Dashboard."""
+
 from __future__ import annotations
 
 from typing import Any, Dict, List
@@ -129,10 +130,13 @@ class OperationalMonitoringDashboard(Dashboard):
                             kwargs["elements"].append(
                                 {
                                     "title": title,
-                                    "metric": summary["metric"]
-                                    if metric_group is None
-                                    else ", ".join(
-                                        f'"{m}"' for m in metric_groups[metric_group]
+                                    "metric": (
+                                        summary["metric"]
+                                        if metric_group is None
+                                        else ", ".join(
+                                            f'"{m}"'
+                                            for m in metric_groups[metric_group]
+                                        )
                                     ),
                                     "statistic": summary["statistic"],
                                     "explore": explore,
@@ -153,10 +157,13 @@ class OperationalMonitoringDashboard(Dashboard):
                             kwargs["elements"].append(
                                 {
                                     "title": f"{title} - By {self.group_by_dimension}",
-                                    "metric": summary["metric"]
-                                    if metric_group is None
-                                    else ", ".join(
-                                        f'"{m}"' for m in metric_groups[metric_group]
+                                    "metric": (
+                                        summary["metric"]
+                                        if metric_group is None
+                                        else ", ".join(
+                                            f'"{m}"'
+                                            for m in metric_groups[metric_group]
+                                        )
                                     ),
                                     "statistic": summary["statistic"],
                                     "explore": explore,

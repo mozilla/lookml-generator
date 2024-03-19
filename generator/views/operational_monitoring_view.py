@@ -1,4 +1,5 @@
 """Class to describe an Operational Monitoring View."""
+
 from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Union

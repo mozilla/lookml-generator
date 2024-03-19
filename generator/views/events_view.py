@@ -1,4 +1,5 @@
 """Class to describe an Events view."""
+
 from __future__ import annotations
 
 from copy import deepcopy

@@ -1,4 +1,5 @@
 """Generic class to describe Looker views."""
+
 from __future__ import annotations
 
 from typing import Any, Dict, Iterator, List, Optional, Set, TypedDict

@@ -3,6 +3,7 @@
 .. include:: ../README.md
 .. include:: ../architecture/namespaces_yaml.md
 """
+
 __docformat__ = "restructuredtext"
 
 import warnings
