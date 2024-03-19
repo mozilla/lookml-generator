@@ -436,6 +436,11 @@ mozilla_vpn:
       tables:
         - channel: release
           table: mozdata.mozilla_vpn.site_metrics_summary
+    ga4_site_metrics_summary:
+      type: table_view
+      tables:
+        - channel: release
+          table: mozdata.mozilla_vpn.site_metrics_summary_v2
     subscriptions:
       type: table_view
       tables:
