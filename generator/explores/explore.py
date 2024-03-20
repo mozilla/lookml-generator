@@ -58,9 +58,9 @@ class Explore:
             if "join" in view_type:
                 continue
             if time_partitioning_group := self.get_view_time_partitioning_group(view):
-                base_lookml[
-                    "sql_always_where"
-                ] = f"${{{base_view_name}.{time_partitioning_group}_date}} >= '2010-01-01'"
+                base_lookml["sql_always_where"] = (
+                    f"${{{base_view_name}.{time_partitioning_group}_date}} >= '2010-01-01'"
+                )
 
         # We only update the first returned explore
         new_lookml = self._to_lookml(client, v1_name)
