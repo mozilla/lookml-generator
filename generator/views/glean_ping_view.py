@@ -101,6 +101,26 @@ class GleanPingView(PingView):
                 view_label = f"{category} - {name}"
                 metric_hidden = "no" if metric.is_in_source() else "yes"
 
+                measures = [
+                    {
+                        "name": "count",
+                        "type": "sum",
+                        "sql": "${value}",
+                        "hidden": metric_hidden,
+                    }
+                ]
+
+                if client_id_field is not None:
+                    # client_id field is missing for pings with minimal Glean schema
+                    measures.append(
+                        {
+                            "name": "client_count",
+                            "type": "count_distinct",
+                            "sql": f"case when ${{value}} > 0 then ${{{self.name}.{client_id_field}}} end",
+                            "hidden": metric_hidden,
+                        }
+                    )
+
                 join_view = {
                     "name": view_name,
                     "label": view_label,
@@ -136,20 +156,7 @@ class GleanPingView(PingView):
                             "hidden": "yes",
                         },
                     ],
-                    "measures": [
-                        {
-                            "name": "count",
-                            "type": "sum",
-                            "sql": "${value}",
-                            "hidden": metric_hidden,
-                        },
-                        {
-                            "name": "client_count",
-                            "type": "count_distinct",
-                            "sql": f"case when ${{value}} > 0 then ${{{self.name}.{client_id_field}}} end",
-                            "hidden": metric_hidden,
-                        },
-                    ],
+                    "measures": measures,
                 }
                 suggest_view = {
                     "name": suggest_name,
@@ -410,14 +417,18 @@ class GleanPingView(PingView):
                         "sql": f"${{{dimension_name}}}",
                         "links": self._get_links(dimension),
                     },
-                    {
-                        "name": f"{name}_client_count",
-                        "type": "count_distinct",
-                        "filters": [{dimension_name: ">0"}],
-                        "sql": f"${{{client_id_field}}}",
-                        "links": self._get_links(dimension),
-                    },
                 ]
+
+                if client_id_field is not None:
+                    measures += [
+                        {
+                            "name": f"{name}_client_count",
+                            "type": "count_distinct",
+                            "filters": [{dimension_name: ">0"}],
+                            "sql": f"${{{client_id_field}}}",
+                            "links": self._get_links(dimension),
+                        },
+                    ]
 
         # check if there are any duplicate values
         names = [measure["name"] for measure in measures]
