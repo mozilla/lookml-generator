@@ -453,9 +453,9 @@ mccabe==0.6.1 \
     --hash=sha256:ab8a6258860da4b6677da4bd2fe5dc2c659cff31b3ee4f7f5d64e79735b80d42 \
     --hash=sha256:dd8d182285a0fe56bace7f45b5e7d1a6ebcbf524e8f3bd87eb0f125271b8831f
     # via flake8
-mozilla-metric-config-parser==2024.3.1 \
-    --hash=sha256:b2a34750531766494b0f5e48baa6a738cfe6b55ea8799135daee8a92d0ae3bc6 \
-    --hash=sha256:ecaf44bf891aff9e4ec11a8aab2e39d965ed76bbad91920f5833e2982840bfbc
+mozilla-metric-config-parser==2024.3.2 \
+    --hash=sha256:0fc04476709ec10288ddfa389a9dbfea2ec768c7258a6d2772a1fa946dceed88 \
+    --hash=sha256:db76336a67e8f6f10523b5736cdc94df38abe6dd24ecf21729c26c0a2ec4a89f
     # via -r requirements.in
 mozilla-nimbus-schemas==2023.10.23 \
     --hash=sha256:84ddebf89d99754442676dc379c7eccc76de9adc13cbf8942ead85d8a6cde540 \
