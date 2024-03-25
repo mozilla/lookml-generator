@@ -670,6 +670,10 @@ ads:
       type: table_view
       tables:
         - table: mozdata.ads.consolidated_ad_metrics_hourly
+    tiles_addressable_inventory_hourly:
+      type: table_view
+      tables:
+        - table: mozdata.ads.tiles_addressable_inventory_hourly
 firefox_ios:
   pretty_name: Firefox iOS
   owners:
