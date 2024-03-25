@@ -37,7 +37,7 @@
                     <a class="function" href="#get_xaxis_val">get_xaxis_val</a>
             </li>
             <li>
-                    <a class="function" href="#get_projects">get_projects</a>
+                    <a class="function" href="#get_active_projects">get_active_projects</a>
             </li>
     </ul>
 
@@ -131,7 +131,7 @@
 </span><span id="L-67"><a href="#L-67"><span class="linenos">67</span></a>    <span class="p">)</span>
 </span><span id="L-68"><a href="#L-68"><span class="linenos">68</span></a>
 </span><span id="L-69"><a href="#L-69"><span class="linenos">69</span></a>
-</span><span id="L-70"><a href="#L-70"><span class="linenos">70</span></a><span class="k">def</span> <span class="nf">get_projects</span><span class="p">(</span>
+</span><span id="L-70"><a href="#L-70"><span class="linenos">70</span></a><span class="k">def</span> <span class="nf">get_active_projects</span><span class="p">(</span>
 </span><span id="L-71"><a href="#L-71"><span class="linenos">71</span></a>    <span class="n">bq_client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span> <span class="n">project_table</span><span class="p">:</span> <span class="nb">str</span>
 </span><span id="L-72"><a href="#L-72"><span class="linenos">72</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 </span><span id="L-73"><a href="#L-73"><span class="linenos">73</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Select all operational monitoring projects.&quot;&quot;&quot;</span>
@@ -140,13 +140,16 @@
 </span><span id="L-76"><a href="#L-76"><span class="linenos">76</span></a>            <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
 </span><span id="L-77"><a href="#L-77"><span class="linenos">77</span></a><span class="s2">                SELECT *</span>
 </span><span id="L-78"><a href="#L-78"><span class="linenos">78</span></a><span class="s2">                FROM `</span><span class="si">{</span><span class="n">project_table</span><span class="si">}</span><span class="s2">`</span>
-</span><span id="L-79"><a href="#L-79"><span class="linenos">79</span></a><span class="s2">            &quot;&quot;&quot;</span>
-</span><span id="L-80"><a href="#L-80"><span class="linenos">80</span></a>        <span class="p">)</span>
-</span><span id="L-81"><a href="#L-81"><span class="linenos">81</span></a>
-</span><span id="L-82"><a href="#L-82"><span class="linenos">82</span></a>        <span class="n">projects</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">query_job</span><span class="o">.</span><span class="n">result</span><span class="p">()]</span>
-</span><span id="L-83"><a href="#L-83"><span class="linenos">83</span></a>    <span class="k">except</span> <span class="n">exceptions</span><span class="o">.</span><span class="n">Forbidden</span><span class="p">:</span>
-</span><span id="L-84"><a href="#L-84"><span class="linenos">84</span></a>        <span class="n">projects</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="L-85"><a href="#L-85"><span class="linenos">85</span></a>    <span class="k">return</span> <span class="n">projects</span>
+</span><span id="L-79"><a href="#L-79"><span class="linenos">79</span></a><span class="s2">                WHERE</span>
+</span><span id="L-80"><a href="#L-80"><span class="linenos">80</span></a><span class="s2">                    DATE_ADD(end_date, INTERVAL 90 DAY) &gt; CURRENT_DATE() OR</span>
+</span><span id="L-81"><a href="#L-81"><span class="linenos">81</span></a><span class="s2">                    end_date IS NULL</span>
+</span><span id="L-82"><a href="#L-82"><span class="linenos">82</span></a><span class="s2">            &quot;&quot;&quot;</span>
+</span><span id="L-83"><a href="#L-83"><span class="linenos">83</span></a>        <span class="p">)</span>
+</span><span id="L-84"><a href="#L-84"><span class="linenos">84</span></a>
+</span><span id="L-85"><a href="#L-85"><span class="linenos">85</span></a>        <span class="n">projects</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">query_job</span><span class="o">.</span><span class="n">result</span><span class="p">()]</span>
+</span><span id="L-86"><a href="#L-86"><span class="linenos">86</span></a>    <span class="k">except</span> <span class="n">exceptions</span><span class="o">.</span><span class="n">Forbidden</span><span class="p">:</span>
+</span><span id="L-87"><a href="#L-87"><span class="linenos">87</span></a>        <span class="n">projects</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="L-88"><a href="#L-88"><span class="linenos">88</span></a>    <span class="k">return</span> <span class="n">projects</span>
 </span></pre></div>
 
 
@@ -224,33 +227,36 @@ value and its top 10 most common to be used as dropdown options.</p>
 
 
                 </section>
-                <section id="get_projects">
-                            <input id="get_projects-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+                <section id="get_active_projects">
+                            <input id="get_active_projects-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">get_projects</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">bq_client</span><span class="p">:</span> <span class="n">google</span><span class="o">.</span><span class="n">cloud</span><span class="o">.</span><span class="n">bigquery</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">Client</span>,</span><span class="param">	<span class="n">project_table</span><span class="p">:</span> <span class="nb">str</span></span><span class="return-annotation">) -> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>:</span></span>
+        <span class="name">get_active_projects</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">bq_client</span><span class="p">:</span> <span class="n">google</span><span class="o">.</span><span class="n">cloud</span><span class="o">.</span><span class="n">bigquery</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">Client</span>,</span><span class="param">	<span class="n">project_table</span><span class="p">:</span> <span class="nb">str</span></span><span class="return-annotation">) -> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>:</span></span>
 
-                <label class="view-source-button" for="get_projects-view-source"><span>View Source</span></label>
+                <label class="view-source-button" for="get_active_projects-view-source"><span>View Source</span></label>
 
     </div>
-    <a class="headerlink" href="#get_projects"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="get_projects-71"><a href="#get_projects-71"><span class="linenos">71</span></a><span class="k">def</span> <span class="nf">get_projects</span><span class="p">(</span>
-</span><span id="get_projects-72"><a href="#get_projects-72"><span class="linenos">72</span></a>    <span class="n">bq_client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span> <span class="n">project_table</span><span class="p">:</span> <span class="nb">str</span>
-</span><span id="get_projects-73"><a href="#get_projects-73"><span class="linenos">73</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
-</span><span id="get_projects-74"><a href="#get_projects-74"><span class="linenos">74</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Select all operational monitoring projects.&quot;&quot;&quot;</span>
-</span><span id="get_projects-75"><a href="#get_projects-75"><span class="linenos">75</span></a>    <span class="k">try</span><span class="p">:</span>
-</span><span id="get_projects-76"><a href="#get_projects-76"><span class="linenos">76</span></a>        <span class="n">query_job</span> <span class="o">=</span> <span class="n">bq_client</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
-</span><span id="get_projects-77"><a href="#get_projects-77"><span class="linenos">77</span></a>            <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
-</span><span id="get_projects-78"><a href="#get_projects-78"><span class="linenos">78</span></a><span class="s2">                SELECT *</span>
-</span><span id="get_projects-79"><a href="#get_projects-79"><span class="linenos">79</span></a><span class="s2">                FROM `</span><span class="si">{</span><span class="n">project_table</span><span class="si">}</span><span class="s2">`</span>
-</span><span id="get_projects-80"><a href="#get_projects-80"><span class="linenos">80</span></a><span class="s2">            &quot;&quot;&quot;</span>
-</span><span id="get_projects-81"><a href="#get_projects-81"><span class="linenos">81</span></a>        <span class="p">)</span>
-</span><span id="get_projects-82"><a href="#get_projects-82"><span class="linenos">82</span></a>
-</span><span id="get_projects-83"><a href="#get_projects-83"><span class="linenos">83</span></a>        <span class="n">projects</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">query_job</span><span class="o">.</span><span class="n">result</span><span class="p">()]</span>
-</span><span id="get_projects-84"><a href="#get_projects-84"><span class="linenos">84</span></a>    <span class="k">except</span> <span class="n">exceptions</span><span class="o">.</span><span class="n">Forbidden</span><span class="p">:</span>
-</span><span id="get_projects-85"><a href="#get_projects-85"><span class="linenos">85</span></a>        <span class="n">projects</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="get_projects-86"><a href="#get_projects-86"><span class="linenos">86</span></a>    <span class="k">return</span> <span class="n">projects</span>
+    <a class="headerlink" href="#get_active_projects"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="get_active_projects-71"><a href="#get_active_projects-71"><span class="linenos">71</span></a><span class="k">def</span> <span class="nf">get_active_projects</span><span class="p">(</span>
+</span><span id="get_active_projects-72"><a href="#get_active_projects-72"><span class="linenos">72</span></a>    <span class="n">bq_client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span> <span class="n">project_table</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="get_active_projects-73"><a href="#get_active_projects-73"><span class="linenos">73</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+</span><span id="get_active_projects-74"><a href="#get_active_projects-74"><span class="linenos">74</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Select all operational monitoring projects.&quot;&quot;&quot;</span>
+</span><span id="get_active_projects-75"><a href="#get_active_projects-75"><span class="linenos">75</span></a>    <span class="k">try</span><span class="p">:</span>
+</span><span id="get_active_projects-76"><a href="#get_active_projects-76"><span class="linenos">76</span></a>        <span class="n">query_job</span> <span class="o">=</span> <span class="n">bq_client</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
+</span><span id="get_active_projects-77"><a href="#get_active_projects-77"><span class="linenos">77</span></a>            <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+</span><span id="get_active_projects-78"><a href="#get_active_projects-78"><span class="linenos">78</span></a><span class="s2">                SELECT *</span>
+</span><span id="get_active_projects-79"><a href="#get_active_projects-79"><span class="linenos">79</span></a><span class="s2">                FROM `</span><span class="si">{</span><span class="n">project_table</span><span class="si">}</span><span class="s2">`</span>
+</span><span id="get_active_projects-80"><a href="#get_active_projects-80"><span class="linenos">80</span></a><span class="s2">                WHERE</span>
+</span><span id="get_active_projects-81"><a href="#get_active_projects-81"><span class="linenos">81</span></a><span class="s2">                    DATE_ADD(end_date, INTERVAL 90 DAY) &gt; CURRENT_DATE() OR</span>
+</span><span id="get_active_projects-82"><a href="#get_active_projects-82"><span class="linenos">82</span></a><span class="s2">                    end_date IS NULL</span>
+</span><span id="get_active_projects-83"><a href="#get_active_projects-83"><span class="linenos">83</span></a><span class="s2">            &quot;&quot;&quot;</span>
+</span><span id="get_active_projects-84"><a href="#get_active_projects-84"><span class="linenos">84</span></a>        <span class="p">)</span>
+</span><span id="get_active_projects-85"><a href="#get_active_projects-85"><span class="linenos">85</span></a>
+</span><span id="get_active_projects-86"><a href="#get_active_projects-86"><span class="linenos">86</span></a>        <span class="n">projects</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">query_job</span><span class="o">.</span><span class="n">result</span><span class="p">()]</span>
+</span><span id="get_active_projects-87"><a href="#get_active_projects-87"><span class="linenos">87</span></a>    <span class="k">except</span> <span class="n">exceptions</span><span class="o">.</span><span class="n">Forbidden</span><span class="p">:</span>
+</span><span id="get_active_projects-88"><a href="#get_active_projects-88"><span class="linenos">88</span></a>        <span class="n">projects</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="get_active_projects-89"><a href="#get_active_projects-89"><span class="linenos">89</span></a>    <span class="k">return</span> <span class="n">projects</span>
 </span></pre></div>
 
 

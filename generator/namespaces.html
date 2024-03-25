@@ -144,7 +144,7 @@
 </span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a>        <span class="k">return</span> <span class="p">{}</span>
 </span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a>
 </span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a>    <span class="n">projects_table</span> <span class="o">=</span> <span class="n">projects_view</span><span class="p">[</span><span class="s2">&quot;tables&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;table&quot;</span><span class="p">]</span>
-</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a>    <span class="n">projects</span> <span class="o">=</span> <span class="n">operational_monitoring_utils</span><span class="o">.</span><span class="n">get_projects</span><span class="p">(</span>
+</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a>    <span class="n">projects</span> <span class="o">=</span> <span class="n">operational_monitoring_utils</span><span class="o">.</span><span class="n">get_active_projects</span><span class="p">(</span>
 </span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a>        <span class="n">bq_client</span><span class="p">,</span> <span class="n">project_table</span><span class="o">=</span><span class="n">projects_table</span>
 </span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a>    <span class="p">)</span>
 </span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a>
