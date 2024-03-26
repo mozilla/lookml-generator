@@ -598,6 +598,10 @@ firefox_accounts:
       type: table_explore
       views:
         base_view: monitor_mozilla_accounts_funnels
+    password_reset_funnels:
+      type: table_explore
+      views:
+        base_view: password_reset_funnels
 revenue:
   glean_app: false
   connection: bigquery-oauth
