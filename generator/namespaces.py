@@ -71,7 +71,7 @@ def _get_opmon(bq_client: bigquery.Client, namespaces: Dict[str, Any]):
         return {}
 
     projects_table = projects_view["tables"][0]["table"]
-    projects = operational_monitoring_utils.get_projects(
+    projects = operational_monitoring_utils.get_active_projects(
         bq_client, project_table=projects_table
     )
 

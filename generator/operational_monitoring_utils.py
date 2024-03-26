@@ -67,7 +67,7 @@ def get_xaxis_val(bq_client: bigquery.Client, table: str) -> str:
     )
 
 
-def get_projects(
+def get_active_projects(
     bq_client: bigquery.Client, project_table: str
 ) -> List[Dict[str, Any]]:
     """Select all operational monitoring projects."""
@@ -76,6 +76,9 @@ def get_projects(
             f"""
                 SELECT *
                 FROM `{project_table}`
+                WHERE
+                    DATE_ADD(end_date, INTERVAL 90 DAY) > CURRENT_DATE() OR
+                    end_date IS NULL
             """
         )
 
