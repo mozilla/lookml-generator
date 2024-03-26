@@ -553,6 +553,10 @@ firefox_accounts:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.accounts_frontend_derived.monitor_mozilla_accounts_funnels_v1
+    password_reset_funnels:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.accounts_frontend_derived.pwd_reset_funnels_v1
   explores:
     all_event_counts:
       type: events_explore
