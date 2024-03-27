@@ -457,7 +457,7 @@ monitor_frontend:
     - ksiegler@mozilla.com
   pretty_name: Monitor Frontend
   views:
-      dashboard_user_journey_funnels:
+    dashboard_user_journey_funnels:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.monitor_frontend_derived.monitor_dashboard_user_journey_funnels_v1
