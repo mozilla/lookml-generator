@@ -572,6 +572,10 @@ firefox_accounts:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.accounts_frontend_derived.pwd_reset_funnels_v1
+    email_first_funnels:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.accounts_frontend_derived.email_first_reg_login_funnels_v1
   explores:
     all_event_counts:
       type: events_explore
@@ -617,6 +621,10 @@ firefox_accounts:
       type: table_explore
       views:
         base_view: password_reset_funnels
+    email_first_funnels:
+      type: table_explore
+      views:
+        base_view: email_first_funnels
 revenue:
   glean_app: false
   connection: bigquery-oauth
