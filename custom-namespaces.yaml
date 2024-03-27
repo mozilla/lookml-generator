@@ -462,7 +462,7 @@ monitor_frontend:
       tables:
         - table: moz-fx-data-shared-prod.monitor_frontend_derived.monitor_dashboard_user_journey_funnels_v1
   explores:
-      dashboard_user_journey_funnels:
+    dashboard_user_journey_funnels:
       type: table_explore
       views:
         base_view: dashboard_user_journey_funnels
