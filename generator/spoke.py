@@ -3,6 +3,7 @@
 import logging
 import os
 import shutil
+from collections import defaultdict
 from pathlib import Path
 from typing import Dict, List, TypedDict
 
@@ -149,13 +150,10 @@ def generate_directories(
     namespaces: Dict[str, NamespaceDict], base_dir: Path, sdk_setup=False
 ):
     """Generate directories and model for a namespace, if it doesn't exist."""
-    seen_spoke_namespaces = {}
+    seen_spoke_namespaces = defaultdict(list)
     for namespace, defn in namespaces.items():
         spoke = defn["spoke"]
-        if spoke not in seen_spoke_namespaces:
-            seen_spoke_namespaces[spoke] = [namespace]
-        else:
-            seen_spoke_namespaces[spoke].append(namespace)
+        seen_spoke_namespaces[spoke].append(namespace)
 
         spoke_dir = base_dir / spoke
         spoke_dir.mkdir(parents=True, exist_ok=True)
@@ -186,10 +184,11 @@ def generate_directories(
 
         for existing_dir in existing_dirs:
             # make sure the directory belongs to a namespace by checking if a model file exists
-            if Path(existing_dir / f"{existing_dir}.model.lkml").is_file():
+            if (spoke_dir / existing_dir / f"{existing_dir}.model.lkml").is_file():
                 if existing_dir not in seen_spoke_namespaces[spoke]:
                     # namespace does not exists anymore, remove directory
-                    shutil.rmtree(Path(existing_dir))
+                    print(f"Removing {existing_dir} from {spoke_dir}")
+                    shutil.rmtree(spoke_dir / existing_dir)
 
 
 @click.command(help=__doc__)
