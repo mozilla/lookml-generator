@@ -531,9 +531,9 @@ firefox_accounts:
           table: mozdata.firefox_accounts.events_daily
     growth_accounting:
       type: growth_accounting_view
-      identifier_field: user_id
+      identifier_field: user_id_sha256
       tables:
-        - table: mozdata.firefox_accounts.fxa_users_last_seen
+        - table: mozdata.accounts_backend.users_services_last_seen
     fxa_first_seen_table:
       type: table_view
       tables:
