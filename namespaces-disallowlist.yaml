@@ -16,3 +16,9 @@
 - org_mozilla_tiktokreporter
 - moso_*
 - regrets_reporter
+- mozphab
+- mozregression
+- pine
+- treeherder
+- sync
+- mozillavpn_backend_cirrus
