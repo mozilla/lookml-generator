@@ -142,7 +142,7 @@ function check_files_and_commit() {
   # Add the new files and commit.
   # Use interactive mode to add untracked files
   # This also works when it's untracked directories
-  echo -e "a\n*\nq\n"|git add -i
+  echo -e "a\n*\nu\n*\nq\n"|git add -i
   git commit -m "Auto-push from LookML generation" \
     || echo "Nothing to commit"
 }
