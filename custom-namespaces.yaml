@@ -1611,3 +1611,24 @@ telemetry_dev_cycle:
       type: table_view
       tables:
         - table: mozdata.telemetry_dev_cycle.telemetry_probes_stats
+growth:
+  pretty_name: Growth
+  owners:
+    - fbertsch@mozilla.com
+    - kik@mozilla.com
+  glean_app: false
+mr_2022:
+  pretty_name: MR 2022
+  owners:
+    - loines@mozilla.com
+  glean_app: false
+user_journey:
+  pretty_name: User Journey
+  owners:
+    - fbertsch@mozilla.com
+  glean_app: false
+pocket_snowflake:
+  pretty_name: Pocket Snowflake
+  owners:
+    - mhirose@mozilla.com
+  glean_app: false
