@@ -1233,21 +1233,6 @@ monitoring:
       type: ping_explore
       views:
         base_view: telemetry_missing_columns
-accessibility:
-  glean_app: false
-  owners:
-    - mreschenberg@mozilla.com
-  pretty_name: Accessibility
-  views:
-    accessibility_clients:
-      type: ping_view
-      tables:
-        - table: mozdata.telemetry.accessibility_clients
-  explores:
-    accessibility_clients:
-      type: ping_explore
-      views:
-        base_view: accessibility_clients
 casa:
   glean_app: false
   spoke: looker-spoke-private
@@ -1611,3 +1596,24 @@ telemetry_dev_cycle:
       type: table_view
       tables:
         - table: mozdata.telemetry_dev_cycle.telemetry_probes_stats
+growth:
+  pretty_name: Growth
+  owners:
+    - fbertsch@mozilla.com
+    - kik@mozilla.com
+  glean_app: false
+mr_2022:
+  pretty_name: MR 2022
+  owners:
+    - loines@mozilla.com
+  glean_app: false
+user_journey:
+  pretty_name: User Journey
+  owners:
+    - fbertsch@mozilla.com
+  glean_app: false
+pocket_snowflake:
+  pretty_name: Pocket Snowflake
+  owners:
+    - mhirose@mozilla.com
+  glean_app: false
