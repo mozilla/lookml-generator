@@ -1602,6 +1602,19 @@ growth:
     - fbertsch@mozilla.com
     - kik@mozilla.com
   glean_app: false
+  views:
+    browser_usage:
+      type: table_view
+      tables:
+        - table: mozdata.analysis.cloudflare_browser_usage_data
+    device_usage:
+      type: table_view
+      tables:
+        - table: mozdata.analysis.cloudflare_device_usage_data
+    operating_system_usage:
+      type: table_view
+      tables:
+        - table: mozdata.analysis.cloudflare_os_usage_data
 mr_2022:
   pretty_name: MR 2022
   owners:
