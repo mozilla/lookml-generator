@@ -435,7 +435,7 @@ mozilla_vpn:
       type: table_view
       tables:
         - channel: release
-          table: mozdata.mozilla_vpn.site_metrics_summary
+          table: mozdata.mozilla_vpn.site_metrics_summary_v2
     ga4_site_metrics_summary:
       type: table_view
       tables:
@@ -1348,7 +1348,7 @@ websites:
     moz_org_page_metrics:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.ga_derived.www_site_page_metrics_v1
+        - table: moz-fx-data-marketing-prod.ga.www_site_page_metrics
     ga4_moz_org_metrics_summary:
       type: table_view
       tables:
@@ -1356,7 +1356,7 @@ websites:
     moz_org_metrics_summary:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.ga_derived.www_site_metrics_summary_v1
+        - table: moz-fx-data-marketing-prod.ga.www_site_metrics_summary
     ga4_moz_org_landing_page_metrics:
       type: table_view
       tables:
@@ -1364,7 +1364,7 @@ websites:
     moz_org_landing_page_metrics:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.ga_derived.www_site_landing_page_metrics_v1
+        - table: moz-fx-data-marketing-prod.ga.www_site_landing_page_metrics
     ga4_blogs_sessions:
       type: table_view
       tables:
@@ -1376,7 +1376,7 @@ websites:
     blogs_daily_summary:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.ga_derived.blogs_daily_summary_v1
+        - table: moz-fx-data-marketing-prod.ga.blogs_daily_summary
     ga4_blogs_daily_summary:
       type: table_view
       tables:
@@ -1384,7 +1384,7 @@ websites:
     blogs_landing_page_summary:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.ga_derived.blogs_landing_page_summary_v1
+        - table: moz-fx-data-marketing-prod.ga.blogs_landing_page_summary
     ga4_blogs_landing_page_summary:
       type: table_view
       tables:
@@ -1396,11 +1396,11 @@ websites:
     www_site_events_metrics:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.ga_derived.www_site_events_metrics_v1
+        - table: moz-fx-data-marketing-prod.ga.www_site_events_metrics
     firefox_whatsnew_summary:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.ga_derived.firefox_whatsnew_summary_v1
+        - table: moz-fx-data-marketing-prod.ga.firefox_whatsnew_summary
     ga4_firefox_whatsnew_summary:
       type: table_view
       tables:
