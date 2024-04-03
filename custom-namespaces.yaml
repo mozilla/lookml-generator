@@ -1605,11 +1605,6 @@ growth:
       type: table_view
       tables:
         - table: mozdata.cloudflare.os_usage
-mr_2022:
-  pretty_name: MR 2022
-  owners:
-    - loines@mozilla.com
-  glean_app: false
 user_journey:
   pretty_name: User Journey
   owners:
