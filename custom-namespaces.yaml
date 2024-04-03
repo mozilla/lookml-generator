@@ -1646,15 +1646,15 @@ growth:
     browser_usage:
       type: table_view
       tables:
-        - table: mozdata.analysis.cloudflare_browser_usage_data
+        - table: mozdata.cloudflare.browser_usage
     device_usage:
       type: table_view
       tables:
-        - table: mozdata.analysis.cloudflare_device_usage_data
+        - table: mozdata.cloudflare.device_usage
     operating_system_usage:
       type: table_view
       tables:
-        - table: mozdata.analysis.cloudflare_os_usage_data
+        - table: mozdata.cloudflare.os_usage
 mr_2022:
   pretty_name: MR 2022
   owners:
