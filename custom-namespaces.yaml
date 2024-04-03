@@ -878,11 +878,6 @@ experimentation:
       tables:
         - channel: release
           table: moz-fx-data-experiments.monitoring.task_monitoring_logs
-    task_profiling_logs:
-      type: table_view
-      tables:
-        - channel: release
-          table: moz-fx-data-experiments.monitoring.task_profiling_logs
     experiment_enrollment_daily_active_population:
       type: table_view
       tables:
@@ -933,14 +928,6 @@ experimentation:
       tables:
         - channel: release
           table: moz-fx-data-shared-prod.telemetry_derived.experiment_search_aggregates_live_v1
-    mr_2022_weekly_statistics_desktop_existing_users:
-      type: table_view
-      tables:
-        - table: moz-fx-data-experiments.mozanalysis.statistics_106_major_release_firefox_existing_user_experience_weekly
-    mr_2022_weekly_statistic_desktop_new_users:
-      type: table_view
-      tables:
-        - table: moz-fx-data-experiments.mozanalysis.statistics_106_major_release_firefox_new_user_weekly
 firefox_desktop:
   glean_app: true
   views:
@@ -1082,32 +1069,6 @@ firefox_desktop:
       type: table_explore
       views:
         base_view: urlbar_events_daily_table
-pocket:
-  glean_app: false
-  owners:
-    - kenny@getpocket.com
-    - kirill@getpocket.com
-  pretty_name: Pocket
-  views:
-    twice_weekly_active_user_counts_history_v1:
-      type: table_view
-      tables:
-        - table: moz-fx-data-shared-prod.pocket_derived.twice_weekly_active_user_counts_history_v1
-sync:
-  glean_app: false
-  owners:
-    - ascholtz@mozilla.com
-  pretty_name: Sync
-  views:
-    sync:
-      type: ping_view
-      tables:
-        - table: mozdata.telemetry.sync
-  explores:
-    sync:
-      type: ping_explore
-      views:
-        base_view: sync
 monitoring:
   glean_app: false
   owners:
@@ -1300,17 +1261,6 @@ reference:
       type: table_view
       tables:
         - table: mozdata.reference.macroeconomic_indices
-regrets_reporter:
-  glean_app: false
-  pretty_name: RegretsReporter
-  owners:
-    - jessed@mozillafoundation.org
-  spoke: looker-spoke-default
-  views:
-    regrets_reporter_summary:
-      type: table_view
-      tables:
-        - table: moz-fx-data-shared-prod.regrets_reporter_derived.regrets_reporter_summary_v1
 kpi:
   glean_app: false
   owners:
@@ -1664,9 +1614,4 @@ user_journey:
   pretty_name: User Journey
   owners:
     - fbertsch@mozilla.com
-  glean_app: false
-pocket_snowflake:
-  pretty_name: Pocket Snowflake
-  owners:
-    - mhirose@mozilla.com
   glean_app: false
