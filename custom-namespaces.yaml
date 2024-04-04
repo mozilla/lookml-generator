@@ -745,6 +745,10 @@ ads:
       type: table_view
       tables:
         - table: mozdata.ads.tiles_addressable_inventory_hourly
+    amp_search_with:
+      type: table_view
+      tables:
+        - table: mozdata.ads.amp_search_with
 firefox_ios:
   pretty_name: Firefox iOS
   owners:
