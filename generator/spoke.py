@@ -92,7 +92,6 @@ def generate_model(
 # Include files from looker-hub or spoke-default below. For example:
 {'' if has_explores else '# '}include: "//looker-hub/{name}/explores/*"
 # include: "//looker-hub/{name}/dashboards/*"
-# include: "//looker-hub/{name}/views/*"
 # include: "views/*"
 # include: "explores/*"
 # include: "dashboards/*"
