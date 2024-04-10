@@ -846,21 +846,6 @@ newtab:
     - cmorales@mozilla.com
     - mbowerman@mozilla.com
   spoke: looker-spoke-private
-awesome_bar:
-  glean_app: false
-  owners:
-    - ascholtz@mozilla.com
-  pretty_name: Awesome Bar
-  views:
-    urlbar_clients_daily:
-      type: ping_view
-      tables:
-        - table: mozdata.telemetry.urlbar_clients_daily
-  explores:
-    urlbar_clients_daily:
-      type: ping_explore
-      views:
-        base_view: urlbar_clients_daily
 experimentation:
   glean_app: false
   owners:
