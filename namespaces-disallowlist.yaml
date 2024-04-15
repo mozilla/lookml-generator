@@ -24,3 +24,4 @@
 - mozillavpn_backend_cirrus
 - glean_dictionary
 - mach
+- "*_cirrus"
