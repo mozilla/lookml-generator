@@ -1557,6 +1557,10 @@ growth:
       type: table_view
       tables:
         - table: mozdata.cloudflare.os_usage
+    android_app_campaign_stats:
+      type: table_view
+      tables:
+        - table: mozdata.google_ads.android_app_campaign_stats
 user_journey:
   pretty_name: User Journey
   owners:
