@@ -104,26 +104,31 @@ class View(object):
 
     def get_client_id(self, dimensions: List[dict], table: str) -> Optional[str]:
         """Return the first field that looks like a client identifier."""
-        client_id_fields = [
-            d["name"]
-            for d in dimensions
-            if d["name"] in {"client_id", "client_info__client_id", "context_id"}
-        ]
-        if not client_id_fields:
-            # Some pings purposely disinclude client_ids, e.g. firefox installer
-            return None
-        if len(client_id_fields) > 1:
-            raise ClickException(f"Duplicate client_id dimension in {table!r}")
-        return client_id_fields[0]
+        client_id_fields = self.select_dimension(
+            {"client_id", "client_info__client_id", "context_id"},
+            dimensions,
+            table,
+        )
+        return client_id_fields["name"] if client_id_fields else None
 
     def get_document_id(self, dimensions: List[dict], table: str) -> Optional[str]:
         """Return the first field that looks like a document_id."""
-        document_id_fields = [
-            d["name"] for d in dimensions if d["name"] in {"document_id"}
-        ]
-        if not document_id_fields:
+        document_id = self.select_dimension("document_id", dimensions, table)
+        return document_id["name"] if document_id else None
+
+    def select_dimension(
+        self,
+        dimension_names: str | Set[str],
+        dimensions: List[dict],
+        table: str,
+    ) -> Optional[dict[str, str]]:
+        """Return the first field that matches dimension name."""
+        if not isinstance(dimension_names, set):
+            dimension_names = {dimension_names}
+        selected = [d for d in dimensions if d["name"] in dimension_names]
+        if not selected:
             # Some pings purposely disinclude client_ids, e.g. firefox installer
             return None
-        if len(document_id_fields) > 1:
-            raise ClickException(f"Duplicate document_id dimension in {table!r}")
-        return document_id_fields[0]
+        if len(selected) > 1:
+            raise ClickException(f"Duplicate {dimension_names} dimension in {table!r}")
+        return selected[0]
