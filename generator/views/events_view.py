@@ -104,7 +104,7 @@ class EventsView(View):
         return measures
 
     def generate_event_id(self, dimensions: list[dict]) -> Optional[Dict[str, str]]:
-        """Generate the event_id dimension to be used as a primary key for a one to many join"""
+        """Generate the event_id dimension to be used as a primary key for a one to many join."""
         document_id_field = self.get_document_id(dimensions, "events")
         event_timestamp = self.select_dimension("event_timestamp", dimensions, "events")
         event_timestamp_field = event_timestamp["name"] if event_timestamp else None
