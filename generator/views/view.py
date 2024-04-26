@@ -136,7 +136,7 @@ class View(object):
             # if there are multiple options in the dimention_names set.
             if len(dimension_names) > 1 and len(selected) > 1:
                 raise ClickException(
-                    f"Duplicate {dimension_names} dimension in {table!r}"
+                    f"Duplicate {'/'.join(dimension_names)} dimension in {table!r}"
                 )
             return selected[0]
         return None
