@@ -118,17 +118,18 @@ class View(object):
 
     def select_dimension(
         self,
-        dimension_names: str | Set[str],
+        dimension_names: str | set[str],
         dimensions: List[dict],
         table: str,
     ) -> Optional[dict[str, str]]:
         """Return the first field that matches dimension name."""
-        if not isinstance(dimension_names, set):
+        if isinstance(dimension_names, str):
             dimension_names = {dimension_names}
         selected = [d for d in dimensions if d["name"] in dimension_names]
-        if not selected:
-            # Some pings purposely disinclude client_ids, e.g. firefox installer
-            return None
-        if len(selected) > 1:
-            raise ClickException(f"Duplicate {dimension_names} dimension in {table!r}")
-        return selected[0]
+        if selected:
+            if len(selected) > 1:
+                raise ClickException(
+                    f"Duplicate {dimension_names} dimension in {table!r}"
+                )
+            return selected[0]
+        return None

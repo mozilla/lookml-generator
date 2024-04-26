@@ -76,7 +76,7 @@ class EventsView(View):
 
         # set document_id as primary key if it exists in the underlying table
         # this will allow one_to_many joins
-        event_id_dimension = self.generate_event_id(dimensions)
+        event_id_dimension = self.generate_event_id_dimension(dimensions)
         if event_id_dimension is not None:
             view_defn["dimensions"] = [event_id_dimension]
 
@@ -103,15 +103,16 @@ class EventsView(View):
 
         return measures
 
-    def generate_event_id(self, dimensions: list[dict]) -> Optional[Dict[str, str]]:
+    def generate_event_id_dimension(
+        self, dimensions: list[dict]
+    ) -> Optional[Dict[str, str]]:
         """Generate the event_id dimension to be used as a primary key for a one to many join."""
-        document_id_field = self.get_document_id(dimensions, "events")
-        event_timestamp = self.select_dimension("event_timestamp", dimensions, "events")
-        event_timestamp_field = event_timestamp["name"] if event_timestamp else None
-        if document_id_field and event_timestamp_field:
+        event_id = self.select_dimension("event_id", dimensions, "events")
+        if event_id:
+            event_id_field = event_id["name"]
             return {
                 "name": "event_id",
                 "primary_key": "yes",
-                "sql": f"CONCAT(${{{document_id_field}}}, ${{{event_timestamp_field}}})",
+                "sql": f"${{{event_id_field}}}",
             }
         return None
