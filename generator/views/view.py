@@ -109,6 +109,7 @@ class View(object):
             dimensions,
             table,
         )
+        # Some pings purposely disinclude client_ids, e.g. firefox installer
         return client_id_fields["name"] if client_id_fields else None
 
     def get_document_id(self, dimensions: List[dict], table: str) -> Optional[str]:
@@ -122,12 +123,18 @@ class View(object):
         dimensions: List[dict],
         table: str,
     ) -> Optional[dict[str, str]]:
-        """Return the first field that matches dimension name."""
+        """
+        Return the first field that matches dimension name.
+
+        Throws if the query set is greater than one and more than one item is selected.
+        """
         if isinstance(dimension_names, str):
             dimension_names = {dimension_names}
         selected = [d for d in dimensions if d["name"] in dimension_names]
         if selected:
-            if len(selected) > 1:
+            # there should only be one dimension selected from the set
+            # if there are multiple options in the dimention_names set.
+            if len(dimension_names) > 1 and len(selected) > 1:
                 raise ClickException(
                     f"Duplicate {dimension_names} dimension in {table!r}"
                 )
