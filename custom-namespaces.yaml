@@ -677,6 +677,10 @@ revenue:
       type: table_view
       tables:
         - table: mozdata.ltv.fenix_client_ltv
+    firefox_ios_ltv:
+      type: table_view
+      tables:
+      - table: mozdata.ltv.firefox_ios_client_ltv
     revenue_google_top10_row_data:
       type: table_view
       tables:
