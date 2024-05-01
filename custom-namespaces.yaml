@@ -677,6 +677,10 @@ revenue:
       type: table_view
       tables:
         - table: mozdata.ltv.fenix_client_ltv
+    firefox_ios_ltv:
+      type: table_view
+      tables:
+        - table: mozdata.ltv.firefox_ios_client_ltv
     revenue_google_top10_row_data:
       type: table_view
       tables:
@@ -1347,11 +1351,11 @@ websites:
       type: table_view
       tables:
         - table: moz-fx-data-marketing-prod.ga.firefox_whatsnew_summary
-    google_search_impressions_by_page:
+    google_search_console_by_page:
       type: table_view
       tables:
         - table: moz-fx-data-marketing-prod.google_search_console.search_impressions_by_page
-    google_search_impressions_by_site:
+    google_search_console_by_site:
       type: table_view
       tables:
         - table: moz-fx-data-marketing-prod.google_search_console.search_impressions_by_site
@@ -1557,6 +1561,10 @@ growth:
       type: table_view
       tables:
         - table: mozdata.cloudflare.os_usage
+    android_app_campaign_stats:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.google_ads_derived.android_app_campaign_stats_v1
 user_journey:
   pretty_name: User Journey
   owners:
