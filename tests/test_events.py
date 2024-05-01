@@ -160,6 +160,13 @@ def test_view_lookml(events_view):
                         "sql": "${client_info__client_id}",
                     },
                 ],
+                "dimensions": [
+                    {
+                        "name": "event_id",
+                        "primary_key": "yes",
+                        "sql": "${event_id}",
+                    },
+                ],
             },
         ],
     }
@@ -168,7 +175,8 @@ def test_view_lookml(events_view):
         [
             SchemaField(
                 "client_info", "RECORD", fields=[SchemaField("client_id", "STRING")]
-            )
+            ),
+            SchemaField("event_id", "STRING"),
         ]
     )
     actual = events_view.to_lookml(mock_bq_client, None)

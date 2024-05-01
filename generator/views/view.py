@@ -104,26 +104,39 @@ class View(object):
 
     def get_client_id(self, dimensions: List[dict], table: str) -> Optional[str]:
         """Return the first field that looks like a client identifier."""
-        client_id_fields = [
-            d["name"]
-            for d in dimensions
-            if d["name"] in {"client_id", "client_info__client_id", "context_id"}
-        ]
-        if not client_id_fields:
-            # Some pings purposely disinclude client_ids, e.g. firefox installer
-            return None
-        if len(client_id_fields) > 1:
-            raise ClickException(f"Duplicate client_id dimension in {table!r}")
-        return client_id_fields[0]
+        client_id_fields = self.select_dimension(
+            {"client_id", "client_info__client_id", "context_id"},
+            dimensions,
+            table,
+        )
+        # Some pings purposely disinclude client_ids, e.g. firefox installer
+        return client_id_fields["name"] if client_id_fields else None
 
     def get_document_id(self, dimensions: List[dict], table: str) -> Optional[str]:
         """Return the first field that looks like a document_id."""
-        document_id_fields = [
-            d["name"] for d in dimensions if d["name"] in {"document_id"}
-        ]
-        if not document_id_fields:
-            # Some pings purposely disinclude client_ids, e.g. firefox installer
-            return None
-        if len(document_id_fields) > 1:
-            raise ClickException(f"Duplicate document_id dimension in {table!r}")
-        return document_id_fields[0]
+        document_id = self.select_dimension("document_id", dimensions, table)
+        return document_id["name"] if document_id else None
+
+    def select_dimension(
+        self,
+        dimension_names: str | set[str],
+        dimensions: List[dict],
+        table: str,
+    ) -> Optional[dict[str, str]]:
+        """
+        Return the first field that matches dimension name.
+
+        Throws if the query set is greater than one and more than one item is selected.
+        """
+        if isinstance(dimension_names, str):
+            dimension_names = {dimension_names}
+        selected = [d for d in dimensions if d["name"] in dimension_names]
+        if selected:
+            # there should only be one dimension selected from the set
+            # if there are multiple options in the dimention_names set.
+            if len(dimension_names) > 1 and len(selected) > 1:
+                raise ClickException(
+                    f"Duplicate {'/'.join(dimension_names)} dimension in {table!r}"
+                )
+            return selected[0]
+        return None

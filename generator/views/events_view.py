@@ -76,11 +76,9 @@ class EventsView(View):
 
         # set document_id as primary key if it exists in the underlying table
         # this will allow one_to_many joins
-        document_id_field = self.get_document_id(dimensions, "events")
-        if document_id_field is not None:
-            view_defn["dimensions"] = [
-                {"name": document_id_field, "primary_key": "yes"}
-            ]
+        event_id_dimension = self.generate_event_id_dimension(dimensions)
+        if event_id_dimension is not None:
+            view_defn["dimensions"] = [event_id_dimension]
 
         return {
             "includes": [f"{self.tables[0]['events_table_view']}.view.lkml"],
@@ -104,3 +102,17 @@ class EventsView(View):
             )
 
         return measures
+
+    def generate_event_id_dimension(
+        self, dimensions: list[dict]
+    ) -> Optional[Dict[str, str]]:
+        """Generate the event_id dimension to be used as a primary key for a one to many join."""
+        event_id = self.select_dimension("event_id", dimensions, "events")
+        if event_id:
+            event_id_field = event_id["name"]
+            return {
+                "name": "event_id",
+                "primary_key": "yes",
+                "sql": f"${{{event_id_field}}}",
+            }
+        return None
