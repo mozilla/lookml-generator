@@ -194,13 +194,11 @@
 </span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate the event_id dimension to be used as a primary key for a one to many join.&quot;&quot;&quot;</span>
 </span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a>        <span class="n">event_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">select_dimension</span><span class="p">(</span><span class="s2">&quot;event_id&quot;</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">,</span> <span class="s2">&quot;events&quot;</span><span class="p">)</span>
 </span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a>        <span class="k">if</span> <span class="n">event_id</span><span class="p">:</span>
-</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a>            <span class="n">event_id_field</span> <span class="o">=</span> <span class="n">event_id</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
-</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>            <span class="k">return</span> <span class="p">{</span>
-</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a>                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;event_id&quot;</span><span class="p">,</span>
-</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>                <span class="s2">&quot;primary_key&quot;</span><span class="p">:</span> <span class="s2">&quot;yes&quot;</span><span class="p">,</span>
-</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>                <span class="s2">&quot;sql&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;$</span><span class="se">{{</span><span class="si">{</span><span class="n">event_id_field</span><span class="si">}</span><span class="se">}}</span><span class="s2">&quot;</span><span class="p">,</span>
-</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a>            <span class="p">}</span>
-</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>        <span class="k">return</span> <span class="kc">None</span>
+</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a>            <span class="k">return</span> <span class="p">{</span>
+</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;event_id&quot;</span><span class="p">,</span>
+</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a>                <span class="s2">&quot;primary_key&quot;</span><span class="p">:</span> <span class="s2">&quot;yes&quot;</span><span class="p">,</span>
+</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>            <span class="p">}</span>
+</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>        <span class="k">return</span> <span class="kc">None</span>
 </span></pre></div>
 
 
@@ -316,13 +314,11 @@
 </span><span id="EventsView-110"><a href="#EventsView-110"><span class="linenos">110</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate the event_id dimension to be used as a primary key for a one to many join.&quot;&quot;&quot;</span>
 </span><span id="EventsView-111"><a href="#EventsView-111"><span class="linenos">111</span></a>        <span class="n">event_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">select_dimension</span><span class="p">(</span><span class="s2">&quot;event_id&quot;</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">,</span> <span class="s2">&quot;events&quot;</span><span class="p">)</span>
 </span><span id="EventsView-112"><a href="#EventsView-112"><span class="linenos">112</span></a>        <span class="k">if</span> <span class="n">event_id</span><span class="p">:</span>
-</span><span id="EventsView-113"><a href="#EventsView-113"><span class="linenos">113</span></a>            <span class="n">event_id_field</span> <span class="o">=</span> <span class="n">event_id</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
-</span><span id="EventsView-114"><a href="#EventsView-114"><span class="linenos">114</span></a>            <span class="k">return</span> <span class="p">{</span>
-</span><span id="EventsView-115"><a href="#EventsView-115"><span class="linenos">115</span></a>                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;event_id&quot;</span><span class="p">,</span>
-</span><span id="EventsView-116"><a href="#EventsView-116"><span class="linenos">116</span></a>                <span class="s2">&quot;primary_key&quot;</span><span class="p">:</span> <span class="s2">&quot;yes&quot;</span><span class="p">,</span>
-</span><span id="EventsView-117"><a href="#EventsView-117"><span class="linenos">117</span></a>                <span class="s2">&quot;sql&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;$</span><span class="se">{{</span><span class="si">{</span><span class="n">event_id_field</span><span class="si">}</span><span class="se">}}</span><span class="s2">&quot;</span><span class="p">,</span>
-</span><span id="EventsView-118"><a href="#EventsView-118"><span class="linenos">118</span></a>            <span class="p">}</span>
-</span><span id="EventsView-119"><a href="#EventsView-119"><span class="linenos">119</span></a>        <span class="k">return</span> <span class="kc">None</span>
+</span><span id="EventsView-113"><a href="#EventsView-113"><span class="linenos">113</span></a>            <span class="k">return</span> <span class="p">{</span>
+</span><span id="EventsView-114"><a href="#EventsView-114"><span class="linenos">114</span></a>                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;event_id&quot;</span><span class="p">,</span>
+</span><span id="EventsView-115"><a href="#EventsView-115"><span class="linenos">115</span></a>                <span class="s2">&quot;primary_key&quot;</span><span class="p">:</span> <span class="s2">&quot;yes&quot;</span><span class="p">,</span>
+</span><span id="EventsView-116"><a href="#EventsView-116"><span class="linenos">116</span></a>            <span class="p">}</span>
+</span><span id="EventsView-117"><a href="#EventsView-117"><span class="linenos">117</span></a>        <span class="k">return</span> <span class="kc">None</span>
 </span></pre></div>
 
 
@@ -544,13 +540,11 @@
 </span><span id="EventsView.generate_event_id_dimension-110"><a href="#EventsView.generate_event_id_dimension-110"><span class="linenos">110</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate the event_id dimension to be used as a primary key for a one to many join.&quot;&quot;&quot;</span>
 </span><span id="EventsView.generate_event_id_dimension-111"><a href="#EventsView.generate_event_id_dimension-111"><span class="linenos">111</span></a>        <span class="n">event_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">select_dimension</span><span class="p">(</span><span class="s2">&quot;event_id&quot;</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">,</span> <span class="s2">&quot;events&quot;</span><span class="p">)</span>
 </span><span id="EventsView.generate_event_id_dimension-112"><a href="#EventsView.generate_event_id_dimension-112"><span class="linenos">112</span></a>        <span class="k">if</span> <span class="n">event_id</span><span class="p">:</span>
-</span><span id="EventsView.generate_event_id_dimension-113"><a href="#EventsView.generate_event_id_dimension-113"><span class="linenos">113</span></a>            <span class="n">event_id_field</span> <span class="o">=</span> <span class="n">event_id</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
-</span><span id="EventsView.generate_event_id_dimension-114"><a href="#EventsView.generate_event_id_dimension-114"><span class="linenos">114</span></a>            <span class="k">return</span> <span class="p">{</span>
-</span><span id="EventsView.generate_event_id_dimension-115"><a href="#EventsView.generate_event_id_dimension-115"><span class="linenos">115</span></a>                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;event_id&quot;</span><span class="p">,</span>
-</span><span id="EventsView.generate_event_id_dimension-116"><a href="#EventsView.generate_event_id_dimension-116"><span class="linenos">116</span></a>                <span class="s2">&quot;primary_key&quot;</span><span class="p">:</span> <span class="s2">&quot;yes&quot;</span><span class="p">,</span>
-</span><span id="EventsView.generate_event_id_dimension-117"><a href="#EventsView.generate_event_id_dimension-117"><span class="linenos">117</span></a>                <span class="s2">&quot;sql&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;$</span><span class="se">{{</span><span class="si">{</span><span class="n">event_id_field</span><span class="si">}</span><span class="se">}}</span><span class="s2">&quot;</span><span class="p">,</span>
-</span><span id="EventsView.generate_event_id_dimension-118"><a href="#EventsView.generate_event_id_dimension-118"><span class="linenos">118</span></a>            <span class="p">}</span>
-</span><span id="EventsView.generate_event_id_dimension-119"><a href="#EventsView.generate_event_id_dimension-119"><span class="linenos">119</span></a>        <span class="k">return</span> <span class="kc">None</span>
+</span><span id="EventsView.generate_event_id_dimension-113"><a href="#EventsView.generate_event_id_dimension-113"><span class="linenos">113</span></a>            <span class="k">return</span> <span class="p">{</span>
+</span><span id="EventsView.generate_event_id_dimension-114"><a href="#EventsView.generate_event_id_dimension-114"><span class="linenos">114</span></a>                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;event_id&quot;</span><span class="p">,</span>
+</span><span id="EventsView.generate_event_id_dimension-115"><a href="#EventsView.generate_event_id_dimension-115"><span class="linenos">115</span></a>                <span class="s2">&quot;primary_key&quot;</span><span class="p">:</span> <span class="s2">&quot;yes&quot;</span><span class="p">,</span>
+</span><span id="EventsView.generate_event_id_dimension-116"><a href="#EventsView.generate_event_id_dimension-116"><span class="linenos">116</span></a>            <span class="p">}</span>
+</span><span id="EventsView.generate_event_id_dimension-117"><a href="#EventsView.generate_event_id_dimension-117"><span class="linenos">117</span></a>        <span class="k">return</span> <span class="kc">None</span>
 </span></pre></div>
 
 
