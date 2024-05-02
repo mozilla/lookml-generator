@@ -164,7 +164,6 @@ def test_view_lookml(events_view):
                     {
                         "name": "event_id",
                         "primary_key": "yes",
-                        "sql": "${event_id}",
                     },
                 ],
             },

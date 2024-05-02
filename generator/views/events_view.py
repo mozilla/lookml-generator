@@ -109,10 +109,8 @@ class EventsView(View):
         """Generate the event_id dimension to be used as a primary key for a one to many join."""
         event_id = self.select_dimension("event_id", dimensions, "events")
         if event_id:
-            event_id_field = event_id["name"]
             return {
                 "name": "event_id",
                 "primary_key": "yes",
-                "sql": f"${{{event_id_field}}}",
             }
         return None
