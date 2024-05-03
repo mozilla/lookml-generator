@@ -555,6 +555,18 @@ firefox_accounts:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.firefox_accounts_derived.login_funnels_by_service_v1
+    login_funnels_email_confirmation_by_service:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.firefox_accounts_derived.login_funnels_email_confirmation_by_service_v1
+    login_funnels_submit_by_service:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.firefox_accounts_derived.login_funnels_submit_by_service_v1
+    login_funnels_two_factor_by_service:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.firefox_accounts_derived.login_funnels_two_factor_by_service_v1
     registration_funnels_by_service:
       type: table_view
       tables:
@@ -656,6 +668,18 @@ firefox_accounts:
       type: table_explore
       views:
         base_view: login_funnels_by_service
+    login_funnels_email_conformation_by_service:
+      type: table_explore
+      views:
+        base_view: login_funnels_email_confirmation_by_service
+    login_funnels_submit_by_service:
+      type: table_explore
+      views:
+        base_view: login_funnels_submit_by_service
+    login_funnels_two_factor_by_service:
+      type: table_explore
+      views:
+        base_view: login_funnels_two_factor_by_service
     registration_funnels_by_service:
       type: table_explore
       views:
