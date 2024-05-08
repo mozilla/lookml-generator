@@ -1565,6 +1565,10 @@ growth:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.google_ads_derived.android_app_campaign_stats_v1
+    ios_app_campaign_stats:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.apple_ads_external.ios_app_campaign_stats_v1
 user_journey:
   pretty_name: User Journey
   owners:
