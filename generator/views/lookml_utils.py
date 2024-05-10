@@ -137,6 +137,32 @@ def _generate_dimensions(client: bigquery.Client, table: str) -> List[Dict[str, 
     return list(dimensions.values())
 
 
+def _generate_dimensions_from_query(
+    client: bigquery.Client, query: str
+) -> List[Dict[str, Any]]:
+    """Generate dimensions and dimension groups from a SQL query."""
+    job_config = bigquery.QueryJobConfig(dry_run=True, use_query_cache=False)
+    schema = client.query(query, job_config=job_config).schema
+    dimensions = {}
+    for dimension in _generate_dimensions_helper(schema or []):
+        name = dimension["name"]
+        # overwrite duplicate "submission", "end", "start" dimension group, thus picking the
+        # last value sorted by field name, which is submission_timestamp
+        # See also https://github.com/mozilla/lookml-generator/issues/471
+        if (
+            name in dimensions
+            and name != "submission"
+            and not name.endswith("end")
+            and not name.endswith("start")
+            and not (name == "event" and dimension["type"] == "time")
+            # workaround for `mozdata.firefox_desktop.desktop_installs`
+            and not (name == "attribution_dltoken" and dimension["type"] == "time")
+        ):
+            raise click.ClickException(f"duplicate dimension {name!r} in query")
+        dimensions[name] = dimension
+    return list(dimensions.values())
+
+
 def _generate_nested_dimension_views(
     schema: List[bigquery.SchemaField], view_name: str
 ) -> List[Dict[str, Any]]:

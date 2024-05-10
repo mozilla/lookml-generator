@@ -165,29 +165,6 @@ def _get_metric_hub_namespaces(existing_namespaces):
                 "type": "metric_definitions_view"
             }
 
-            if (
-                namespace in existing_namespaces
-                and "client_counts" in existing_namespaces[namespace]["views"]
-            ):
-                views[f"metric_definitions_{data_source}"]["tables"] = [
-                    {
-                        "table": existing_namespaces[namespace]["views"][
-                            "client_counts"
-                        ]["tables"][0]["table"]
-                    }
-                ]
-            elif (
-                namespace in existing_namespaces
-                and "baseline_clients_daily" in existing_namespaces[namespace]["views"]
-            ):
-                views[f"metric_definitions_{data_source}"]["tables"] = [
-                    {
-                        "table": existing_namespaces[namespace]["views"][
-                            "baseline_clients_daily"
-                        ]["tables"][0]["table"]
-                    }
-                ]
-
             explores[f"metric_definitions_{data_source}"] = {
                 "type": "metric_definitions_explore",
                 "views": {"base_view": f"metric_definitions_{data_source}"},

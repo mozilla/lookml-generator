@@ -8,7 +8,6 @@ from typing import Any, Dict, Iterator, List, Optional, Union
 from generator.metrics_utils import MetricsConfigLoader
 
 from . import lookml_utils
-from .table_view import TableView
 from .view import View, ViewDict
 
 
@@ -88,148 +87,158 @@ class MetricDefinitionsView(View):
             and metric.data_source.name == data_source_name
             and metric.type != "histogram"
         ]
-        base_view_fields = []
-        base_view_fields_aliased = []
-        base_view_lkml = None
-        join_base_view = ""
-        if len(self.tables) > 0 and data_source_definition.client_id_column != "NULL":
-            base_table = self.tables[0]["table"]
-            base_view = TableView(
+
+        base_view_dimensions = {}
+        joined_data_sources = []
+
+        # check if the metric data source has joins
+        # joined data sources are generally used for creating the "Base Fields"
+        if (
+            data_source_definition.joins
+            and data_source_definition.client_id_column != "NULL"
+        ):
+            # determine the dimensions selected by the joined data sources
+            for joined_data_source_slug, _ in data_source_definition.joins.items():
+                joined_data_source = (
+                    MetricsConfigLoader.configs.get_data_source_definition(
+                        joined_data_source_slug, self.namespace
+                    )
+                )
+
+                if joined_data_source.columns_as_dimensions:
+                    joined_data_sources.append(joined_data_source)
+                    # create Looker dimensions by doing a dryrun
+                    query = MetricsConfigLoader.configs.get_data_source_sql(
+                        joined_data_source_slug,
+                        self.namespace,
+                        where=(
+                            None
+                            if joined_data_source.submission_date_column is None
+                            else f"{joined_data_source.submission_date_column} = '2023-01-01'"
+                        ),
+                    ).format(dataset=self.namespace)
+
+                    base_view_dimensions[joined_data_source_slug] = (
+                        lookml_utils._generate_dimensions_from_query(bq_client, query)
+                    )
+        elif (
+            data_source_definition.client_id_column == "NULL"
+            or data_source_definition.columns_as_dimensions
+        ):
+            # if the metrics data source doesn't have any joins then use the dimensions
+            # of the data source itself as base fields
+            query = MetricsConfigLoader.configs.get_data_source_sql(
+                data_source_definition.name,
                 self.namespace,
-                "base_view",
-                [{"table": base_table, "channel": "release"}],
+                where=(
+                    "submission_date = '2023-01-01'"
+                    if data_source_definition.submission_date_column is None
+                    else f"{data_source_definition.submission_date_column} = '2023-01-01'"
+                ),
+            ).format(dataset=self.namespace)
+
+            base_view_dimensions[data_source_definition.name] = (
+                lookml_utils._generate_dimensions_from_query(bq_client, query)
             )
-            base_view_lkml = base_view.to_lookml(bq_client=bq_client, v1_name=None)
 
-            base_view_fields_aliased = [
-                f"base_{d['name']} AS {d['name']},\n"
-                for d in base_view_lkml["views"][0]["dimensions"]
-                if d["name"] not in ignore_base_fields and "hidden" not in d
-            ] + [
-                f"base_{d['sql'].replace('${TABLE}.', '')} AS {d['sql'].replace('${TABLE}.', '')},\n"
-                for d in base_view_lkml["views"][0]["dimension_groups"]
-                if d["name"] not in ignore_base_fields and "hidden" not in d
-            ]
-
-            base_view_fields = [
-                f"{d['name']},\n"
-                for d in base_view_lkml["views"][0]["dimensions"]
-                if d["name"] not in ignore_base_fields and "hidden" not in d
-            ] + [
-                f"{d['sql'].replace('${TABLE}.', '')},\n"
-                for d in base_view_lkml["views"][0]["dimension_groups"]
-                if d["name"] not in ignore_base_fields and "hidden" not in d
-            ]
-
-            selected_fields = [
-                f"{d['name'].replace('__', '.')} AS base_{d['name']},\n"
-                for d in base_view_lkml["views"][0]["dimensions"]
-                if d["name"] not in ignore_base_fields and "hidden" not in d
-            ] + [
-                f"{d['sql'].replace('${TABLE}.', '').replace('__', '.')} AS base_{d['sql'].replace('${TABLE}.', '')},\n"
-                for d in base_view_lkml["views"][0]["dimension_groups"]
-                if d["name"] not in ignore_base_fields and "hidden" not in d
-            ]
-
-            client_id_join = (
-                ""
-                if data_source_definition.client_id_column == " NULL"
-                else f' AND base.base_client_id = m.{data_source_definition.client_id_column or "client_id"}'
-            )
-            join_base_view = f"""
-            INNER JOIN (
-                SELECT
-                client_id AS base_client_id,
-                submission_date AS base_submission_date,
-                {"".join(selected_fields)}
-                FROM
-                {base_table}
-                WHERE
-                submission_date BETWEEN
-                COALESCE(
-                    SAFE_CAST(
-                    {{% date_start {data_source_definition.submission_date_column or "submission_date"} %}} AS DATE),
-                CURRENT_DATE()) AND
-                COALESCE(
-                    SAFE_CAST(
-                        {{% date_end {data_source_definition.submission_date_column or "submission_date"} %}} AS DATE
-                ), CURRENT_DATE())
-            ) base
-            ON
-                base.base_submission_date = m.{data_source_definition.submission_date_column or "submission_date"}
-                {client_id_join}
-            WHERE base.base_submission_date BETWEEN
-            COALESCE(
-                SAFE_CAST(
-                    {{% date_start {data_source_definition.submission_date_column or "submission_date"} %}} AS DATE
-            ), CURRENT_DATE()) AND
-            COALESCE(
-                SAFE_CAST(
-                    {{% date_end {data_source_definition.submission_date_column or "submission_date"} %}} AS DATE
-                ), CURRENT_DATE())
-            AND
-                base.base_sample_id < {{% parameter sampling %}}
-            """
+        # prepare base field data for query
+        base_view_fields = [
+            {
+                "name": f"{data_source}_{dimension['name']}",
+                "select_sql": f"{data_source}_{dimension['name']},\n",
+                "sql": f"{data_source}.{dimension['name'].replace('__', '.')} AS {data_source}_{dimension['name']},\n",
+            }
+            for data_source, dimensions in base_view_dimensions.items()
+            for dimension in dimensions
+            if dimension["name"] not in ignore_base_fields
+            and "hidden" not in dimension
+            and dimension["type"] != "time"
+        ]
 
         client_id_field = (
             "NULL"
             if data_source_definition.client_id_column == "NULL"
-            else f'm.{data_source_definition.client_id_column or "client_id"}'
+            else f'{data_source_definition.client_id_column or "client_id"}'
         )
+
+        # filters for date ranges
+        where_sql = " AND ".join(
+            [
+                f"""
+                    {data_source.name}.{data_source.submission_date_column or "submission_date"}
+                    BETWEEN
+                    COALESCE(
+                        SAFE_CAST(
+                            {{% date_start {data_source.submission_date_column or "submission_date"} %}} AS DATE
+                        ), CURRENT_DATE()) AND
+                    COALESCE(
+                        SAFE_CAST(
+                            {{% date_end {data_source.submission_date_column or "submission_date"} %}} AS DATE
+                        ), CURRENT_DATE())
+                """
+                for data_source in [data_source_definition] + joined_data_sources
+                if data_source.submission_date_column != "NULL"
+            ]
+        )
+
+        # filte on sample_id if such a field exists
+        for field in base_view_fields:
+            if field["name"].endswith("_sample_id"):
+                where_sql += f"""
+                    AND
+                        {field['name'].split('_sample_id')[0]}.sample_id < {{% parameter sampling %}}
+                """
+                break
+
         view_defn["derived_table"] = {
             "sql": f"""
             SELECT
                 {"".join(metric_definitions)}
-                {"base.".join(base_view_fields_aliased)}
+                {"".join([field['select_sql'] for field in base_view_fields])}
                 {client_id_field} AS client_id,
                 {{% if aggregate_metrics_by._parameter_value == 'day' %}}
-                m.{data_source_definition.submission_date_column or "submission_date"} AS analysis_basis
+                {data_source_definition.submission_date_column or "submission_date"} AS analysis_basis
                 {{% elsif aggregate_metrics_by._parameter_value == 'week'  %}}
                 (FORMAT_DATE(
                     '%F',
-                    DATE_TRUNC(m.{data_source_definition.submission_date_column or "submission_date"},
+                    DATE_TRUNC({data_source_definition.submission_date_column or "submission_date"},
                     WEEK(MONDAY)))
                 ) AS analysis_basis
                 {{% elsif aggregate_metrics_by._parameter_value == 'month'  %}}
                 (FORMAT_DATE(
                     '%Y-%m',
-                    m.{data_source_definition.submission_date_column or "submission_date"})
+                    {data_source_definition.submission_date_column or "submission_date"})
                 ) AS analysis_basis
                 {{% elsif aggregate_metrics_by._parameter_value == 'quarter'  %}}
                 (FORMAT_DATE(
                     '%Y-%m',
-                    DATE_TRUNC(m.{data_source_definition.submission_date_column or "submission_date"},
+                    DATE_TRUNC({data_source_definition.submission_date_column or "submission_date"},
                     QUARTER))
                 ) AS analysis_basis
                 {{% elsif aggregate_metrics_by._parameter_value == 'year'  %}}
                 (EXTRACT(
-                    YEAR FROM m.{data_source_definition.submission_date_column or "submission_date"})
+                    YEAR FROM {data_source_definition.submission_date_column or "submission_date"})
                 ) AS analysis_basis
                 {{% else %}}
                 NULL as analysis_basis
                 {{% endif %}}
             FROM
-                {
-                    MetricsConfigLoader.configs.get_data_source_sql(
-                        data_source_name,
-                        self.namespace
-                    ).format(dataset=self.namespace)
-                }
-            AS m
-            {join_base_view}
-            {'AND' if join_base_view else 'WHERE'}
-            m.{data_source_definition.submission_date_column or "submission_date"}
-            BETWEEN
-            COALESCE(
-                SAFE_CAST(
-                    {{% date_start {data_source_definition.submission_date_column or "submission_date"} %}} AS DATE
-                ), CURRENT_DATE()) AND
-            COALESCE(
-                SAFE_CAST(
-                    {{% date_end {data_source_definition.submission_date_column or "submission_date"} %}} AS DATE
-                ), CURRENT_DATE())
+                (
+                    SELECT
+                        {data_source_name}.*,
+                        {"".join([field['sql'] for field in base_view_fields])}
+                    FROM
+                    {
+                        MetricsConfigLoader.configs.get_data_source_sql(
+                            data_source_name,
+                            self.namespace,
+                            select_fields=False
+                        ).format(dataset=self.namespace)
+                    }
+                    WHERE {where_sql}
+                )
             GROUP BY
-                {"".join(base_view_fields)}
+                {"".join([field['select_sql'] for field in base_view_fields])}
                 client_id,
                 analysis_basis
             """
@@ -238,16 +247,21 @@ class MetricDefinitionsView(View):
         view_defn["dimensions"] = self.get_dimensions()
         view_defn["dimension_groups"] = self.get_dimension_groups()
 
-        if base_view_lkml:
-            for dimension in base_view_lkml["views"][0]["dimensions"]:
-                if dimension["name"] not in ignore_base_fields:
+        # add the Looker dimensions
+        for data_source, dimensions in base_view_dimensions.items():
+            for dimension in dimensions:
+                if (
+                    dimension["name"] not in ignore_base_fields
+                    and dimension.get("type", "") != "time"
+                ):
+                    dimension["sql"] = (
+                        "${TABLE}." + f"{data_source}_{dimension['name']}"
+                    )
                     dimension["group_label"] = "Base Fields"
-                    view_defn["dimensions"].append(dimension)
-
-            for dimension_group in base_view_lkml["views"][0]["dimension_groups"]:
-                if dimension_group["name"] not in ignore_base_fields:
-                    dimension_group["group_label"] = "Base Fields"
-                    view_defn["dimension_groups"].append(dimension_group)
+                    if not lookml_utils._is_dimension_group(dimension):
+                        view_defn["dimensions"].append(dimension)
+                    else:
+                        view_defn["dimension_groups"].append(dimension)
 
         view_defn["measures"] = self.get_measures(
             view_defn["dimensions"],
@@ -381,6 +395,7 @@ class MetricDefinitionsView(View):
             )
             if metric and metric.statistics:
                 for statistic_slug, statistic_conf in metric.statistics.items():
+                    dimension_label = dimension.get("label") or dimension.get("name")
                     if statistic_slug in [
                         "average",
                         "max",
@@ -392,9 +407,9 @@ class MetricDefinitionsView(View):
                                 "name": f"{dimension['name']}_{statistic_slug}",
                                 "type": statistic_slug,
                                 "sql": "${TABLE}." + dimension["name"],
-                                "label": f"{dimension['label']} {statistic_slug.title()}",
+                                "label": f"{dimension_label} {statistic_slug.title()}",
                                 "group_label": "Statistics",
-                                "description": f"{statistic_slug.title()} of {dimension['label']}",
+                                "description": f"{statistic_slug.title()} of {dimension_label}",
                             }
                         )
                     elif statistic_slug == "sum":
@@ -403,9 +418,9 @@ class MetricDefinitionsView(View):
                                 "name": f"{dimension['name']}_{statistic_slug}",
                                 "type": "sum",
                                 "sql": "${TABLE}." + dimension["name"] + "*" + sampling,
-                                "label": f"{dimension['label']} Sum",
+                                "label": f"{dimension_label} Sum",
                                 "group_label": "Statistics",
-                                "description": f"Sum of {dimension['label']}",
+                                "description": f"Sum of {dimension_label}",
                             }
                         )
                     elif statistic_slug == "client_count":
@@ -417,12 +432,12 @@ class MetricDefinitionsView(View):
                                     else f"{dimension['name']}_{statistic_slug}"
                                 ),
                                 "type": "count_distinct",
-                                "label": f"{dimension['label']} Client Count",
+                                "label": f"{dimension_label} Client Count",
                                 "group_label": "Statistics",
                                 "sql": "IF(${TABLE}."
                                 + f"{dimension['name']} > 0, "
                                 + "${TABLE}.client_id, SAFE_CAST(NULL AS STRING))",
-                                "description": f"Number of clients with {dimension['label']}",
+                                "description": f"Number of clients with {dimension_label}",
                                 "hidden": "yes" if sampling else "no",
                             }
                         )
@@ -432,13 +447,13 @@ class MetricDefinitionsView(View):
                                 {
                                     "name": f"{dimension['name']}_{statistic_slug}",
                                     "type": "number",
-                                    "label": f"{dimension['label']} Client Count",
+                                    "label": f"{dimension_label} Client Count",
                                     "group_label": "Statistics",
                                     "sql": "${"
                                     + f"{dimension['name']}_{statistic_slug}_sampled"
                                     + "} *"
                                     + sampling,
-                                    "description": f"Number of clients with {dimension['label']}",
+                                    "description": f"Number of clients with {dimension_label}",
                                 }
                             )
                     elif statistic_slug == "dau_proportion":
@@ -473,7 +488,7 @@ class MetricDefinitionsView(View):
                                 {
                                     "name": f"{dimension['name']}_{statistic_slug}",
                                     "type": "number",
-                                    "label": f"{dimension['label']} DAU Proportion",
+                                    "label": f"{dimension_label} DAU Proportion",
                                     "sql": "SAFE_DIVIDE(${"
                                     + f"{numerator}_{numerator_stat}"
                                     + "}, ${DAU})",
@@ -497,7 +512,7 @@ class MetricDefinitionsView(View):
                                 {
                                     "name": f"{dimension['name']}_{statistic_slug}",
                                     "type": "number",
-                                    "label": f"{dimension['label']} Ratio",
+                                    "label": f"{dimension_label} Ratio",
                                     "sql": "SAFE_DIVIDE(${"
                                     + f"{numerator}_{numerator_stat}"
                                     + "}, ${"
