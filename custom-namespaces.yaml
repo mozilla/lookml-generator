@@ -1313,7 +1313,7 @@ websites:
         - table: moz-fx-data-marketing-prod.ga.www_site_downloads
     ga4_sessions:
       type: table_view
-      tables: 
+      tables:
         - table: moz-fx-data-shared-prod.mozilla_org.ga_sessions_v2
     moz_org_page_metrics:
       type: table_view
@@ -1574,3 +1574,13 @@ user_journey:
   owners:
     - fbertsch@mozilla.com
   glean_app: false
+firefox_okrs:
+  glean_app: false
+  owners:
+    - vsabino@mozilla.com
+  pretty_name: Firefox OKRs
+  views:
+    desktop_engagement:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.telemetry.desktop_engagement
