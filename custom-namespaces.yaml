@@ -1584,3 +1584,7 @@ firefox_okrs:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.telemetry.desktop_engagement
+    mobile_retention:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.telemetry.mobile_retention
