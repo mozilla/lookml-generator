@@ -554,11 +554,11 @@ firefox_accounts:
     login_funnels_by_service:
       type: table_view
       tables:
-        - table: moz-fx-data-shared-prod.accounts_frontend_derived.login_funnels_by_service_v1
+        - table: moz-fx-data-shared-prod.accounts_frontend.login_funnels_by_service
     registration_funnels_by_service:
       type: table_view
       tables:
-        - table: moz-fx-data-shared-prod.accounts_frontend_derived.registration_funnels_by_service_v1
+        - table: moz-fx-data-shared-prod.accounts_frontend.registration_funnels_by_service
     registration_funnels:
       type: table_view
       tables:
@@ -590,7 +590,7 @@ firefox_accounts:
     email_first_funnels_by_service:
       type: table_view
       tables:
-        - table: moz-fx-data-shared-prod.accounts_frontend_derived.email_first_reg_login_funnels_by_service_v1
+        - table: moz-fx-data-shared-prod.accounts_frontend.email_first_reg_login_funnels_by_service
   explores:
     all_event_counts:
       type: events_explore
