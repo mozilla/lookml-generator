@@ -554,11 +554,11 @@ firefox_accounts:
     login_funnels_by_service:
       type: table_view
       tables:
-        - table: moz-fx-data-shared-prod.firefox_accounts_derived.login_funnels_by_service_v1
+        - table: moz-fx-data-shared-prod.accounts_frontend_derived.login_funnels_by_service_v1
     registration_funnels_by_service:
       type: table_view
       tables:
-        - table: moz-fx-data-shared-prod.firefox_accounts_derived.registration_funnels_by_service_v1
+        - table: moz-fx-data-shared-prod.accounts_frontend_derived.registration_funnels_by_service_v1
     registration_funnels:
       type: table_view
       tables:
