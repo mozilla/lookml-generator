@@ -1580,6 +1580,10 @@ firefox_okrs:
     - vsabino@mozilla.com
   pretty_name: Firefox OKRs
   views:
+    desktop_retention:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.telemetry.desktop_retention
     desktop_engagement:
       type: table_view
       tables:
