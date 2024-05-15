@@ -49,6 +49,10 @@ RENAMED_METRIC_TYPES = {
 
 DISALLOWED_PINGS = {"events"}
 
+# List of labeled counter names for which a suggest explore should be generated.
+# Generating suggest explores for all labeled counters slows down Looker.
+SUGGESTS_FOR_LABELED_COUNTERS = {"metrics__labeled_counter__glean_error_invalid_label"}
+
 
 class GleanPingView(PingView):
     """A view on a ping table for an application using the Glean SDK."""
@@ -121,7 +125,7 @@ class GleanPingView(PingView):
                         }
                     )
 
-                join_view = {
+                join_view: Dict[str, Any] = {
                     "name": view_name,
                     "label": view_label,
                     "dimensions": [
@@ -142,14 +146,6 @@ class GleanPingView(PingView):
                             "hidden": "yes",
                         },
                         {
-                            "name": "label",
-                            "type": "string",
-                            "sql": "${TABLE}.key",
-                            "suggest_explore": suggest_name,
-                            "suggest_dimension": f"{suggest_name}.key",
-                            "hidden": metric_hidden,
-                        },
-                        {
                             "name": "value",
                             "type": "number",
                             "sql": "${TABLE}.value",
@@ -158,28 +154,52 @@ class GleanPingView(PingView):
                     ],
                     "measures": measures,
                 }
-                suggest_view = {
-                    "name": suggest_name,
-                    "derived_table": {
-                        "sql": dedent(
-                            f"""
-                            select
-                                m.key,
-                                count(*) as n
-                            from {table} as t,
-                            unnest(metrics.{metric.type}.{metric.id.replace(".", "_")}) as m
-                            where date(submission_timestamp) > date_sub(current_date, interval 30 day)
-                                and sample_id = 0
-                            group by key
-                            order by n desc
-                            """
-                        )
-                    },
-                    "dimensions": [
-                        {"name": "key", "type": "string", "sql": "${TABLE}.key"}
-                    ],
-                }
-                view_definitions += [join_view, suggest_view]
+
+                if looker_name in SUGGESTS_FOR_LABELED_COUNTERS:
+                    join_view["dimensions"].append(
+                        {
+                            "name": "label",
+                            "type": "string",
+                            "sql": "${TABLE}.key",
+                            "suggest_explore": suggest_name,
+                            "suggest_dimension": f"{suggest_name}.key",
+                            "hidden": metric_hidden,
+                        },
+                    )
+
+                    suggest_view = {
+                        "name": suggest_name,
+                        "derived_table": {
+                            "sql": dedent(
+                                f"""
+                                select
+                                    m.key,
+                                    count(*) as n
+                                from {table} as t,
+                                unnest(metrics.{metric.type}.{metric.id.replace(".", "_")}) as m
+                                where date(submission_timestamp) > date_sub(current_date, interval 30 day)
+                                    and sample_id = 0
+                                group by key
+                                order by n desc
+                                """
+                            )
+                        },
+                        "dimensions": [
+                            {"name": "key", "type": "string", "sql": "${TABLE}.key"}
+                        ],
+                    }
+                    view_definitions += [join_view, suggest_view]
+                else:
+                    join_view["dimensions"].append(
+                        {
+                            "name": "label",
+                            "type": "string",
+                            "sql": "${TABLE}.key",
+                            "hidden": metric_hidden,
+                        },
+                    )
+                    view_definitions += [join_view]
+
         # deduplicate view definitions, because somehow a few entries make it in
         # twice e.g. metrics__metrics__labeled_counter__media_audio_init_failure
         view_definitions = sorted(

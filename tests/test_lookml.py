@@ -207,6 +207,19 @@ class MockClient:
                                             ),
                                         ],
                                     ),
+                                    SchemaField(
+                                        name="glean_error_invalid_label",
+                                        field_type="RECORD",
+                                        mode="REPEATED",
+                                        fields=[
+                                            SchemaField(
+                                                name="key", field_type="STRING"
+                                            ),
+                                            SchemaField(
+                                                name="value", field_type="INTEGER"
+                                            ),
+                                        ],
+                                    ),
                                 ],
                             ),
                             SchemaField(
@@ -587,6 +600,15 @@ def msg_glean_probes():
                 "type": "labeled_counter",
                 "history": history,
                 "name": "test.labeled_counter_not_in_source",
+                "in-source": False,
+            },
+        ),
+        GleanProbe(
+            "glean_error.invalid_label",
+            {
+                "type": "labeled_counter",
+                "history": history,
+                "name": "glean_error.invalid_label",
                 "in-source": False,
             },
         ),
@@ -1146,6 +1168,21 @@ def test_lookml_actual_metric_definitions_view(
                             ],
                         },
                         {
+                            "group_item_label": "Invalid Label",
+                            "group_label": "Glean Error",
+                            "hidden": "yes",
+                            "label": "Glean Error Invalid Label",
+                            "links": [
+                                {
+                                    "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",
+                                    "label": "Glean Dictionary reference for Glean Error Invalid Label",
+                                    "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/glean_error_invalid_label",  # noqa: E501
+                                }
+                            ],
+                            "name": "metrics__labeled_counter__glean_error_invalid_label",
+                            "sql": "${TABLE}.metrics.labeled_counter.glean_error_invalid_label",
+                        },
+                        {
                             "group_item_label": "No Category Counter",
                             "group_label": "Glean",
                             "hidden": "no",
@@ -1496,11 +1533,51 @@ def test_lookml_actual_metric_definitions_view(
                             "type": "string",
                         },
                         {
+                            "hidden": "yes",
+                            "name": "value",
+                            "sql": "${TABLE}.value",
+                            "type": "number",
+                        },
+                        {
+                            "hidden": "yes",
                             "name": "label",
-                            "hidden": "no",
                             "sql": "${TABLE}.key",
-                            "suggest_dimension": "suggest__metrics__metrics__labeled_counter__test_labeled_counter.key",
-                            "suggest_explore": "suggest__metrics__metrics__labeled_counter__test_labeled_counter",
+                            "suggest_dimension": "suggest__metrics__metrics__labeled_counter__glean_error_invalid_label.key",  # noqa: E501
+                            "suggest_explore": "suggest__metrics__metrics__labeled_counter__glean_error_invalid_label",
+                            "type": "string",
+                        },
+                    ],
+                    "label": "Glean Error - Invalid Label",
+                    "measures": [
+                        {
+                            "hidden": "yes",
+                            "name": "count",
+                            "sql": "${value}",
+                            "type": "sum",
+                        },
+                        {
+                            "hidden": "yes",
+                            "name": "client_count",
+                            "sql": "case when ${value} > 0 then "
+                            "${metrics.client_info__client_id} end",
+                            "type": "count_distinct",
+                        },
+                    ],
+                    "name": "metrics__metrics__labeled_counter__glean_error_invalid_label",
+                },
+                {
+                    "dimensions": [
+                        {
+                            "hidden": "yes",
+                            "name": "document_id",
+                            "sql": "${metrics.document_id}",
+                            "type": "string",
+                        },
+                        {
+                            "hidden": "yes",
+                            "name": "document_label_id",
+                            "primary_key": "yes",
+                            "sql": "${metrics.document_id}-${label}",
                             "type": "string",
                         },
                         {
@@ -1508,6 +1585,12 @@ def test_lookml_actual_metric_definitions_view(
                             "name": "value",
                             "sql": "${TABLE}.value",
                             "type": "number",
+                        },
+                        {
+                            "name": "label",
+                            "hidden": "no",
+                            "sql": "${TABLE}.key",
+                            "type": "string",
                         },
                     ],
                     "label": "Test - Labeled Counter",
@@ -1544,18 +1627,16 @@ def test_lookml_actual_metric_definitions_view(
                             "type": "string",
                         },
                         {
-                            "name": "label",
-                            "hidden": "yes",
-                            "sql": "${TABLE}.key",
-                            "suggest_dimension": "suggest__metrics__metrics__labeled_counter__test_labeled_counter_not_in_source.key",  # noqa: E501
-                            "suggest_explore": "suggest__metrics__metrics__labeled_counter__test_labeled_counter_not_in_source",  # noqa: E501
-                            "type": "string",
-                        },
-                        {
                             "hidden": "yes",
                             "name": "value",
                             "sql": "${TABLE}.value",
                             "type": "number",
+                        },
+                        {
+                            "name": "label",
+                            "hidden": "yes",
+                            "sql": "${TABLE}.key",
+                            "type": "string",
                         },
                     ],
                     "label": "Test - Labeled Counter Not In Source",
@@ -1583,8 +1664,11 @@ def test_lookml_actual_metric_definitions_view(
                         "    count(*) as n\n"
                         "from mozdata.glean_app.metrics as "
                         "t,\n"
-                        "unnest(metrics.labeled_counter.test_labeled_counter) as m\n"
-                        "where date(submission_timestamp) > date_sub(current_date, interval 30 day)\n"
+                        "unnest(metrics.labeled_counter.glean_error_invalid_label) "
+                        "as m\n"
+                        "where date(submission_timestamp) > "
+                        "date_sub(current_date, interval 30 "
+                        "day)\n"
                         "    and sample_id = 0\n"
                         "group by key\n"
                         "order by n desc"
@@ -1592,25 +1676,7 @@ def test_lookml_actual_metric_definitions_view(
                     "dimensions": [
                         {"name": "key", "sql": "${TABLE}.key", "type": "string"}
                     ],
-                    "name": "suggest__metrics__metrics__labeled_counter__test_labeled_counter",
-                },
-                {
-                    "derived_table": {
-                        "sql": "select\n"
-                        "    m.key,\n"
-                        "    count(*) as n\n"
-                        "from mozdata.glean_app.metrics as "
-                        "t,\n"
-                        "unnest(metrics.labeled_counter.test_labeled_counter_not_in_source) as m\n"
-                        "where date(submission_timestamp) > date_sub(current_date, interval 30 day)\n"
-                        "    and sample_id = 0\n"
-                        "group by key\n"
-                        "order by n desc"
-                    },
-                    "dimensions": [
-                        {"name": "key", "sql": "${TABLE}.key", "type": "string"}
-                    ],
-                    "name": "suggest__metrics__metrics__labeled_counter__test_labeled_counter_not_in_source",
+                    "name": "suggest__metrics__metrics__labeled_counter__glean_error_invalid_label",
                 },
                 {
                     "dimensions": [

@@ -226,4 +226,4 @@ def test_undeployed_probe(mock_glean_ping):
     # view. Expect 3 views, because 1 for the table view, 2 added for fun.counter_metric
     # because it's in the table schema, and 0 added for fun.counter_metric2 because it's
     # not in the table schema.
-    assert len(lookml["views"]) == 3
+    assert len(lookml["views"]) == 2
