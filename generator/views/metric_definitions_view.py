@@ -169,11 +169,11 @@ class MetricDefinitionsView(View):
                     BETWEEN
                     COALESCE(
                         SAFE_CAST(
-                            {{% date_start {data_source.submission_date_column or "submission_date"} %}} AS DATE
+                            {{% date_start submission_date %}} AS DATE
                         ), CURRENT_DATE()) AND
                     COALESCE(
                         SAFE_CAST(
-                            {{% date_end {data_source.submission_date_column or "submission_date"} %}} AS DATE
+                            {{% date_end submission_date %}} AS DATE
                         ), CURRENT_DATE())
                 """
                 for data_source in [data_source_definition] + joined_data_sources
