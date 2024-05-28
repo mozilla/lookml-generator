@@ -96,35 +96,29 @@ class MetricDefinitionsView(View):
         if data_source_definition.joins:
             # determine the dimensions selected by the joined data sources
             for joined_data_source_slug, join in data_source_definition.joins.items():
-                if (
-                    data_source_definition.client_id_column != "NULL"
-                    or join.get("on_expression", None) is not None
-                ):
-                    joined_data_source = (
-                        MetricsConfigLoader.configs.get_data_source_definition(
-                            joined_data_source_slug, self.namespace
-                        )
+                joined_data_source = (
+                    MetricsConfigLoader.configs.get_data_source_definition(
+                        joined_data_source_slug, self.namespace
                     )
+                )
 
-                    if joined_data_source.columns_as_dimensions:
-                        joined_data_sources.append(joined_data_source)
-                        # create Looker dimensions by doing a dryrun
-                        query = MetricsConfigLoader.configs.get_data_source_sql(
-                            joined_data_source_slug,
-                            self.namespace,
-                            where=(
-                                None
-                                if joined_data_source.submission_date_column is None
-                                or joined_data_source.submission_date_column == "NULL"
-                                else f"{joined_data_source.submission_date_column} = '2023-01-01'"
-                            ),
-                        ).format(dataset=self.namespace)
+                if joined_data_source.columns_as_dimensions:
+                    joined_data_sources.append(joined_data_source)
+                    # create Looker dimensions by doing a dryrun
+                    query = MetricsConfigLoader.configs.get_data_source_sql(
+                        joined_data_source_slug,
+                        self.namespace,
+                        where=(
+                            None
+                            if joined_data_source.submission_date_column is None
+                            or joined_data_source.submission_date_column == "NULL"
+                            else f"{joined_data_source.submission_date_column} = '2023-01-01'"
+                        ),
+                    ).format(dataset=self.namespace)
 
-                        base_view_dimensions[joined_data_source_slug] = (
-                            lookml_utils._generate_dimensions_from_query(
-                                bq_client, query
-                            )
-                        )
+                    base_view_dimensions[joined_data_source_slug] = (
+                        lookml_utils._generate_dimensions_from_query(bq_client, query)
+                    )
         elif (
             data_source_definition.client_id_column == "NULL"
             or data_source_definition.columns_as_dimensions
