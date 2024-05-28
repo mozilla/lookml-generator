@@ -1596,3 +1596,8 @@ firefox_okrs:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.telemetry.mobile_engagement
+fakespot:
+  pretty_name: Fakespot
+  owners:
+    - wstuckey@mozilla.com
+  glean_app: false
