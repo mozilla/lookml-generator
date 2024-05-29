@@ -93,12 +93,9 @@ class MetricDefinitionsView(View):
 
         # check if the metric data source has joins
         # joined data sources are generally used for creating the "Base Fields"
-        if (
-            data_source_definition.joins
-            and data_source_definition.client_id_column != "NULL"
-        ):
+        if data_source_definition.joins:
             # determine the dimensions selected by the joined data sources
-            for joined_data_source_slug, _ in data_source_definition.joins.items():
+            for joined_data_source_slug, join in data_source_definition.joins.items():
                 joined_data_source = (
                     MetricsConfigLoader.configs.get_data_source_definition(
                         joined_data_source_slug, self.namespace
@@ -114,6 +111,7 @@ class MetricDefinitionsView(View):
                         where=(
                             None
                             if joined_data_source.submission_date_column is None
+                            or joined_data_source.submission_date_column == "NULL"
                             else f"{joined_data_source.submission_date_column} = '2023-01-01'"
                         ),
                     ).format(dataset=self.namespace)
@@ -524,5 +522,22 @@ class MetricDefinitionsView(View):
                                         {statistic_conf['denominator']}""",
                                 }
                             )
+                    elif statistic_slug == "rolling_average":
+                        aggregation = statistic_conf.get("aggregation", "sum")
+                        if "window_sizes" in statistic_conf:
+                            for window_size in statistic_conf["window_sizes"]:
+                                measures.append(
+                                    {
+                                        "name": f"{dimension['name']}_{window_size}_day_{statistic_slug}",
+                                        "type": "number",
+                                        "label": f"{dimension_label} {window_size} Day Rolling Average",
+                                        "sql": f"""
+                                            AVG({aggregation}(${{TABLE}}.{dimension["name"]} * {sampling})) OVER (
+                                                ROWS {window_size} PRECEDING
+                                        )""",
+                                        "group_label": "Statistics",
+                                        "description": f"{window_size} day rolling average of {dimension_label}",
+                                    }
+                                )
 
         return measures
