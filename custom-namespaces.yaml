@@ -563,6 +563,10 @@ firefox_accounts:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.firefox_accounts_derived.registration_funnels_v1
+    registration_funnels_legacy_events:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.firefox_accounts_derived.registration_funnels_legacy_events_v1
     accounts_aggregates:
       type: table_view
       tables:
@@ -636,6 +640,10 @@ firefox_accounts:
       type: table_explore
       views:
         base_view: registration_funnels
+    registration_funnels_legacy_events:
+      type: table_explore
+      views:
+        base_view: registration_funnels_legacy_events
     password_reset_funnels:
       type: table_explore
       views:
