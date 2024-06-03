@@ -104,35 +104,45 @@ class MetricDefinitionsView(View):
 
                 if joined_data_source.columns_as_dimensions:
                     joined_data_sources.append(joined_data_source)
+
+                    date_filter = None
+                    if joined_data_source.submission_date_column != "NULL":
+                        date_filter = (
+                            "submission_date = '2023-01-01'"
+                            if joined_data_source.submission_date_column is None
+                            else f"{joined_data_source.submission_date_column} = '2023-01-01'"
+                        )
+
                     # create Looker dimensions by doing a dryrun
                     query = MetricsConfigLoader.configs.get_data_source_sql(
                         joined_data_source_slug,
                         self.namespace,
-                        where=(
-                            None
-                            if joined_data_source.submission_date_column is None
-                            or joined_data_source.submission_date_column == "NULL"
-                            else f"{joined_data_source.submission_date_column} = '2023-01-01'"
-                        ),
+                        where=date_filter,
                     ).format(dataset=self.namespace)
 
                     base_view_dimensions[joined_data_source_slug] = (
                         lookml_utils._generate_dimensions_from_query(bq_client, query)
                     )
-        elif (
+
+        if (
             data_source_definition.client_id_column == "NULL"
             or data_source_definition.columns_as_dimensions
         ):
             # if the metrics data source doesn't have any joins then use the dimensions
             # of the data source itself as base fields
-            query = MetricsConfigLoader.configs.get_data_source_sql(
-                data_source_definition.name,
-                self.namespace,
-                where=(
+            data_source_definition.joins = []
+            date_filter = None
+            if data_source_definition.submission_date_column != "NULL":
+                date_filter = (
                     "submission_date = '2023-01-01'"
                     if data_source_definition.submission_date_column is None
                     else f"{data_source_definition.submission_date_column} = '2023-01-01'"
-                ),
+                )
+
+            query = MetricsConfigLoader.configs.get_data_source_sql(
+                data_source_definition.name,
+                self.namespace,
+                where=date_filter,
             ).format(dataset=self.namespace)
 
             base_view_dimensions[data_source_definition.name] = (
