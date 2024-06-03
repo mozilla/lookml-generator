@@ -108,8 +108,9 @@ class MetricDefinitionsView(View):
                     date_filter = None
                     if joined_data_source.submission_date_column != "NULL":
                         date_filter = (
-                            "submission_date = '2023-01-01'"
+                            None
                             if joined_data_source.submission_date_column is None
+                            or joined_data_source.submission_date_column == "NULL"
                             else f"{joined_data_source.submission_date_column} = '2023-01-01'"
                         )
 
@@ -130,7 +131,6 @@ class MetricDefinitionsView(View):
         ):
             # if the metrics data source doesn't have any joins then use the dimensions
             # of the data source itself as base fields
-            data_source_definition.joins = []
             date_filter = None
             if data_source_definition.submission_date_column != "NULL":
                 date_filter = (
@@ -143,6 +143,7 @@ class MetricDefinitionsView(View):
                 data_source_definition.name,
                 self.namespace,
                 where=date_filter,
+                ignore_joins=True,
             ).format(dataset=self.namespace)
 
             base_view_dimensions[data_source_definition.name] = (
