@@ -271,6 +271,8 @@ class MetricDefinitionsView(View):
                         view_defn["dimensions"].append(dimension)
                     else:
                         view_defn["dimension_groups"].append(dimension)
+                    # avoid duplicate dimensions
+                    ignore_base_fields.append(dimension["name"])
 
         view_defn["measures"] = self.get_measures(
             view_defn["dimensions"],
