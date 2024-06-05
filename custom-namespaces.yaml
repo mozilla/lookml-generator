@@ -1605,3 +1605,8 @@ fakespot:
   owners:
     - wstuckey@mozilla.com
   glean_app: false
+firefox_metrics:
+  pretty_name: Firefox Metrics
+  owners:
+    - vsabino@mozilla.com
+  glean_app: false
