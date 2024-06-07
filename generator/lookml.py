@@ -8,6 +8,8 @@ import click
 import lkml
 import yaml
 from google.cloud import bigquery
+from functools import partial
+from multiprocessing.pool import ThreadPool
 
 from .dashboards import DASHBOARD_TYPES
 from .explores import EXPLORE_TYPES
@@ -28,8 +30,9 @@ FILE_HEADER = """
 def _generate_views(
     client, out_dir: Path, views: Iterable[View], v1_name: Optional[str]
 ) -> Iterable[Path]:
+    print("dd")
     for view in views:
-        logging.info(
+        print(
             f"Generating lookml for view {view.name} in {view.namespace} of type {view.view_type}"
         )
         path = out_dir / f"{view.name}.view.lkml"
@@ -113,6 +116,7 @@ def _lookml(namespaces, glean_apps, target_dir, namespace_filter=[]):
     with open(target / "namespaces.yaml", "w") as target_namespaces_file:
         target_namespaces_file.write(namespaces_content)
 
+    views_with_v1_name = []
     v1_mapping = _glean_apps_to_v1_map(glean_apps)
     for namespace, lookml_objects in _namespaces.items():
         if len(namespace_filter) == 0 or namespace in namespace_filter:
@@ -124,31 +128,46 @@ def _lookml(namespaces, glean_apps, target_dir, namespace_filter=[]):
                 _get_views_from_dict(lookml_objects.get("views", {}), namespace)
             )
 
-            logging.info("  Generating views")
-            v1_name: Optional[str] = v1_mapping.get(namespace)
-            for view_path in _generate_views(client, view_dir, views, v1_name):
-                logging.info(f"    ...Generating {view_path}")
+        logging.info("  Generating views")
+        v1_name: Optional[str] = v1_mapping.get(namespace)
+        for view in views:
+            print(view)
+            views_with_v1_name.append(partial(_generate_views, client, view_dir, [view], v1_name))
 
-            logging.info("  Generating datagroups")
-            generate_datagroups(views, target, namespace, client)
+    print(views_with_v1_name)
+    
+    with ThreadPool(8) as pool:
+        pool.map(lambda x: x(), views_with_v1_name, chunksize=1)
 
-            explore_dir = target / namespace / "explores"
-            explore_dir.mkdir(parents=True, exist_ok=True)
-            explores = lookml_objects.get("explores", {})
-            logging.info("  Generating explores")
-            for explore_path in _generate_explores(
-                client, explore_dir, namespace, explores, view_dir, v1_name
-            ):
-                logging.info(f"    ...Generating {explore_path}")
+    explores_with_v1_name = []
+    for namespace, lookml_objects in _namespaces.items():
+        logging.info("  Generating datagroups")
+        generate_datagroups(views, target, namespace, client)
 
-            logging.info("  Generating dashboards")
-            dashboard_dir = target / namespace / "dashboards"
-            dashboard_dir.mkdir(parents=True, exist_ok=True)
-            dashboards = lookml_objects.get("dashboards", {})
-            for dashboard_path in _generate_dashboards(
-                client, dashboard_dir, namespace, dashboards
-            ):
-                logging.info(f"    ...Generating {dashboard_path}")
+        explore_dir = target / namespace / "explores"
+        explore_dir.mkdir(parents=True, exist_ok=True)
+        explores = lookml_objects.get("explores", {})
+        logging.info("  Generating explores")
+        for explore_path in _generate_explores(
+            client, explore_dir, namespace, explores, view_dir, v1_name
+        ):
+            logging.info(f"    ...Generating {explore_path}")
+
+        explores_with_v1_name += [(namespace, [explore], view_dir, v1_name) for explore in explores]
+
+    with ThreadPool(8) as pool:
+        pool.starmap(partial(_generate_explores, client, explore_dir), explores_with_v1_name)
+
+    dashboards_with_namespace = []
+    for namespace, lookml_objects in _namespaces.items():
+        logging.info("  Generating dashboards")
+        dashboard_dir = target / namespace / "dashboards"
+        dashboard_dir.mkdir(parents=True, exist_ok=True)
+        dashboards = lookml_objects.get("dashboards", {})
+        dashboards_with_namespace += [(namespace, [dashboard]) for dashboard in dashboards]
+
+    with ThreadPool(8) as pool:
+        pool.starmap(partial(_generate_dashboards, client, dashboard_dir), dashboards_with_namespace)
 
 
 @click.command(help=__doc__)
