@@ -100,7 +100,7 @@ def _glean_apps_to_v1_map(glean_apps):
     return {d["name"]: d["v1_name"] for d in glean_apps}
 
 
-def _lookml(namespaces, glean_apps, target_dir):
+def _lookml(namespaces, glean_apps, target_dir, namespace_filter=[]):
     client = bigquery.Client()
 
     namespaces_content = namespaces.read()
@@ -115,37 +115,40 @@ def _lookml(namespaces, glean_apps, target_dir):
 
     v1_mapping = _glean_apps_to_v1_map(glean_apps)
     for namespace, lookml_objects in _namespaces.items():
-        logging.info(f"\nGenerating namespace {namespace}")
+        if len(namespace_filter) == 0 or namespace in namespace_filter:
+            logging.info(f"\nGenerating namespace {namespace}")
 
-        view_dir = target / namespace / "views"
-        view_dir.mkdir(parents=True, exist_ok=True)
-        views = list(_get_views_from_dict(lookml_objects.get("views", {}), namespace))
+            view_dir = target / namespace / "views"
+            view_dir.mkdir(parents=True, exist_ok=True)
+            views = list(
+                _get_views_from_dict(lookml_objects.get("views", {}), namespace)
+            )
 
-        logging.info("  Generating views")
-        v1_name: Optional[str] = v1_mapping.get(namespace)
-        for view_path in _generate_views(client, view_dir, views, v1_name):
-            logging.info(f"    ...Generating {view_path}")
+            logging.info("  Generating views")
+            v1_name: Optional[str] = v1_mapping.get(namespace)
+            for view_path in _generate_views(client, view_dir, views, v1_name):
+                logging.info(f"    ...Generating {view_path}")
 
-        logging.info("  Generating datagroups")
-        generate_datagroups(views, target, namespace, client)
+            logging.info("  Generating datagroups")
+            generate_datagroups(views, target, namespace, client)
 
-        explore_dir = target / namespace / "explores"
-        explore_dir.mkdir(parents=True, exist_ok=True)
-        explores = lookml_objects.get("explores", {})
-        logging.info("  Generating explores")
-        for explore_path in _generate_explores(
-            client, explore_dir, namespace, explores, view_dir, v1_name
-        ):
-            logging.info(f"    ...Generating {explore_path}")
+            explore_dir = target / namespace / "explores"
+            explore_dir.mkdir(parents=True, exist_ok=True)
+            explores = lookml_objects.get("explores", {})
+            logging.info("  Generating explores")
+            for explore_path in _generate_explores(
+                client, explore_dir, namespace, explores, view_dir, v1_name
+            ):
+                logging.info(f"    ...Generating {explore_path}")
 
-        logging.info("  Generating dashboards")
-        dashboard_dir = target / namespace / "dashboards"
-        dashboard_dir.mkdir(parents=True, exist_ok=True)
-        dashboards = lookml_objects.get("dashboards", {})
-        for dashboard_path in _generate_dashboards(
-            client, dashboard_dir, namespace, dashboards
-        ):
-            logging.info(f"    ...Generating {dashboard_path}")
+            logging.info("  Generating dashboards")
+            dashboard_dir = target / namespace / "dashboards"
+            dashboard_dir.mkdir(parents=True, exist_ok=True)
+            dashboards = lookml_objects.get("dashboards", {})
+            for dashboard_path in _generate_dashboards(
+                client, dashboard_dir, namespace, dashboards
+            ):
+                logging.info(f"    ...Generating {dashboard_path}")
 
 
 @click.command(help=__doc__)
@@ -173,10 +176,16 @@ def _lookml(namespaces, glean_apps, target_dir):
     default=[METRIC_HUB_REPO, LOOKER_METRIC_HUB_REPO],
     help="Repos to load metric configs from.",
 )
-def lookml(namespaces, app_listings_uri, target_dir, metric_hub_repos):
+@click.option(
+    "--only",
+    multiple=True,
+    default=[],
+    help="List of namespace names to generate lookml for.",
+)
+def lookml(namespaces, app_listings_uri, target_dir, metric_hub_repos, only):
     """Generate lookml from namespaces."""
     if metric_hub_repos:
         MetricsConfigLoader.update_repos(metric_hub_repos)
 
     glean_apps = _get_glean_apps(app_listings_uri)
-    return _lookml(namespaces, glean_apps, target_dir)
+    return _lookml(namespaces, glean_apps, target_dir, only)
