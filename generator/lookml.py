@@ -4,7 +4,7 @@ import logging
 from functools import partial
 from multiprocessing.pool import ThreadPool
 from pathlib import Path
-from typing import Dict, Iterable, Optional
+from typing import Any, Dict, Iterable, Optional
 
 import click
 import lkml
@@ -48,12 +48,12 @@ def _generate_explore(
     out_dir: Path,
     namespace: str,
     explore_name: str,
-    explore: dict,
+    explore: Any,
     views_dir: Path,
     v1_name: Optional[
         str
     ],  # v1_name for Glean explores: see: https://mozilla.github.io/probe-scraper/#tag/library
-) -> Iterable[Path]:
+) -> Path:
     logging.info(f"Generating lookml for explore {explore_name} in {namespace}")
     explore = EXPLORE_TYPES[explore["type"]].from_dict(explore_name, explore, views_dir)
     file_lookml = {
@@ -77,7 +77,7 @@ def _generate_dashboard(
     dash_dir: Path,
     namespace: str,
     dashboard_name: str,
-    dashboard: dict,
+    dashboard: Any,
 ):
     logging.info(f"Generating lookml for dashboard {dashboard_name} in {namespace}")
     dashboard = DASHBOARD_TYPES[dashboard["type"]].from_dict(
@@ -101,7 +101,9 @@ def _glean_apps_to_v1_map(glean_apps):
     return {d["name"]: d["v1_name"] for d in glean_apps}
 
 
-def _lookml(namespaces, glean_apps, target_dir, namespace_filter=[]):
+def _lookml(
+    namespaces, glean_apps, target_dir, namespace_filter=[], parallelism: int = 8
+):
     client = bigquery.Client()
 
     namespaces_content = namespaces.read()
@@ -133,7 +135,7 @@ def _lookml(namespaces, glean_apps, target_dir, namespace_filter=[]):
                     partial(_generate_view, client, view_dir, view, v1_name)
                 )
 
-    with ThreadPool(8) as pool:
+    with ThreadPool(parallelism) as pool:
         pool.map(lambda x: x(), views_with_v1_name, chunksize=1)
 
     explores_with_v1_name = []
@@ -151,7 +153,7 @@ def _lookml(namespaces, glean_apps, target_dir, namespace_filter=[]):
                 for explore_name, explore in explores.items()
             ]
 
-    with ThreadPool(8) as pool:
+    with ThreadPool(parallelism) as pool:
         pool.starmap(
             partial(_generate_explore, client, explore_dir), explores_with_v1_name
         )
@@ -168,7 +170,7 @@ def _lookml(namespaces, glean_apps, target_dir, namespace_filter=[]):
                 for dashboard_name, dashboard in dashboards.items()
             ]
 
-    with ThreadPool(8) as pool:
+    with ThreadPool(parallelism) as pool:
         pool.starmap(
             partial(_generate_dashboard, client, dashboard_dir),
             dashboards_with_namespace,
@@ -206,10 +208,19 @@ def _lookml(namespaces, glean_apps, target_dir, namespace_filter=[]):
     default=[],
     help="List of namespace names to generate lookml for.",
 )
-def lookml(namespaces, app_listings_uri, target_dir, metric_hub_repos, only):
+@click.option(
+    "--parallelism",
+    "-p",
+    default=8,
+    type=int,
+    help="Number of threads to use for lookml generation",
+)
+def lookml(
+    namespaces, app_listings_uri, target_dir, metric_hub_repos, only, parallelism
+):
     """Generate lookml from namespaces."""
     if metric_hub_repos:
         MetricsConfigLoader.update_repos(metric_hub_repos)
 
     glean_apps = _get_glean_apps(app_listings_uri)
-    return _lookml(namespaces, glean_apps, target_dir, only)
+    return _lookml(namespaces, glean_apps, target_dir, only, parallelism)
