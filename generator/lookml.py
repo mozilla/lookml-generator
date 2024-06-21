@@ -131,12 +131,10 @@ def _lookml(
             logging.info("  Generating views")
             v1_name: Optional[str] = v1_mapping.get(namespace)
             for view in views:
-                views_with_v1_name.append(
-                    partial(_generate_view, client, view_dir, view, v1_name)
-                )
+                views_with_v1_name.append((view_dir, view, v1_name))
 
     with ThreadPool(parallelism) as pool:
-        pool.map(lambda x: x(), views_with_v1_name, chunksize=1)
+        pool.starmap(partial(_generate_view, client), views_with_v1_name)
 
     explores_with_v1_name = []
     for namespace, lookml_objects in _namespaces.items():
@@ -144,19 +142,18 @@ def _lookml(
             logging.info("  Generating datagroups")
             generate_datagroups(views, target, namespace, client)
 
+            view_dir = target / namespace / "views"
             explore_dir = target / namespace / "explores"
             explore_dir.mkdir(parents=True, exist_ok=True)
             explores = lookml_objects.get("explores", {})
             logging.info("  Generating explores")
             explores_with_v1_name += [
-                (namespace, explore_name, explore, view_dir, v1_name)
+                (explore_dir, namespace, explore_name, explore, view_dir, v1_name)
                 for explore_name, explore in explores.items()
             ]
 
     with ThreadPool(parallelism) as pool:
-        pool.starmap(
-            partial(_generate_explore, client, explore_dir), explores_with_v1_name
-        )
+        pool.starmap(partial(_generate_explore, client), explores_with_v1_name)
 
     dashboards_with_namespace = []
     for namespace, lookml_objects in _namespaces.items():
@@ -166,13 +163,13 @@ def _lookml(
             dashboard_dir.mkdir(parents=True, exist_ok=True)
             dashboards = lookml_objects.get("dashboards", {})
             dashboards_with_namespace += [
-                (namespace, dashboard_name, dashboard)
+                (dashboard_dir, namespace, dashboard_name, dashboard)
                 for dashboard_name, dashboard in dashboards.items()
             ]
 
     with ThreadPool(parallelism) as pool:
         pool.starmap(
-            partial(_generate_dashboard, client, dashboard_dir),
+            partial(_generate_dashboard, client),
             dashboards_with_namespace,
         )
 
