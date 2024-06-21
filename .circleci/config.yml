@@ -6,6 +6,7 @@ orbs:
   gcp-gcr: circleci/gcp-gcr@0.16.2
   docker: circleci/docker@2.5.0
   python: circleci/python@2.1.1
+  gcp-cli: circleci/gcp-cli@3.1.1
 
 parameters:
   python-version:
@@ -106,7 +107,6 @@ jobs:
       - persist_to_workspace:
           root: /tmp
           paths: _html
-
   docs-deploy:
     docker:
       - image: node:14
@@ -126,7 +126,24 @@ jobs:
       - run:
           name: Deploy docs to gh-pages branch
           command: gh-pages --message "[skip ci] updates" --dist /tmp/_html
-
+  looker-deploy:
+    executor: gcp-cli/google
+    steps:
+      - gcp-cli/setup:
+          use_oidc: true
+          workload_identity_pool_id: GCP_WIP_ID
+          workload_identity_pool_provider_id: GCP_WIP_PROVIDER_ID
+          google_project_number: GCP_PROJECT_ID
+          service_account_email: GCP_SERVICE_ACCOUNT_EMAIL
+      - run:
+          name: Trigger looker DAG in Airflow to deploy lookml
+          command: >
+            ID_TOKEN=$(gcloud auth print-identity-token --impersonate-service-account ${GCP_SERVICE_ACCOUNT_EMAIL}) &&
+            DAGRUN_NOTE="DAG triggered by **[${CIRCLE_USERNAME}](https://github.com/${CIRCLE_USERNAME})** from ${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME} CI build [${CIRCLE_BUILD_NUM}](${CIRCLE_BUILD_URL})" &&
+            curl --location --request POST "https://us-west1-moz-fx-telemetry-airflow-prod.cloudfunctions.net/ci-external-trigger"
+            -H "Authorization: bearer ${ID_TOKEN}"
+            -H "Content-Type:application/json"
+            -d "{\"dagrun_note\": \"${DAGRUN_NOTE}\", \"dag_id\":\"looker\"}"
   build-container:
     executor: docker/docker
     working_directory: ~/mozilla/lookml-generator
@@ -181,3 +198,12 @@ workflows:
           filters:
             branches:
               only: main
+
+      - looker-deploy:
+          name: Trigger looker Airflow DAG to deploy lookml
+          requires:
+            - Add commit hash as docker image tag
+          filters:
+            branches:
+              only:
+                - main
