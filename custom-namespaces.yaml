@@ -1358,11 +1358,11 @@ websites:
     google_search_console_by_page:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.google_search_console.search_impressions_by_page
+        - table: mozdata.google_search_console.search_impressions_by_page
     google_search_console_by_site:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.google_search_console.search_impressions_by_site
+        - table: mozdata.google_search_console.search_impressions_by_site
 marketing:
   glean_app: false
   pretty_name: Marketing
