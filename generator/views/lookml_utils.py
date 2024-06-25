@@ -236,19 +236,6 @@ def render_template(filename, template_folder, **kwargs) -> str:
     return rendered
 
 
-def get_distinct_vals(bq_client: bigquery.Client, table: str, column: str):
-    """Given a table and column name, return all distinct values for that column."""
-    query_job = bq_client.query(
-        f"""
-            SELECT DISTINCT {column}
-            FROM {table}
-            ORDER BY {column}
-        """
-    )
-    distinct_values = query_job.result().to_dataframe()[column].tolist()
-    return distinct_values
-
-
 def slug_to_title(slug):
     """Convert a slug to title case."""
     return slug.replace("_", " ").title()
