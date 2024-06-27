@@ -201,6 +201,7 @@ workflows:
 
       - looker-deploy:
           name: Trigger looker Airflow DAG to deploy lookml
+          context: gcpv2-workload-identity
           requires:
             - Add commit hash as docker image tag
           filters:
