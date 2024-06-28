@@ -177,8 +177,8 @@ def test_view_lookml(events_view):
             ),
             SchemaField("event_id", "STRING"),
         ]
-    )
-    actual = events_view.to_lookml(mock_bq_client, None)
+    ) # todo
+    actual = events_view.to_lookml(None)
     print_and_test(expected=expected, actual=actual)
 
 
@@ -210,5 +210,5 @@ def test_explore_lookml(time_partitioning_group, events_explore):
         },
     ]
 
-    actual = events_explore.to_lookml(None, None)
+    actual = events_explore.to_lookml(None)
     print_and_test(expected=expected, actual=actual)

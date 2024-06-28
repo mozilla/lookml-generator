@@ -40,7 +40,6 @@ class MetricDefinitionsExplore(Explore):
 
     def _to_lookml(
         self,
-        _bq_client: bigquery.Client,
         _v1_name: Optional[str],
     ) -> List[Dict[str, Any]]:
         exposed_fields = ["ALL_FIELDS*"]

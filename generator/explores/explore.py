@@ -27,7 +27,7 @@ class Explore:
         return {self.name: {"type": self.type, "views": self.views}}
 
     def to_lookml(
-        self, client: bigquery.Client, v1_name: Optional[str]
+        self, v1_name: Optional[str]
     ) -> List[Dict[str, Any]]:
         """
         Generate LookML for this explore.
@@ -63,7 +63,7 @@ class Explore:
                 )
 
         # We only update the first returned explore
-        new_lookml = self._to_lookml(client, v1_name)
+        new_lookml = self._to_lookml(v1_name)
         base_lookml.update(new_lookml[0])
         new_lookml[0] = base_lookml
 
@@ -71,7 +71,6 @@ class Explore:
 
     def _to_lookml(
         self,
-        client: bigquery.Client,
         v1_name: Optional[str],
     ) -> List[Dict[str, Any]]:
         raise NotImplementedError("Only implemented in subclasses")

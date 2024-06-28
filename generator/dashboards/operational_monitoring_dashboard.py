@@ -54,7 +54,7 @@ class OperationalMonitoringDashboard(Dashboard):
         ]
         return {branch: color for branch, color in zip(branches, colours)}
 
-    def to_lookml(self, bq_client):
+    def to_lookml(self):
         """Get this dashboard as LookML."""
         kwargs = {
             "name": self.name,

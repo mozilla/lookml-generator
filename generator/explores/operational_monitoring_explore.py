@@ -50,7 +50,6 @@ class OperationalMonitoringExplore(Explore):
 
     def _to_lookml(
         self,
-        bq_client: bigquery.Client,
         v1_name: Optional[str],
     ) -> List[Dict[str, Any]]:
         base_view_name = self.views["base_view"]
@@ -115,7 +114,6 @@ class OperationalMonitoringAlertingExplore(Explore):
 
     def _to_lookml(
         self,
-        bq_client: bigquery.Client,
         v1_name: Optional[str],
     ) -> List[Dict[str, Any]]:
         defn: List[Dict[str, Any]] = [

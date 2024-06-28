@@ -17,7 +17,7 @@ class ClientCountsExplore(Explore):
     type: str = "client_counts_explore"
 
     def _to_lookml(
-        self, client: bigquery.Client, v1_name: Optional[str]
+        self, v1_name: Optional[str]
     ) -> List[Dict[str, Any]]:
         """Generate LookML to represent this explore."""
         queries = []

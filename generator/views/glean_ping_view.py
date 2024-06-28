@@ -67,13 +67,13 @@ class GleanPingView(PingView):
             if view.name not in DISALLOWED_PINGS:
                 yield view
 
-    def to_lookml(self, bq_client, v1_name: Optional[str]) -> Dict[str, Any]:
+    def to_lookml(self, v1_name: Optional[str]) -> Dict[str, Any]:
         """Generate LookML for this view.
 
         The Glean views include a labeled metrics, which need to be joined
         against the view in the explore.
         """
-        lookml = super().to_lookml(bq_client, v1_name)
+        lookml = super().to_lookml(v1_name)
         # ignore nested join views
         lookml["views"] = [lookml["views"][0]]
 
@@ -84,7 +84,7 @@ class GleanPingView(PingView):
             (table for table in self.tables if table.get("channel") == "release"),
             self.tables[0],
         )["table"]
-        dimensions = self.get_dimensions(bq_client, table, v1_name)
+        dimensions = self.get_dimensions(table, v1_name)
         dimension_names = {dimension["name"] for dimension in dimensions}
 
         client_id_field = self.get_client_id(dimensions, table)

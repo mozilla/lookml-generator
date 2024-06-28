@@ -28,7 +28,7 @@ def funnel_analysis_view():
 @pytest.fixture()
 def funnel_analysis_explore(tmp_path, funnel_analysis_view):
     (tmp_path / "funnel_analysis.view.lkml").write_text(
-        lkml.dump(funnel_analysis_view.to_lookml(Mock(), None))
+        lkml.dump(funnel_analysis_view.to_lookml(None))
     )
     return FunnelAnalysisExplore(
         "funnel_analysis",
@@ -285,7 +285,7 @@ def test_view_lookml(funnel_analysis_view):
             },
         ],
     }
-    actual = funnel_analysis_view.to_lookml(Mock(), None)
+    actual = funnel_analysis_view.to_lookml(None)
 
     print_and_test(expected=expected, actual=actual)
 
@@ -318,5 +318,5 @@ def test_explore_lookml(funnel_analysis_explore):
         {"name": "event_names", "hidden": "yes"},
     ]
 
-    actual = funnel_analysis_explore.to_lookml(None, None)
+    actual = funnel_analysis_explore.to_lookml(None)
     print_and_test(expected=expected, actual=actual)

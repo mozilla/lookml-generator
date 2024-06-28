@@ -64,7 +64,7 @@ class PingView(View):
         """Get a view from a name and dict definition."""
         return klass(namespace, name, _dict["tables"])
 
-    def to_lookml(self, bq_client, v1_name: Optional[str]) -> Dict[str, Any]:
+    def to_lookml(self, v1_name: Optional[str]) -> Dict[str, Any]:
         """Generate LookML for this view."""
         view_defn: Dict[str, Any] = {"name": self.name}
 
@@ -74,7 +74,7 @@ class PingView(View):
             self.tables[0],
         )["table"]
 
-        dimensions = self.get_dimensions(bq_client, table, v1_name)
+        dimensions = self.get_dimensions(table, v1_name)
 
         # set document id field as a primary key for joins
         view_defn["dimensions"] = [
@@ -90,7 +90,7 @@ class PingView(View):
         view_defn["measures"] = self.get_measures(dimensions, table, v1_name)
 
         nested_views = lookml_utils._generate_nested_dimension_views(
-            bq_client.get_table(table).schema, self.name
+            bq_client.get_table(table).schema, self.name # todo
         )
 
         # Round-tripping through a dict to get an ordered deduped list.

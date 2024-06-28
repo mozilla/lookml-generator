@@ -35,7 +35,7 @@ class EventsExplore(Explore):
         return EventsExplore(name, defn["views"], views_path)
 
     def _to_lookml(
-        self, client: bigquery.Client, v1_name: Optional[str]
+        self, v1_name: Optional[str]
     ) -> List[Dict[str, Any]]:
         name = self.name
         if not name.endswith("_counts"):

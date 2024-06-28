@@ -7,7 +7,7 @@ from mozilla_schema_generator.probes import GleanProbe
 from generator.views import GleanPingView
 
 
-class MockClient:
+class MockClient: # todo
     """Mock bigquery.Client."""
 
     def get_table(self, table_ref):
@@ -93,7 +93,7 @@ def test_kebab_case(mock_glean_ping):
         "dash_name",
         [{"channel": "release", "table": "mozdata.glean_app.dash_name"}],
     )
-    lookml = view.to_lookml(mock_bq_client, "glean-app")
+    lookml = view.to_lookml("glean-app")
     assert len(lookml["views"]) == 1
     assert len(lookml["views"][0]["dimensions"]) == 1
     assert (

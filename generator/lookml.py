@@ -26,14 +26,14 @@ FILE_HEADER = """
 
 
 def _generate_views(
-    client, out_dir: Path, views: Iterable[View], v1_name: Optional[str]
+    out_dir: Path, views: Iterable[View], v1_name: Optional[str]
 ) -> Iterable[Path]:
     for view in views:
         logging.info(
             f"Generating lookml for view {view.name} in {view.namespace} of type {view.view_type}"
         )
         path = out_dir / f"{view.name}.view.lkml"
-        lookml = view.to_lookml(client, v1_name)
+        lookml = view.to_lookml(v1_name)
         if lookml == {}:
             continue
 
@@ -43,7 +43,6 @@ def _generate_views(
 
 
 def _generate_explores(
-    client,
     out_dir: Path,
     namespace: str,
     explores: dict,
@@ -63,7 +62,7 @@ def _generate_explores(
                 f"/looker-hub/{namespace}/views/{view}.view.lkml"
                 for view in explore.get_dependent_views()
             ],
-            "explores": explore.to_lookml(client, v1_name),
+            "explores": explore.to_lookml(v1_name),
         }
         path = out_dir / (explore_name + ".explore.lkml")
         # lkml.dump may return None, in which case write an empty file
@@ -72,7 +71,6 @@ def _generate_explores(
 
 
 def _generate_dashboards(
-    client,
     dash_dir: Path,
     namespace: str,
     dashboards: dict,
@@ -83,7 +81,7 @@ def _generate_dashboards(
             namespace, dashboard_name, dashboard_info
         )
 
-        dashboard_lookml = dashboard.to_lookml(client)
+        dashboard_lookml = dashboard.to_lookml()
         dash_path = dash_dir / f"{dashboard_name}.dashboard.lookml"
         dash_path.write_text(FILE_HEADER + dashboard_lookml)
         yield dash_path
@@ -101,8 +99,6 @@ def _glean_apps_to_v1_map(glean_apps):
 
 
 def _lookml(namespaces, glean_apps, target_dir, namespace_filter=[]):
-    client = bigquery.Client()
-
     namespaces_content = namespaces.read()
     _namespaces = yaml.safe_load(namespaces_content)
     target = Path(target_dir)
@@ -126,18 +122,18 @@ def _lookml(namespaces, glean_apps, target_dir, namespace_filter=[]):
 
             logging.info("  Generating views")
             v1_name: Optional[str] = v1_mapping.get(namespace)
-            for view_path in _generate_views(client, view_dir, views, v1_name):
+            for view_path in _generate_views(view_dir, views, v1_name):
                 logging.info(f"    ...Generating {view_path}")
 
             logging.info("  Generating datagroups")
-            generate_datagroups(views, target, namespace, client)
+            generate_datagroups(views, target, namespace)
 
             explore_dir = target / namespace / "explores"
             explore_dir.mkdir(parents=True, exist_ok=True)
             explores = lookml_objects.get("explores", {})
             logging.info("  Generating explores")
             for explore_path in _generate_explores(
-                client, explore_dir, namespace, explores, view_dir, v1_name
+                explore_dir, namespace, explores, view_dir, v1_name
             ):
                 logging.info(f"    ...Generating {explore_path}")
 
@@ -146,7 +142,7 @@ def _lookml(namespaces, glean_apps, target_dir, namespace_filter=[]):
             dashboard_dir.mkdir(parents=True, exist_ok=True)
             dashboards = lookml_objects.get("dashboards", {})
             for dashboard_path in _generate_dashboards(
-                client, dashboard_dir, namespace, dashboards
+                dashboard_dir, namespace, dashboards
             ):
                 logging.info(f"    ...Generating {dashboard_path}")
 

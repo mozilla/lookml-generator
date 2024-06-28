@@ -271,13 +271,13 @@ class GrowthAccountingView(View):
             ),
         )
 
-    def to_lookml(self, bq_client, v1_name: Optional[str]) -> Dict[str, Any]:
+    def to_lookml(self, v1_name: Optional[str]) -> Dict[str, Any]:
         """Generate LookML for this view."""
         view_defn: Dict[str, Any] = {"name": self.name}
         table = self.tables[0]["table"]
 
         # add dimensions and dimension groups
-        dimensions = lookml_utils._generate_dimensions(bq_client, table) + deepcopy(
+        dimensions = lookml_utils._generate_dimensions(table) + deepcopy(
             GrowthAccountingView.get_default_dimensions(
                 identifier_field=self.identifier_field
             )

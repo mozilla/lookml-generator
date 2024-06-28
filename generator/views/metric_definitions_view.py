@@ -38,7 +38,7 @@ class MetricDefinitionsView(View):
         """Get a MetricDefinitionsView from a dict representation."""
         return klass(namespace, name, definition.get("tables", []))
 
-    def to_lookml(self, bq_client, v1_name: Optional[str]) -> Dict[str, Any]:
+    def to_lookml(self, v1_name: Optional[str]) -> Dict[str, Any]:
         """Get this view as LookML."""
         namespace_definitions = MetricsConfigLoader.configs.get_platform_definitions(
             self.namespace
@@ -122,7 +122,7 @@ class MetricDefinitionsView(View):
                     ).format(dataset=self.namespace)
 
                     base_view_dimensions[joined_data_source_slug] = (
-                        lookml_utils._generate_dimensions_from_query(bq_client, query)
+                        lookml_utils._generate_dimensions_from_query(query)
                     )
 
         if (
@@ -147,7 +147,7 @@ class MetricDefinitionsView(View):
             ).format(dataset=self.namespace)
 
             base_view_dimensions[data_source_definition.name] = (
-                lookml_utils._generate_dimensions_from_query(bq_client, query)
+                lookml_utils._generate_dimensions_from_query(query)
             )
 
         # prepare base field data for query

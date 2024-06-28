@@ -61,7 +61,7 @@ class TableView(View):
         """Get a view from a name and dict definition."""
         return TableView(namespace, name, _dict["tables"], _dict.get("measures"))
 
-    def to_lookml(self, bq_client, v1_name: Optional[str]) -> Dict[str, Any]:
+    def to_lookml(self, v1_name: Optional[str]) -> Dict[str, Any]:
         """Generate LookML for this view."""
         view_defn: Dict[str, Any] = {"name": self.name}
 
@@ -72,7 +72,7 @@ class TableView(View):
         )["table"]
 
         # add dimensions and dimension groups
-        dimensions = lookml_utils._generate_dimensions(bq_client, table)
+        dimensions = lookml_utils._generate_dimensions(table)
         view_defn["dimensions"] = list(
             filterfalse(lookml_utils._is_dimension_group, dimensions)
         )
@@ -104,7 +104,7 @@ class TableView(View):
                 )
 
         nested_views = lookml_utils._generate_nested_dimension_views(
-            bq_client.get_table(table).schema, self.name
+            bq_client.get_table(table).schema, self.name  # todo
         )
 
         if self.measures:
