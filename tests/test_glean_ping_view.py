@@ -77,6 +77,9 @@ class MockDryRun:
 
 
 @patch("generator.views.glean_ping_view.GleanPing")
+@patch("generator.views.lookml_utils.DryRun", MockDryRun)
+@patch("generator.views.ping_view.DryRun", MockDryRun)
+@patch("generator.views.glean_ping_view.DryRun", MockDryRun)
 def test_kebab_case(mock_glean_ping):
     """
     Tests that we handle metrics from kebab-case pings
@@ -118,6 +121,9 @@ def test_kebab_case(mock_glean_ping):
 
 
 @patch("generator.views.glean_ping_view.GleanPing")
+@patch("generator.views.lookml_utils.DryRun", MockDryRun)
+@patch("generator.views.ping_view.DryRun", MockDryRun)
+@patch("generator.views.glean_ping_view.DryRun", MockDryRun)
 def test_url_metric(mock_glean_ping):
     """
     Tests that we handle URL metrics
@@ -158,6 +164,9 @@ def test_url_metric(mock_glean_ping):
 
 
 @patch("generator.views.glean_ping_view.GleanPing")
+@patch("generator.views.lookml_utils.DryRun", MockDryRun)
+@patch("generator.views.ping_view.DryRun", MockDryRun)
+@patch("generator.views.glean_ping_view.DryRun", MockDryRun)
 def test_datetime_metric(mock_glean_ping):
     """
     Tests that we handle datetime metrics
@@ -203,6 +212,9 @@ def test_datetime_metric(mock_glean_ping):
 
 
 @patch("generator.views.glean_ping_view.GleanPing")
+@patch("generator.views.lookml_utils.DryRun", MockDryRun)
+@patch("generator.views.ping_view.DryRun", MockDryRun)
+@patch("generator.views.glean_ping_view.DryRun", MockDryRun)
 def test_undeployed_probe(mock_glean_ping):
     """
     Tests that we handle metrics not yet deployed to bigquery

@@ -5,9 +5,10 @@ from __future__ import annotations
 from collections import defaultdict
 from typing import Any, Dict, Iterator, List, Optional, Union
 
+from generator.dryrun import DryRun
+
 from . import lookml_utils
 from .view import OMIT_VIEWS, View, ViewDict
-from dryrun import DryRun
 
 
 class PingView(View):

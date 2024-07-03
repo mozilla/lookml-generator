@@ -10,6 +10,8 @@ import click
 from mozilla_schema_generator.glean_ping import GleanPing
 from mozilla_schema_generator.probes import GleanProbe
 
+from generator.dryrun import DryRun
+
 from . import lookml_utils
 from .lookml_utils import slug_to_title
 from .ping_view import PingView

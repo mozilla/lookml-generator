@@ -1,5 +1,6 @@
 import functools
 from textwrap import dedent
+from unittest.mock import MagicMock, patch
 
 import lkml
 import pytest
@@ -74,6 +75,7 @@ def operational_monitoring_view():
 
 
 @pytest.fixture()
+@patch("generator.views.lookml_utils.DryRun", MagicMock)
 def operational_monitoring_explore(tmp_path, operational_monitoring_view):
     mock_dryrun = functools.partial(MockDryRun, None, False, None)
     (tmp_path / "fission.view.lkml").write_text(
@@ -164,6 +166,7 @@ def test_view_from_dict(operational_monitoring_view):
     assert actual == operational_monitoring_view
 
 
+@patch("generator.views.lookml_utils.DryRun", MockDryRun)
 def test_view_lookml(operational_monitoring_view):
     expected = {
         "views": [

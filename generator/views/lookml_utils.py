@@ -6,16 +6,12 @@ import urllib.request
 from collections import defaultdict
 from io import BytesIO
 from typing import Any, Dict, Iterable, List, Optional, Tuple
-import google.auth
-from google.auth.transport.requests import Request as GoogleAuthRequest
-from google.oauth2.id_token import fetch_id_token
-from urllib.request import Request, urlopen
-import json
-from dryrun import DryRun
 
 import click
 import yaml
 from jinja2 import Environment, PackageLoader
+
+from generator.dryrun import DryRun
 
 BIGQUERY_TYPE_TO_DIMENSION_TYPE = {
     "BIGNUMERIC": "string",

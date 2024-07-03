@@ -791,6 +791,10 @@ def _prepare_lookml_actual_test(
 
 @patch("generator.views.glean_ping_view.GleanPing")
 @patch("generator.explores.glean_ping_explore.GleanPing")
+@patch("generator.views.ping_view.DryRun", MockDryRun)
+@patch("generator.views.table_view.DryRun", MockDryRun)
+@patch("generator.views.glean_ping_view.DryRun", MockDryRun)
+@patch("generator.views.datagroups.DryRun", MockDryRun)
 def test_lookml_actual_baseline_view(
     mock_glean_ping_view,
     mock_glean_ping_explore,
@@ -860,6 +864,10 @@ def test_lookml_actual_baseline_view(
 
 @patch("generator.views.glean_ping_view.GleanPing")
 @patch("generator.explores.glean_ping_explore.GleanPing")
+@patch("generator.views.ping_view.DryRun", MockDryRun)
+@patch("generator.views.table_view.DryRun", MockDryRun)
+@patch("generator.views.glean_ping_view.DryRun", MockDryRun)
+@patch("generator.views.datagroups.DryRun", MockDryRun)
 def test_lookml_actual_baseline_view_parameterized(
     mock_glean_ping_view,
     mock_glean_ping_explore,
@@ -1035,6 +1043,10 @@ def test_lookml_actual_baseline_view_parameterized(
 
 @patch("generator.views.glean_ping_view.GleanPing")
 @patch("generator.explores.glean_ping_explore.GleanPing")
+@patch("generator.views.ping_view.DryRun", MockDryRun)
+@patch("generator.views.table_view.DryRun", MockDryRun)
+@patch("generator.views.glean_ping_view.DryRun", MockDryRun)
+@patch("generator.views.datagroups.DryRun", MockDryRun)
 def test_lookml_actual_metric_definitions_view(
     mock_glean_ping_view,
     mock_glean_ping_explore,
@@ -1678,6 +1690,10 @@ def test_lookml_actual_metric_definitions_view(
 
 @patch("generator.views.glean_ping_view.GleanPing")
 @patch("generator.explores.glean_ping_explore.GleanPing")
+@patch("generator.views.ping_view.DryRun", MockDryRun)
+@patch("generator.views.table_view.DryRun", MockDryRun)
+@patch("generator.views.glean_ping_view.DryRun", MockDryRun)
+@patch("generator.views.datagroups.DryRun", MockDryRun)
 def test_lookml_actual_growth_accounting_view(
     mock_glean_ping_view,
     mock_glean_ping_explore,
@@ -1736,6 +1752,10 @@ def test_lookml_actual_growth_accounting_view(
 
 @patch("generator.views.glean_ping_view.GleanPing")
 @patch("generator.explores.glean_ping_explore.GleanPing")
+@patch("generator.views.ping_view.DryRun", MockDryRun)
+@patch("generator.views.table_view.DryRun", MockDryRun)
+@patch("generator.views.glean_ping_view.DryRun", MockDryRun)
+@patch("generator.views.datagroups.DryRun", MockDryRun)
 def test_lookml_actual_baseline_explore(
     mock_glean_ping_view,
     mock_glean_ping_explore,
@@ -1780,6 +1800,10 @@ def test_lookml_actual_baseline_explore(
 
 @patch("generator.views.glean_ping_view.GleanPing")
 @patch("generator.explores.glean_ping_explore.GleanPing")
+@patch("generator.views.ping_view.DryRun", MockDryRun)
+@patch("generator.views.table_view.DryRun", MockDryRun)
+@patch("generator.views.glean_ping_view.DryRun", MockDryRun)
+@patch("generator.views.datagroups.DryRun", MockDryRun)
 def test_lookml_actual_client_counts(
     mock_glean_ping_view,
     mock_glean_ping_explore,
@@ -1986,6 +2010,7 @@ def test_duplicate_client_id(runner, glean_apps, tmp_path):
             _lookml(open(namespaces), glean_apps, "looker-hub/", dryrun=mock_dryrun)
 
 
+@patch("generator.views.ping_view.DryRun", MockDryRun)
 def test_context_id(runner, glean_apps, tmp_path):
     namespaces = tmp_path / "namespaces.yaml"
     namespaces.write_text(

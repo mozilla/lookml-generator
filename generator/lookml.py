@@ -2,13 +2,13 @@
 
 import functools
 import logging
+import os
 from pathlib import Path
 from typing import Dict, Iterable, Optional
 
 import click
 import lkml
 import yaml
-from google.cloud import bigquery
 
 from generator.utils import get_file_from_looker_hub
 
@@ -211,7 +211,8 @@ def lookml(
     if metric_hub_repos:
         MetricsConfigLoader.update_repos(metric_hub_repos)
 
-    glean_apps = _get_glean_apps(app_listings_uri)
+    if use_cloud_function is not None:
+        os.environ["USE_CLOUD_FUNCTION"] = "True" if use_cloud_function else "False"
 
     dryrun = functools.partial(
         DryRun, bigquery.Client(), use_cloud_function, id_token()
