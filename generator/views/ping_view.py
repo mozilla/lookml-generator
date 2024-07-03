@@ -7,6 +7,7 @@ from typing import Any, Dict, Iterator, List, Optional, Union
 
 from . import lookml_utils
 from .view import OMIT_VIEWS, View, ViewDict
+from dryrun import DryRun
 
 
 class PingView(View):

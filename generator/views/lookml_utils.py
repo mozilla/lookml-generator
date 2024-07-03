@@ -11,6 +11,7 @@ from google.auth.transport.requests import Request as GoogleAuthRequest
 from google.oauth2.id_token import fetch_id_token
 from urllib.request import Request, urlopen
 import json
+from dryrun import DryRun
 
 import click
 import yaml
@@ -43,7 +44,9 @@ MAP_LAYER_NAMES = {
     ("metadata", "geo", "country"): "countries",
 }
 
-DRY_RUN_URL = "https://us-central1-moz-fx-data-shared-prod.cloudfunctions.net/bigquery-etl-dryrun"
+DRY_RUN_URL = (
+    "https://us-central1-moz-fx-data-shared-prod.cloudfunctions.net/bigquery-etl-dryrun"
+)
 
 
 def _get_dimension(
@@ -155,6 +158,7 @@ def _generate_dimensions(table: str, dryrun) -> List[Dict[str, Any]]:
             )
         dimensions[name_key] = dimension
     return list(dimensions.values())
+
 
 def _get_query_schema(query, project):
     auth_req = GoogleAuthRequest()
