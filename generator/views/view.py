@@ -86,9 +86,7 @@ class View(object):
             )
         return False
 
-    def get_dimensions(
-        self, table, v1_name: Optional[str]
-    ) -> List[Dict[str, Any]]:
+    def get_dimensions(self, table, v1_name: Optional[str]) -> List[Dict[str, Any]]:
         """Get the set of dimensions for this view."""
         raise NotImplementedError("Only implemented in subclass.")
 

@@ -7,6 +7,7 @@ from typing import Any, Dict, Iterator, List, Optional, Union
 
 from . import lookml_utils
 from .view import OMIT_VIEWS, View, ViewDict
+from dryrun import DryRun
 
 
 class PingView(View):
@@ -89,8 +90,12 @@ class PingView(View):
         # add measures
         view_defn["measures"] = self.get_measures(dimensions, table, v1_name)
 
+        [project, dataset, table] = table.split(".")
+        table_schema = DryRun(
+            project=project, dataset=dataset, table=table
+        ).get_table_schema()
         nested_views = lookml_utils._generate_nested_dimension_views(
-            bq_client.get_table(table).schema, self.name # todo
+            table_schema, self.name
         )
 
         # Round-tripping through a dict to get an ordered deduped list.

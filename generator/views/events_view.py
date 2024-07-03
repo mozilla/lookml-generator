@@ -69,9 +69,7 @@ class EventsView(View):
         }
 
         # add measures
-        dimensions = lookml_utils._generate_dimensions(
-            self.tables[0]["base_table"]
-        )
+        dimensions = lookml_utils._generate_dimensions(self.tables[0]["base_table"])
         view_defn["measures"] = self.get_measures(dimensions)
 
         # set document_id as primary key if it exists in the underlying table

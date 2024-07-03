@@ -26,9 +26,7 @@ class Explore:
         """Explore instance represented as a dict."""
         return {self.name: {"type": self.type, "views": self.views}}
 
-    def to_lookml(
-        self, v1_name: Optional[str]
-    ) -> List[Dict[str, Any]]:
+    def to_lookml(self, v1_name: Optional[str]) -> List[Dict[str, Any]]:
         """
         Generate LookML for this explore.
 

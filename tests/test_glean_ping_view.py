@@ -7,15 +7,27 @@ from mozilla_schema_generator.probes import GleanProbe
 from generator.views import GleanPingView
 
 
-class MockClient: # todo
-    """Mock bigquery.Client."""
+class MockDryRun:
+    """Mock dryrun.DryRun."""
+    def __init__(
+        self,
+        sql=None,
+        project=None,
+        dataset=None,
+        table=None,
+    ):
+        self.sql = sql
+        self.project = project
+        self.dataset = dataset
+        self.table = table
 
-    def get_table(self, table_ref):
-        """Mock bigquery.Client.get_table."""
+    def get_table_schema(self):
+        """Mock dryrun.DryRun.get_table_schema"""
+        table_id = f"{self.project}.{self.dataset}.{self.table}"
 
-        if table_ref == "mozdata.glean_app.dash_name":
+        if table_id == "mozdata.glean_app.dash_name":
             return bigquery.Table(
-                table_ref,
+                table_id,
                 schema=[
                     SchemaField(
                         "metrics",
@@ -58,7 +70,7 @@ class MockClient: # todo
                 ],
             )
 
-        raise ValueError(f"Table not found: {table_ref}")
+        raise ValueError(f"Table not found: {table_id}")
 
 
 @patch("generator.views.glean_ping_view.GleanPing")
@@ -87,7 +99,7 @@ def test_kebab_case(mock_glean_ping):
         ),
     ]
     mock_glean_ping.return_value = glean_app
-    mock_bq_client = MockClient()
+    mock_bq_client = MockDryRun()
     view = GleanPingView(
         "glean_app",
         "dash_name",
@@ -128,7 +140,7 @@ def test_url_metric(mock_glean_ping):
         ),
     ]
     mock_glean_ping.return_value = glean_app
-    mock_bq_client = MockClient()
+    mock_bq_client = MockDryRun()
     view = GleanPingView(
         "glean_app",
         "dash_name",

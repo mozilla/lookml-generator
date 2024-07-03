@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections import defaultdict
 from itertools import filterfalse
 from typing import Any, Dict, Iterator, List, Optional, Set
+from dryrun import DryRun
 
 from click import ClickException
 
@@ -103,8 +104,12 @@ class TableView(View):
                     f"time_partitioning_field {field_name!r} not found in {self.name!r}"
                 )
 
+        [project, dataset, table] = table.split(".")
+        table_schema = DryRun(
+            project=project, dataset=dataset, table=table
+        ).get_table_schema()
         nested_views = lookml_utils._generate_nested_dimension_views(
-            bq_client.get_table(table).schema, self.name  # todo
+            table_schema, self.name
         )
 
         if self.measures:

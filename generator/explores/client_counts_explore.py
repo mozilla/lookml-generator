@@ -16,9 +16,7 @@ class ClientCountsExplore(Explore):
 
     type: str = "client_counts_explore"
 
-    def _to_lookml(
-        self, v1_name: Optional[str]
-    ) -> List[Dict[str, Any]]:
+    def _to_lookml(self, v1_name: Optional[str]) -> List[Dict[str, Any]]:
         """Generate LookML to represent this explore."""
         queries = []
         if time_partitioning_group := self.get_view_time_partitioning_group(

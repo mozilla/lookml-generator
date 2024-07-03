@@ -11,6 +11,7 @@ from google.auth.transport.requests import Request as GoogleAuthRequest
 from google.oauth2.id_token import fetch_id_token
 from urllib.request import Request, urlopen
 import json
+from dryrun import DryRun
 
 import click
 import yaml
@@ -44,7 +45,9 @@ MAP_LAYER_NAMES = {
     ("metadata", "geo", "country"): "countries",
 }
 
-DRY_RUN_URL = "https://us-central1-moz-fx-data-shared-prod.cloudfunctions.net/bigquery-etl-dryrun"
+DRY_RUN_URL = (
+    "https://us-central1-moz-fx-data-shared-prod.cloudfunctions.net/bigquery-etl-dryrun"
+)
 
 
 def _get_dimension(
@@ -123,7 +126,11 @@ def _generate_dimensions(table: str) -> List[Dict[str, Any]]:
     Raise ClickException if schema results in duplicate dimensions.
     """
     dimensions = {}
-    for dimension in _generate_dimensions_helper(client.get_table(table).schema):
+    [project, dataset, table] = table.split(".")
+    table_schema = DryRun(
+        project=project, dataset=dataset, table=table
+    ).get_table_schema()
+    for dimension in _generate_dimensions_helper(table_schema):
         name = dimension["name"]
         # overwrite duplicate "submission", "end", "start" dimension group, thus picking the
         # last value sorted by field name, which is submission_timestamp
@@ -142,6 +149,7 @@ def _generate_dimensions(table: str) -> List[Dict[str, Any]]:
             )
         dimensions[name_key] = dimension
     return list(dimensions.values())
+
 
 def _get_query_schema(query, project):
     auth_req = GoogleAuthRequest()
@@ -175,19 +183,13 @@ def _get_query_schema(query, project):
     )
     result = json.load(r)
 
-    if (
-        result
-        and result["valid"]
-        and "schema" in result
-    ):
+    if result and result["valid"] and "schema" in result:
         return result["schema"]
-    
+
     return {}
 
 
-def _generate_dimensions_from_query(
-    query: str, project_id
-) -> List[Dict[str, Any]]:
+def _generate_dimensions_from_query(query: str, project_id) -> List[Dict[str, Any]]:
     """Generate dimensions and dimension groups from a SQL query."""
     schema = _get_query_schema(query, project_id)
     dimensions = {}

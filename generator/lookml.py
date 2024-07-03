@@ -98,7 +98,9 @@ def _glean_apps_to_v1_map(glean_apps):
     return {d["name"]: d["v1_name"] for d in glean_apps}
 
 
-def _lookml(namespaces, glean_apps, target_dir, namespace_filter=[]):
+def _lookml(
+    namespaces, glean_apps, target_dir, namespace_filter=[], use_cloud_function=False
+):
     namespaces_content = namespaces.read()
     _namespaces = yaml.safe_load(namespaces_content)
     target = Path(target_dir)
@@ -178,10 +180,18 @@ def _lookml(namespaces, glean_apps, target_dir, namespace_filter=[]):
     default=[],
     help="List of namespace names to generate lookml for.",
 )
-def lookml(namespaces, app_listings_uri, target_dir, metric_hub_repos, only):
+@click.option(
+    "--use_cloud_function",
+    "--use-cloud-function",
+    default=False,
+    help="Use the Cloud Function to run dry runs during LookML generation.",
+)
+def lookml(
+    namespaces, app_listings_uri, target_dir, metric_hub_repos, only, use_cloud_function
+):
     """Generate lookml from namespaces."""
     if metric_hub_repos:
         MetricsConfigLoader.update_repos(metric_hub_repos)
 
     glean_apps = _get_glean_apps(app_listings_uri)
-    return _lookml(namespaces, glean_apps, target_dir, only)
+    return _lookml(namespaces, glean_apps, target_dir, only, use_cloud_function)
