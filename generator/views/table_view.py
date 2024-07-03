@@ -5,9 +5,10 @@ from __future__ import annotations
 from collections import defaultdict
 from itertools import filterfalse
 from typing import Any, Dict, Iterator, List, Optional, Set
-from dryrun import DryRun
 
 from click import ClickException
+
+from generator.dryrun import DryRun
 
 from . import lookml_utils
 from .view import OMIT_VIEWS, View, ViewDict

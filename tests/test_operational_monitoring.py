@@ -1,11 +1,8 @@
-import re
 from textwrap import dedent
+from unittest.mock import MagicMock, patch
 
 import lkml
-import pandas as pd
 import pytest
-from google.cloud import bigquery
-from google.cloud.bigquery.schema import SchemaField
 
 from generator.dashboards import OperationalMonitoringDashboard
 from generator.explores import OperationalMonitoringExplore
@@ -14,56 +11,36 @@ from generator.views import OperationalMonitoringView
 from .utils import print_and_test
 
 
-class MockClient:
-    """Mock bigquery.Client."""
+class MockDryRun:
+    """Mock dryrun.DryRun."""
 
-    def query(self, query):
-        class QueryJob:
-            def result(self):
-                class ResultObject:
-                    def to_dataframe(self):
-                        if "summaries" in query:
-                            return pd.DataFrame(
-                                [
-                                    {"metric": "GC_MS", "statistic": "mean"},
-                                    {
-                                        "metric": "GC_MS_CONTENT",
-                                        "statistic": "percentile",
-                                    },
-                                ],
-                                columns=["summary"],
-                            )
+    def __init__(
+        self,
+        sql=None,
+        project=None,
+        dataset=None,
+        table=None,
+    ):
+        self.sql = sql
+        self.project = project
+        self.dataset = dataset
+        self.table = table
 
-                        pattern = re.compile("SELECT DISTINCT (.*), COUNT")
-                        column = pattern.findall(query)[0]
-                        data = [["Windows", 10]]
-                        if column == "cores_count":
-                            data = [["4", 100]]
-
-                        return pd.DataFrame(data, columns=[column, "count"])
-
-                return ResultObject()
-
-        return QueryJob()
-
-    def get_table(self, table_ref):
-        """Mock bigquery.Client.get_table."""
-        return bigquery.Table(
-            table_ref,
-            schema=[
-                SchemaField("client_id", "STRING"),
-                SchemaField("build_id", "STRING"),
-                SchemaField("cores_count", "STRING"),
-                SchemaField("os", "STRING"),
-                SchemaField("branch", "STRING"),
-                SchemaField("metric", "STRING"),
-                SchemaField("statistic", "STRING"),
-                SchemaField("point", "FLOAT"),
-                SchemaField("lower", "FLOAT"),
-                SchemaField("upper", "FLOAT"),
-                SchemaField("parameter", "FLOAT"),
-            ],
-        )
+    def get_table_schema(self):
+        """Mock dryrun.DryRun.get_table_schema"""
+        return [
+            {"name": "client_id", "type": "STRING"},
+            {"name": "build_id", "type": "STRING"},
+            {"name": "cores_count", "type": "STRING"},
+            {"name": "os", "type": "STRING"},
+            {"name": "branch", "type": "STRING"},
+            {"name": "metric", "type": "STRING"},
+            {"name": "statistic", "type": "STRING"},
+            {"name": "point", "type": "FLOAT"},
+            {"name": "lower", "type": "FLOAT"},
+            {"name": "upper", "type": "FLOAT"},
+            {"name": "parameter", "type": "FLOAT"},
+        ]
 
 
 @pytest.fixture()
@@ -91,9 +68,10 @@ def operational_monitoring_view():
 
 
 @pytest.fixture()
+@patch("generator.views.lookml_utils.DryRun", MagicMock)
 def operational_monitoring_explore(tmp_path, operational_monitoring_view):
     (tmp_path / "fission.view.lkml").write_text(
-        lkml.dump(operational_monitoring_view.to_lookml(MockClient(), None))
+        lkml.dump(operational_monitoring_view.to_lookml(None))
     )
     return OperationalMonitoringExplore(
         "fission",
@@ -180,8 +158,8 @@ def test_view_from_dict(operational_monitoring_view):
     assert actual == operational_monitoring_view
 
 
+@patch("generator.views.lookml_utils.DryRun", MockDryRun)
 def test_view_lookml(operational_monitoring_view):
-    mock_bq_client = MockClient()
     expected = {
         "views": [
             {
@@ -223,14 +201,13 @@ def test_view_lookml(operational_monitoring_view):
             }
         ]
     }
-    actual = operational_monitoring_view.to_lookml(mock_bq_client, None)
+    actual = operational_monitoring_view.to_lookml(None)
     print(actual)
 
     print_and_test(expected=expected, actual=actual)
 
 
 def test_explore_lookml(operational_monitoring_explore):
-    mock_bq_client = MockClient()
     expected = [
         {
             "always_filter": {"filters": [{"branch": "enabled, disabled"}]},
@@ -239,12 +216,11 @@ def test_explore_lookml(operational_monitoring_explore):
         }
     ]
 
-    actual = operational_monitoring_explore.to_lookml(mock_bq_client, None)
+    actual = operational_monitoring_explore.to_lookml(None)
     print_and_test(expected=expected, actual=actual)
 
 
 def test_dashboard_lookml(operational_monitoring_dashboard):
-    mock_bq_client = MockClient()
     expected = dedent(
         """\
 - dashboard: fission
@@ -388,7 +364,7 @@ def test_dashboard_lookml(operational_monitoring_dashboard):
 
     """
     )
-    actual = operational_monitoring_dashboard.to_lookml(mock_bq_client)
+    actual = operational_monitoring_dashboard.to_lookml()
 
     print_and_test(expected=expected, actual=dedent(actual))
 
@@ -429,7 +405,6 @@ def operational_monitoring_dashboard_group_by_dimension():
 def test_dashboard_lookml_group_by_dimension(
     operational_monitoring_dashboard_group_by_dimension,
 ):
-    mock_bq_client = MockClient()
     expected = dedent(
         """\
 - dashboard: fission
@@ -573,8 +548,6 @@ def test_dashboard_lookml_group_by_dimension(
 
     """
     )
-    actual = operational_monitoring_dashboard_group_by_dimension.to_lookml(
-        mock_bq_client
-    )
+    actual = operational_monitoring_dashboard_group_by_dimension.to_lookml()
 
     print_and_test(expected=expected, actual=dedent(actual))

@@ -6,17 +6,12 @@ import urllib.request
 from collections import defaultdict
 from io import BytesIO
 from typing import Any, Dict, Iterable, List, Optional, Tuple
-import google.auth
-from google.auth.transport.requests import Request as GoogleAuthRequest
-from google.oauth2.id_token import fetch_id_token
-from urllib.request import Request, urlopen
-import json
-from dryrun import DryRun
 
 import click
 import yaml
-from google.cloud import bigquery
 from jinja2 import Environment, PackageLoader
+
+from generator.dryrun import DryRun
 
 BIGQUERY_TYPE_TO_DIMENSION_TYPE = {
     "BIGNUMERIC": "string",
@@ -105,15 +100,18 @@ def _get_dimension(
     return result
 
 
-def _generate_dimensions_helper(
-    schema: List[bigquery.SchemaField], *prefix: str
-) -> Iterable[dict]:
-    for field in sorted(schema, key=lambda f: f.name):
-        if field.field_type == "RECORD" and not field.mode == "REPEATED":
-            yield from _generate_dimensions_helper(field.fields, *prefix, field.name)
+def _generate_dimensions_helper(schema: List[Any], *prefix: str) -> Iterable[dict]:
+    for field in sorted(schema, key=lambda f: f["name"]):
+        if field["type"] == "RECORD" and not field.get("mode", "") == "REPEATED":
+            yield from _generate_dimensions_helper(
+                field["fields"], *prefix, field["name"]
+            )
         else:
             yield _get_dimension(
-                (*prefix, field.name), field.field_type, field.mode, field.description
+                (*prefix, field["name"]),
+                field["type"],
+                field.get("mode", ""),
+                field.get("description", ""),
             )
 
 
@@ -151,47 +149,9 @@ def _generate_dimensions(table: str) -> List[Dict[str, Any]]:
     return list(dimensions.values())
 
 
-def _get_query_schema(query, project):
-    auth_req = GoogleAuthRequest()
-    creds, _ = google.auth.default(
-        scopes=["https://www.googleapis.com/auth/cloud-platform"]
-    )
-    creds.refresh(auth_req)
-    if hasattr(creds, "id_token"):
-        # Get token from default credentials for the current environment created via Cloud SDK run
-        id_token = creds.id_token
-    else:
-        # If the environment variable GOOGLE_APPLICATION_CREDENTIALS is set to service account JSON file,
-        # then ID token is acquired using this service account credentials.
-        id_token = fetch_id_token(auth_req, DRY_RUN_URL)
-
-    r = urlopen(
-        Request(
-            DRY_RUN_URL,
-            headers={
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {id_token}",
-            },
-            data=json.dumps(
-                {
-                    "project": project,
-                    "query": query,
-                }
-            ).encode("utf8"),
-            method="POST",
-        )
-    )
-    result = json.load(r)
-
-    if result and result["valid"] and "schema" in result:
-        return result["schema"]
-
-    return {}
-
-
-def _generate_dimensions_from_query(query: str, project_id) -> List[Dict[str, Any]]:
+def _generate_dimensions_from_query(query: str) -> List[Dict[str, Any]]:
     """Generate dimensions and dimension groups from a SQL query."""
-    schema = _get_query_schema(query, project_id)
+    schema = DryRun(sql=query).get_schema()["fields"]
     dimensions = {}
     for dimension in _generate_dimensions_helper(schema or []):
         name_key = dimension["name"]
@@ -217,7 +177,7 @@ def _generate_dimensions_from_query(query: str, project_id) -> List[Dict[str, An
 
 
 def _generate_nested_dimension_views(
-    schema: List[bigquery.SchemaField], view_name: str
+    schema: dict, view_name: str
 ) -> List[Dict[str, Any]]:
     """
     Recursively generate views for nested fields.
@@ -225,14 +185,14 @@ def _generate_nested_dimension_views(
     Nested fields are created as views, with dimensions and optionally measures.
     """
     views: List[Dict[str, Any]] = []
-    for field in sorted(schema, key=lambda f: f.name):
-        if field.field_type == "RECORD" and field.name != "labeled_counter":
+    for field in sorted(schema, key=lambda f: f["name"]):
+        if field["type"] == "RECORD" and field["name"] != "labeled_counter":
             # labeled_counter is handled explicitly in glean ping views; hidden for other views
-            if field.mode == "REPEATED":
+            if field.get("mode") == "REPEATED":
                 nested_field_view: Dict[str, Any] = {
-                    "name": f"{view_name}__{field.name}"
+                    "name": f"{view_name}__{field['name']}"
                 }
-                dimensions = _generate_dimensions_helper(schema=field.fields)
+                dimensions = _generate_dimensions_helper(schema=field["fields"])
                 nested_field_view["dimensions"] = [
                     d for d in dimensions if not _is_dimension_group(d)
                 ]
@@ -243,12 +203,12 @@ def _generate_nested_dimension_views(
                     views
                     + [nested_field_view]
                     + _generate_nested_dimension_views(
-                        field.fields, f"{view_name}__{field.name}"
+                        field["fields"], f"{view_name}__{field['name']}"
                     )
                 )
             else:
                 views = views + _generate_nested_dimension_views(
-                    field.fields, f"{view_name}__{field.name}"
+                    field["fields"], f"{view_name}__{field['name']}"
                 )
 
     return views

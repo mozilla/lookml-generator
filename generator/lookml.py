@@ -1,13 +1,13 @@
 """Generate lookml from namespaces."""
 
 import logging
+import os
 from pathlib import Path
 from typing import Dict, Iterable, Optional
 
 import click
 import lkml
 import yaml
-from google.cloud import bigquery
 
 from .dashboards import DASHBOARD_TYPES
 from .explores import EXPLORE_TYPES
@@ -98,9 +98,7 @@ def _glean_apps_to_v1_map(glean_apps):
     return {d["name"]: d["v1_name"] for d in glean_apps}
 
 
-def _lookml(
-    namespaces, glean_apps, target_dir, namespace_filter=[], use_cloud_function=False
-):
+def _lookml(namespaces, glean_apps, target_dir, namespace_filter=[]):
     namespaces_content = namespaces.read()
     _namespaces = yaml.safe_load(namespaces_content)
     target = Path(target_dir)
@@ -183,7 +181,6 @@ def _lookml(
 @click.option(
     "--use_cloud_function",
     "--use-cloud-function",
-    default=False,
     help="Use the Cloud Function to run dry runs during LookML generation.",
 )
 def lookml(
@@ -193,5 +190,8 @@ def lookml(
     if metric_hub_repos:
         MetricsConfigLoader.update_repos(metric_hub_repos)
 
+    if use_cloud_function is not None:
+        os.environ["USE_CLOUD_FUNCTION"] = "True" if use_cloud_function else "False"
+
     glean_apps = _get_glean_apps(app_listings_uri)
-    return _lookml(namespaces, glean_apps, target_dir, only, use_cloud_function)
+    return _lookml(namespaces, glean_apps, target_dir, only)

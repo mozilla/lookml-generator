@@ -7,7 +7,6 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 import lkml
-from google.cloud import bigquery
 
 from ..views.lookml_utils import escape_filter_expr, slug_to_title
 

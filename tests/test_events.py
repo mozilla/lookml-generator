@@ -1,11 +1,40 @@
+from unittest.mock import patch
+
 import lkml
 import pytest
-from google.cloud.bigquery.schema import SchemaField
 
 from generator.explores import EventsExplore
 from generator.views import EventsView
 
-from .utils import get_mock_bq_client, print_and_test
+from .utils import print_and_test
+
+
+class MockDryRun:
+    """Mock dryrun.DryRun."""
+
+    def __init__(
+        self,
+        sql=None,
+        project=None,
+        dataset=None,
+        table=None,
+    ):
+        self.sql = sql
+        self.project = project
+        self.dataset = dataset
+        self.table = table
+
+    def get_table_schema(self):
+        """Mock dryrun.DryRun.get_table_schema"""
+
+        return [
+            {
+                "name": "client_info",
+                "type": "RECORD",
+                "fields": [{"name": "client_id", "type": "STRING"}],
+            },
+            {"name": "event_id", "type": "STRING"},
+        ]
 
 
 @pytest.fixture()
@@ -138,6 +167,7 @@ def test_explore_from_dict(events_explore, tmp_path):
     assert actual == events_explore
 
 
+@patch("generator.views.lookml_utils.DryRun", MockDryRun)
 def test_view_lookml(events_view):
     expected = {
         "includes": ["events_unnested_table.view.lkml"],
@@ -170,14 +200,6 @@ def test_view_lookml(events_view):
         ],
     }
 
-    mock_bq_client = get_mock_bq_client(
-        [
-            SchemaField(
-                "client_info", "RECORD", fields=[SchemaField("client_id", "STRING")]
-            ),
-            SchemaField("event_id", "STRING"),
-        ]
-    ) # todo
     actual = events_view.to_lookml(None)
     print_and_test(expected=expected, actual=actual)
 

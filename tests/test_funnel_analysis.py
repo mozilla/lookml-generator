@@ -1,5 +1,4 @@
 from textwrap import dedent
-from unittest.mock import Mock
 
 import lkml
 import pytest

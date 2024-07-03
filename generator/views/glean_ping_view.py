@@ -10,6 +10,8 @@ import click
 from mozilla_schema_generator.glean_ping import GleanPing
 from mozilla_schema_generator.probes import GleanProbe
 
+from generator.dryrun import DryRun
+
 from . import lookml_utils
 from .lookml_utils import slug_to_title
 from .ping_view import PingView
@@ -206,8 +208,12 @@ class GleanPingView(PingView):
             {v["name"]: v for v in view_definitions}.values(), key=lambda x: x["name"]  # type: ignore
         )
 
+        [project, dataset, table] = table.split(".")
+        table_schema = DryRun(
+            project=project, dataset=dataset, table=table
+        ).get_table_schema()
         nested_views = lookml_utils._generate_nested_dimension_views(
-            bq_client.get_table(table).schema, self.name
+            table_schema, self.name
         )
 
         lookml["views"] += view_definitions + nested_views
@@ -396,11 +402,9 @@ class GleanPingView(PingView):
 
         return dict(dimension, **annotations)
 
-    def get_dimensions(
-        self, bq_client, table, v1_name: Optional[str]
-    ) -> List[Dict[str, Any]]:
+    def get_dimensions(self, table, v1_name: Optional[str]) -> List[Dict[str, Any]]:
         """Get the set of dimensions for this view."""
-        all_fields = super().get_dimensions(bq_client, table, v1_name)
+        all_fields = super().get_dimensions(table, v1_name)
         fields = self._get_glean_metric_dimensions(all_fields, v1_name) + [
             self._add_link(d)
             for d in all_fields

@@ -5,9 +5,10 @@ from __future__ import annotations
 from collections import defaultdict
 from typing import Any, Dict, Iterator, List, Optional, Union
 
+from generator.dryrun import DryRun
+
 from . import lookml_utils
 from .view import OMIT_VIEWS, View, ViewDict
-from dryrun import DryRun
 
 
 class PingView(View):
@@ -90,9 +91,9 @@ class PingView(View):
         # add measures
         view_defn["measures"] = self.get_measures(dimensions, table, v1_name)
 
-        [project, dataset, table] = table.split(".")
+        [project, dataset, table_id] = table.split(".")
         table_schema = DryRun(
-            project=project, dataset=dataset, table=table
+            project=project, dataset=dataset, table=table_id
         ).get_table_schema()
         nested_views = lookml_utils._generate_nested_dimension_views(
             table_schema, self.name
@@ -121,12 +122,10 @@ class PingView(View):
 
         return {"views": [view_defn] + nested_views}
 
-    def get_dimensions(
-        self, bq_client, table, v1_name: Optional[str]
-    ) -> List[Dict[str, Any]]:
+    def get_dimensions(self, table, v1_name: Optional[str]) -> List[Dict[str, Any]]:
         """Get the set of dimensions for this view."""
         # add dimensions and dimension groups
-        return lookml_utils._generate_dimensions(bq_client, table)
+        return lookml_utils._generate_dimensions(table)
 
     def get_measures(
         self, dimensions: List[dict], table: str, v1_name: Optional[str]

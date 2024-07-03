@@ -5,7 +5,6 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional
 
-from google.cloud import bigquery
 from mozilla_schema_generator.glean_ping import GleanPing
 
 from ..views import GleanPingView, View

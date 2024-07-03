@@ -1,7 +1,5 @@
 from unittest.mock import Mock, patch
 
-from google.cloud import bigquery
-from google.cloud.bigquery.schema import SchemaField
 from mozilla_schema_generator.probes import GleanProbe
 
 from generator.views import GleanPingView
@@ -9,6 +7,7 @@ from generator.views import GleanPingView
 
 class MockDryRun:
     """Mock dryrun.DryRun."""
+
     def __init__(
         self,
         sql=None,
@@ -26,54 +25,54 @@ class MockDryRun:
         table_id = f"{self.project}.{self.dataset}.{self.table}"
 
         if table_id == "mozdata.glean_app.dash_name":
-            return bigquery.Table(
-                table_id,
-                schema=[
-                    SchemaField(
-                        "metrics",
-                        "RECORD",
-                        fields=[
-                            SchemaField(
-                                "string",
-                                "RECORD",
-                                fields=[SchemaField("fun_string_metric", "STRING")],
-                            ),
-                            SchemaField(
-                                "url2",
-                                "RECORD",
-                                fields=[SchemaField("fun_url_metric", "STRING")],
-                            ),
-                            SchemaField(
-                                "datetime",
-                                "RECORD",
-                                fields=[
-                                    SchemaField("fun_datetime_metric", "TIMESTAMP")
-                                ],
-                            ),
-                            SchemaField(
-                                "labeled_counter",
-                                "RECORD",
-                                fields=[
-                                    SchemaField(
-                                        "fun_counter_metric",
-                                        "STRING",
-                                        mode="REPEATED",
-                                        fields=[
-                                            SchemaField("key", "STRING"),
-                                            SchemaField("value", "INT64"),
-                                        ],
-                                    ),
-                                ],
-                            ),
-                        ],
-                    ),
-                ],
-            )
+            return [
+                {
+                    "name": "metrics",
+                    "type": "RECORD",
+                    "fields": [
+                        {
+                            "name": "string",
+                            "type": "RECORD",
+                            "fields": [{"name": "fun_string_metric", "type": "STRING"}],
+                        },
+                        {
+                            "name": "url2",
+                            "type": "RECORD",
+                            "fields": [{"name": "fun_url_metric", "type": "STRING"}],
+                        },
+                        {
+                            "name": "datetime",
+                            "type": "RECORD",
+                            "fields": [
+                                {"name": "fun_datetime_metric", "type": "TIMESTAMP"}
+                            ],
+                        },
+                        {
+                            "name": "labeled_counter",
+                            "type": "RECORD",
+                            "fields": [
+                                {
+                                    "name": "fun_counter_metric",
+                                    "type": "STRING",
+                                    "mode": "REPEATED",
+                                    "fields": [
+                                        {"name": "key", "type": "STRING"},
+                                        {"name": "value", "type": "INT64"},
+                                    ],
+                                }
+                            ],
+                        },
+                    ],
+                }
+            ]
 
         raise ValueError(f"Table not found: {table_id}")
 
 
 @patch("generator.views.glean_ping_view.GleanPing")
+@patch("generator.views.lookml_utils.DryRun", MockDryRun)
+@patch("generator.views.ping_view.DryRun", MockDryRun)
+@patch("generator.views.glean_ping_view.DryRun", MockDryRun)
 def test_kebab_case(mock_glean_ping):
     """
     Tests that we handle metrics from kebab-case pings
@@ -99,7 +98,6 @@ def test_kebab_case(mock_glean_ping):
         ),
     ]
     mock_glean_ping.return_value = glean_app
-    mock_bq_client = MockDryRun()
     view = GleanPingView(
         "glean_app",
         "dash_name",
@@ -115,6 +113,9 @@ def test_kebab_case(mock_glean_ping):
 
 
 @patch("generator.views.glean_ping_view.GleanPing")
+@patch("generator.views.lookml_utils.DryRun", MockDryRun)
+@patch("generator.views.ping_view.DryRun", MockDryRun)
+@patch("generator.views.glean_ping_view.DryRun", MockDryRun)
 def test_url_metric(mock_glean_ping):
     """
     Tests that we handle URL metrics
@@ -140,13 +141,12 @@ def test_url_metric(mock_glean_ping):
         ),
     ]
     mock_glean_ping.return_value = glean_app
-    mock_bq_client = MockDryRun()
     view = GleanPingView(
         "glean_app",
         "dash_name",
         [{"channel": "release", "table": "mozdata.glean_app.dash_name"}],
     )
-    lookml = view.to_lookml(mock_bq_client, "glean-app")
+    lookml = view.to_lookml("glean-app")
     assert len(lookml["views"]) == 1
     assert len(lookml["views"][0]["dimensions"]) == 1
     assert (
@@ -155,6 +155,9 @@ def test_url_metric(mock_glean_ping):
 
 
 @patch("generator.views.glean_ping_view.GleanPing")
+@patch("generator.views.lookml_utils.DryRun", MockDryRun)
+@patch("generator.views.ping_view.DryRun", MockDryRun)
+@patch("generator.views.glean_ping_view.DryRun", MockDryRun)
 def test_datetime_metric(mock_glean_ping):
     """
     Tests that we handle datetime metrics
@@ -180,13 +183,12 @@ def test_datetime_metric(mock_glean_ping):
         ),
     ]
     mock_glean_ping.return_value = glean_app
-    mock_bq_client = MockClient()
     view = GleanPingView(
         "glean_app",
         "dash_name",
         [{"channel": "release", "table": "mozdata.glean_app.dash_name"}],
     )
-    lookml = view.to_lookml(mock_bq_client, "glean-app")
+    lookml = view.to_lookml("glean-app")
     assert len(lookml["views"]) == 1
     assert len(lookml["views"][0]["dimension_groups"]) == 1
     assert (
@@ -200,6 +202,9 @@ def test_datetime_metric(mock_glean_ping):
 
 
 @patch("generator.views.glean_ping_view.GleanPing")
+@patch("generator.views.lookml_utils.DryRun", MockDryRun)
+@patch("generator.views.ping_view.DryRun", MockDryRun)
+@patch("generator.views.glean_ping_view.DryRun", MockDryRun)
 def test_undeployed_probe(mock_glean_ping):
     """
     Tests that we handle metrics not yet deployed to bigquery
@@ -227,13 +232,12 @@ def test_undeployed_probe(mock_glean_ping):
         for name in ["counter_metric", "counter_metric2"]
     ]
     mock_glean_ping.return_value = glean_app
-    mock_bq_client = MockClient()
     view = GleanPingView(
         "glean_app",
         "dash_name",
         [{"channel": "release", "table": "mozdata.glean_app.dash_name"}],
     )
-    lookml = view.to_lookml(mock_bq_client, "glean-app")
+    lookml = view.to_lookml("glean-app")
     # In addition to the table view, each labeled counter adds a join view and a suggest
     # view. Expect 3 views, because 1 for the table view, 2 added for fun.counter_metric
     # because it's in the table schema, and 0 added for fun.counter_metric2 because it's

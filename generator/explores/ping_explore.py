@@ -5,8 +5,6 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional
 
-from google.cloud import bigquery
-
 from ..views import PingView, View
 from . import Explore
 
