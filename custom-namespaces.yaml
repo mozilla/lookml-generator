@@ -940,6 +940,10 @@ firefox_desktop:
       type: table_view
       tables:
         - table: mozdata.firefox_desktop.urlbar_events_daily
+    serp_categorization_unnested_table:
+      type: table_view
+      tables:
+        - table: mozdata.firefox_desktop.serp_categorization_unnested
     feature_usage_table:
       type: table_view
       tables:
@@ -1061,6 +1065,10 @@ firefox_desktop:
       type: table_explore
       views:
         base_view: urlbar_events_daily_table
+    serp_categorization_unnested:
+      type: table_explore
+      views:
+        base_view: serp_categorization_unnested_table
 monitoring:
   glean_app: false
   owners:
