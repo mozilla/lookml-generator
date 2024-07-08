@@ -58,9 +58,6 @@ class DryRun:
 
     def __init__(
         self,
-        client=None,
-        use_cloud_function=False,
-        id_token=None,
         sql=None,
         project="moz-fx-data-shared-prod",
         dataset=None,

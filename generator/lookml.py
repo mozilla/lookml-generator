@@ -2,7 +2,6 @@
 
 import functools
 import logging
-import os
 from pathlib import Path
 from typing import Dict, Iterable, Optional
 

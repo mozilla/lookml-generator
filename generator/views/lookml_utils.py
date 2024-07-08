@@ -40,10 +40,6 @@ MAP_LAYER_NAMES = {
     ("metadata", "geo", "country"): "countries",
 }
 
-DRY_RUN_URL = (
-    "https://us-central1-moz-fx-data-shared-prod.cloudfunctions.net/bigquery-etl-dryrun"
-)
-
 
 def _get_dimension(
     path: Tuple[str, ...], field_type: str, mode: str, description: Optional[str]
