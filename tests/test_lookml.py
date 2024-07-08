@@ -30,16 +30,13 @@ class MockDryRun:
     """Mock dryrun.DryRun."""
 
     def __init__(
-        self,
-        sql=None,
-        project=None,
-        dataset=None,
-        table=None,
+        self, sql=None, project=None, dataset=None, table=None, use_cloud_function=False
     ):
         self.sql = sql
         self.project = project
         self.dataset = dataset
         self.table = table
+        self.use_cloud_function = use_cloud_function
 
     def get_table_metadata(self):
         """Mock dryrun.DryRun.get_table_metadata"""

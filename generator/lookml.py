@@ -1,7 +1,6 @@
 """Generate lookml from namespaces."""
 
 import logging
-import os
 from pathlib import Path
 from typing import Dict, Iterable, Optional
 
@@ -26,14 +25,17 @@ FILE_HEADER = """
 
 
 def _generate_views(
-    out_dir: Path, views: Iterable[View], v1_name: Optional[str]
+    out_dir: Path,
+    views: Iterable[View],
+    v1_name: Optional[str],
+    use_cloud_function: bool,
 ) -> Iterable[Path]:
     for view in views:
         logging.info(
             f"Generating lookml for view {view.name} in {view.namespace} of type {view.view_type}"
         )
         path = out_dir / f"{view.name}.view.lkml"
-        lookml = view.to_lookml(v1_name)
+        lookml = view.to_lookml(v1_name, use_cloud_function)
         if lookml == {}:
             continue
 
@@ -98,7 +100,9 @@ def _glean_apps_to_v1_map(glean_apps):
     return {d["name"]: d["v1_name"] for d in glean_apps}
 
 
-def _lookml(namespaces, glean_apps, target_dir, namespace_filter=[]):
+def _lookml(
+    namespaces, glean_apps, target_dir, namespace_filter=[], use_cloud_function=False
+):
     namespaces_content = namespaces.read()
     _namespaces = yaml.safe_load(namespaces_content)
     target = Path(target_dir)
@@ -122,11 +126,15 @@ def _lookml(namespaces, glean_apps, target_dir, namespace_filter=[]):
 
             logging.info("  Generating views")
             v1_name: Optional[str] = v1_mapping.get(namespace)
-            for view_path in _generate_views(view_dir, views, v1_name):
+            for view_path in _generate_views(
+                view_dir, views, v1_name, use_cloud_function=use_cloud_function
+            ):
                 logging.info(f"    ...Generating {view_path}")
 
             logging.info("  Generating datagroups")
-            generate_datagroups(views, target, namespace)
+            generate_datagroups(
+                views, target, namespace, use_cloud_function=use_cloud_function
+            )
 
             explore_dir = target / namespace / "explores"
             explore_dir.mkdir(parents=True, exist_ok=True)
@@ -182,6 +190,7 @@ def _lookml(namespaces, glean_apps, target_dir, namespace_filter=[]):
     "--use_cloud_function",
     "--use-cloud-function",
     help="Use the Cloud Function to run dry runs during LookML generation.",
+    type=bool,
 )
 def lookml(
     namespaces, app_listings_uri, target_dir, metric_hub_repos, only, use_cloud_function
@@ -190,8 +199,7 @@ def lookml(
     if metric_hub_repos:
         MetricsConfigLoader.update_repos(metric_hub_repos)
 
-    if use_cloud_function is not None:
-        os.environ["USE_CLOUD_FUNCTION"] = "True" if use_cloud_function else "False"
-
     glean_apps = _get_glean_apps(app_listings_uri)
-    return _lookml(namespaces, glean_apps, target_dir, only)
+    return _lookml(
+        namespaces, glean_apps, target_dir, only, use_cloud_function=use_cloud_function
+    )

@@ -63,7 +63,9 @@ class TableView(View):
         """Get a view from a name and dict definition."""
         return TableView(namespace, name, _dict["tables"], _dict.get("measures"))
 
-    def to_lookml(self, v1_name: Optional[str]) -> Dict[str, Any]:
+    def to_lookml(
+        self, v1_name: Optional[str], use_cloud_function: bool
+    ) -> Dict[str, Any]:
         """Generate LookML for this view."""
         view_defn: Dict[str, Any] = {"name": self.name}
 
@@ -74,7 +76,9 @@ class TableView(View):
         )["table"]
 
         # add dimensions and dimension groups
-        dimensions = lookml_utils._generate_dimensions(table)
+        dimensions = lookml_utils._generate_dimensions(
+            table, use_cloud_function=use_cloud_function
+        )
         view_defn["dimensions"] = list(
             filterfalse(lookml_utils._is_dimension_group, dimensions)
         )
@@ -107,7 +111,10 @@ class TableView(View):
 
         [project, dataset, table] = table.split(".")
         table_schema = DryRun(
-            project=project, dataset=dataset, table=table
+            project=project,
+            dataset=dataset,
+            table=table,
+            use_cloud_function=use_cloud_function,
         ).get_table_schema()
         nested_views = lookml_utils._generate_nested_dimension_views(
             table_schema, self.name

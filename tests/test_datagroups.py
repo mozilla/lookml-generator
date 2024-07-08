@@ -27,16 +27,13 @@ class MockDryRun:
     """Mock dryrun.DryRun."""
 
     def __init__(
-        self,
-        sql=None,
-        project=None,
-        dataset=None,
-        table=None,
+        self, sql=None, project=None, dataset=None, table=None, use_cloud_function=False
     ):
         self.sql = sql
         self.project = project
         self.dataset = dataset
         self.table = table
+        self.use_cloud_function = use_cloud_function
 
     def get_table_metadata(self):
         """Mock dryrun.DryRun.get_table_metadata"""
@@ -117,6 +114,7 @@ def test_generates_datagroups(reference_map_mock, runner):
             views,
             target_dir=Path("looker-hub"),
             namespace="test_namespace",
+            use_cloud_function=False,
         )
 
         assert Path(namespace_dir / "datagroups").exists()
@@ -201,6 +199,7 @@ def test_generates_datagroups_with_tables_and_views(reference_map_mock, runner):
             views,
             target_dir=Path("looker-hub"),
             namespace="test_namespace",
+            use_cloud_function=False,
         )
 
         assert Path("looker-hub/test_namespace/datagroups").exists()
@@ -245,6 +244,7 @@ def test_skips_non_table_views(runner):
             views,
             target_dir=Path("looker-hub"),
             namespace="test_namespace",
+            use_cloud_function=False,
         )
 
         assert not Path("looker-hub/test_namespace/datagroups").exists()
@@ -309,6 +309,7 @@ def test_only_generates_one_datagroup_for_references_to_same_table(
             views,
             target_dir=Path("looker-hub"),
             namespace="test_namespace",
+            use_cloud_function=False,
         )
 
         assert Path(namespace_dir / "datagroups").exists()

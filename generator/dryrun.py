@@ -2,7 +2,6 @@
 
 import io
 import json
-import os
 import sys
 from enum import Enum
 from functools import cached_property
@@ -43,11 +42,10 @@ class DryRun:
     def __init__(
         self,
         sql=None,
-        use_cloud_function=os.getenv("USE_CLOUD_FUNCTION", "False").lower()
-        in ("true", "1", "t"),
+        use_cloud_function=False,
         client=None,
-        project=None,
-        dataset=None,
+        project="moz-fx-data-shared-prod",
+        dataset="telemetry",
         table=None,
         dry_run_url=DRY_RUN_URL,
     ):
@@ -86,11 +84,13 @@ class DryRun:
                     id_token = fetch_id_token(auth_req, self.dry_run_url)
 
                 json_data = {
-                    "query": self.sql,
+                    "query": self.sql or "SELECT 1",
                     "project": self.project,
                     "dataset": self.dataset,
-                    "table": self.table,
                 }
+
+                if self.table:
+                    json_data["table"] = self.table
 
                 r = urlopen(
                     Request(
@@ -163,7 +163,7 @@ class DryRun:
                     table_metadata = {
                         "tableType": table.table_type,
                         "friendlyName": table.friendly_name,
-                        "schema": table_schema,
+                        "schema": {"fields": table_schema},
                     }
 
                 return {
@@ -187,7 +187,7 @@ class DryRun:
             and self.dry_run_result["valid"]
             and "schema" in self.dry_run_result
         ):
-            return self.dry_run_result["schema"]
+            return self.dry_run_result["schema"]["fields"]
 
         return {}
 
@@ -201,7 +201,7 @@ class DryRun:
             and self.dry_run_result["valid"]
             and "tableMetadata" in self.dry_run_result
         ):
-            return self.dry_run_result["tableMetadata"]["schema"]
+            return self.dry_run_result["tableMetadata"]["schema"]["fields"]
 
         return {}
 

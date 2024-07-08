@@ -75,6 +75,7 @@ def _get_datagroup_from_bigquery_view(
     table_id,
     table_metadata: Dict[str, Any],
     dataset_view_map: BQViewReferenceMap,
+    use_cloud_function: bool,
 ) -> Optional[Datagroup]:
     # Dataset view map only contains references for shared-prod views.
     full_table_id = f"{project_id}.{dataset_id}.{table_id}"
@@ -100,6 +101,7 @@ def _get_datagroup_from_bigquery_view(
     source_table_id = ".".join(view_references[0])
     try:
         table_metadata = DryRun(
+            use_cloud_function=use_cloud_function,
             project=view_references[0][0],
             dataset=view_references[0][1],
             table=view_references[0][2],
@@ -118,6 +120,7 @@ def _get_datagroup_from_bigquery_view(
                 view_references[0][2],
                 table_metadata,
                 dataset_view_map,
+                use_cloud_function=use_cloud_function,
             )
     except TypeError as e:
         raise ValueError(
@@ -130,6 +133,7 @@ def _get_datagroup_from_bigquery_view(
 def _generate_view_datagroup(
     view: View,
     dataset_view_map: BQViewReferenceMap,
+    use_cloud_function: bool,
 ) -> Optional[Datagroup]:
     """Generate the Datagroup LookML for a Looker View."""
     # Only generate datagroup for views that can be linked to a BigQuery table:
@@ -144,7 +148,10 @@ def _generate_view_datagroup(
 
     [project, dataset, table] = view_table.split(".")
     table_metadata = DryRun(
-        project=project, dataset=dataset, table=table
+        project=project,
+        dataset=dataset,
+        table=table,
+        use_cloud_function=use_cloud_function,
     ).get_table_metadata()
 
     if "TABLE" == table_metadata.get("tableType"):
@@ -154,7 +161,12 @@ def _generate_view_datagroup(
         return datagroup
     elif "VIEW" == table_metadata.get("tableType"):
         datagroup = _get_datagroup_from_bigquery_view(
-            project, dataset, table, table_metadata, dataset_view_map
+            project,
+            dataset,
+            table,
+            table_metadata,
+            dataset_view_map,
+            use_cloud_function,
         )
         return datagroup
 
@@ -165,6 +177,7 @@ def generate_datagroups(
     views: List[View],
     target_dir: Path,
     namespace: str,
+    use_cloud_function: bool,
 ) -> None:
     """Generate and write a datagroups.lkml file to the namespace folder."""
     datagroups_folder_path = target_dir / namespace / "datagroups"
@@ -178,7 +191,11 @@ def generate_datagroups(
         set(
             datagroup
             for view in views
-            if (datagroup := _generate_view_datagroup(view, dataset_view_map))
+            if (
+                datagroup := _generate_view_datagroup(
+                    view, dataset_view_map, use_cloud_function
+                )
+            )
             is not None
         )
     )

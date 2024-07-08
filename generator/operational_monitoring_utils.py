@@ -53,13 +53,15 @@ def get_dimension_defaults(
         }
 
 
-def get_xaxis_val(table: str) -> str:
+def get_xaxis_val(table: str, use_cloud_function: bool) -> str:
     """
     Return whether the x-axis should be build_id or submission_date.
 
     This is based on which one is found in the table provided.
     """
-    all_dimensions = lookml_utils._generate_dimensions(table)
+    all_dimensions = lookml_utils._generate_dimensions(
+        table, use_cloud_function=use_cloud_function
+    )
     return (
         "build_id"
         if "build_id" in {dimension["name"] for dimension in all_dimensions}

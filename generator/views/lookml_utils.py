@@ -40,10 +40,6 @@ MAP_LAYER_NAMES = {
     ("metadata", "geo", "country"): "countries",
 }
 
-DRY_RUN_URL = (
-    "https://us-central1-moz-fx-data-shared-prod.cloudfunctions.net/bigquery-etl-dryrun"
-)
-
 
 def _get_dimension(
     path: Tuple[str, ...], field_type: str, mode: str, description: Optional[str]
@@ -115,7 +111,7 @@ def _generate_dimensions_helper(schema: List[Any], *prefix: str) -> Iterable[dic
             )
 
 
-def _generate_dimensions(table: str) -> List[Dict[str, Any]]:
+def _generate_dimensions(table: str, use_cloud_function: bool) -> List[Dict[str, Any]]:
     """Generate dimensions and dimension groups from a bigquery table.
 
     When schema contains both submission_timestamp and submission_date, only produce
@@ -126,8 +122,12 @@ def _generate_dimensions(table: str) -> List[Dict[str, Any]]:
     dimensions = {}
     [project, dataset, table] = table.split(".")
     table_schema = DryRun(
-        project=project, dataset=dataset, table=table
+        project=project,
+        dataset=dataset,
+        table=table,
+        use_cloud_function=use_cloud_function,
     ).get_table_schema()
+
     for dimension in _generate_dimensions_helper(table_schema):
         name = dimension["name"]
         # overwrite duplicate "submission", "end", "start" dimension group, thus picking the
@@ -149,9 +149,11 @@ def _generate_dimensions(table: str) -> List[Dict[str, Any]]:
     return list(dimensions.values())
 
 
-def _generate_dimensions_from_query(query: str) -> List[Dict[str, Any]]:
+def _generate_dimensions_from_query(
+    query: str, use_cloud_function: bool
+) -> List[Dict[str, Any]]:
     """Generate dimensions and dimension groups from a SQL query."""
-    schema = DryRun(sql=query).get_schema()["fields"]
+    schema = DryRun(sql=query, use_cloud_function=use_cloud_function).get_schema()
     dimensions = {}
     for dimension in _generate_dimensions_helper(schema or []):
         name_key = dimension["name"]

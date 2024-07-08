@@ -9,16 +9,13 @@ class MockDryRun:
     """Mock dryrun.DryRun."""
 
     def __init__(
-        self,
-        sql=None,
-        project=None,
-        dataset=None,
-        table=None,
+        self, sql=None, project=None, dataset=None, table=None, use_cloud_function=False
     ):
         self.sql = sql
         self.project = project
         self.dataset = dataset
         self.table = table
+        self.use_cloud_function = use_cloud_function
 
     def get_table_schema(self):
         """Mock dryrun.DryRun.get_table_schema"""
@@ -103,7 +100,7 @@ def test_kebab_case(mock_glean_ping):
         "dash_name",
         [{"channel": "release", "table": "mozdata.glean_app.dash_name"}],
     )
-    lookml = view.to_lookml("glean-app")
+    lookml = view.to_lookml("glean-app", False)
     assert len(lookml["views"]) == 1
     assert len(lookml["views"][0]["dimensions"]) == 1
     assert (
@@ -146,7 +143,7 @@ def test_url_metric(mock_glean_ping):
         "dash_name",
         [{"channel": "release", "table": "mozdata.glean_app.dash_name"}],
     )
-    lookml = view.to_lookml("glean-app")
+    lookml = view.to_lookml("glean-app", False)
     assert len(lookml["views"]) == 1
     assert len(lookml["views"][0]["dimensions"]) == 1
     assert (
@@ -188,7 +185,7 @@ def test_datetime_metric(mock_glean_ping):
         "dash_name",
         [{"channel": "release", "table": "mozdata.glean_app.dash_name"}],
     )
-    lookml = view.to_lookml("glean-app")
+    lookml = view.to_lookml("glean-app", False)
     assert len(lookml["views"]) == 1
     assert len(lookml["views"][0]["dimension_groups"]) == 1
     assert (
@@ -237,7 +234,7 @@ def test_undeployed_probe(mock_glean_ping):
         "dash_name",
         [{"channel": "release", "table": "mozdata.glean_app.dash_name"}],
     )
-    lookml = view.to_lookml("glean-app")
+    lookml = view.to_lookml("glean-app", False)
     # In addition to the table view, each labeled counter adds a join view and a suggest
     # view. Expect 3 views, because 1 for the table view, 2 added for fun.counter_metric
     # because it's in the table schema, and 0 added for fun.counter_metric2 because it's

@@ -15,16 +15,13 @@ class MockDryRun:
     """Mock dryrun.DryRun."""
 
     def __init__(
-        self,
-        sql=None,
-        project=None,
-        dataset=None,
-        table=None,
+        self, sql=None, project=None, dataset=None, table=None, use_cloud_function=False
     ):
         self.sql = sql
         self.project = project
         self.dataset = dataset
         self.table = table
+        self.use_cloud_function = use_cloud_function
 
     def get_table_schema(self):
         """Mock dryrun.DryRun.get_table_schema"""
@@ -71,7 +68,7 @@ def operational_monitoring_view():
 @patch("generator.views.lookml_utils.DryRun", MagicMock)
 def operational_monitoring_explore(tmp_path, operational_monitoring_view):
     (tmp_path / "fission.view.lkml").write_text(
-        lkml.dump(operational_monitoring_view.to_lookml(None))
+        lkml.dump(operational_monitoring_view.to_lookml(None, False))
     )
     return OperationalMonitoringExplore(
         "fission",
@@ -201,7 +198,7 @@ def test_view_lookml(operational_monitoring_view):
             }
         ]
     }
-    actual = operational_monitoring_view.to_lookml(None)
+    actual = operational_monitoring_view.to_lookml(None, False)
     print(actual)
 
     print_and_test(expected=expected, actual=actual)

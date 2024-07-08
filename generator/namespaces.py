@@ -343,6 +343,12 @@ def _get_metric_hub_data_sources() -> Dict[str, List[str]]:
     default=[],
     help="Namespaces to ignore during generation.",
 )
+@click.option(
+    "--use_cloud_function",
+    "--use-cloud-function",
+    help="Use the Cloud Function to run dry runs during LookML generation.",
+    type=bool,
+)
 def namespaces(
     custom_namespaces,
     generated_sql_uri,
@@ -350,6 +356,7 @@ def namespaces(
     disallowlist,
     metric_hub_repos,
     ignore,
+    use_cloud_function,
 ):
     """Generate namespaces.yaml."""
     warnings.filterwarnings("ignore", module="google.auth._default")
@@ -379,7 +386,7 @@ def namespaces(
 
         # generating operational monitoring namespace, if available
         if "operational_monitoring" in custom_namespaces:
-            dryrun = DryRun()
+            dryrun = DryRun(use_cloud_function=use_cloud_function)
             if dryrun.use_cloud_function:
                 raise Exception(
                     "Cannot generate OpMon using dry run Cloud Function"

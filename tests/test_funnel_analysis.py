@@ -27,7 +27,7 @@ def funnel_analysis_view():
 @pytest.fixture()
 def funnel_analysis_explore(tmp_path, funnel_analysis_view):
     (tmp_path / "funnel_analysis.view.lkml").write_text(
-        lkml.dump(funnel_analysis_view.to_lookml(None))
+        lkml.dump(funnel_analysis_view.to_lookml(None, False))
     )
     return FunnelAnalysisExplore(
         "funnel_analysis",
@@ -284,7 +284,7 @@ def test_view_lookml(funnel_analysis_view):
             },
         ],
     }
-    actual = funnel_analysis_view.to_lookml(None)
+    actual = funnel_analysis_view.to_lookml(None, False)
 
     print_and_test(expected=expected, actual=actual)
 
