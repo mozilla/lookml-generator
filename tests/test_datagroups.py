@@ -1,3 +1,4 @@
+import functools
 from dataclasses import dataclass
 from pathlib import Path
 from unittest.mock import patch
@@ -27,13 +28,22 @@ class MockDryRun:
     """Mock dryrun.DryRun."""
 
     def __init__(
-        self, sql=None, project=None, dataset=None, table=None, use_cloud_function=False
+        self,
+        client,
+        use_cloud_function,
+        id_token,
+        sql=None,
+        project=None,
+        dataset=None,
+        table=None,
     ):
         self.sql = sql
         self.project = project
         self.dataset = dataset
         self.table = table
+        self.client = client
         self.use_cloud_function = use_cloud_function
+        self.id_token = id_token
 
     def get_table_metadata(self):
         """Mock dryrun.DryRun.get_table_metadata"""
@@ -59,7 +69,6 @@ class MockDryRun:
         return {}
 
 
-@patch("generator.views.datagroups.DryRun", MockDryRun)
 @patch("generator.views.lookml_utils.get_bigquery_view_reference_map")
 def test_generates_datagroups(reference_map_mock, runner):
     table_1_expected = (
@@ -105,6 +114,8 @@ def test_generates_datagroups(reference_map_mock, runner):
         ),
     ]
 
+    mock_dryrun = functools.partial(MockDryRun, None, False, None)
+
     with runner.isolated_filesystem():
         namespace_dir = Path("looker-hub/test_namespace")
         namespace_dir.mkdir(parents=True)
@@ -114,7 +125,7 @@ def test_generates_datagroups(reference_map_mock, runner):
             views,
             target_dir=Path("looker-hub"),
             namespace="test_namespace",
-            use_cloud_function=False,
+            dryrun=mock_dryrun,
         )
 
         assert Path(namespace_dir / "datagroups").exists()
@@ -139,7 +150,6 @@ def test_generates_datagroups(reference_map_mock, runner):
 
 
 @patch("generator.views.lookml_utils.get_bigquery_view_reference_map")
-@patch("generator.views.datagroups.DryRun", MockDryRun)
 def test_generates_datagroups_with_tables_and_views(reference_map_mock, runner):
     table_1_expected = (
         FILE_HEADER
@@ -186,6 +196,8 @@ def test_generates_datagroups_with_tables_and_views(reference_map_mock, runner):
         ),
     ]
 
+    mock_dryrun = functools.partial(MockDryRun, None, False, None)
+
     with runner.isolated_filesystem():
         reference_map_mock.return_value = {
             "analysis": {
@@ -199,7 +211,7 @@ def test_generates_datagroups_with_tables_and_views(reference_map_mock, runner):
             views,
             target_dir=Path("looker-hub"),
             namespace="test_namespace",
-            use_cloud_function=False,
+            dryrun=mock_dryrun,
         )
 
         assert Path("looker-hub/test_namespace/datagroups").exists()
@@ -223,7 +235,6 @@ def test_generates_datagroups_with_tables_and_views(reference_map_mock, runner):
         )
 
 
-@patch("generator.views.datagroups.DryRun", MockDryRun)
 def test_skips_non_table_views(runner):
     views = [
         EventsView(
@@ -238,19 +249,20 @@ def test_skips_non_table_views(runner):
         ),
     ]
 
+    mock_dryrun = functools.partial(MockDryRun, None, False, None)
+
     with runner.isolated_filesystem():
         Path("looker-hub/test_namespace").mkdir(parents=True)
         generate_datagroups(
             views,
             target_dir=Path("looker-hub"),
             namespace="test_namespace",
-            use_cloud_function=False,
+            dryrun=mock_dryrun,
         )
 
         assert not Path("looker-hub/test_namespace/datagroups").exists()
 
 
-@patch("generator.views.datagroups.DryRun", MockDryRun)
 @patch("generator.views.lookml_utils.get_bigquery_view_reference_map")
 def test_only_generates_one_datagroup_for_references_to_same_table(
     reference_map_mock, runner
@@ -294,6 +306,8 @@ def test_only_generates_one_datagroup_for_references_to_same_table(
         ),
     ]
 
+    mock_dryrun = functools.partial(MockDryRun, None, False, None)
+
     with runner.isolated_filesystem():
         reference_map_mock.return_value = {
             "analysis": {
@@ -309,7 +323,7 @@ def test_only_generates_one_datagroup_for_references_to_same_table(
             views,
             target_dir=Path("looker-hub"),
             namespace="test_namespace",
-            use_cloud_function=False,
+            dryrun=mock_dryrun,
         )
 
         assert Path(namespace_dir / "datagroups").exists()

@@ -69,15 +69,13 @@ class GleanPingView(PingView):
             if view.name not in DISALLOWED_PINGS:
                 yield view
 
-    def to_lookml(
-        self, v1_name: Optional[str], use_cloud_function: bool
-    ) -> Dict[str, Any]:
+    def to_lookml(self, v1_name: Optional[str], dryrun) -> Dict[str, Any]:
         """Generate LookML for this view.
 
         The Glean views include a labeled metrics, which need to be joined
         against the view in the explore.
         """
-        lookml = super().to_lookml(v1_name, use_cloud_function=use_cloud_function)
+        lookml = super().to_lookml(v1_name, dryrun=dryrun)
         # ignore nested join views
         lookml["views"] = [lookml["views"][0]]
 
@@ -88,9 +86,7 @@ class GleanPingView(PingView):
             (table for table in self.tables if table.get("channel") == "release"),
             self.tables[0],
         )["table"]
-        dimensions = self.get_dimensions(
-            table, v1_name, use_cloud_function=use_cloud_function
-        )
+        dimensions = self.get_dimensions(table, v1_name, dryrun=dryrun)
         dimension_names = {dimension["name"] for dimension in dimensions}
 
         client_id_field = self.get_client_id(dimensions, table)
@@ -213,11 +209,10 @@ class GleanPingView(PingView):
         )
 
         [project, dataset, table] = table.split(".")
-        table_schema = DryRun(
+        table_schema = dryrun(
             project=project,
             dataset=dataset,
             table=table,
-            use_cloud_function=use_cloud_function,
         ).get_table_schema()
         nested_views = lookml_utils._generate_nested_dimension_views(
             table_schema, self.name
@@ -410,12 +405,10 @@ class GleanPingView(PingView):
         return dict(dimension, **annotations)
 
     def get_dimensions(
-        self, table, v1_name: Optional[str], use_cloud_function: bool
+        self, table, v1_name: Optional[str], dryrun
     ) -> List[Dict[str, Any]]:
         """Get the set of dimensions for this view."""
-        all_fields = super().get_dimensions(
-            table, v1_name, use_cloud_function=use_cloud_function
-        )
+        all_fields = super().get_dimensions(table, v1_name, dryrun=dryrun)
         fields = self._get_glean_metric_dimensions(all_fields, v1_name) + [
             self._add_link(d)
             for d in all_fields

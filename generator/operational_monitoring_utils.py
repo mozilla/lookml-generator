@@ -6,6 +6,8 @@ from typing import Any, Dict, List, Optional, Tuple
 from google.api_core import exceptions
 from google.cloud import bigquery
 
+from generator.dryrun import DryRun
+
 from .views import lookml_utils
 
 
@@ -53,15 +55,13 @@ def get_dimension_defaults(
         }
 
 
-def get_xaxis_val(table: str, use_cloud_function: bool) -> str:
+def get_xaxis_val(table: str, dryrun) -> str:
     """
     Return whether the x-axis should be build_id or submission_date.
 
     This is based on which one is found in the table provided.
     """
-    all_dimensions = lookml_utils._generate_dimensions(
-        table, use_cloud_function=use_cloud_function
-    )
+    all_dimensions = lookml_utils._generate_dimensions(table, dryrun=dryrun)
     return (
         "build_id"
         if "build_id" in {dimension["name"] for dimension in all_dimensions}

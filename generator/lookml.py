@@ -1,5 +1,6 @@
 """Generate lookml from namespaces."""
 
+import functools
 import logging
 from pathlib import Path
 from typing import Dict, Iterable, Optional
@@ -7,8 +8,10 @@ from typing import Dict, Iterable, Optional
 import click
 import lkml
 import yaml
+from google.cloud import bigquery
 
 from .dashboards import DASHBOARD_TYPES
+from .dryrun import DryRun, id_token
 from .explores import EXPLORE_TYPES
 from .metrics_utils import LOOKER_METRIC_HUB_REPO, METRIC_HUB_REPO, MetricsConfigLoader
 from .namespaces import _get_glean_apps
@@ -28,14 +31,14 @@ def _generate_views(
     out_dir: Path,
     views: Iterable[View],
     v1_name: Optional[str],
-    use_cloud_function: bool,
+    dryrun,
 ) -> Iterable[Path]:
     for view in views:
         logging.info(
             f"Generating lookml for view {view.name} in {view.namespace} of type {view.view_type}"
         )
         path = out_dir / f"{view.name}.view.lkml"
-        lookml = view.to_lookml(v1_name, use_cloud_function)
+        lookml = view.to_lookml(v1_name, dryrun)
         if lookml == {}:
             continue
 
@@ -100,9 +103,7 @@ def _glean_apps_to_v1_map(glean_apps):
     return {d["name"]: d["v1_name"] for d in glean_apps}
 
 
-def _lookml(
-    namespaces, glean_apps, target_dir, namespace_filter=[], use_cloud_function=False
-):
+def _lookml(namespaces, glean_apps, target_dir, namespace_filter=[], dryrun=None):
     namespaces_content = namespaces.read()
     _namespaces = yaml.safe_load(namespaces_content)
     target = Path(target_dir)
@@ -126,15 +127,11 @@ def _lookml(
 
             logging.info("  Generating views")
             v1_name: Optional[str] = v1_mapping.get(namespace)
-            for view_path in _generate_views(
-                view_dir, views, v1_name, use_cloud_function=use_cloud_function
-            ):
+            for view_path in _generate_views(view_dir, views, v1_name, dryrun=dryrun):
                 logging.info(f"    ...Generating {view_path}")
 
             logging.info("  Generating datagroups")
-            generate_datagroups(
-                views, target, namespace, use_cloud_function=use_cloud_function
-            )
+            generate_datagroups(views, target, namespace, dryrun=dryrun)
 
             explore_dir = target / namespace / "explores"
             explore_dir.mkdir(parents=True, exist_ok=True)
@@ -200,6 +197,8 @@ def lookml(
         MetricsConfigLoader.update_repos(metric_hub_repos)
 
     glean_apps = _get_glean_apps(app_listings_uri)
-    return _lookml(
-        namespaces, glean_apps, target_dir, only, use_cloud_function=use_cloud_function
+
+    dryrun = functools.partial(
+        DryRun, bigquery.Client(), use_cloud_function, id_token()
     )
+    return _lookml(namespaces, glean_apps, target_dir, only, dryrun)

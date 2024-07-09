@@ -1,3 +1,4 @@
+import functools
 from unittest.mock import Mock, patch
 
 from mozilla_schema_generator.probes import GleanProbe
@@ -9,13 +10,22 @@ class MockDryRun:
     """Mock dryrun.DryRun."""
 
     def __init__(
-        self, sql=None, project=None, dataset=None, table=None, use_cloud_function=False
+        self,
+        client,
+        use_cloud_function,
+        id_token,
+        sql=None,
+        project=None,
+        dataset=None,
+        table=None,
     ):
         self.sql = sql
         self.project = project
         self.dataset = dataset
         self.table = table
         self.use_cloud_function = use_cloud_function
+        self.client = client
+        self.id_token = id_token
 
     def get_table_schema(self):
         """Mock dryrun.DryRun.get_table_schema"""
@@ -67,9 +77,6 @@ class MockDryRun:
 
 
 @patch("generator.views.glean_ping_view.GleanPing")
-@patch("generator.views.lookml_utils.DryRun", MockDryRun)
-@patch("generator.views.ping_view.DryRun", MockDryRun)
-@patch("generator.views.glean_ping_view.DryRun", MockDryRun)
 def test_kebab_case(mock_glean_ping):
     """
     Tests that we handle metrics from kebab-case pings
@@ -94,13 +101,14 @@ def test_kebab_case(mock_glean_ping):
             },
         ),
     ]
+    mock_dryrun = functools.partial(MockDryRun, None, False, None)
     mock_glean_ping.return_value = glean_app
     view = GleanPingView(
         "glean_app",
         "dash_name",
         [{"channel": "release", "table": "mozdata.glean_app.dash_name"}],
     )
-    lookml = view.to_lookml("glean-app", False)
+    lookml = view.to_lookml("glean-app", dryrun=mock_dryrun)
     assert len(lookml["views"]) == 1
     assert len(lookml["views"][0]["dimensions"]) == 1
     assert (
@@ -110,13 +118,11 @@ def test_kebab_case(mock_glean_ping):
 
 
 @patch("generator.views.glean_ping_view.GleanPing")
-@patch("generator.views.lookml_utils.DryRun", MockDryRun)
-@patch("generator.views.ping_view.DryRun", MockDryRun)
-@patch("generator.views.glean_ping_view.DryRun", MockDryRun)
 def test_url_metric(mock_glean_ping):
     """
     Tests that we handle URL metrics
     """
+    mock_dryrun = functools.partial(MockDryRun, None, False, None)
     mock_glean_ping.get_repos.return_value = [{"name": "glean-app"}]
     glean_app = Mock()
     glean_app.get_probes.return_value = [
@@ -143,7 +149,7 @@ def test_url_metric(mock_glean_ping):
         "dash_name",
         [{"channel": "release", "table": "mozdata.glean_app.dash_name"}],
     )
-    lookml = view.to_lookml("glean-app", False)
+    lookml = view.to_lookml("glean-app", dryrun=mock_dryrun)
     assert len(lookml["views"]) == 1
     assert len(lookml["views"][0]["dimensions"]) == 1
     assert (
@@ -152,15 +158,13 @@ def test_url_metric(mock_glean_ping):
 
 
 @patch("generator.views.glean_ping_view.GleanPing")
-@patch("generator.views.lookml_utils.DryRun", MockDryRun)
-@patch("generator.views.ping_view.DryRun", MockDryRun)
-@patch("generator.views.glean_ping_view.DryRun", MockDryRun)
 def test_datetime_metric(mock_glean_ping):
     """
     Tests that we handle datetime metrics
     """
     mock_glean_ping.get_repos.return_value = [{"name": "glean-app"}]
     glean_app = Mock()
+    mock_dryrun = functools.partial(MockDryRun, None, False, None)
     glean_app.get_probes.return_value = [
         GleanProbe(
             "fun.datetime_metric",
@@ -185,7 +189,7 @@ def test_datetime_metric(mock_glean_ping):
         "dash_name",
         [{"channel": "release", "table": "mozdata.glean_app.dash_name"}],
     )
-    lookml = view.to_lookml("glean-app", False)
+    lookml = view.to_lookml("glean-app", dryrun=mock_dryrun)
     assert len(lookml["views"]) == 1
     assert len(lookml["views"][0]["dimension_groups"]) == 1
     assert (
@@ -199,9 +203,6 @@ def test_datetime_metric(mock_glean_ping):
 
 
 @patch("generator.views.glean_ping_view.GleanPing")
-@patch("generator.views.lookml_utils.DryRun", MockDryRun)
-@patch("generator.views.ping_view.DryRun", MockDryRun)
-@patch("generator.views.glean_ping_view.DryRun", MockDryRun)
 def test_undeployed_probe(mock_glean_ping):
     """
     Tests that we handle metrics not yet deployed to bigquery
@@ -229,12 +230,13 @@ def test_undeployed_probe(mock_glean_ping):
         for name in ["counter_metric", "counter_metric2"]
     ]
     mock_glean_ping.return_value = glean_app
+    mock_dryrun = functools.partial(MockDryRun, None, False, None)
     view = GleanPingView(
         "glean_app",
         "dash_name",
         [{"channel": "release", "table": "mozdata.glean_app.dash_name"}],
     )
-    lookml = view.to_lookml("glean-app", False)
+    lookml = view.to_lookml("glean-app", dryrun=mock_dryrun)
     # In addition to the table view, each labeled counter adds a join view and a suggest
     # view. Expect 3 views, because 1 for the table view, 2 added for fun.counter_metric
     # because it's in the table schema, and 0 added for fun.counter_metric2 because it's

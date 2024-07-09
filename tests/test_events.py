@@ -1,4 +1,4 @@
-from unittest.mock import patch
+import functools
 
 import lkml
 import pytest
@@ -13,13 +13,22 @@ class MockDryRun:
     """Mock dryrun.DryRun."""
 
     def __init__(
-        self, sql=None, project=None, dataset=None, table=None, use_cloud_function=False
+        self,
+        client,
+        use_cloud_function,
+        id_token,
+        sql=None,
+        project=None,
+        dataset=None,
+        table=None,
     ):
         self.sql = sql
         self.project = project
         self.dataset = dataset
         self.table = table
         self.use_cloud_function = use_cloud_function
+        self.client = client
+        self.id_token = id_token
 
     def get_table_schema(self):
         """Mock dryrun.DryRun.get_table_schema"""
@@ -164,7 +173,6 @@ def test_explore_from_dict(events_explore, tmp_path):
     assert actual == events_explore
 
 
-@patch("generator.views.lookml_utils.DryRun", MockDryRun)
 def test_view_lookml(events_view):
     expected = {
         "includes": ["events_unnested_table.view.lkml"],
@@ -197,7 +205,9 @@ def test_view_lookml(events_view):
         ],
     }
 
-    actual = events_view.to_lookml(None, False)
+    mock_dryrun = functools.partial(MockDryRun, None, False, None)
+
+    actual = events_view.to_lookml(None, dryrun=mock_dryrun)
     print_and_test(expected=expected, actual=actual)
 
 

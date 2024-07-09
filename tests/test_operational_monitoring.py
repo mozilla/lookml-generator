@@ -1,5 +1,5 @@
+import functools
 from textwrap import dedent
-from unittest.mock import MagicMock, patch
 
 import lkml
 import pytest
@@ -15,13 +15,22 @@ class MockDryRun:
     """Mock dryrun.DryRun."""
 
     def __init__(
-        self, sql=None, project=None, dataset=None, table=None, use_cloud_function=False
+        self,
+        client,
+        use_cloud_function,
+        id_token,
+        sql=None,
+        project=None,
+        dataset=None,
+        table=None,
     ):
         self.sql = sql
         self.project = project
         self.dataset = dataset
         self.table = table
         self.use_cloud_function = use_cloud_function
+        self.client = client
+        self.id_token = id_token
 
     def get_table_schema(self):
         """Mock dryrun.DryRun.get_table_schema"""
@@ -65,10 +74,10 @@ def operational_monitoring_view():
 
 
 @pytest.fixture()
-@patch("generator.views.lookml_utils.DryRun", MagicMock)
 def operational_monitoring_explore(tmp_path, operational_monitoring_view):
+    mock_dryrun = functools.partial(MockDryRun, None, False, None)
     (tmp_path / "fission.view.lkml").write_text(
-        lkml.dump(operational_monitoring_view.to_lookml(None, False))
+        lkml.dump(operational_monitoring_view.to_lookml(None, dryrun=mock_dryrun))
     )
     return OperationalMonitoringExplore(
         "fission",
@@ -155,7 +164,6 @@ def test_view_from_dict(operational_monitoring_view):
     assert actual == operational_monitoring_view
 
 
-@patch("generator.views.lookml_utils.DryRun", MockDryRun)
 def test_view_lookml(operational_monitoring_view):
     expected = {
         "views": [
@@ -198,7 +206,8 @@ def test_view_lookml(operational_monitoring_view):
             }
         ]
     }
-    actual = operational_monitoring_view.to_lookml(None, False)
+    mock_dryrun = functools.partial(MockDryRun, None, False, None)
+    actual = operational_monitoring_view.to_lookml(None, dryrun=mock_dryrun)
     print(actual)
 
     print_and_test(expected=expected, actual=actual)

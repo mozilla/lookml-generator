@@ -6,6 +6,8 @@ from typing import Any, Dict, Iterator, List, Optional, Set, TypedDict
 
 from click import ClickException
 
+from generator.dryrun import DryRun
+
 OMIT_VIEWS: Set[str] = set()
 
 
@@ -87,14 +89,12 @@ class View(object):
         return False
 
     def get_dimensions(
-        self, table, v1_name: Optional[str], use_cloud_function: bool
+        self, table, v1_name: Optional[str], dryrun
     ) -> List[Dict[str, Any]]:
         """Get the set of dimensions for this view."""
         raise NotImplementedError("Only implemented in subclass.")
 
-    def to_lookml(
-        self, v1_name: Optional[str], use_cloud_function: bool
-    ) -> Dict[str, Any]:
+    def to_lookml(self, v1_name: Optional[str], dryrun) -> Dict[str, Any]:
         """
         Generate Lookml for this view.
 

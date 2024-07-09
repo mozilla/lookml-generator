@@ -1,4 +1,5 @@
 import contextlib
+import functools
 from pathlib import Path
 from textwrap import dedent
 from unittest.mock import Mock, patch
@@ -30,13 +31,22 @@ class MockDryRun:
     """Mock dryrun.DryRun."""
 
     def __init__(
-        self, sql=None, project=None, dataset=None, table=None, use_cloud_function=False
+        self,
+        client,
+        use_cloud_function,
+        id_token,
+        sql=None,
+        project=None,
+        dataset=None,
+        table=None,
     ):
         self.sql = sql
         self.project = project
         self.dataset = dataset
         self.table = table
         self.use_cloud_function = use_cloud_function
+        self.client = client
+        self.id_token = id_token
 
     def get_table_metadata(self):
         """Mock dryrun.DryRun.get_table_metadata"""
@@ -746,6 +756,7 @@ def _prepare_lookml_actual_test(
             """
     )
     namespaces.write_text(namespaces_text)
+    mock_dryrun = functools.partial(MockDryRun, None, False, None)
     for mock in [mock_glean_ping_view, mock_glean_ping_explore]:
         mock.get_repos.return_value = [{"name": "glean-app-release"}]
         glean_app = Mock()
@@ -756,17 +767,12 @@ def _prepare_lookml_actual_test(
         mock.return_value = glean_app
 
     with runner.isolated_filesystem():
-        with patch("generator.views.lookml_utils.DryRun", MockDryRun):
-            _lookml(open(namespaces), glean_apps, "looker-hub/")
-            yield namespaces_text
+        _lookml(open(namespaces), glean_apps, "looker-hub/", dryrun=mock_dryrun)
+        yield namespaces_text
 
 
 @patch("generator.views.glean_ping_view.GleanPing")
 @patch("generator.explores.glean_ping_explore.GleanPing")
-@patch("generator.views.ping_view.DryRun", MockDryRun)
-@patch("generator.views.table_view.DryRun", MockDryRun)
-@patch("generator.views.glean_ping_view.DryRun", MockDryRun)
-@patch("generator.views.datagroups.DryRun", MockDryRun)
 def test_lookml_actual_baseline_view(
     mock_glean_ping_view,
     mock_glean_ping_explore,
@@ -836,10 +842,6 @@ def test_lookml_actual_baseline_view(
 
 @patch("generator.views.glean_ping_view.GleanPing")
 @patch("generator.explores.glean_ping_explore.GleanPing")
-@patch("generator.views.ping_view.DryRun", MockDryRun)
-@patch("generator.views.table_view.DryRun", MockDryRun)
-@patch("generator.views.glean_ping_view.DryRun", MockDryRun)
-@patch("generator.views.datagroups.DryRun", MockDryRun)
 def test_lookml_actual_baseline_view_parameterized(
     mock_glean_ping_view,
     mock_glean_ping_explore,
@@ -1015,10 +1017,6 @@ def test_lookml_actual_baseline_view_parameterized(
 
 @patch("generator.views.glean_ping_view.GleanPing")
 @patch("generator.explores.glean_ping_explore.GleanPing")
-@patch("generator.views.ping_view.DryRun", MockDryRun)
-@patch("generator.views.table_view.DryRun", MockDryRun)
-@patch("generator.views.glean_ping_view.DryRun", MockDryRun)
-@patch("generator.views.datagroups.DryRun", MockDryRun)
 def test_lookml_actual_metric_definitions_view(
     mock_glean_ping_view,
     mock_glean_ping_explore,
@@ -1662,10 +1660,6 @@ def test_lookml_actual_metric_definitions_view(
 
 @patch("generator.views.glean_ping_view.GleanPing")
 @patch("generator.explores.glean_ping_explore.GleanPing")
-@patch("generator.views.ping_view.DryRun", MockDryRun)
-@patch("generator.views.table_view.DryRun", MockDryRun)
-@patch("generator.views.glean_ping_view.DryRun", MockDryRun)
-@patch("generator.views.datagroups.DryRun", MockDryRun)
 def test_lookml_actual_growth_accounting_view(
     mock_glean_ping_view,
     mock_glean_ping_explore,
@@ -1724,10 +1718,6 @@ def test_lookml_actual_growth_accounting_view(
 
 @patch("generator.views.glean_ping_view.GleanPing")
 @patch("generator.explores.glean_ping_explore.GleanPing")
-@patch("generator.views.ping_view.DryRun", MockDryRun)
-@patch("generator.views.table_view.DryRun", MockDryRun)
-@patch("generator.views.glean_ping_view.DryRun", MockDryRun)
-@patch("generator.views.datagroups.DryRun", MockDryRun)
 def test_lookml_actual_baseline_explore(
     mock_glean_ping_view,
     mock_glean_ping_explore,
@@ -1772,10 +1762,6 @@ def test_lookml_actual_baseline_explore(
 
 @patch("generator.views.glean_ping_view.GleanPing")
 @patch("generator.explores.glean_ping_explore.GleanPing")
-@patch("generator.views.ping_view.DryRun", MockDryRun)
-@patch("generator.views.table_view.DryRun", MockDryRun)
-@patch("generator.views.glean_ping_view.DryRun", MockDryRun)
-@patch("generator.views.datagroups.DryRun", MockDryRun)
 def test_lookml_actual_client_counts(
     mock_glean_ping_view,
     mock_glean_ping_explore,
@@ -1881,10 +1867,10 @@ def test_duplicate_dimension(runner, glean_apps, tmp_path):
             """
         )
     )
+    mock_dryrun = functools.partial(MockDryRun, None, False, None)
     with runner.isolated_filesystem():
-        with patch("generator.views.lookml_utils.DryRun", MockDryRun):
-            with pytest.raises(ClickException):
-                _lookml(open(namespaces), glean_apps, "looker-hub/")
+        with pytest.raises(ClickException):
+            _lookml(open(namespaces), glean_apps, "looker-hub/", dryrun=mock_dryrun)
 
 
 def test_duplicate_dimension_event(runner, glean_apps, tmp_path):
@@ -1958,6 +1944,7 @@ def test_duplicate_dimension_event(runner, glean_apps, tmp_path):
 
 
 def test_duplicate_client_id(runner, glean_apps, tmp_path):
+    mock_dryrun = functools.partial(MockDryRun, None, False, None)
     namespaces = tmp_path / "namespaces.yaml"
     namespaces.write_text(
         dedent(
@@ -1974,13 +1961,12 @@ def test_duplicate_client_id(runner, glean_apps, tmp_path):
             """
         )
     )
+    mock_dryrun = functools.partial(MockDryRun, None, False, None)
     with runner.isolated_filesystem():
-        with patch("generator.views.lookml_utils.DryRun", MockDryRun):
-            with pytest.raises(ClickException):
-                _lookml(open(namespaces), glean_apps, "looker-hub/")
+        with pytest.raises(ClickException):
+            _lookml(open(namespaces), glean_apps, "looker-hub/", dryrun=mock_dryrun)
 
 
-@patch("generator.views.ping_view.DryRun", MockDryRun)
 def test_context_id(runner, glean_apps, tmp_path):
     namespaces = tmp_path / "namespaces.yaml"
     namespaces.write_text(
@@ -2004,9 +1990,9 @@ def test_context_id(runner, glean_apps, tmp_path):
         )
     )
 
+    mock_dryrun = functools.partial(MockDryRun, None, False, None)
     with runner.isolated_filesystem():
-        with patch("generator.views.lookml_utils.DryRun", MockDryRun):
-            _lookml(open(namespaces), glean_apps, "looker-hub/")
+        _lookml(open(namespaces), glean_apps, "looker-hub/", dryrun=mock_dryrun)
         expected = {
             "views": [
                 {

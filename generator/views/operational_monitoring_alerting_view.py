@@ -2,6 +2,8 @@
 
 from typing import Any, Dict, Optional
 
+from generator.dryrun import DryRun
+
 from . import lookml_utils
 from .operational_monitoring_view import OperationalMonitoringView
 
@@ -11,9 +13,7 @@ class OperationalMonitoringAlertingView(OperationalMonitoringView):
 
     type: str = "operational_monitoring_alerting_view"
 
-    def to_lookml(
-        self, v1_name: Optional[str], use_cloud_function: bool
-    ) -> Dict[str, Any]:
+    def to_lookml(self, v1_name: Optional[str], dryrun) -> Dict[str, Any]:
         """Get this view as LookML."""
         if len(self.tables) == 0:
             raise Exception((f"Operational Monitoring view {self.name} has no tables"))
@@ -21,9 +21,7 @@ class OperationalMonitoringAlertingView(OperationalMonitoringView):
         reference_table = self.tables[0]["table"]
         dimensions = [
             d
-            for d in lookml_utils._generate_dimensions(
-                reference_table, use_cloud_function=use_cloud_function
-            )
+            for d in lookml_utils._generate_dimensions(reference_table, dryrun=dryrun)
             if d["name"] != "submission"
         ]
 

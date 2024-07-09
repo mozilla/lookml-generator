@@ -25,6 +25,8 @@ from __future__ import annotations
 from textwrap import dedent
 from typing import Any, Dict, Iterator, List, Optional
 
+from generator.dryrun import DryRun
+
 from .view import View, ViewDict
 
 DEFAULT_NUM_FUNNEL_STEPS: int = 4
@@ -89,9 +91,7 @@ class FunnelAnalysisView(View):
         """Get a FunnalAnalysisView from a dict representation."""
         return FunnelAnalysisView(namespace, _dict["tables"])
 
-    def to_lookml(
-        self, v1_name: Optional[str], use_cloud_function: bool
-    ) -> Dict[str, Any]:
+    def to_lookml(self, v1_name: Optional[str], dryrun) -> Dict[str, Any]:
         """Get this view as LookML."""
         return {
             "includes": [f"{self.tables[0]['funnel_analysis']}.view.lkml"],

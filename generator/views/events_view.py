@@ -5,6 +5,8 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import Any, Dict, Iterator, List, Optional
 
+from generator.dryrun import DryRun
+
 from . import lookml_utils
 from .view import View, ViewDict
 
@@ -61,9 +63,7 @@ class EventsView(View):
         """Get a view from a name and dict definition."""
         return EventsView(namespace, name, _dict["tables"])
 
-    def to_lookml(
-        self, v1_name: Optional[str], use_cloud_function: bool
-    ) -> Dict[str, Any]:
+    def to_lookml(self, v1_name: Optional[str], dryrun) -> Dict[str, Any]:
         """Generate LookML for this view."""
         view_defn: Dict[str, Any] = {
             "extends": [self.tables[0]["events_table_view"]],
@@ -72,7 +72,7 @@ class EventsView(View):
 
         # add measures
         dimensions = lookml_utils._generate_dimensions(
-            self.tables[0]["base_table"], use_cloud_function=use_cloud_function
+            self.tables[0]["base_table"], dryrun=dryrun
         )
         view_defn["measures"] = self.get_measures(dimensions)
 

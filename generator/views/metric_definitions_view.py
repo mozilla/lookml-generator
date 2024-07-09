@@ -5,6 +5,7 @@ from __future__ import annotations
 import re
 from typing import Any, Dict, Iterator, List, Optional, Union
 
+from generator.dryrun import DryRun
 from generator.metrics_utils import MetricsConfigLoader
 
 from . import lookml_utils
@@ -38,9 +39,7 @@ class MetricDefinitionsView(View):
         """Get a MetricDefinitionsView from a dict representation."""
         return klass(namespace, name, definition.get("tables", []))
 
-    def to_lookml(
-        self, v1_name: Optional[str], use_cloud_function: bool
-    ) -> Dict[str, Any]:
+    def to_lookml(self, v1_name: Optional[str], dryrun) -> Dict[str, Any]:
         """Get this view as LookML."""
         namespace_definitions = MetricsConfigLoader.configs.get_platform_definitions(
             self.namespace
@@ -125,7 +124,7 @@ class MetricDefinitionsView(View):
 
                     base_view_dimensions[joined_data_source_slug] = (
                         lookml_utils._generate_dimensions_from_query(
-                            query, use_cloud_function=use_cloud_function
+                            query, dryrun=dryrun
                         )
                     )
 
@@ -151,9 +150,7 @@ class MetricDefinitionsView(View):
             ).format(dataset=self.namespace)
 
             base_view_dimensions[data_source_definition.name] = (
-                lookml_utils._generate_dimensions_from_query(
-                    query, use_cloud_function=use_cloud_function
-                )
+                lookml_utils._generate_dimensions_from_query(query, dryrun=dryrun)
             )
 
         # prepare base field data for query
@@ -259,9 +256,7 @@ class MetricDefinitionsView(View):
             """
         }
 
-        view_defn["dimensions"] = self.get_dimensions(
-            use_cloud_function=use_cloud_function
-        )
+        view_defn["dimensions"] = self.get_dimensions(dryrun=dryrun)
         view_defn["dimension_groups"] = self.get_dimension_groups()
 
         # add the Looker dimensions
@@ -294,7 +289,7 @@ class MetricDefinitionsView(View):
         self,
         _table=None,
         _v1_name: Optional[str] = None,
-        use_cloud_function: bool = False,
+        dryrun=False,
     ) -> List[Dict[str, Any]]:
         """Get the set of dimensions for this view based on the metric definitions in metric-hub."""
         namespace_definitions = MetricsConfigLoader.configs.get_platform_definitions(

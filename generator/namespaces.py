@@ -17,7 +17,6 @@ import yaml
 from google.cloud import bigquery
 
 from generator import operational_monitoring_utils
-from generator.dryrun import DryRun
 
 from .explores import EXPLORE_TYPES
 from .metrics_utils import LOOKER_METRIC_HUB_REPO, METRIC_HUB_REPO, MetricsConfigLoader
@@ -386,14 +385,13 @@ def namespaces(
 
         # generating operational monitoring namespace, if available
         if "operational_monitoring" in custom_namespaces:
-            dryrun = DryRun(use_cloud_function=use_cloud_function)
-            if dryrun.use_cloud_function:
+            if use_cloud_function:
                 raise Exception(
                     "Cannot generate OpMon using dry run Cloud Function"
                     + "`export USE_CLOUD_FUNCTION=False` to use user GCP credentials"
                 )
 
-            client = dryrun.client
+            client = bigquery.Client()
             opmon = _get_opmon(bq_client=client, namespaces=custom_namespaces)
             custom_namespaces["operational_monitoring"].update(opmon)
 

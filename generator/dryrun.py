@@ -1,15 +1,12 @@
 """Dry Run method to get BigQuery metadata."""
 
-import io
 import json
-import sys
 from enum import Enum
 from functools import cached_property
 from typing import Optional
 from urllib.request import Request, urlopen
 
 import google.auth
-from google.auth.exceptions import DefaultCredentialsError
 from google.auth.transport.requests import Request as GoogleAuthRequest
 from google.cloud import bigquery
 from google.oauth2.id_token import fetch_id_token
@@ -19,13 +16,21 @@ DRY_RUN_URL = (
 )
 
 
-def is_authenticated():
-    """Check if the user is authenticated to GCP."""
-    try:
-        bigquery.Client()
-    except DefaultCredentialsError:
-        return False
-    return True
+def id_token():
+    """Get token to authenticate against Cloud Function."""
+    auth_req = GoogleAuthRequest()
+    creds, _ = google.auth.default(
+        scopes=["https://www.googleapis.com/auth/cloud-platform"]
+    )
+    creds.refresh(auth_req)
+    if hasattr(creds, "id_token"):
+        # Get token from default credentials for the current environment created via Cloud SDK run
+        id_token = creds.id_token
+    else:
+        # If the environment variable GOOGLE_APPLICATION_CREDENTIALS is set to service account JSON file,
+        # then ID token is acquired using this service account credentials.
+        id_token = fetch_id_token(auth_req, DRY_RUN_URL)
+    return id_token
 
 
 class Errors(Enum):
@@ -41,52 +46,34 @@ class DryRun:
 
     def __init__(
         self,
-        sql=None,
-        use_cloud_function=False,
         client=None,
+        use_cloud_function=False,
+        id_token=None,
+        sql=None,
         project="moz-fx-data-shared-prod",
-        dataset="telemetry",
+        dataset=None,
         table=None,
         dry_run_url=DRY_RUN_URL,
     ):
         """Initialize dry run instance."""
-        self.sql = sql or "SELECT 1"
+        self.sql = sql
         self.use_cloud_function = use_cloud_function
-        self.client = client if use_cloud_function or client else bigquery.Client()
+        self.client = client
         self.project = project
         self.dataset = dataset
         self.table = table
         self.dry_run_url = dry_run_url
-
-        if not is_authenticated():
-            print(
-                "Authentication to GCP required. Run `gcloud auth login  --update-adc` "
-                "and check that the project is set correctly."
-            )
-            sys.exit(1)
+        self.id_token = id_token
 
     @cached_property
     def dry_run_result(self):
         """Return the dry run result."""
         try:
             if self.use_cloud_function:
-                auth_req = GoogleAuthRequest()
-                creds, _ = google.auth.default(
-                    scopes=["https://www.googleapis.com/auth/cloud-platform"]
-                )
-                creds.refresh(auth_req)
-                if hasattr(creds, "id_token"):
-                    # Get token from default credentials for the current environment created via Cloud SDK run
-                    id_token = creds.id_token
-                else:
-                    # If the environment variable GOOGLE_APPLICATION_CREDENTIALS is set to service account JSON file,
-                    # then ID token is acquired using this service account credentials.
-                    id_token = fetch_id_token(auth_req, self.dry_run_url)
-
                 json_data = {
                     "query": self.sql or "SELECT 1",
                     "project": self.project,
-                    "dataset": self.dataset,
+                    "dataset": self.dataset or "telemetry",
                 }
 
                 if self.table:
@@ -97,7 +84,7 @@ class DryRun:
                         self.dry_run_url,
                         headers={
                             "Content-Type": "application/json",
-                            "Authorization": f"Bearer {id_token}",
+                            "Authorization": f"Bearer {self.id_token}",
                         },
                         data=json.dumps(json_data).encode("utf8"),
                         method="POST",
@@ -110,8 +97,6 @@ class DryRun:
 
                 query_schema = None
                 referenced_tables = []
-                dataset_labels = []
-                table_schema = None
                 table_metadata = None
 
                 if self.sql:
@@ -134,21 +119,6 @@ class DryRun:
                         ref.to_api_repr() for ref in job.referenced_tables
                     ]
 
-                if self.dataset is not None:
-                    try:
-                        dataset_labels = self.client.get_dataset(self.dataset).labels
-                    except Exception as e:
-                        # Most users do not have bigquery.datasets.get permission in
-                        # moz-fx-data-shared-prod
-                        # This should not prevent the dry run from running since the dataset
-                        # labels are usually not required
-                        if "Permission bigquery.datasets.get denied on dataset" in str(
-                            e
-                        ):
-                            dataset_labels = []
-                        else:
-                            raise e
-
                 if (
                     self.project is not None
                     and self.table is not None
@@ -157,20 +127,18 @@ class DryRun:
                     table = self.client.get_table(
                         f"{self.project}.{self.dataset}.{self.table}"
                     )
-                    s = io.StringIO("")
-                    self.client.schema_to_json(table.schema, s)
-                    table_schema = json.loads(s.getvalue())
                     table_metadata = {
                         "tableType": table.table_type,
                         "friendlyName": table.friendly_name,
-                        "schema": {"fields": table_schema},
+                        "schema": {
+                            "fields": [field.to_api_repr() for field in table.schema]
+                        },
                     }
 
                 return {
                     "valid": True,
                     "referencedTables": referenced_tables,
                     "schema": query_schema,
-                    "datasetLabels": dataset_labels,
                     "tableMetadata": table_metadata,
                 }
         except Exception as e:

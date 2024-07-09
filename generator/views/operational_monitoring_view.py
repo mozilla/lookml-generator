@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Union
 
+from generator.dryrun import DryRun
+
 from . import lookml_utils
 from .ping_view import PingView
 from .view import ViewDict
@@ -49,16 +51,14 @@ class OperationalMonitoringView(PingView):
         """Get a OperationalMonitoringView from a dict representation."""
         return klass(namespace, name, _dict["tables"])
 
-    def to_lookml(
-        self, v1_name: Optional[str], use_cloud_function: bool
-    ) -> Dict[str, Any]:
+    def to_lookml(self, v1_name: Optional[str], dryrun) -> Dict[str, Any]:
         """Get this view as LookML."""
         if len(self.tables) == 0:
             raise Exception((f"Operational Monitoring view {self.name} has no tables"))
 
         reference_table = self.tables[0]["table"]
         all_dimensions = lookml_utils._generate_dimensions(
-            reference_table, use_cloud_function=use_cloud_function
+            reference_table, dryrun=dryrun
         )
 
         filtered_dimensions = [

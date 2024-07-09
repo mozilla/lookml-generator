@@ -111,7 +111,7 @@ def _generate_dimensions_helper(schema: List[Any], *prefix: str) -> Iterable[dic
             )
 
 
-def _generate_dimensions(table: str, use_cloud_function: bool) -> List[Dict[str, Any]]:
+def _generate_dimensions(table: str, dryrun) -> List[Dict[str, Any]]:
     """Generate dimensions and dimension groups from a bigquery table.
 
     When schema contains both submission_timestamp and submission_date, only produce
@@ -121,11 +121,10 @@ def _generate_dimensions(table: str, use_cloud_function: bool) -> List[Dict[str,
     """
     dimensions = {}
     [project, dataset, table] = table.split(".")
-    table_schema = DryRun(
+    table_schema = dryrun(
         project=project,
         dataset=dataset,
         table=table,
-        use_cloud_function=use_cloud_function,
     ).get_table_schema()
 
     for dimension in _generate_dimensions_helper(table_schema):
@@ -149,11 +148,9 @@ def _generate_dimensions(table: str, use_cloud_function: bool) -> List[Dict[str,
     return list(dimensions.values())
 
 
-def _generate_dimensions_from_query(
-    query: str, use_cloud_function: bool
-) -> List[Dict[str, Any]]:
+def _generate_dimensions_from_query(query: str, dryrun) -> List[Dict[str, Any]]:
     """Generate dimensions and dimension groups from a SQL query."""
-    schema = DryRun(sql=query, use_cloud_function=use_cloud_function).get_schema()
+    schema = dryrun(sql=query).get_schema()
     dimensions = {}
     for dimension in _generate_dimensions_helper(schema or []):
         name_key = dimension["name"]
