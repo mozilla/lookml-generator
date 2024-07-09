@@ -5,6 +5,8 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import Any, Dict, Iterator, List, Optional, Union
 
+from generator.dryrun import DryRun
+
 from .view import View, ViewDict
 
 

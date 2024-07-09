@@ -17,7 +17,6 @@ import yaml
 from google.cloud import bigquery
 
 from generator import operational_monitoring_utils
-from generator.dryrun import DryRun
 
 from .explores import EXPLORE_TYPES
 from .metrics_utils import LOOKER_METRIC_HUB_REPO, METRIC_HUB_REPO, MetricsConfigLoader

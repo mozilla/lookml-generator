@@ -2,6 +2,8 @@
 
 from typing import Any, Dict, Optional
 
+from generator.dryrun import DryRun
+
 from . import lookml_utils
 from .operational_monitoring_view import OperationalMonitoringView
 

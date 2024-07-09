@@ -5,6 +5,8 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import Any, Dict, Iterator, List, Optional
 
+from generator.dryrun import DryRun
+
 from . import lookml_utils
 from .view import View, ViewDict
 

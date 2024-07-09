@@ -5,6 +5,7 @@ from __future__ import annotations
 import re
 from typing import Any, Dict, Iterator, List, Optional, Union
 
+from generator.dryrun import DryRun
 from generator.metrics_utils import MetricsConfigLoader
 
 from . import lookml_utils

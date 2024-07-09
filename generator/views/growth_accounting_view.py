@@ -6,6 +6,8 @@ from copy import deepcopy
 from itertools import filterfalse
 from typing import Any, Dict, Iterator, List, Optional, Union
 
+from generator.dryrun import DryRun
+
 from . import lookml_utils
 from .view import View, ViewDict
 

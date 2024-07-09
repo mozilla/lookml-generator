@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Union
 
+from generator.dryrun import DryRun
+
 from . import lookml_utils
 from .ping_view import PingView
 from .view import ViewDict

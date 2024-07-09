@@ -173,7 +173,6 @@ def test_explore_from_dict(events_explore, tmp_path):
     assert actual == events_explore
 
 
-@patch("generator.views.lookml_utils.DryRun", MockDryRun)
 def test_view_lookml(events_view):
     expected = {
         "includes": ["events_unnested_table.view.lkml"],
