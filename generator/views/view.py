@@ -6,8 +6,6 @@ from typing import Any, Dict, Iterator, List, Optional, Set, TypedDict
 
 from click import ClickException
 
-from generator.dryrun import DryRun
-
 OMIT_VIEWS: Set[str] = set()
 
 

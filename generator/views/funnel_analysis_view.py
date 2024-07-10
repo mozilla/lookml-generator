@@ -25,8 +25,6 @@ from __future__ import annotations
 from textwrap import dedent
 from typing import Any, Dict, Iterator, List, Optional
 
-from generator.dryrun import DryRun
-
 from .view import View, ViewDict
 
 DEFAULT_NUM_FUNNEL_STEPS: int = 4
