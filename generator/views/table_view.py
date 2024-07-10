@@ -103,11 +103,11 @@ class TableView(View):
                     f"time_partitioning_field {field_name!r} not found in {self.name!r}"
                 )
 
-        [project, dataset, table] = table.split(".")
+        [project, dataset, table_id] = table.split(".")
         table_schema = dryrun(
             project=project,
             dataset=dataset,
-            table=table,
+            table=table_id,
         ).get_table_schema()
         nested_views = lookml_utils._generate_nested_dimension_views(
             table_schema, self.name

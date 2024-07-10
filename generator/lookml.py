@@ -10,6 +10,8 @@ import lkml
 import yaml
 from google.cloud import bigquery
 
+from generator.utils import get_file_from_looker_hub
+
 from .dashboards import DASHBOARD_TYPES
 from .dryrun import DryRun, DryRunError, Errors, id_token
 from .explores import EXPLORE_TYPES
@@ -48,7 +50,10 @@ def _generate_views(
             yield path
         except DryRunError as e:
             if e.error == Errors.PERMISSION_DENIED and e.use_cloud_function:
-                print(f"Permission error dry running: {path}")
+                print(
+                    f"Permission error dry running: {path}. Copy existing file from looker-hub."
+                )
+                get_file_from_looker_hub(path)
             else:
                 raise e
 

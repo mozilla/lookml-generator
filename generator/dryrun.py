@@ -36,11 +36,12 @@ def id_token():
 class DryRunError(Exception):
     """Exception raised on dry run errors."""
 
-    def __init__(self, message, error, use_cloud_function):
+    def __init__(self, message, error, use_cloud_function, table_id):
         """Initialize DryRunError."""
         super().__init__(message)
         self.error = error
         self.use_cloud_function = use_cloud_function
+        self.table_id = table_id
 
 
 class Errors(Enum):
@@ -160,7 +161,10 @@ class DryRun:
         """Return the query schema by dry running the SQL file."""
         if not self.is_valid():
             raise DryRunError(
-                "Error when dry running SQL", self.get_error(), self.use_cloud_function
+                "Error when dry running SQL",
+                self.get_error(),
+                self.use_cloud_function,
+                self.table,
             )
 
         if (
@@ -176,7 +180,10 @@ class DryRun:
         """Return the schema of the provided table."""
         if not self.is_valid():
             raise DryRunError(
-                "Error when dry running SQL", self.get_error(), self.use_cloud_function
+                "Error when dry running SQL",
+                self.get_error(),
+                self.use_cloud_function,
+                self.table,
             )
 
         if (
@@ -192,7 +199,10 @@ class DryRun:
         """Return table metadata."""
         if not self.is_valid():
             raise DryRunError(
-                "Error when dry running SQL", self.get_error(), self.use_cloud_function
+                "Error when dry running SQL",
+                self.get_error(),
+                self.use_cloud_function,
+                self.table,
             )
 
         if (
@@ -255,6 +265,9 @@ class DryRun:
                 in error_message
             ):
                 return Errors.DATE_FILTER_NEEDED_AND_SYNTAX
-            if "Permission bigquery.tables.get denied on table" in error_message:
+            if (
+                "Permission bigquery.tables.get denied on table" in error_message
+                or "User does not have permission to query table" in error_message
+            ):
                 return Errors.PERMISSION_DENIED
         return None

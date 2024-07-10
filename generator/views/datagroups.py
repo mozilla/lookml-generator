@@ -9,6 +9,7 @@ import lkml
 
 from generator.dryrun import DryRunError, Errors
 from generator.namespaces import DEFAULT_GENERATED_SQL_URI
+from generator.utils import get_file_from_looker_hub
 from generator.views import TableView, View, lookml_utils
 from generator.views.lookml_utils import BQViewReferenceMap
 
@@ -194,20 +195,16 @@ def generate_datagroups(
                 datagroups.add(datagroup)
         except DryRunError as e:
             if e.error == Errors.PERMISSION_DENIED and e.use_cloud_function:
-                view_table = next(
-                    (
-                        table
-                        for table in view.tables
-                        if table.get("channel") == "release"
-                    ),
-                    view.tables[0],
-                )["table"]
-
-                [_, _, table_id] = view_table.split(".")
                 path = (
-                    datagroups_folder_path / f"{table_id}_last_updated.datagroup.lkml"
+                    datagroups_folder_path / f"{e.table_id}_last_updated.datagroup.lkml"
                 )
-                print(f"Permission error dry running: {path}")
+                print(
+                    f"Permission error dry running: {path}. Copy existing file from looker-hub."
+                )
+                try:
+                    get_file_from_looker_hub(path)
+                except Exception as ex:
+                    print(f"Skip generating datagroup for {path}: {ex}")
             else:
                 raise e
 
