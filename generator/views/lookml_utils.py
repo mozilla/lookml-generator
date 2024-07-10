@@ -11,8 +11,6 @@ import click
 import yaml
 from jinja2 import Environment, PackageLoader
 
-from generator.dryrun import DryRun
-
 BIGQUERY_TYPE_TO_DIMENSION_TYPE = {
     "BIGNUMERIC": "string",
     "BOOLEAN": "yesno",

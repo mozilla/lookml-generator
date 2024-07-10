@@ -11,7 +11,7 @@ import yaml
 from google.cloud import bigquery
 
 from .dashboards import DASHBOARD_TYPES
-from .dryrun import DryRun, id_token
+from .dryrun import DryRun, DryRunError, Errors, id_token
 from .explores import EXPLORE_TYPES
 from .metrics_utils import LOOKER_METRIC_HUB_REPO, METRIC_HUB_REPO, MetricsConfigLoader
 from .namespaces import _get_glean_apps
@@ -38,13 +38,19 @@ def _generate_views(
             f"Generating lookml for view {view.name} in {view.namespace} of type {view.view_type}"
         )
         path = out_dir / f"{view.name}.view.lkml"
-        lookml = view.to_lookml(v1_name, dryrun)
-        if lookml == {}:
-            continue
+        try:
+            lookml = view.to_lookml(v1_name, dryrun)
+            if lookml == {}:
+                continue
 
-        # lkml.dump may return None, in which case write an empty file
-        path.write_text(FILE_HEADER + (lkml.dump(lookml) or ""))
-        yield path
+            # lkml.dump may return None, in which case write an empty file
+            path.write_text(FILE_HEADER + (lkml.dump(lookml) or ""))
+            yield path
+        except DryRunError as e:
+            if e.error == Errors.PERMISSION_DENIED and e.use_cloud_function:
+                print(f"Permission error dry running: {path}")
+            else:
+                raise e
 
 
 def _generate_explores(

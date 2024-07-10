@@ -7,7 +7,7 @@ from typing import Any, Dict, List, Optional
 
 import lkml
 
-from generator.dryrun import DryRun
+from generator.dryrun import DryRunError, Errors
 from generator.namespaces import DEFAULT_GENERATED_SQL_URI
 from generator.views import TableView, View, lookml_utils
 from generator.views.lookml_utils import BQViewReferenceMap
@@ -185,14 +185,31 @@ def generate_datagroups(
         DEFAULT_GENERATED_SQL_URI
     )
 
-    datagroups = sorted(
-        set(
-            datagroup
-            for view in views
-            if (datagroup := _generate_view_datagroup(view, dataset_view_map, dryrun))
-            is not None
-        )
-    )
+    datagroups = set()
+    for view in views:
+        try:
+            if (
+                datagroup := _generate_view_datagroup(view, dataset_view_map, dryrun)
+            ) is not None:
+                datagroups.add(datagroup)
+        except DryRunError as e:
+            if e.error == Errors.PERMISSION_DENIED and e.use_cloud_function:
+                view_table = next(
+                    (
+                        table
+                        for table in view.tables
+                        if table.get("channel") == "release"
+                    ),
+                    view.tables[0],
+                )["table"]
+
+                [_, _, table_id] = view_table.split(".")
+                path = (
+                    datagroups_folder_path / f"{table_id}_last_updated.datagroup.lkml"
+                )
+                print(f"Permission error dry running: {path}")
+            else:
+                raise e
 
     if datagroups:
         datagroups_folder_path.mkdir(exist_ok=True)

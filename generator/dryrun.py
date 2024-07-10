@@ -33,12 +33,23 @@ def id_token():
     return id_token
 
 
+class DryRunError(Exception):
+    """Exception raised on dry run errors."""
+
+    def __init__(self, message, error, use_cloud_function):
+        """Initialize DryRunError."""
+        super().__init__(message)
+        self.error = error
+        self.use_cloud_function = use_cloud_function
+
+
 class Errors(Enum):
     """DryRun errors that require special handling."""
 
     READ_ONLY = 1
     DATE_FILTER_NEEDED = 2
     DATE_FILTER_NEEDED_AND_SYNTAX = 3
+    PERMISSION_DENIED = 4
 
 
 class DryRun:
@@ -148,7 +159,9 @@ class DryRun:
     def get_schema(self):
         """Return the query schema by dry running the SQL file."""
         if not self.is_valid():
-            raise Exception("Error when dry running SQL")
+            raise DryRunError(
+                "Error when dry running SQL", self.get_error(), self.use_cloud_function
+            )
 
         if (
             self.dry_run_result
@@ -162,7 +175,9 @@ class DryRun:
     def get_table_schema(self):
         """Return the schema of the provided table."""
         if not self.is_valid():
-            raise Exception("Error when dry running SQL")
+            raise DryRunError(
+                "Error when dry running SQL", self.get_error(), self.use_cloud_function
+            )
 
         if (
             self.dry_run_result
@@ -176,7 +191,9 @@ class DryRun:
     def get_table_metadata(self):
         """Return table metadata."""
         if not self.is_valid():
-            raise Exception("Error when dry running SQL")
+            raise DryRunError(
+                "Error when dry running SQL", self.get_error(), self.use_cloud_function
+            )
 
         if (
             self.dry_run_result
@@ -238,4 +255,6 @@ class DryRun:
                 in error_message
             ):
                 return Errors.DATE_FILTER_NEEDED_AND_SYNTAX
+            if "Permission bigquery.tables.get denied on table" in error_message:
+                return Errors.PERMISSION_DENIED
         return None
