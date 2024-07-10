@@ -11,6 +11,8 @@ import yaml
 
 from generator.utils import get_file_from_looker_hub
 
+from generator.utils import get_file_from_looker_hub
+
 from .dashboards import DASHBOARD_TYPES
 from .dryrun import DryRun, DryRunError, Errors, id_token
 from .explores import EXPLORE_TYPES
