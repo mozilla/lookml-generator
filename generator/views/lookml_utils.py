@@ -117,6 +117,16 @@ def _generate_dimensions(client: bigquery.Client, table: str) -> List[Dict[str, 
     """
     dimensions = {}
     for dimension in _generate_dimensions_helper(client.get_table(table).schema):
+        # Rename `event` field in `events_stream` to `full_event_name` to expose it in Looker views.
+        # This is required since `event_timestamp` is renamed to `event` in `_get_dimension` and takes precedence below.
+        if (
+            table.endswith(".events_stream")
+            and dimension["name"] == "event"
+            and dimension["type"] == "string"
+        ):
+            # `event` field contains concatenated event category and name
+            dimension["name"] = "full_event_name"
+
         name = dimension["name"]
         # overwrite duplicate "submission", "end", "start" dimension group, thus picking the
         # last value sorted by field name, which is submission_timestamp
@@ -197,7 +207,6 @@ def _generate_nested_dimension_views(
                 views = views + _generate_nested_dimension_views(
                     field.fields, f"{view_name}__{field.name}"
                 )
-
     return views
 
 
