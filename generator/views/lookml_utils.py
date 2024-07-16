@@ -118,6 +118,11 @@ def _generate_dimensions(client: bigquery.Client, table: str) -> List[Dict[str, 
     dimensions = {}
     for dimension in _generate_dimensions_helper(client.get_table(table).schema):
         name = dimension["name"]
+
+        # This prevents `time` dimension groups from overwriting other dimensions below
+        if dimension.get("type") == "time":
+            name += "_time"
+
         # overwrite duplicate "submission", "end", "start" dimension group, thus picking the
         # last value sorted by field name, which is submission_timestamp
         # See also https://github.com/mozilla/lookml-generator/issues/471
@@ -126,9 +131,6 @@ def _generate_dimensions(client: bigquery.Client, table: str) -> List[Dict[str, 
             and name != "submission"
             and not name.endswith("end")
             and not name.endswith("start")
-            and not (name == "event" and dimension["type"] == "time")
-            # workaround for `mozdata.firefox_desktop.desktop_installs`
-            and not (name == "attribution_dltoken" and dimension["type"] == "time")
         ):
             raise click.ClickException(
                 f"duplicate dimension {name!r} for table {table!r}"
@@ -146,6 +148,11 @@ def _generate_dimensions_from_query(
     dimensions = {}
     for dimension in _generate_dimensions_helper(schema or []):
         name = dimension["name"]
+
+        # This prevents `time` dimension groups from overwriting other dimensions below
+        if dimension.get("type") == "time":
+            name += "_time"
+
         # overwrite duplicate "submission", "end", "start" dimension group, thus picking the
         # last value sorted by field name, which is submission_timestamp
         # See also https://github.com/mozilla/lookml-generator/issues/471
@@ -154,9 +161,6 @@ def _generate_dimensions_from_query(
             and name != "submission"
             and not name.endswith("end")
             and not name.endswith("start")
-            and not (name == "event" and dimension["type"] == "time")
-            # workaround for `mozdata.firefox_desktop.desktop_installs`
-            and not (name == "attribution_dltoken" and dimension["type"] == "time")
         ):
             raise click.ClickException(f"duplicate dimension {name!r} in query")
         dimensions[name] = dimension
