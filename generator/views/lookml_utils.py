@@ -126,11 +126,13 @@ def _generate_dimensions(client: bigquery.Client, table: str) -> List[Dict[str, 
         # overwrite duplicate "submission", "end", "start" dimension group, thus picking the
         # last value sorted by field name, which is submission_timestamp
         # See also https://github.com/mozilla/lookml-generator/issues/471
-        if (
-            name_key in dimensions
-            and dimension["name"] != "submission"
-            and not dimension["name"].endswith("end")
-            and not dimension["name"].endswith("start")
+        if name_key in dimensions and not (
+            dimension.get("type") == "time"
+            and (
+                dimension["name"] == "submission"
+                or dimension["name"].endswith("end")
+                or dimension["name"].endswith("start")
+            )
         ):
             raise click.ClickException(
                 f"duplicate dimension {name_key!r} for table {table!r}"
@@ -156,11 +158,13 @@ def _generate_dimensions_from_query(
         # overwrite duplicate "submission", "end", "start" dimension group, thus picking the
         # last value sorted by field name, which is submission_timestamp
         # See also https://github.com/mozilla/lookml-generator/issues/471
-        if (
-            name_key in dimensions
-            and dimension["name"] != "submission"
-            and not dimension["name"].endswith("end")
-            and not dimension["name"].endswith("start")
+        if name_key in dimensions and not (
+            dimension.get("type") == "time"
+            and (
+                dimension["name"] == "submission"
+                or dimension["name"].endswith("end")
+                or dimension["name"].endswith("start")
+            )
         ):
             raise click.ClickException(f"duplicate dimension {name_key!r} in query")
         dimensions[name_key] = dimension
