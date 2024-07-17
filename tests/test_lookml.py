@@ -473,6 +473,15 @@ class MockClient:
                     SchemaField(name="parsed_date", field_type="DATE"),
                 ],
             )
+        if table_ref == "mozdata.pass.duplicate_event_dimension":
+            return bigquery.Table(
+                table_ref,
+                schema=[
+                    SchemaField(name="submission_timestamp", field_type="TIMESTAMP"),
+                    SchemaField(name="event_timestamp", field_type="TIMESTAMP"),
+                    SchemaField(name="event", field_type="STRING"),
+                ],
+            )
         if table_ref == "mozdata.fail.duplicate_client":
             return bigquery.Table(
                 table_ref,
@@ -1920,6 +1929,76 @@ def test_duplicate_dimension(runner, glean_apps, tmp_path):
         with patch("google.cloud.bigquery.Client", MockClient):
             with pytest.raises(ClickException):
                 _lookml(open(namespaces), glean_apps, "looker-hub/")
+
+
+def test_duplicate_dimension_event(runner, glean_apps, tmp_path):
+    namespaces = tmp_path / "namespaces.yaml"
+    namespaces.write_text(
+        dedent(
+            """
+            custom:
+              pretty_name: Custom
+              glean_app: false
+              views:
+                events_stream:
+                  type: table_view
+                  tables:
+                  - channel: release
+                    table: mozdata.pass.duplicate_event_dimension
+            """
+        )
+    )
+    with runner.isolated_filesystem():
+        with patch("google.cloud.bigquery.Client", MockClient):
+            _lookml(open(namespaces), glean_apps, "looker-hub/")
+        expected = {
+            "views": [
+                {
+                    "dimension_groups": [
+                        {
+                            "name": "event",
+                            "sql": "${TABLE}.event_timestamp",
+                            "timeframes": [
+                                "raw",
+                                "time",
+                                "date",
+                                "week",
+                                "month",
+                                "quarter",
+                                "year",
+                            ],
+                            "type": "time",
+                        },
+                        {
+                            "sql": "${TABLE}.submission_timestamp",
+                            "type": "time",
+                            "timeframes": [
+                                "raw",
+                                "time",
+                                "date",
+                                "week",
+                                "month",
+                                "quarter",
+                                "year",
+                            ],
+                            "name": "submission",
+                        },
+                    ],
+                    "dimensions": [
+                        {"name": "event", "sql": "${TABLE}.event", "type": "string"}
+                    ],
+                    "name": "events_stream",
+                    "sql_table_name": "`mozdata.pass.duplicate_event_dimension`",
+                }
+            ]
+        }
+
+        print_and_test(
+            lkml.load(lkml.dump(expected)),
+            lkml.load(
+                Path("looker-hub/custom/views/events_stream.view.lkml").read_text()
+            ),
+        )
 
 
 def test_duplicate_client_id(runner, glean_apps, tmp_path):
