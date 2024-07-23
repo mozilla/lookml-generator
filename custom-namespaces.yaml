@@ -688,7 +688,7 @@ revenue:
     firefox_desktop_ltv:
       type: table_view
       tables: 
-      - table: mozdata.ltv.firefox_desktop_client_ltv
+        - table: mozdata.ltv.firefox_desktop_client_ltv
     revenue_google_top10_row_data:
       type: table_view
       tables:
