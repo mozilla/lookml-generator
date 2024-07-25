@@ -381,15 +381,13 @@ def namespaces(
         custom_namespaces = yaml.safe_load(custom_namespaces.read()) or {}
         # remove namespaces that should be ignored
         for ignored_namespace in ignore:
-            del custom_namespaces[ignored_namespace]
+            if ignored_namespace in custom_namespaces:
+                del custom_namespaces[ignored_namespace]
 
         # generating operational monitoring namespace, if available
         if "operational_monitoring" in custom_namespaces:
             if use_cloud_function:
-                raise Exception(
-                    "Cannot generate OpMon using dry run Cloud Function"
-                    + "`export USE_CLOUD_FUNCTION=False` to use user GCP credentials"
-                )
+                raise Exception("Cannot generate OpMon using dry run Cloud Function")
 
             client = bigquery.Client()
             opmon = _get_opmon(bq_client=client, namespaces=custom_namespaces)

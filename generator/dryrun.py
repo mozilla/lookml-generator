@@ -104,9 +104,6 @@ class DryRun:
                 )
                 return json.load(r)
             else:
-                if self.project:
-                    self.client.project = self.project
-
                 query_schema = None
                 referenced_tables = []
                 table_metadata = None
@@ -121,6 +118,14 @@ class DryRun:
                             )
                         ],
                     )
+
+                    if self.project:
+                        job_config.connection_properties = [
+                            bigquery.ConnectionProperty(
+                                "dataset_project_id", self.project
+                            )
+                        ]
+
                     job = self.client.query(self.sql, job_config=job_config)
                     query_schema = (
                         job._properties.get("statistics", {})
@@ -159,13 +164,7 @@ class DryRun:
 
     def get_schema(self):
         """Return the query schema by dry running the SQL file."""
-        if not self.is_valid():
-            raise DryRunError(
-                "Error when dry running SQL",
-                self.get_error(),
-                self.use_cloud_function,
-                self.table,
-            )
+        self.validate()
 
         if (
             self.dry_run_result
@@ -174,17 +173,11 @@ class DryRun:
         ):
             return self.dry_run_result["schema"]["fields"]
 
-        return {}
+        return []
 
     def get_table_schema(self):
         """Return the schema of the provided table."""
-        if not self.is_valid():
-            raise DryRunError(
-                "Error when dry running SQL",
-                self.get_error(),
-                self.use_cloud_function,
-                self.table,
-            )
+        self.validate()
 
         if (
             self.dry_run_result
@@ -193,17 +186,11 @@ class DryRun:
         ):
             return self.dry_run_result["tableMetadata"]["schema"]["fields"]
 
-        return {}
+        return []
 
     def get_table_metadata(self):
         """Return table metadata."""
-        if not self.is_valid():
-            raise DryRunError(
-                "Error when dry running SQL",
-                self.get_error(),
-                self.use_cloud_function,
-                self.table,
-            )
+        self.validate()
 
         if (
             self.dry_run_result
@@ -214,10 +201,17 @@ class DryRun:
 
         return {}
 
-    def is_valid(self):
+    def validate(self):
         """Dry run the provided SQL file and check if valid."""
+        dry_run_error = DryRunError(
+            "Error when dry running SQL",
+            self.get_error(),
+            self.use_cloud_function,
+            self.table,
+        )
+
         if self.dry_run_result is None:
-            return False
+            raise dry_run_error
 
         if self.dry_run_result["valid"]:
             return True
@@ -229,12 +223,10 @@ class DryRun:
         elif self.get_error() == Errors.DATE_FILTER_NEEDED:
             # With strip_dml flag, some queries require a partition filter
             # (submission_date, submission_timestamp, etc.) to run
-            # We mark these requests as valid and add a date filter
-            # in get_referenced_table()
             return True
         else:
             print("ERROR\n", self.dry_run_result["errors"])
-            return False
+            raise dry_run_error
 
     def errors(self):
         """Dry run the provided SQL file and return errors."""

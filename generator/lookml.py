@@ -51,11 +51,15 @@ def _generate_views(
         except DryRunError as e:
             if e.error == Errors.PERMISSION_DENIED and e.use_cloud_function:
                 print(
-                    f"Permission error dry running: {path}. Copy existing file from looker-hub."
+                    f"Permission error dry running {view.name}. Copy existing {path} file from looker-hub."
                 )
-                get_file_from_looker_hub(path)
+                try:
+                    get_file_from_looker_hub(path)
+                except Exception as ex:
+                    print(f"Skip generating view for {path}: {ex}")
+                yield path
             else:
-                raise e
+                raise
 
 
 def _generate_explores(
@@ -114,7 +118,7 @@ def _glean_apps_to_v1_map(glean_apps):
     return {d["name"]: d["v1_name"] for d in glean_apps}
 
 
-def _lookml(namespaces, glean_apps, target_dir, namespace_filter=[], dryrun=None):
+def _lookml(namespaces, glean_apps, target_dir, dryrun, namespace_filter=[]):
     namespaces_content = namespaces.read()
     _namespaces = yaml.safe_load(namespaces_content)
     target = Path(target_dir)
@@ -212,4 +216,4 @@ def lookml(
     dryrun = functools.partial(
         DryRun, bigquery.Client(), use_cloud_function, id_token()
     )
-    return _lookml(namespaces, glean_apps, target_dir, only, dryrun)
+    return _lookml(namespaces, glean_apps, target_dir, dryrun, only)

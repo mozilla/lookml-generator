@@ -255,7 +255,7 @@ class MetricDefinitionsView(View):
             """
         }
 
-        view_defn["dimensions"] = self.get_dimensions(dryrun=dryrun)
+        view_defn["dimensions"] = self.get_dimensions()
         view_defn["dimension_groups"] = self.get_dimension_groups()
 
         # add the Looker dimensions
@@ -288,7 +288,7 @@ class MetricDefinitionsView(View):
         self,
         _table=None,
         _v1_name: Optional[str] = None,
-        dryrun=False,
+        _dryrun=None,
     ) -> List[Dict[str, Any]]:
         """Get the set of dimensions for this view based on the metric definitions in metric-hub."""
         namespace_definitions = MetricsConfigLoader.configs.get_platform_definitions(

@@ -126,18 +126,21 @@ def _generate_dimensions(table: str, dryrun) -> List[Dict[str, Any]]:
     ).get_table_schema()
 
     for dimension in _generate_dimensions_helper(table_schema):
-        name = dimension["name"]
+        name_key = dimension["name"]
+
+        # This prevents `time` dimension groups from overwriting other dimensions below
+        if dimension.get("type") == "time":
+            name_key += "_time"
         # overwrite duplicate "submission", "end", "start" dimension group, thus picking the
         # last value sorted by field name, which is submission_timestamp
         # See also https://github.com/mozilla/lookml-generator/issues/471
-        if (
-            name in dimensions
-            and name != "submission"
-            and not name.endswith("end")
-            and not name.endswith("start")
-            and not (name == "event" and dimension["type"] == "time")
-            # workaround for `mozdata.firefox_desktop.desktop_installs`
-            and not (name == "attribution_dltoken" and dimension["type"] == "time")
+        if name_key in dimensions and not (
+            dimension.get("type") == "time"
+            and (
+                dimension["name"] == "submission"
+                or dimension["name"].endswith("end")
+                or dimension["name"].endswith("start")
+            )
         ):
             raise click.ClickException(
                 f"duplicate dimension {name_key!r} for table {table!r}"
@@ -174,7 +177,7 @@ def _generate_dimensions_from_query(query: str, dryrun) -> List[Dict[str, Any]]:
 
 
 def _generate_nested_dimension_views(
-    schema: dict, view_name: str
+    schema: List[dict], view_name: str
 ) -> List[Dict[str, Any]]:
     """
     Recursively generate views for nested fields.

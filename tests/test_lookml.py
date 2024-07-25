@@ -429,13 +429,31 @@ class MockDryRun:
                 },
             ]
         if table_ref == "mozdata.fail.duplicate_dimension":
-            return bigquery.Table(
-                table_ref,
-                schema=[
-                    SchemaField(name="parsed_timestamp", field_type="TIMESTAMP"),
-                    SchemaField(name="parsed_date", field_type="DATE"),
-                ],
-            )
+            return [
+                {
+                    "name": "parsed_timestamp",
+                    "type": "TIMESTAMP",
+                },
+                {
+                    "name": "parsed_date",
+                    "type": "DATE",
+                },
+            ]
+        if table_ref == "mozdata.pass.duplicate_event_dimension":
+            return [
+                {
+                    "name": "submission_timestamp",
+                    "type": "TIMESTAMP",
+                },
+                {
+                    "name": "event_timestamp",
+                    "type": "TIMESTAMP",
+                },
+                {
+                    "name": "event",
+                    "type": "STRING",
+                },
+            ]
         if table_ref == "mozdata.fail.duplicate_client":
             return [
                 {
@@ -1891,8 +1909,9 @@ def test_duplicate_dimension_event(runner, glean_apps, tmp_path):
         )
     )
     with runner.isolated_filesystem():
-        with patch("google.cloud.bigquery.Client", MockClient):
-            _lookml(open(namespaces), glean_apps, "looker-hub/")
+        mock_dryrun = functools.partial(MockDryRun, None, False, None)
+        namespaces = tmp_path / "namespaces.yaml"
+        _lookml(open(namespaces), glean_apps, "looker-hub/", dryrun=mock_dryrun)
         expected = {
             "views": [
                 {

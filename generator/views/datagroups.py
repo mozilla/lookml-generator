@@ -122,7 +122,7 @@ def _get_datagroup_from_bigquery_view(
                 dataset_view_map,
                 dryrun=dryrun,
             )
-    except TypeError as e:
+    except DryRunError as e:
         raise ValueError(
             f"Unable to find {source_table_id} referenced in {full_table_id}"
         ) from e
@@ -206,7 +206,7 @@ def generate_datagroups(
                 except Exception as ex:
                     print(f"Skip generating datagroup for {path}: {ex}")
             else:
-                raise e
+                raise
 
     if datagroups:
         datagroups_folder_path.mkdir(exist_ok=True)
