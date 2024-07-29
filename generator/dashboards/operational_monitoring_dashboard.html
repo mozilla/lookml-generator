@@ -139,7 +139,7 @@
 </span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a>        <span class="p">]</span>
 </span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a>        <span class="k">return</span> <span class="p">{</span><span class="n">branch</span><span class="p">:</span> <span class="n">color</span> <span class="k">for</span> <span class="n">branch</span><span class="p">,</span> <span class="n">color</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">branches</span><span class="p">,</span> <span class="n">colours</span><span class="p">)}</span>
 </span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a>
-</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a>    <span class="k">def</span> <span class="nf">to_lookml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bq_client</span><span class="p">):</span>
+</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a>    <span class="k">def</span> <span class="nf">to_lookml</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get this dashboard as LookML.&quot;&quot;&quot;</span>
 </span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a>        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
 </span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a>            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
@@ -337,7 +337,7 @@
 </span><span id="OperationalMonitoringDashboard-55"><a href="#OperationalMonitoringDashboard-55"><span class="linenos"> 55</span></a>        <span class="p">]</span>
 </span><span id="OperationalMonitoringDashboard-56"><a href="#OperationalMonitoringDashboard-56"><span class="linenos"> 56</span></a>        <span class="k">return</span> <span class="p">{</span><span class="n">branch</span><span class="p">:</span> <span class="n">color</span> <span class="k">for</span> <span class="n">branch</span><span class="p">,</span> <span class="n">color</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">branches</span><span class="p">,</span> <span class="n">colours</span><span class="p">)}</span>
 </span><span id="OperationalMonitoringDashboard-57"><a href="#OperationalMonitoringDashboard-57"><span class="linenos"> 57</span></a>
-</span><span id="OperationalMonitoringDashboard-58"><a href="#OperationalMonitoringDashboard-58"><span class="linenos"> 58</span></a>    <span class="k">def</span> <span class="nf">to_lookml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bq_client</span><span class="p">):</span>
+</span><span id="OperationalMonitoringDashboard-58"><a href="#OperationalMonitoringDashboard-58"><span class="linenos"> 58</span></a>    <span class="k">def</span> <span class="nf">to_lookml</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="OperationalMonitoringDashboard-59"><a href="#OperationalMonitoringDashboard-59"><span class="linenos"> 59</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get this dashboard as LookML.&quot;&quot;&quot;</span>
 </span><span id="OperationalMonitoringDashboard-60"><a href="#OperationalMonitoringDashboard-60"><span class="linenos"> 60</span></a>        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
 </span><span id="OperationalMonitoringDashboard-61"><a href="#OperationalMonitoringDashboard-61"><span class="linenos"> 61</span></a>            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
@@ -602,13 +602,13 @@
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">to_lookml</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">bq_client</span></span><span class="return-annotation">):</span></span>
+        <span class="name">to_lookml</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="OperationalMonitoringDashboard.to_lookml-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#OperationalMonitoringDashboard.to_lookml"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="OperationalMonitoringDashboard.to_lookml-58"><a href="#OperationalMonitoringDashboard.to_lookml-58"><span class="linenos"> 58</span></a>    <span class="k">def</span> <span class="nf">to_lookml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bq_client</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="OperationalMonitoringDashboard.to_lookml-58"><a href="#OperationalMonitoringDashboard.to_lookml-58"><span class="linenos"> 58</span></a>    <span class="k">def</span> <span class="nf">to_lookml</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="OperationalMonitoringDashboard.to_lookml-59"><a href="#OperationalMonitoringDashboard.to_lookml-59"><span class="linenos"> 59</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get this dashboard as LookML.&quot;&quot;&quot;</span>
 </span><span id="OperationalMonitoringDashboard.to_lookml-60"><a href="#OperationalMonitoringDashboard.to_lookml-60"><span class="linenos"> 60</span></a>        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
 </span><span id="OperationalMonitoringDashboard.to_lookml-61"><a href="#OperationalMonitoringDashboard.to_lookml-61"><span class="linenos"> 61</span></a>            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
