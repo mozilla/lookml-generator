@@ -595,9 +595,9 @@ polyfactory==2.8.0 \
     --hash=sha256:20346bb77f4a46deef7dcda5b65dd5bd51f606b2e53c6121aea3fdc50320c73a \
     --hash=sha256:cbd501a354659d8f281e13b78614c3010d21b457ae4b98165a157c838211c5b9
     # via mozilla-nimbus-schemas
-pre-commit==3.7.1 \
-    --hash=sha256:8ca3ad567bc78a4972a3f1a477e94a79d4597e8140a6e0b651c5e33899c3654a \
-    --hash=sha256:fae36fd1d7ad7d6a5a1c0b0d5adb2ed1a3bda5a21bf6c3e5372073d7a11cd4c5
+pre-commit==3.8.0 \
+    --hash=sha256:8bb6494d4a20423842e198980c9ecf9f96607a07ea29549e180eef9ae80fe7af \
+    --hash=sha256:9a90a53bf82fdd8778d58085faf8d83df56e40dfe18f45b19446e26bf1b3a63f
     # via -r requirements.in
 protobuf==4.24.2 \
     --hash=sha256:237b9a50bd3b7307d0d834c1b0eb1a6cd47d3f4c2da840802cd03ea288ae8880 \
