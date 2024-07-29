@@ -208,8 +208,6 @@ def test_view_lookml(operational_monitoring_view):
     }
     mock_dryrun = functools.partial(MockDryRun, None, False, None)
     actual = operational_monitoring_view.to_lookml(None, dryrun=mock_dryrun)
-    print(actual)
-
     print_and_test(expected=expected, actual=actual)
 
 

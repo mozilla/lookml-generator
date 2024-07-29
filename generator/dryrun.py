@@ -38,7 +38,8 @@ class DryRunError(Exception):
 
     def __init__(self, message, error, use_cloud_function, table_id):
         """Initialize DryRunError."""
-        super().__init__(message)
+        # super().__init__(message, error, use_cloud_function, table_id)
+        super(DryRunError, self).__init__(message, error, use_cloud_function, table_id)
         self.error = error
         self.use_cloud_function = use_cloud_function
         self.table_id = table_id
@@ -58,6 +59,8 @@ class DryRun:
 
     def __init__(
         self,
+        use_cloud_function=False,
+        id_token=None,
         sql=None,
         project="moz-fx-data-shared-prod",
         dataset=None,
@@ -67,12 +70,15 @@ class DryRun:
         """Initialize dry run instance."""
         self.sql = sql
         self.use_cloud_function = use_cloud_function
-        self.client = client
         self.project = project
         self.dataset = dataset
         self.table = table
         self.dry_run_url = dry_run_url
         self.id_token = id_token
+
+    @cached_property
+    def client(self):
+        return bigquery.Client()
 
     @cached_property
     def dry_run_result(self):

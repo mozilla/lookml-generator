@@ -3,7 +3,7 @@
 import logging
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
 import lkml
 
@@ -21,6 +21,11 @@ SQL_TRIGGER_TEMPLATE = """
     WHERE table_schema = '{dataset_id}'
     AND table_name = '{table_id}'
 """
+
+# To map views to their underlying tables:
+DATASET_VIEW_MAP = lookml_utils.get_bigquery_view_reference_map(
+    DEFAULT_GENERATED_SQL_URI
+)
 
 FILE_HEADER = """# *Do not manually modify this file*
 
@@ -58,7 +63,7 @@ def _get_datagroup_from_bigquery_table(
     full_table_id = f"{project_id}.{dataset_id}.{table_id}"
     return Datagroup(
         name=f"{table_id}_last_updated",
-        label=f"{table_metadata.get('friendlyName', table_id)} Last Updated",
+        label=f"{table_metadata.get('friendlyName', table_id) or table_id} Last Updated",
         description=f"Updates when {full_table_id} is modified.",
         sql_trigger=SQL_TRIGGER_TEMPLATE.format(
             project_id=project_id,
@@ -172,8 +177,8 @@ def _generate_view_datagroup(
     return None
 
 
-def generate_datagroups(
-    views: List[View],
+def generate_datagroup(
+    view: View,
     target_dir: Path,
     namespace: str,
     dryrun,
@@ -181,37 +186,25 @@ def generate_datagroups(
     """Generate and write a datagroups.lkml file to the namespace folder."""
     datagroups_folder_path = target_dir / namespace / "datagroups"
 
-    # To map views to their underlying tables:
-    dataset_view_map = lookml_utils.get_bigquery_view_reference_map(
-        DEFAULT_GENERATED_SQL_URI
-    )
-
-    datagroups = set()
-    for view in views:
-        try:
-            if (
-                datagroup := _generate_view_datagroup(view, dataset_view_map, dryrun)
-            ) is not None:
-                datagroups.add(datagroup)
-        except DryRunError as e:
-            if e.error == Errors.PERMISSION_DENIED and e.use_cloud_function:
-                path = (
-                    datagroups_folder_path / f"{e.table_id}_last_updated.datagroup.lkml"
-                )
-                print(
-                    f"Permission error dry running: {path}. Copy existing file from looker-hub."
-                )
-                try:
-                    get_file_from_looker_hub(path)
-                except Exception as ex:
-                    print(f"Skip generating datagroup for {path}: {ex}")
-            else:
-                raise
-
-    if datagroups:
-        datagroups_folder_path.mkdir(exist_ok=True)
-        for datagroup in datagroups:
-            datagroup_lkml_path = (
-                datagroups_folder_path / f"{datagroup.name}.datagroup.lkml"
+    datagroup = None
+    try:
+        datagroup = _generate_view_datagroup(view, DATASET_VIEW_MAP, dryrun)
+    except DryRunError as e:
+        if e.error == Errors.PERMISSION_DENIED and e.use_cloud_function:
+            path = datagroups_folder_path / f"{e.table_id}_last_updated.datagroup.lkml"
+            print(
+                f"Permission error dry running: {path}. Copy existing file from looker-hub."
             )
-            datagroup_lkml_path.write_text(FILE_HEADER + str(datagroup))
+            try:
+                get_file_from_looker_hub(path)
+            except Exception as ex:
+                print(f"Skip generating datagroup for {path}: {ex}")
+        else:
+            raise
+
+    if datagroup:
+        datagroups_folder_path.mkdir(exist_ok=True)
+        datagroup_lkml_path = (
+            datagroups_folder_path / f"{datagroup.name}.datagroup.lkml"
+        )
+        datagroup_lkml_path.write_text(FILE_HEADER + str(datagroup))
