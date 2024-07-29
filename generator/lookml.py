@@ -55,9 +55,9 @@ def _generate_views(
                 )
                 try:
                     get_file_from_looker_hub(path)
+                    yield path
                 except Exception as ex:
                     print(f"Skip generating view for {path}: {ex}")
-                yield path
             else:
                 raise
 
