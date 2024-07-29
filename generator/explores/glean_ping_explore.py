@@ -5,7 +5,6 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional
 
-from google.cloud import bigquery
 from mozilla_schema_generator.glean_ping import GleanPing
 
 from ..views import GleanPingView, View
@@ -17,9 +16,7 @@ class GleanPingExplore(PingExplore):
 
     type: str = "glean_ping_explore"
 
-    def _to_lookml(
-        self, client: bigquery.Client, v1_name: Optional[str]
-    ) -> List[Dict[str, Any]]:
+    def _to_lookml(self, v1_name: Optional[str]) -> List[Dict[str, Any]]:
         """Generate LookML to represent this explore."""
         repo = next((r for r in GleanPing.get_repos() if r["name"] == v1_name))
         glean_app = GleanPing(repo)

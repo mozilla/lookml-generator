@@ -107,7 +107,7 @@ class ClientCountsView(View):
         """Get a view from a name and dict definition."""
         return ClientCountsView(namespace, _dict["tables"], name)
 
-    def to_lookml(self, bq_client, v1_name: Optional[str]) -> Dict[str, Any]:
+    def to_lookml(self, v1_name: Optional[str], dryrun) -> Dict[str, Any]:
         """Generate LookML for this view."""
         table = self.tables[0]["table"]
 

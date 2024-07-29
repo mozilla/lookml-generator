@@ -3,13 +3,13 @@
 import logging
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 import lkml
-from google.api_core.exceptions import NotFound
-from google.cloud import bigquery
 
+from generator.dryrun import DryRunError, Errors
 from generator.namespaces import DEFAULT_GENERATED_SQL_URI
+from generator.utils import get_file_from_looker_hub
 from generator.views import TableView, View, lookml_utils
 from generator.views.lookml_utils import BQViewReferenceMap
 
@@ -51,16 +51,19 @@ class Datagroup:
         return self.name < other.name
 
 
-def _get_datagroup_from_bigquery_table(table: bigquery.Table) -> Datagroup:
+def _get_datagroup_from_bigquery_table(
+    project_id, dataset_id, table_id, table_metadata: Dict[str, Any]
+) -> Datagroup:
     """Use template and default values to create a Datagroup from a BQ Table."""
+    full_table_id = f"{project_id}.{dataset_id}.{table_id}"
     return Datagroup(
-        name=f"{table.table_id}_last_updated",
-        label=f"{table.friendly_name or table.table_id} Last Updated",
-        description=f"Updates when {table.full_table_id} is modified.",
+        name=f"{table_id}_last_updated",
+        label=f"{table_metadata.get('friendlyName', table_id)} Last Updated",
+        description=f"Updates when {full_table_id} is modified.",
         sql_trigger=SQL_TRIGGER_TEMPLATE.format(
-            project_id=table.project,
-            dataset_id=table.dataset_id,
-            table_id=table.table_id,
+            project_id=project_id,
+            dataset_id=dataset_id,
+            table_id=table_id,
         ),
         # Note: Ideally we'd use the table's ETL schedule as the `maximum_cache_age` but we don't have schedule
         # metadata here.
@@ -68,40 +71,60 @@ def _get_datagroup_from_bigquery_table(table: bigquery.Table) -> Datagroup:
 
 
 def _get_datagroup_from_bigquery_view(
-    view: bigquery.Table,
-    client: bigquery.Client,
+    project_id,
+    dataset_id,
+    table_id,
+    table_metadata: Dict[str, Any],
     dataset_view_map: BQViewReferenceMap,
+    dryrun,
 ) -> Optional[Datagroup]:
     # Dataset view map only contains references for shared-prod views.
-    if view.project not in ("moz-fx-data-shared-prod", "mozdata"):
+    full_table_id = f"{project_id}.{dataset_id}.{table_id}"
+    if project_id not in ("moz-fx-data-shared-prod", "mozdata"):
         logging.debug(
-            f"Unable to get sources for non shared-prod/mozdata view: {view.full_table_id} in generated-sql."
+            f"Unable to get sources for non shared-prod/mozdata view: {full_table_id} in generated-sql."
         )
         return None
 
-    dataset_view_references = dataset_view_map.get(view.dataset_id)
+    dataset_view_references = dataset_view_map.get(dataset_id)
     if dataset_view_references is None:
-        logging.debug(f"Unable to find dataset {view.dataset_id} in generated-sql.")
+        logging.debug(f"Unable to find dataset {dataset_id} in generated-sql.")
         return None
 
-    view_references = dataset_view_references.get(view.table_id)
+    view_references = dataset_view_references.get(table_id)
     if not view_references or len(view_references) > 1:
         # For views with multiple sources it's unclear which table to check for updates.
         logging.debug(
-            f"Unable to find a single source for {view.full_table_id} in generated-sql."
+            f"Unable to find a single source for {full_table_id} in generated-sql."
         )
         return None
 
     source_table_id = ".".join(view_references[0])
     try:
-        table = client.get_table(source_table_id)
-        if "TABLE" == table.table_type:
-            return _get_datagroup_from_bigquery_table(table)
-        elif "VIEW" == table.table_type:
-            return _get_datagroup_from_bigquery_view(table, client, dataset_view_map)
-    except NotFound as e:
+        table_metadata = dryrun(
+            project=view_references[0][0],
+            dataset=view_references[0][1],
+            table=view_references[0][2],
+        ).get_table_metadata()
+        if "TABLE" == table_metadata.get("tableType"):
+            return _get_datagroup_from_bigquery_table(
+                view_references[0][0],
+                view_references[0][1],
+                view_references[0][2],
+                table_metadata,
+            )
+        elif "VIEW" == table_metadata.get("tableType"):
+            return _get_datagroup_from_bigquery_view(
+                view_references[0][0],
+                view_references[0][1],
+                view_references[0][2],
+                table_metadata,
+                dataset_view_map,
+                dryrun=dryrun,
+            )
+    except DryRunError as e:
         raise ValueError(
-            f"Unable to find {source_table_id} referenced in {view.full_table_id}"
+            f"Unable to find {source_table_id} referenced in {full_table_id}"
         ) from e
 
     return None
@@ -109,8 +132,8 @@ def _get_datagroup_from_bigquery_view(
 
 def _generate_view_datagroup(
     view: View,
-    client: bigquery.Client,
     dataset_view_map: BQViewReferenceMap,
+    dryrun,
 ) -> Optional[Datagroup]:
     """Generate the Datagroup LookML for a Looker View."""
     # Only generate datagroup for views that can be linked to a BigQuery table:
@@ -123,19 +146,26 @@ def _generate_view_datagroup(
         view.tables[0],
     )["table"]
 
-    try:
-        bq_table = client.get_table(view_table)
-    except NotFound as e:
-        raise ValueError(
-            f"{view_table} not found when generating datagroup but in namespaces yaml."
-        ) from e
+    [project, dataset, table] = view_table.split(".")
+    table_metadata = dryrun(
+        project=project,
+        dataset=dataset,
+        table=table,
+    ).get_table_metadata()
 
-    if "TABLE" == bq_table.table_type:
-        datagroup: Optional[Datagroup] = _get_datagroup_from_bigquery_table(bq_table)
+    if "TABLE" == table_metadata.get("tableType"):
+        datagroup: Optional[Datagroup] = _get_datagroup_from_bigquery_table(
+            project, dataset, table, table_metadata
+        )
         return datagroup
-    elif "VIEW" == bq_table.table_type:
+    elif "VIEW" == table_metadata.get("tableType"):
         datagroup = _get_datagroup_from_bigquery_view(
-            bq_table, client, dataset_view_map
+            project,
+            dataset,
+            table,
+            table_metadata,
+            dataset_view_map,
+            dryrun,
         )
         return datagroup
 
@@ -143,7 +173,10 @@ def _generate_view_datagroup(
 
 
 def generate_datagroups(
-    views: List[View], target_dir: Path, namespace: str, client: bigquery.Client
+    views: List[View],
+    target_dir: Path,
+    namespace: str,
+    dryrun,
 ) -> None:
     """Generate and write a datagroups.lkml file to the namespace folder."""
     datagroups_folder_path = target_dir / namespace / "datagroups"
@@ -153,14 +186,27 @@ def generate_datagroups(
         DEFAULT_GENERATED_SQL_URI
     )
 
-    datagroups = sorted(
-        set(
-            datagroup
-            for view in views
-            if (datagroup := _generate_view_datagroup(view, client, dataset_view_map))
-            is not None
-        )
-    )
+    datagroups = set()
+    for view in views:
+        try:
+            if (
+                datagroup := _generate_view_datagroup(view, dataset_view_map, dryrun)
+            ) is not None:
+                datagroups.add(datagroup)
+        except DryRunError as e:
+            if e.error == Errors.PERMISSION_DENIED and e.use_cloud_function:
+                path = (
+                    datagroups_folder_path / f"{e.table_id}_last_updated.datagroup.lkml"
+                )
+                print(
+                    f"Permission error dry running: {path}. Copy existing file from looker-hub."
+                )
+                try:
+                    get_file_from_looker_hub(path)
+                except Exception as ex:
+                    print(f"Skip generating datagroup for {path}: {ex}")
+            else:
+                raise
 
     if datagroups:
         datagroups_folder_path.mkdir(exist_ok=True)

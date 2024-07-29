@@ -5,8 +5,6 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional
 
-from google.cloud import bigquery
-
 from ..views import View
 from . import Explore
 
@@ -50,7 +48,6 @@ class OperationalMonitoringExplore(Explore):
 
     def _to_lookml(
         self,
-        bq_client: bigquery.Client,
         v1_name: Optional[str],
     ) -> List[Dict[str, Any]]:
         base_view_name = self.views["base_view"]
@@ -115,7 +112,6 @@ class OperationalMonitoringAlertingExplore(Explore):
 
     def _to_lookml(
         self,
-        bq_client: bigquery.Client,
         v1_name: Optional[str],
     ) -> List[Dict[str, Any]]:
         defn: List[Dict[str, Any]] = [

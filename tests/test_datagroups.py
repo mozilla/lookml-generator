@@ -1,3 +1,4 @@
+import functools
 from dataclasses import dataclass
 from pathlib import Path
 from unittest.mock import patch
@@ -23,11 +24,53 @@ class MockTable(bigquery.Table):
     table_type: str
 
 
-@patch("google.cloud.bigquery.Table")
-@patch("google.cloud.bigquery.Table")
-@patch("google.cloud.bigquery.Client")
+class MockDryRun:
+    """Mock dryrun.DryRun."""
+
+    def __init__(
+        self,
+        client,
+        use_cloud_function,
+        id_token,
+        sql=None,
+        project=None,
+        dataset=None,
+        table=None,
+    ):
+        self.sql = sql
+        self.project = project
+        self.dataset = dataset
+        self.table = table
+        self.client = client
+        self.use_cloud_function = use_cloud_function
+        self.id_token = id_token
+
+    def get_table_metadata(self):
+        """Mock dryrun.DryRun.get_table_metadata"""
+        full_table_id = f"{self.project}.{self.dataset}.{self.table}"
+
+        if full_table_id == "mozdata.analysis.test_table":
+            return {"tableType": "TABLE", "friendlyName": "Test Table"}
+        elif full_table_id == "moz-fx-data-shared-prod.analysis.view_1_source":
+            return {"tableType": "TABLE", "friendlyName": "View Source Table"}
+        elif full_table_id == "mozdata.analysis.view_1":
+            return {"tableType": "VIEW", "friendlyName": "Test View"}
+        elif full_table_id == "mozdata.analysis.test_table":
+            return {"tableType": "TABLE", "friendlyName": "Test Table"}
+        elif full_table_id == "mozdata.analysis.test_table_2":
+            return {"tableType": "TABLE", "friendlyName": "Test Table 2"}
+        elif full_table_id == "mozdata.analysis.view_1":
+            return {"tableType": "VIEW", "friendlyName": "Test View"}
+        elif full_table_id == "mozdata.analysis.test_view_2":
+            return {"tableType": "VIEW", "friendlyName": "Test View"}
+        elif full_table_id == "moz-fx-data-shared-prod.analysis.source_table":
+            return {"tableType": "TABLE", "friendlyName": "Source Table"}
+
+        return {}
+
+
 @patch("generator.views.lookml_utils.get_bigquery_view_reference_map")
-def test_generates_datagroups(reference_map_mock, client, table_1, table_2, runner):
+def test_generates_datagroups(reference_map_mock, runner):
     table_1_expected = (
         FILE_HEADER
         + """datagroup: test_table_last_updated {
@@ -36,7 +79,7 @@ def test_generates_datagroups(reference_map_mock, client, table_1, table_2, runn
     FROM `mozdata`.`region-us`.INFORMATION_SCHEMA.TABLE_STORAGE
     WHERE table_schema = 'analysis'
     AND table_name = 'test_table' ;;
-  description: "Updates when mozdata:analysis.test_table is modified."
+  description: "Updates when mozdata.analysis.test_table is modified."
   max_cache_age: "24 hours"
 }"""
     )
@@ -49,7 +92,7 @@ def test_generates_datagroups(reference_map_mock, client, table_1, table_2, runn
     FROM `mozdata`.`region-us`.INFORMATION_SCHEMA.TABLE_STORAGE
     WHERE table_schema = 'analysis'
     AND table_name = 'test_table_2' ;;
-  description: "Updates when mozdata:analysis.test_table_2 is modified."
+  description: "Updates when mozdata.analysis.test_table_2 is modified."
   max_cache_age: "24 hours"
 }"""
     )
@@ -71,25 +114,9 @@ def test_generates_datagroups(reference_map_mock, client, table_1, table_2, runn
         ),
     ]
 
-    with runner.isolated_filesystem():
-        table_1.project = "mozdata"
-        table_2.project = "mozdata"
-        table_1.dataset_id = "analysis"
-        table_2.dataset_id = "analysis"
-        table_1.table_type = "TABLE"
-        table_2.table_type = "TABLE"
-        table_1.full_table_id = "mozdata:analysis.test_table"
-        table_2.full_table_id = "mozdata:analysis.test_table_2"
-        table_1.table_id = "test_table"
-        table_2.table_id = "test_table_2"
-        table_1.friendly_name = "Test Table"
-        table_2.friendly_name = "Test Table 2"
-        tables = {
-            "mozdata.analysis.test_table": table_1,
-            "mozdata.analysis.test_table_2": table_2,
-        }
-        client.get_table = tables.get
+    mock_dryrun = functools.partial(MockDryRun, None, False, None)
 
+    with runner.isolated_filesystem():
         namespace_dir = Path("looker-hub/test_namespace")
         namespace_dir.mkdir(parents=True)
 
@@ -98,40 +125,32 @@ def test_generates_datagroups(reference_map_mock, client, table_1, table_2, runn
             views,
             target_dir=Path("looker-hub"),
             namespace="test_namespace",
-            client=client,
+            dryrun=mock_dryrun,
         )
 
         assert Path(namespace_dir / "datagroups").exists()
         assert Path(
-            namespace_dir / f"datagroups/{table_1.table_id}_last_updated.datagroup.lkml"
+            namespace_dir / "datagroups/test_table_last_updated.datagroup.lkml"
         ).exists()
         assert (
             Path(
-                namespace_dir
-                / f"datagroups/{table_1.table_id}_last_updated.datagroup.lkml"
+                namespace_dir / "datagroups/test_table_last_updated.datagroup.lkml"
             ).read_text()
             == table_1_expected
         )
         assert Path(
-            namespace_dir / f"datagroups/{table_2.table_id}_last_updated.datagroup.lkml"
+            namespace_dir / "datagroups/test_table_2_last_updated.datagroup.lkml"
         ).exists()
         assert (
             Path(
-                namespace_dir
-                / f"datagroups/{table_2.table_id}_last_updated.datagroup.lkml"
+                namespace_dir / "datagroups/test_table_2_last_updated.datagroup.lkml"
             ).read_text()
             == table_2_expected
         )
 
 
-@patch("google.cloud.bigquery.Table")
-@patch("google.cloud.bigquery.Table")
-@patch("google.cloud.bigquery.Table")
-@patch("google.cloud.bigquery.Client")
 @patch("generator.views.lookml_utils.get_bigquery_view_reference_map")
-def test_generates_datagroups_with_tables_and_views(
-    reference_map_mock, client, table_1, view_1, view_1_source_table, runner
-):
+def test_generates_datagroups_with_tables_and_views(reference_map_mock, runner):
     table_1_expected = (
         FILE_HEADER
         + """datagroup: test_table_last_updated {
@@ -140,7 +159,7 @@ def test_generates_datagroups_with_tables_and_views(
     FROM `mozdata`.`region-us`.INFORMATION_SCHEMA.TABLE_STORAGE
     WHERE table_schema = 'analysis'
     AND table_name = 'test_table' ;;
-  description: "Updates when mozdata:analysis.test_table is modified."
+  description: "Updates when mozdata.analysis.test_table is modified."
   max_cache_age: "24 hours"
 }"""
     )
@@ -153,7 +172,7 @@ def test_generates_datagroups_with_tables_and_views(
     FROM `moz-fx-data-shared-prod`.`region-us`.INFORMATION_SCHEMA.TABLE_STORAGE
     WHERE table_schema = 'analysis'
     AND table_name = 'view_1_source' ;;
-  description: "Updates when moz-fx-data-shared-prod:analysis.view_1_source is modified."
+  description: "Updates when moz-fx-data-shared-prod.analysis.view_1_source is modified."
   max_cache_age: "24 hours"
 }"""
     )
@@ -177,42 +196,14 @@ def test_generates_datagroups_with_tables_and_views(
         ),
     ]
 
+    mock_dryrun = functools.partial(MockDryRun, None, False, None)
+
     with runner.isolated_filesystem():
-        table_1.project = "mozdata"
-        table_1.dataset_id = "analysis"
-        table_1.table_type = "TABLE"
-        table_1.full_table_id = "mozdata:analysis.test_table"
-        table_1.table_id = "test_table"
-        table_1.friendly_name = "Test Table"
-
-        view_1.project = "mozdata"
-        view_1.dataset_id = "analysis"
-        view_1.table_type = "VIEW"
-        view_1.full_table_id = "mozdata:analysis.view_1"
-        view_1.table_id = "view_1"
-        view_1.friendly_name = "Test View"
-
-        view_1_source_table.project = "moz-fx-data-shared-prod"
-        view_1_source_table.dataset_id = "analysis"
-        view_1_source_table.table_type = "TABLE"
-        view_1_source_table.full_table_id = (
-            "moz-fx-data-shared-prod:analysis.view_1_source"
-        )
-        view_1_source_table.table_id = "view_1_source"
-        view_1_source_table.friendly_name = "View Source Table"
-
         reference_map_mock.return_value = {
             "analysis": {
                 "view_1": [["moz-fx-data-shared-prod", "analysis", "view_1_source"]]
             }
         }
-
-        tables = {
-            "mozdata.analysis.test_table": table_1,
-            "mozdata.analysis.view_1": view_1,
-            "moz-fx-data-shared-prod.analysis.view_1_source": view_1_source_table,
-        }
-        client.get_table = tables.get
 
         namespace_dir = Path("looker-hub/test_namespace")
         namespace_dir.mkdir(parents=True)
@@ -220,35 +211,31 @@ def test_generates_datagroups_with_tables_and_views(
             views,
             target_dir=Path("looker-hub"),
             namespace="test_namespace",
-            client=client,
+            dryrun=mock_dryrun,
         )
 
         assert Path("looker-hub/test_namespace/datagroups").exists()
         assert Path(
-            namespace_dir / f"datagroups/{table_1.table_id}_last_updated.datagroup.lkml"
+            namespace_dir / "datagroups/test_table_last_updated.datagroup.lkml"
         ).exists()
         assert (
             Path(
-                namespace_dir
-                / f"datagroups/{table_1.table_id}_last_updated.datagroup.lkml"
+                namespace_dir / "datagroups/test_table_last_updated.datagroup.lkml"
             ).read_text()
             == table_1_expected
         )
         assert Path(
-            namespace_dir
-            / f"datagroups/{view_1_source_table.table_id}_last_updated.datagroup.lkml"
+            namespace_dir / "datagroups/view_1_source_last_updated.datagroup.lkml"
         ).exists()
         assert (
             Path(
-                namespace_dir
-                / f"datagroups/{view_1_source_table.table_id}_last_updated.datagroup.lkml"
+                namespace_dir / "datagroups/view_1_source_last_updated.datagroup.lkml"
             ).read_text()
             == source_table_expected
         )
 
 
-@patch("google.cloud.bigquery.Client")
-def test_skips_non_table_views(client, runner):
+def test_skips_non_table_views(runner):
     views = [
         EventsView(
             namespace="test_namespace",
@@ -262,25 +249,23 @@ def test_skips_non_table_views(client, runner):
         ),
     ]
 
+    mock_dryrun = functools.partial(MockDryRun, None, False, None)
+
     with runner.isolated_filesystem():
         Path("looker-hub/test_namespace").mkdir(parents=True)
         generate_datagroups(
             views,
             target_dir=Path("looker-hub"),
             namespace="test_namespace",
-            client=client,
+            dryrun=mock_dryrun,
         )
 
         assert not Path("looker-hub/test_namespace/datagroups").exists()
 
 
-@patch("google.cloud.bigquery.Table")
-@patch("google.cloud.bigquery.Table")
-@patch("google.cloud.bigquery.Table")
-@patch("google.cloud.bigquery.Client")
 @patch("generator.views.lookml_utils.get_bigquery_view_reference_map")
 def test_only_generates_one_datagroup_for_references_to_same_table(
-    reference_map_mock, client, view_1, view_2, view_source_table, runner
+    reference_map_mock, runner
 ):
     expected = (
         FILE_HEADER
@@ -290,7 +275,7 @@ def test_only_generates_one_datagroup_for_references_to_same_table(
     FROM `moz-fx-data-shared-prod`.`region-us`.INFORMATION_SCHEMA.TABLE_STORAGE
     WHERE table_schema = 'analysis'
     AND table_name = 'source_table' ;;
-  description: "Updates when moz-fx-data-shared-prod:analysis.source_table is modified."
+  description: "Updates when moz-fx-data-shared-prod.analysis.source_table is modified."
   max_cache_age: "24 hours"
 }"""
     )
@@ -321,43 +306,15 @@ def test_only_generates_one_datagroup_for_references_to_same_table(
         ),
     ]
 
+    mock_dryrun = functools.partial(MockDryRun, None, False, None)
+
     with runner.isolated_filesystem():
-        view_1.project = "mozdata"
-        view_1.dataset_id = "analysis"
-        view_1.table_type = "VIEW"
-        view_1.full_table_id = "mozdata:analysis.view_1"
-        view_1.table_id = "view_1"
-        view_1.friendly_name = "Test View"
-
-        view_2.project = "mozdata"
-        view_2.dataset_id = "analysis"
-        view_2.table_type = "VIEW"
-        view_2.full_table_id = "mozdata:analysis.test_view_2"
-        view_2.table_id = "view_2"
-        view_2.friendly_name = "Test View"
-
-        view_source_table.project = "moz-fx-data-shared-prod"
-        view_source_table.dataset_id = "analysis"
-        view_source_table.table_type = "TABLE"
-        view_source_table.full_table_id = (
-            "moz-fx-data-shared-prod:analysis.source_table"
-        )
-        view_source_table.table_id = "source_table"
-        view_source_table.friendly_name = "Source Table"
-
         reference_map_mock.return_value = {
             "analysis": {
                 "view_1": [["moz-fx-data-shared-prod", "analysis", "source_table"]],
                 "view_2": [["moz-fx-data-shared-prod", "analysis", "source_table"]],
             }
         }
-
-        tables = {
-            "mozdata.analysis.view_1": view_1,
-            "mozdata.analysis.view_2": view_2,
-            "moz-fx-data-shared-prod.analysis.source_table": view_source_table,
-        }
-        client.get_table = tables.get
 
         namespace_dir = Path("looker-hub/test_namespace")
         namespace_dir.mkdir(parents=True)
@@ -366,7 +323,7 @@ def test_only_generates_one_datagroup_for_references_to_same_table(
             views,
             target_dir=Path("looker-hub"),
             namespace="test_namespace",
-            client=client,
+            dryrun=mock_dryrun,
         )
 
         assert Path(namespace_dir / "datagroups").exists()
@@ -375,7 +332,7 @@ def test_only_generates_one_datagroup_for_references_to_same_table(
             Path(
                 namespace_dir
                 / "datagroups"
-                / f"{view_source_table.table_id}_last_updated.datagroup.lkml"
+                / "source_table_last_updated.datagroup.lkml"
             ).read_text()
             == expected
         )

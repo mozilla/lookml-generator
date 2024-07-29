@@ -336,12 +336,26 @@ def _get_metric_hub_data_sources() -> Dict[str, List[str]]:
     default=[METRIC_HUB_REPO, LOOKER_METRIC_HUB_REPO],
     help="Repos to load metric configs from.",
 )
+@click.option(
+    "--ignore",
+    multiple=True,
+    default=[],
+    help="Namespaces to ignore during generation.",
+)
+@click.option(
+    "--use_cloud_function",
+    "--use-cloud-function",
+    help="Use the Cloud Function to run dry runs during LookML generation.",
+    type=bool,
+)
 def namespaces(
     custom_namespaces,
     generated_sql_uri,
     app_listings_uri,
     disallowlist,
     metric_hub_repos,
+    ignore,
+    use_cloud_function,
 ):
     """Generate namespaces.yaml."""
     warnings.filterwarnings("ignore", module="google.auth._default")
@@ -350,23 +364,31 @@ def namespaces(
 
     namespaces = {}
     for app in glean_apps:
-        looker_views = _get_looker_views(app, db_views)
-        explores = _get_explores(looker_views)
-        views_as_dict = {view.name: view.as_dict() for view in looker_views}
+        if app["name"] not in ignore:
+            looker_views = _get_looker_views(app, db_views)
+            explores = _get_explores(looker_views)
+            views_as_dict = {view.name: view.as_dict() for view in looker_views}
 
-        namespaces[app["name"]] = {
-            "owners": app["owners"],
-            "pretty_name": app["pretty_name"],
-            "views": views_as_dict,
-            "explores": explores,
-            "glean_app": True,
-        }
+            namespaces[app["name"]] = {
+                "owners": app["owners"],
+                "pretty_name": app["pretty_name"],
+                "views": views_as_dict,
+                "explores": explores,
+                "glean_app": True,
+            }
 
     if custom_namespaces is not None:
         custom_namespaces = yaml.safe_load(custom_namespaces.read()) or {}
+        # remove namespaces that should be ignored
+        for ignored_namespace in ignore:
+            if ignored_namespace in custom_namespaces:
+                del custom_namespaces[ignored_namespace]
 
         # generating operational monitoring namespace, if available
         if "operational_monitoring" in custom_namespaces:
+            if use_cloud_function:
+                raise Exception("Cannot generate OpMon using dry run Cloud Function")
+
             client = bigquery.Client()
             opmon = _get_opmon(bq_client=client, namespaces=custom_namespaces)
             custom_namespaces["operational_monitoring"].update(opmon)
@@ -386,7 +408,10 @@ def namespaces(
 
     updated_namespaces = {}
     for namespace, _ in namespaces.items():
-        if not disallowed_namespaces_pattern.fullmatch(namespace):
+        if (
+            not disallowed_namespaces_pattern.fullmatch(namespace)
+            and namespace not in ignore
+        ):
             if "spoke" not in namespaces[namespace]:
                 namespaces[namespace]["spoke"] = DEFAULT_SPOKE
             if "glean_app" not in namespaces[namespace]:

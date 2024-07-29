@@ -1,11 +1,46 @@
+import functools
+
 import lkml
 import pytest
-from google.cloud.bigquery.schema import SchemaField
 
 from generator.explores import EventsExplore
 from generator.views import EventsView
 
-from .utils import get_mock_bq_client, print_and_test
+from .utils import print_and_test
+
+
+class MockDryRun:
+    """Mock dryrun.DryRun."""
+
+    def __init__(
+        self,
+        client,
+        use_cloud_function,
+        id_token,
+        sql=None,
+        project=None,
+        dataset=None,
+        table=None,
+    ):
+        self.sql = sql
+        self.project = project
+        self.dataset = dataset
+        self.table = table
+        self.use_cloud_function = use_cloud_function
+        self.client = client
+        self.id_token = id_token
+
+    def get_table_schema(self):
+        """Mock dryrun.DryRun.get_table_schema"""
+
+        return [
+            {
+                "name": "client_info",
+                "type": "RECORD",
+                "fields": [{"name": "client_id", "type": "STRING"}],
+            },
+            {"name": "event_id", "type": "STRING"},
+        ]
 
 
 @pytest.fixture()
@@ -170,15 +205,9 @@ def test_view_lookml(events_view):
         ],
     }
 
-    mock_bq_client = get_mock_bq_client(
-        [
-            SchemaField(
-                "client_info", "RECORD", fields=[SchemaField("client_id", "STRING")]
-            ),
-            SchemaField("event_id", "STRING"),
-        ]
-    )
-    actual = events_view.to_lookml(mock_bq_client, None)
+    mock_dryrun = functools.partial(MockDryRun, None, False, None)
+
+    actual = events_view.to_lookml(None, dryrun=mock_dryrun)
     print_and_test(expected=expected, actual=actual)
 
 
@@ -210,5 +239,5 @@ def test_explore_lookml(time_partitioning_group, events_explore):
         },
     ]
 
-    actual = events_explore.to_lookml(None, None)
+    actual = events_explore.to_lookml(None)
     print_and_test(expected=expected, actual=actual)

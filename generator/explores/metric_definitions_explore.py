@@ -5,8 +5,6 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional
 
-from google.cloud import bigquery
-
 from ..views import View
 from . import Explore
 
@@ -40,7 +38,6 @@ class MetricDefinitionsExplore(Explore):
 
     def _to_lookml(
         self,
-        _bq_client: bigquery.Client,
         _v1_name: Optional[str],
     ) -> List[Dict[str, Any]]:
         exposed_fields = ["ALL_FIELDS*"]

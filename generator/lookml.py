@@ -1,5 +1,6 @@
 """Generate lookml from namespaces."""
 
+import functools
 import logging
 from pathlib import Path
 from typing import Dict, Iterable, Optional
@@ -9,7 +10,10 @@ import lkml
 import yaml
 from google.cloud import bigquery
 
+from generator.utils import get_file_from_looker_hub
+
 from .dashboards import DASHBOARD_TYPES
+from .dryrun import DryRun, DryRunError, Errors, id_token
 from .explores import EXPLORE_TYPES
 from .metrics_utils import LOOKER_METRIC_HUB_REPO, METRIC_HUB_REPO, MetricsConfigLoader
 from .namespaces import _get_glean_apps
@@ -26,24 +30,39 @@ FILE_HEADER = """
 
 
 def _generate_views(
-    client, out_dir: Path, views: Iterable[View], v1_name: Optional[str]
+    out_dir: Path,
+    views: Iterable[View],
+    v1_name: Optional[str],
+    dryrun,
 ) -> Iterable[Path]:
     for view in views:
         logging.info(
             f"Generating lookml for view {view.name} in {view.namespace} of type {view.view_type}"
         )
         path = out_dir / f"{view.name}.view.lkml"
-        lookml = view.to_lookml(client, v1_name)
-        if lookml == {}:
-            continue
+        try:
+            lookml = view.to_lookml(v1_name, dryrun)
+            if lookml == {}:
+                continue
 
-        # lkml.dump may return None, in which case write an empty file
-        path.write_text(FILE_HEADER + (lkml.dump(lookml) or ""))
-        yield path
+            # lkml.dump may return None, in which case write an empty file
+            path.write_text(FILE_HEADER + (lkml.dump(lookml) or ""))
+            yield path
+        except DryRunError as e:
+            if e.error == Errors.PERMISSION_DENIED and e.use_cloud_function:
+                print(
+                    f"Permission error dry running {view.name}. Copy existing {path} file from looker-hub."
+                )
+                try:
+                    get_file_from_looker_hub(path)
+                    yield path
+                except Exception as ex:
+                    print(f"Skip generating view for {path}: {ex}")
+            else:
+                raise
 
 
 def _generate_explores(
-    client,
     out_dir: Path,
     namespace: str,
     explores: dict,
@@ -63,7 +82,7 @@ def _generate_explores(
                 f"/looker-hub/{namespace}/views/{view}.view.lkml"
                 for view in explore.get_dependent_views()
             ],
-            "explores": explore.to_lookml(client, v1_name),
+            "explores": explore.to_lookml(v1_name),
         }
         path = out_dir / (explore_name + ".explore.lkml")
         # lkml.dump may return None, in which case write an empty file
@@ -72,7 +91,6 @@ def _generate_explores(
 
 
 def _generate_dashboards(
-    client,
     dash_dir: Path,
     namespace: str,
     dashboards: dict,
@@ -83,7 +101,7 @@ def _generate_dashboards(
             namespace, dashboard_name, dashboard_info
         )
 
-        dashboard_lookml = dashboard.to_lookml(client)
+        dashboard_lookml = dashboard.to_lookml()
         dash_path = dash_dir / f"{dashboard_name}.dashboard.lookml"
         dash_path.write_text(FILE_HEADER + dashboard_lookml)
         yield dash_path
@@ -100,9 +118,7 @@ def _glean_apps_to_v1_map(glean_apps):
     return {d["name"]: d["v1_name"] for d in glean_apps}
 
 
-def _lookml(namespaces, glean_apps, target_dir, namespace_filter=[]):
-    client = bigquery.Client()
-
+def _lookml(namespaces, glean_apps, target_dir, dryrun, namespace_filter=[]):
     namespaces_content = namespaces.read()
     _namespaces = yaml.safe_load(namespaces_content)
     target = Path(target_dir)
@@ -126,18 +142,18 @@ def _lookml(namespaces, glean_apps, target_dir, namespace_filter=[]):
 
             logging.info("  Generating views")
             v1_name: Optional[str] = v1_mapping.get(namespace)
-            for view_path in _generate_views(client, view_dir, views, v1_name):
+            for view_path in _generate_views(view_dir, views, v1_name, dryrun=dryrun):
                 logging.info(f"    ...Generating {view_path}")
 
             logging.info("  Generating datagroups")
-            generate_datagroups(views, target, namespace, client)
+            generate_datagroups(views, target, namespace, dryrun=dryrun)
 
             explore_dir = target / namespace / "explores"
             explore_dir.mkdir(parents=True, exist_ok=True)
             explores = lookml_objects.get("explores", {})
             logging.info("  Generating explores")
             for explore_path in _generate_explores(
-                client, explore_dir, namespace, explores, view_dir, v1_name
+                explore_dir, namespace, explores, view_dir, v1_name
             ):
                 logging.info(f"    ...Generating {explore_path}")
 
@@ -146,7 +162,7 @@ def _lookml(namespaces, glean_apps, target_dir, namespace_filter=[]):
             dashboard_dir.mkdir(parents=True, exist_ok=True)
             dashboards = lookml_objects.get("dashboards", {})
             for dashboard_path in _generate_dashboards(
-                client, dashboard_dir, namespace, dashboards
+                dashboard_dir, namespace, dashboards
             ):
                 logging.info(f"    ...Generating {dashboard_path}")
 
@@ -182,10 +198,22 @@ def _lookml(namespaces, glean_apps, target_dir, namespace_filter=[]):
     default=[],
     help="List of namespace names to generate lookml for.",
 )
-def lookml(namespaces, app_listings_uri, target_dir, metric_hub_repos, only):
+@click.option(
+    "--use_cloud_function",
+    "--use-cloud-function",
+    help="Use the Cloud Function to run dry runs during LookML generation.",
+    type=bool,
+)
+def lookml(
+    namespaces, app_listings_uri, target_dir, metric_hub_repos, only, use_cloud_function
+):
     """Generate lookml from namespaces."""
     if metric_hub_repos:
         MetricsConfigLoader.update_repos(metric_hub_repos)
 
     glean_apps = _get_glean_apps(app_listings_uri)
-    return _lookml(namespaces, glean_apps, target_dir, only)
+
+    dryrun = functools.partial(
+        DryRun, bigquery.Client(), use_cloud_function, id_token()
+    )
+    return _lookml(namespaces, glean_apps, target_dir, dryrun, only)

@@ -67,13 +67,13 @@ class GleanPingView(PingView):
             if view.name not in DISALLOWED_PINGS:
                 yield view
 
-    def to_lookml(self, bq_client, v1_name: Optional[str]) -> Dict[str, Any]:
+    def to_lookml(self, v1_name: Optional[str], dryrun) -> Dict[str, Any]:
         """Generate LookML for this view.
 
         The Glean views include a labeled metrics, which need to be joined
         against the view in the explore.
         """
-        lookml = super().to_lookml(bq_client, v1_name)
+        lookml = super().to_lookml(v1_name, dryrun=dryrun)
         # ignore nested join views
         lookml["views"] = [lookml["views"][0]]
 
@@ -84,7 +84,7 @@ class GleanPingView(PingView):
             (table for table in self.tables if table.get("channel") == "release"),
             self.tables[0],
         )["table"]
-        dimensions = self.get_dimensions(bq_client, table, v1_name)
+        dimensions = self.get_dimensions(table, v1_name, dryrun=dryrun)
         dimension_names = {dimension["name"] for dimension in dimensions}
 
         client_id_field = self.get_client_id(dimensions, table)
@@ -206,8 +206,14 @@ class GleanPingView(PingView):
             {v["name"]: v for v in view_definitions}.values(), key=lambda x: x["name"]  # type: ignore
         )
 
+        [project, dataset, table] = table.split(".")
+        table_schema = dryrun(
+            project=project,
+            dataset=dataset,
+            table=table,
+        ).get_table_schema()
         nested_views = lookml_utils._generate_nested_dimension_views(
-            bq_client.get_table(table).schema, self.name
+            table_schema, self.name
         )
 
         lookml["views"] += view_definitions + nested_views
@@ -397,10 +403,10 @@ class GleanPingView(PingView):
         return dict(dimension, **annotations)
 
     def get_dimensions(
-        self, bq_client, table, v1_name: Optional[str]
+        self, table, v1_name: Optional[str], dryrun
     ) -> List[Dict[str, Any]]:
         """Get the set of dimensions for this view."""
-        all_fields = super().get_dimensions(bq_client, table, v1_name)
+        all_fields = super().get_dimensions(table, v1_name, dryrun=dryrun)
         fields = self._get_glean_metric_dimensions(all_fields, v1_name) + [
             self._add_link(d)
             for d in all_fields

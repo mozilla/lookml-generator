@@ -53,13 +53,13 @@ def get_dimension_defaults(
         }
 
 
-def get_xaxis_val(bq_client: bigquery.Client, table: str) -> str:
+def get_xaxis_val(table: str, dryrun) -> str:
     """
     Return whether the x-axis should be build_id or submission_date.
 
     This is based on which one is found in the table provided.
     """
-    all_dimensions = lookml_utils._generate_dimensions(bq_client, table)
+    all_dimensions = lookml_utils._generate_dimensions(table, dryrun=dryrun)
     return (
         "build_id"
         if "build_id" in {dimension["name"] for dimension in all_dimensions}

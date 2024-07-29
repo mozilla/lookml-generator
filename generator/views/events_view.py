@@ -61,7 +61,7 @@ class EventsView(View):
         """Get a view from a name and dict definition."""
         return EventsView(namespace, name, _dict["tables"])
 
-    def to_lookml(self, bq_client, v1_name: Optional[str]) -> Dict[str, Any]:
+    def to_lookml(self, v1_name: Optional[str], dryrun) -> Dict[str, Any]:
         """Generate LookML for this view."""
         view_defn: Dict[str, Any] = {
             "extends": [self.tables[0]["events_table_view"]],
@@ -70,7 +70,7 @@ class EventsView(View):
 
         # add measures
         dimensions = lookml_utils._generate_dimensions(
-            bq_client, self.tables[0]["base_table"]
+            self.tables[0]["base_table"], dryrun=dryrun
         )
         view_defn["measures"] = self.get_measures(dimensions)
 

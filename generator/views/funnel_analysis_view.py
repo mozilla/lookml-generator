@@ -89,7 +89,7 @@ class FunnelAnalysisView(View):
         """Get a FunnalAnalysisView from a dict representation."""
         return FunnelAnalysisView(namespace, _dict["tables"])
 
-    def to_lookml(self, bq_client, v1_name: Optional[str]) -> Dict[str, Any]:
+    def to_lookml(self, v1_name: Optional[str], dryrun) -> Dict[str, Any]:
         """Get this view as LookML."""
         return {
             "includes": [f"{self.tables[0]['funnel_analysis']}.view.lkml"],
