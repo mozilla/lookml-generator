@@ -35,7 +35,7 @@ def _generate_view(
     view: View,
     v1_name: Optional[str],
     dryrun,
-) -> Iterable[Path]:
+) -> Path:
     logging.info(
         f"Generating lookml for view {view.name} in {view.namespace} of type {view.view_type}"
     )
@@ -305,9 +305,7 @@ def lookml(
     """Generate lookml from namespaces."""
     if metric_hub_repos:
         MetricsConfigLoader.update_repos(metric_hub_repos)
-
-    if use_cloud_function is not None:
-        os.environ["USE_CLOUD_FUNCTION"] = "True" if use_cloud_function else "False"
+    glean_apps = _get_glean_apps(app_listings_uri)
 
     return _lookml(
         namespaces,

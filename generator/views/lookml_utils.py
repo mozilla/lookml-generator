@@ -149,20 +149,6 @@ def _generate_dimensions(table: str, dryrun) -> List[Dict[str, Any]]:
     return list(dimensions.values())
 
 
-def _get_query_schema(query, project):
-    auth_req = GoogleAuthRequest()
-    creds, _ = google.auth.default(
-        scopes=["https://www.googleapis.com/auth/cloud-platform"]
-    )
-    creds.refresh(auth_req)
-    if hasattr(creds, "id_token"):
-        # Get token from default credentials for the current environment created via Cloud SDK run
-        id_token = creds.id_token
-    else:
-        # If the environment variable GOOGLE_APPLICATION_CREDENTIALS is set to service account JSON file,
-        # then ID token is acquired using this service account credentials.
-        id_token = fetch_id_token(auth_req, DRY_RUN_URL)
-
 def _generate_dimensions_from_query(query: str, dryrun) -> List[Dict[str, Any]]:
     """Generate dimensions and dimension groups from a SQL query."""
     schema = dryrun(sql=query).get_schema()

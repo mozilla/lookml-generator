@@ -8,7 +8,7 @@ from click.testing import CliRunner
 from google.cloud import bigquery
 
 from generator.views import EventsView, TableView
-from generator.views.datagroups import FILE_HEADER, generate_datagroups
+from generator.views.datagroups import FILE_HEADER, generate_datagroup
 
 
 @pytest.fixture
@@ -121,12 +121,13 @@ def test_generates_datagroups(reference_map_mock, runner):
         namespace_dir.mkdir(parents=True)
 
         reference_map_mock.return_value = {}
-        generate_datagroups(
-            views,
-            target_dir=Path("looker-hub"),
-            namespace="test_namespace",
-            dryrun=mock_dryrun,
-        )
+        for view in views:
+            generate_datagroup(
+                view,
+                target_dir=Path("looker-hub"),
+                namespace="test_namespace",
+                dryrun=mock_dryrun,
+            )
 
         assert Path(namespace_dir / "datagroups").exists()
         assert Path(
@@ -207,12 +208,13 @@ def test_generates_datagroups_with_tables_and_views(reference_map_mock, runner):
 
         namespace_dir = Path("looker-hub/test_namespace")
         namespace_dir.mkdir(parents=True)
-        generate_datagroups(
-            views,
-            target_dir=Path("looker-hub"),
-            namespace="test_namespace",
-            dryrun=mock_dryrun,
-        )
+        for view in views:
+            generate_datagroup(
+                view,
+                target_dir=Path("looker-hub"),
+                namespace="test_namespace",
+                dryrun=mock_dryrun,
+            )
 
         assert Path("looker-hub/test_namespace/datagroups").exists()
         assert Path(
@@ -253,12 +255,13 @@ def test_skips_non_table_views(runner):
 
     with runner.isolated_filesystem():
         Path("looker-hub/test_namespace").mkdir(parents=True)
-        generate_datagroups(
-            views,
-            target_dir=Path("looker-hub"),
-            namespace="test_namespace",
-            dryrun=mock_dryrun,
-        )
+        for view in views:
+            generate_datagroup(
+                view,
+                target_dir=Path("looker-hub"),
+                namespace="test_namespace",
+                dryrun=mock_dryrun,
+            )
 
         assert not Path("looker-hub/test_namespace/datagroups").exists()
 
@@ -319,12 +322,13 @@ def test_only_generates_one_datagroup_for_references_to_same_table(
         namespace_dir = Path("looker-hub/test_namespace")
         namespace_dir.mkdir(parents=True)
 
-        generate_datagroups(
-            views,
-            target_dir=Path("looker-hub"),
-            namespace="test_namespace",
-            dryrun=mock_dryrun,
-        )
+        for view in views:
+            generate_datagroup(
+                view,
+                target_dir=Path("looker-hub"),
+                namespace="test_namespace",
+                dryrun=mock_dryrun,
+            )
 
         assert Path(namespace_dir / "datagroups").exists()
         assert len(list((namespace_dir / "datagroups").iterdir())) == 1

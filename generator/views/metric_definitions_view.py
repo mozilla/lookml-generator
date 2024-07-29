@@ -149,7 +149,7 @@ class MetricDefinitionsView(View):
             ).format(dataset=self.namespace)
 
             base_view_dimensions[data_source_definition.name] = (
-                lookml_utils._generate_dimensions_from_query(bq_client, query)
+                lookml_utils._generate_dimensions_from_query(query, dryrun)
             )
 
         # prepare base field data for query
