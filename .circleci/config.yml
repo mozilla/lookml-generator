@@ -87,13 +87,6 @@ jobs:
             export GOOGLE_APPLICATION_CREDENTIALS="/tmp/gcp.json"
             echo "$GCLOUD_SERVICE_KEY" > "$GOOGLE_APPLICATION_CREDENTIALS"
             venv/bin/pytest -m integration
-      - run:
-          name: Test build namespaces.yaml
-          command: |
-            export GOOGLE_APPLICATION_CREDENTIALS="/tmp/gcp.json"
-            echo "$GCLOUD_SERVICE_KEY" > "$GOOGLE_APPLICATION_CREDENTIALS"
-            ./bin/generator namespaces
-            cat namespaces.yaml
   docs-build:
     docker: *docker
     steps:
@@ -107,6 +100,74 @@ jobs:
       - persist_to_workspace:
           root: /tmp
           paths: _html
+  generate-lookml:
+    docker: *docker
+    steps: 
+      - checkout
+      - *skip_forked_pr
+      - *restore_cache
+      - *build
+      - &attach_generated_lookml
+        attach_workspace:
+          at: /tmp/workspace
+      - run:
+          name: Authenticate to GCP
+          command: |
+            export GOOGLE_APPLICATION_CREDENTIALS="/tmp/gcp.json"
+            echo 'export GOOGLE_APPLICATION_CREDENTIALS="/tmp/gcp.json"' >> "$BASH_ENV"
+            echo "$GCLOUD_SERVICE_KEY" > "$GOOGLE_APPLICATION_CREDENTIALS"
+      - run:
+          name: Generate LookML
+          command: |
+            ./bin/generator namespaces
+            cat namespaces.yaml
+            ./bin/generator lookml --target-dir=/tmp/workspace/generated-lookml --use_cloud_function=True
+      - persist_to_workspace:
+          root: /tmp/workspace
+          paths:
+            - generated-lookml
+  generate-diff:
+    docker:
+      - image: cimg/node:21.2.0
+    steps:
+      - checkout
+      - *skip_forked_pr
+      - *attach_generated_lookml
+      - add_ssh_keys:
+          fingerprints:
+            - "f6:e8:0c:dd:e4:16:0c:4f:1a:5d:da:56:82:9e:a3:61"
+      - run:
+          name: Pull in looker-hub
+          command: |
+            git clone --branch main https://github.com/mozilla/looker-hub.git /tmp/workspace/looker-hub
+      - run:
+          name: Generate diff
+          command: |
+            # remove empty directories as they are not checked into looker-hub
+            find /tmp/workspace/generated-lookml -type d -empty -delete
+
+            # operational monitoring artifacts cannot be generated, copy from looker-hub so
+            # they don't show up as missing.
+            # todo: update operational monitoring logic so BigQuery access is not needed
+            cp -R /tmp/workspace/looker-hub/operational_monitoring /tmp/workspace/generated-lookml
+
+            # the following files are only in looker-hub/ (manually checked in) and can be ignored
+            rm /tmp/workspace/looker-hub/README.md
+            rm /tmp/workspace/looker-hub/hub.model.lkml
+            rm /tmp/workspace/looker-hub/CODE_OF_CONDUCT.md
+
+            diff -x '.*' -qr --no-dereference \
+              /tmp/workspace/looker-hub/ /tmp/workspace/generated-lookml/ \
+              | grep '^Only in' \
+              >> /tmp/workspace/lookml.diff || true
+            diff -x '.*' -bur --no-dereference --new-file \
+              /tmp/workspace/looker-hub/ /tmp/workspace/generated-lookml/ \
+              >> /tmp/workspace/lookml.diff || true
+      - store_artifacts:
+          path: /tmp/workspace/lookml.diff
+          destination: lookml.diff
+      - run: npm i circle-github-bot@2.1.0 @octokit/graphql@7.0.2
+      - run: .circleci/post-diff.js
   docs-deploy:
     docker:
       - image: node:14
@@ -171,6 +232,19 @@ workflows:
       - verify-requirements
       - build-container
       - docs-build
+
+      - generate-lookml:
+          context: data-eng-circleci-tests
+          filters:
+            branches:
+              ignore: main
+
+      - generate-diff:
+          requires:
+            - generate-lookml
+          filters:
+            branches:
+              ignore: main
 
       - docs-deploy:
           requires:
