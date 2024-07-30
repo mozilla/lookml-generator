@@ -11,10 +11,11 @@ import click
 import lkml
 import yaml
 
+from generator.dryrun import DryRun
 from generator.utils import get_file_from_looker_hub
 
 from .dashboards import DASHBOARD_TYPES
-from .dryrun import DryRun, DryRunError, Errors, id_token
+from .dryrun import DryRunError, Errors, id_token
 from .explores import EXPLORE_TYPES
 from .metrics_utils import LOOKER_METRIC_HUB_REPO, METRIC_HUB_REPO, MetricsConfigLoader
 from .namespaces import _get_glean_apps
@@ -35,7 +36,7 @@ def _generate_view(
     view: View,
     v1_name: Optional[str],
     dryrun,
-) -> Path:
+) -> Optional[Path]:
     logging.info(
         f"Generating lookml for view {view.name} in {view.namespace} of type {view.view_type}"
     )
@@ -99,7 +100,7 @@ def _generate_dashboard(
     dashboard_name: str,
     dashboard: Any,
 ):
-    print(f"Generating lookml for dashboard {dashboard_name} in {namespace}")
+    logging.info(f"Generating lookml for dashboard {dashboard_name} in {namespace}")
     dashboard = DASHBOARD_TYPES[dashboard["type"]].from_dict(
         namespace, dashboard_name, dashboard
     )
@@ -138,7 +139,7 @@ def _lookml(
     target_dir,
     namespace_filter=[],
     parallelism: int = 8,
-    use_cloud_function=False,
+    dryrun=None,
     metric_hub_repos=[],
 ):
     namespaces_content = namespaces.read()
@@ -150,10 +151,6 @@ def _lookml(
     # by the Glean Dictionary and other tools
     with open(target / "namespaces.yaml", "w") as target_namespaces_file:
         target_namespaces_file.write(namespaces_content)
-
-    dry_run_id_token = None
-    if use_cloud_function:
-        dry_run_id_token = id_token()
 
     run_generation = partial(_run_generation, metric_hub_repos)
 
@@ -177,7 +174,7 @@ def _lookml(
                         view_dir,
                         view,
                         v1_name,
-                        functools.partial(DryRun, use_cloud_function, dry_run_id_token),
+                        dryrun,
                     )
                 )
                 generate_datagroups.append(
@@ -186,7 +183,7 @@ def _lookml(
                         view,
                         target,
                         namespace,
-                        functools.partial(DryRun, use_cloud_function, dry_run_id_token),
+                        dryrun,
                     )
                 )
 
@@ -307,12 +304,18 @@ def lookml(
         MetricsConfigLoader.update_repos(metric_hub_repos)
     glean_apps = _get_glean_apps(app_listings_uri)
 
+    dry_run_id_token = None
+    if use_cloud_function:
+        dry_run_id_token = id_token()
+
+    dryrun = functools.partial(DryRun, use_cloud_function, dry_run_id_token)
+
     return _lookml(
         namespaces,
         glean_apps,
         target_dir,
         only,
         parallelism,
-        use_cloud_function,
+        dryrun,
         metric_hub_repos,
     )

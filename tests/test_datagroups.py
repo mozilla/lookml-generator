@@ -150,8 +150,15 @@ def test_generates_datagroups(reference_map_mock, runner):
         )
 
 
-@patch("generator.views.lookml_utils.get_bigquery_view_reference_map")
-def test_generates_datagroups_with_tables_and_views(reference_map_mock, runner):
+@patch(
+    "generator.views.datagroups.DATASET_VIEW_MAP",
+    {
+        "analysis": {
+            "view_1": [["moz-fx-data-shared-prod", "analysis", "view_1_source"]]
+        }
+    },
+)
+def test_generates_datagroups_with_tables_and_views(runner):
     table_1_expected = (
         FILE_HEADER
         + """datagroup: test_table_last_updated {
@@ -200,12 +207,6 @@ def test_generates_datagroups_with_tables_and_views(reference_map_mock, runner):
     mock_dryrun = functools.partial(MockDryRun, None, False, None)
 
     with runner.isolated_filesystem():
-        reference_map_mock.return_value = {
-            "analysis": {
-                "view_1": [["moz-fx-data-shared-prod", "analysis", "view_1_source"]]
-            }
-        }
-
         namespace_dir = Path("looker-hub/test_namespace")
         namespace_dir.mkdir(parents=True)
         for view in views:

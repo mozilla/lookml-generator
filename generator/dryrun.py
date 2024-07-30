@@ -38,7 +38,6 @@ class DryRunError(Exception):
 
     def __init__(self, message, error, use_cloud_function, table_id):
         """Initialize DryRunError."""
-        # super().__init__(message, error, use_cloud_function, table_id)
         super(DryRunError, self).__init__(message, error, use_cloud_function, table_id)
         self.error = error
         self.use_cloud_function = use_cloud_function
@@ -78,6 +77,7 @@ class DryRun:
 
     @cached_property
     def client(self):
+        """Get BigQuery client instance."""
         return bigquery.Client()
 
     @cached_property

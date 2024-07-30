@@ -1,5 +1,6 @@
 import contextlib
 import functools
+import multiprocessing
 from pathlib import Path
 from textwrap import dedent
 from unittest.mock import Mock, patch
@@ -706,6 +707,24 @@ def msg_glean_probes():
 
 
 @contextlib.contextmanager
+def pool_started():
+    """
+    Needed when mocking objects that are used within a multiprocessing pool.
+
+    The default start method when using multiprocessing is spawn on MacOS and Windows.
+    If using fork, your processes are forked in the current state, including the mocking,
+    while with using spawn, a new Python interpreter is launched, where the mock will not work.
+    The start method needs to be changed to fork for the mocks to work across processes.
+    """
+    start_method = multiprocessing.get_start_method()
+    try:
+        multiprocessing.set_start_method("fork", force=True)
+        yield
+    finally:
+        multiprocessing.set_start_method(start_method, force=True)
+
+
+@contextlib.contextmanager
 def _prepare_lookml_actual_test(
     mock_glean_ping_view,
     mock_glean_ping_explore,
@@ -774,19 +793,27 @@ def _prepare_lookml_actual_test(
             """
     )
     namespaces.write_text(namespaces_text)
-    mock_dryrun = functools.partial(MockDryRun, None, False, None)
-    for mock in [mock_glean_ping_view, mock_glean_ping_explore]:
-        mock.get_repos.return_value = [{"name": "glean-app-release"}]
-        glean_app = Mock()
-        glean_app.get_probes.return_value = msg_glean_probes
-        glean_app.get_ping_descriptions.return_value = {
-            "baseline": "The baseline ping\n    is foo."
-        }
-        mock.return_value = glean_app
 
-    with runner.isolated_filesystem():
-        _lookml(open(namespaces), glean_apps, "looker-hub/", dryrun=mock_dryrun)
-        yield namespaces_text
+    with pool_started():
+        mock_dryrun = functools.partial(MockDryRun, None, False, None)
+        for mock in [mock_glean_ping_view, mock_glean_ping_explore]:
+            mock.get_repos.return_value = [{"name": "glean-app-release"}]
+            glean_app = Mock()
+            glean_app.get_probes.return_value = msg_glean_probes
+            glean_app.get_ping_descriptions.return_value = {
+                "baseline": "The baseline ping\n    is foo."
+            }
+            mock.return_value = glean_app
+
+        with runner.isolated_filesystem():
+            _lookml(
+                open(namespaces),
+                glean_apps,
+                "looker-hub/",
+                dryrun=mock_dryrun,
+                parallelism=12,
+            )
+            yield namespaces_text
 
 
 @patch("generator.views.glean_ping_view.GleanPing")

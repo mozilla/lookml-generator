@@ -182,7 +182,7 @@ def generate_datagroup(
     target_dir: Path,
     namespace: str,
     dryrun,
-) -> None:
+) -> Optional[Path]:
     """Generate and write a datagroups.lkml file to the namespace folder."""
     datagroups_folder_path = target_dir / namespace / "datagroups"
 
@@ -208,3 +208,6 @@ def generate_datagroup(
             datagroups_folder_path / f"{datagroup.name}.datagroup.lkml"
         )
         datagroup_lkml_path.write_text(FILE_HEADER + str(datagroup))
+        return datagroup_lkml_path
+
+    return None
