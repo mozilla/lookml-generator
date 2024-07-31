@@ -1,6 +1,4 @@
 import contextlib
-import functools
-import multiprocessing
 from pathlib import Path
 from textwrap import dedent
 from unittest.mock import Mock, patch
@@ -14,7 +12,7 @@ from mozilla_schema_generator.probes import GleanProbe
 from generator.lookml import _lookml
 from generator.views import ClientCountsView, GrowthAccountingView
 
-from .utils import print_and_test
+from .utils import MockDryRun, MockDryRunContext, print_and_test
 
 
 @pytest.fixture
@@ -28,26 +26,8 @@ class MockGleanPing:
         return [{"name": "glean-app-release"}]
 
 
-class MockDryRun:
+class MockDryRunLookml(MockDryRun):
     """Mock dryrun.DryRun."""
-
-    def __init__(
-        self,
-        client,
-        use_cloud_function,
-        id_token,
-        sql=None,
-        project=None,
-        dataset=None,
-        table=None,
-    ):
-        self.sql = sql
-        self.project = project
-        self.dataset = dataset
-        self.table = table
-        self.use_cloud_function = use_cloud_function
-        self.client = client
-        self.id_token = id_token
 
     def get_table_metadata(self):
         """Mock dryrun.DryRun.get_table_metadata"""
@@ -707,24 +687,6 @@ def msg_glean_probes():
 
 
 @contextlib.contextmanager
-def pool_started():
-    """
-    Needed when mocking objects that are used within a multiprocessing pool.
-
-    The default start method when using multiprocessing is spawn on MacOS and Windows.
-    If using fork, your processes are forked in the current state, including the mocking,
-    while with using spawn, a new Python interpreter is launched, where the mock will not work.
-    The start method needs to be changed to fork for the mocks to work across processes.
-    """
-    start_method = multiprocessing.get_start_method()
-    try:
-        multiprocessing.set_start_method("fork", force=True)
-        yield
-    finally:
-        multiprocessing.set_start_method(start_method, force=True)
-
-
-@contextlib.contextmanager
 def _prepare_lookml_actual_test(
     mock_glean_ping_view,
     mock_glean_ping_explore,
@@ -794,26 +756,25 @@ def _prepare_lookml_actual_test(
     )
     namespaces.write_text(namespaces_text)
 
-    with pool_started():
-        mock_dryrun = functools.partial(MockDryRun, None, False, None)
-        for mock in [mock_glean_ping_view, mock_glean_ping_explore]:
-            mock.get_repos.return_value = [{"name": "glean-app-release"}]
-            glean_app = Mock()
-            glean_app.get_probes.return_value = msg_glean_probes
-            glean_app.get_ping_descriptions.return_value = {
-                "baseline": "The baseline ping\n    is foo."
-            }
-            mock.return_value = glean_app
+    mock_dryrun = MockDryRunContext(MockDryRunLookml, False)
+    for mock in [mock_glean_ping_view, mock_glean_ping_explore]:
+        mock.get_repos.return_value = [{"name": "glean-app-release"}]
+        glean_app = Mock()
+        glean_app.get_probes.return_value = msg_glean_probes
+        glean_app.get_ping_descriptions.return_value = {
+            "baseline": "The baseline ping\n    is foo."
+        }
+        mock.return_value = glean_app
 
-        with runner.isolated_filesystem():
-            _lookml(
-                open(namespaces),
-                glean_apps,
-                "looker-hub/",
-                dryrun=mock_dryrun,
-                parallelism=12,
-            )
-            yield namespaces_text
+    with runner.isolated_filesystem():
+        _lookml(
+            open(namespaces),
+            glean_apps,
+            "looker-hub/",
+            dryrun=mock_dryrun,
+            parallelism=1,
+        )
+        yield namespaces_text
 
 
 @patch("generator.views.glean_ping_view.GleanPing")
@@ -1912,7 +1873,7 @@ def test_duplicate_dimension(runner, glean_apps, tmp_path):
             """
         )
     )
-    mock_dryrun = functools.partial(MockDryRun, None, False, None)
+    mock_dryrun = MockDryRunContext(MockDryRunLookml, False)
     with runner.isolated_filesystem():
         with pytest.raises(ClickException):
             _lookml(open(namespaces), glean_apps, "looker-hub/", dryrun=mock_dryrun)
@@ -1936,7 +1897,7 @@ def test_duplicate_dimension_event(runner, glean_apps, tmp_path):
         )
     )
     with runner.isolated_filesystem():
-        mock_dryrun = functools.partial(MockDryRun, None, False, None)
+        mock_dryrun = MockDryRunContext(MockDryRunLookml, False)
         namespaces = tmp_path / "namespaces.yaml"
         _lookml(open(namespaces), glean_apps, "looker-hub/", dryrun=mock_dryrun)
         expected = {
@@ -1990,7 +1951,7 @@ def test_duplicate_dimension_event(runner, glean_apps, tmp_path):
 
 
 def test_duplicate_client_id(runner, glean_apps, tmp_path):
-    mock_dryrun = functools.partial(MockDryRun, None, False, None)
+    mock_dryrun = MockDryRunContext(MockDryRunLookml, False)
     namespaces = tmp_path / "namespaces.yaml"
     namespaces.write_text(
         dedent(
@@ -2007,7 +1968,7 @@ def test_duplicate_client_id(runner, glean_apps, tmp_path):
             """
         )
     )
-    mock_dryrun = functools.partial(MockDryRun, None, False, None)
+    mock_dryrun = MockDryRunContext(MockDryRunLookml, False)
     with runner.isolated_filesystem():
         with pytest.raises(ClickException):
             _lookml(open(namespaces), glean_apps, "looker-hub/", dryrun=mock_dryrun)
@@ -2036,7 +1997,7 @@ def test_context_id(runner, glean_apps, tmp_path):
         )
     )
 
-    mock_dryrun = functools.partial(MockDryRun, None, False, None)
+    mock_dryrun = MockDryRunContext(MockDryRunLookml, False)
     with runner.isolated_filesystem():
         _lookml(open(namespaces), glean_apps, "looker-hub/", dryrun=mock_dryrun)
         expected = {

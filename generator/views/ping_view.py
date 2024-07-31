@@ -90,7 +90,7 @@ class PingView(View):
         view_defn["measures"] = self.get_measures(dimensions, table, v1_name)
 
         [project, dataset, table_id] = table.split(".")
-        table_schema = dryrun(
+        table_schema = dryrun.init(
             project=project,
             dataset=dataset,
             table=table_id,

@@ -1,6 +1,5 @@
 """Utils for generating lookml."""
 
-import os
 import re
 import tarfile
 import urllib.request
@@ -13,7 +12,7 @@ import click
 import yaml
 from jinja2 import Environment, FileSystemLoader
 
-PATH = Path(os.path.dirname(__file__)).parent
+GENERATOR_PATH = Path(__file__).parent.parent
 
 BIGQUERY_TYPE_TO_DIMENSION_TYPE = {
     "BIGNUMERIC": "string",
@@ -123,7 +122,7 @@ def _generate_dimensions(table: str, dryrun) -> List[Dict[str, Any]]:
     """
     dimensions = {}
     [project, dataset, table] = table.split(".")
-    table_schema = dryrun(
+    table_schema = dryrun.init(
         project=project,
         dataset=dataset,
         table=table,
@@ -155,7 +154,7 @@ def _generate_dimensions(table: str, dryrun) -> List[Dict[str, Any]]:
 
 def _generate_dimensions_from_query(query: str, dryrun) -> List[Dict[str, Any]]:
     """Generate dimensions and dimension groups from a SQL query."""
-    schema = dryrun(sql=query).get_schema()
+    schema = dryrun.init(sql=query).get_schema()
     dimensions = {}
     for dimension in _generate_dimensions_helper(schema or []):
         name_key = dimension["name"]
@@ -239,7 +238,9 @@ def _is_nested_dimension(dimension: dict):
 
 def render_template(filename, template_folder, **kwargs) -> str:
     """Render a given template using Jinja."""
-    env = Environment(loader=FileSystemLoader(PATH / f"{template_folder}/templates"))
+    env = Environment(
+        loader=FileSystemLoader(GENERATOR_PATH / f"{template_folder}/templates")
+    )
     template = env.get_template(filename)
     rendered = template.render(**kwargs)
     return rendered

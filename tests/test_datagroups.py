@@ -1,4 +1,3 @@
-import functools
 from dataclasses import dataclass
 from pathlib import Path
 from unittest.mock import patch
@@ -9,6 +8,8 @@ from google.cloud import bigquery
 
 from generator.views import EventsView, TableView
 from generator.views.datagroups import FILE_HEADER, generate_datagroup
+
+from .utils import MockDryRun, MockDryRunContext
 
 
 @pytest.fixture
@@ -24,26 +25,8 @@ class MockTable(bigquery.Table):
     table_type: str
 
 
-class MockDryRun:
+class MockDryRunDatagroups(MockDryRun):
     """Mock dryrun.DryRun."""
-
-    def __init__(
-        self,
-        client,
-        use_cloud_function,
-        id_token,
-        sql=None,
-        project=None,
-        dataset=None,
-        table=None,
-    ):
-        self.sql = sql
-        self.project = project
-        self.dataset = dataset
-        self.table = table
-        self.client = client
-        self.use_cloud_function = use_cloud_function
-        self.id_token = id_token
 
     def get_table_metadata(self):
         """Mock dryrun.DryRun.get_table_metadata"""
@@ -114,7 +97,7 @@ def test_generates_datagroups(reference_map_mock, runner):
         ),
     ]
 
-    mock_dryrun = functools.partial(MockDryRun, None, False, None)
+    mock_dryrun = MockDryRunContext(MockDryRunDatagroups, False)
 
     with runner.isolated_filesystem():
         namespace_dir = Path("looker-hub/test_namespace")
@@ -204,7 +187,7 @@ def test_generates_datagroups_with_tables_and_views(runner):
         ),
     ]
 
-    mock_dryrun = functools.partial(MockDryRun, None, False, None)
+    mock_dryrun = MockDryRunContext(MockDryRunDatagroups, False)
 
     with runner.isolated_filesystem():
         namespace_dir = Path("looker-hub/test_namespace")
@@ -252,7 +235,7 @@ def test_skips_non_table_views(runner):
         ),
     ]
 
-    mock_dryrun = functools.partial(MockDryRun, None, False, None)
+    mock_dryrun = MockDryRunContext(MockDryRunDatagroups, False)
 
     with runner.isolated_filesystem():
         Path("looker-hub/test_namespace").mkdir(parents=True)
@@ -310,7 +293,7 @@ def test_only_generates_one_datagroup_for_references_to_same_table(
         ),
     ]
 
-    mock_dryrun = functools.partial(MockDryRun, None, False, None)
+    mock_dryrun = MockDryRunContext(MockDryRunDatagroups, False)
 
     with runner.isolated_filesystem():
         reference_map_mock.return_value = {

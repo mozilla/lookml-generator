@@ -75,3 +75,61 @@ def print_and_test(expected, result=None, actual=None):
     print("\n".join([" - ".join(v) for v in get_differences(expected, result)]))
 
     assert result == expected
+
+
+class MockDryRunContext:
+    """Mock DryRunContext."""
+
+    def __init__(
+        self,
+        cls,
+        use_cloud_function=False,
+        id_token=None,
+        credentials=None,
+    ):
+        """Initialize dry run instance."""
+        self.use_cloud_function = use_cloud_function
+        self.id_token = id_token
+        self.credentials = credentials
+        self.cls = cls
+
+    def init(
+        self,
+        sql=None,
+        project="moz-fx-data-shared-prod",
+        dataset=None,
+        table=None,
+    ):
+        """Initialize passed MockDryRun instance."""
+        return self.cls(
+            use_cloud_function=self.use_cloud_function,
+            id_token=self.id_token,
+            credentials=self.credentials,
+            sql=sql,
+            project=project,
+            dataset=dataset,
+            table=table,
+        )
+
+
+class MockDryRun:
+    """Mock dryrun.DryRun."""
+
+    def __init__(
+        self,
+        use_cloud_function,
+        id_token,
+        credentials,
+        sql=None,
+        project=None,
+        dataset=None,
+        table=None,
+    ):
+        """Create MockDryRun instance."""
+        self.sql = sql
+        self.project = project
+        self.dataset = dataset
+        self.table = table
+        self.use_cloud_function = use_cloud_function
+        self.credentials = credentials
+        self.id_token = id_token

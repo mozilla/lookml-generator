@@ -1,4 +1,3 @@
-import functools
 from textwrap import dedent
 
 import lkml
@@ -8,29 +7,11 @@ from generator.dashboards import OperationalMonitoringDashboard
 from generator.explores import OperationalMonitoringExplore
 from generator.views import OperationalMonitoringView
 
-from .utils import print_and_test
+from .utils import MockDryRun, MockDryRunContext, print_and_test
 
 
-class MockDryRun:
+class MockDryRunOpmon(MockDryRun):
     """Mock dryrun.DryRun."""
-
-    def __init__(
-        self,
-        client,
-        use_cloud_function,
-        id_token,
-        sql=None,
-        project=None,
-        dataset=None,
-        table=None,
-    ):
-        self.sql = sql
-        self.project = project
-        self.dataset = dataset
-        self.table = table
-        self.use_cloud_function = use_cloud_function
-        self.client = client
-        self.id_token = id_token
 
     def get_table_schema(self):
         """Mock dryrun.DryRun.get_table_schema"""
@@ -75,7 +56,7 @@ def operational_monitoring_view():
 
 @pytest.fixture()
 def operational_monitoring_explore(tmp_path, operational_monitoring_view):
-    mock_dryrun = functools.partial(MockDryRun, None, False, None)
+    mock_dryrun = MockDryRunContext(MockDryRunOpmon, False)
     (tmp_path / "fission.view.lkml").write_text(
         lkml.dump(operational_monitoring_view.to_lookml(None, dryrun=mock_dryrun))
     )
@@ -206,7 +187,7 @@ def test_view_lookml(operational_monitoring_view):
             }
         ]
     }
-    mock_dryrun = functools.partial(MockDryRun, None, False, None)
+    mock_dryrun = MockDryRunContext(MockDryRunOpmon, False)
     actual = operational_monitoring_view.to_lookml(None, dryrun=mock_dryrun)
     print_and_test(expected=expected, actual=actual)
 

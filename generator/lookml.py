@@ -1,6 +1,5 @@
 """Generate lookml from namespaces."""
 
-import functools
 import logging
 from functools import partial
 from multiprocessing.pool import Pool
@@ -11,11 +10,10 @@ import click
 import lkml
 import yaml
 
-from generator.dryrun import DryRun
 from generator.utils import get_file_from_looker_hub
 
 from .dashboards import DASHBOARD_TYPES
-from .dryrun import DryRunError, Errors, id_token
+from .dryrun import DryRunContext, DryRunError, Errors, credentials, id_token
 from .explores import EXPLORE_TYPES
 from .metrics_utils import LOOKER_METRIC_HUB_REPO, METRIC_HUB_REPO, MetricsConfigLoader
 from .namespaces import _get_glean_apps
@@ -57,9 +55,10 @@ def _generate_view(
             )
             try:
                 get_file_from_looker_hub(path)
+                return path
             except Exception as ex:
                 print(f"Skip generating view for {path}: {ex}")
-            return path
+                return None
         else:
             raise
 
@@ -98,11 +97,11 @@ def _generate_dashboard(
     dash_dir: Path,
     namespace: str,
     dashboard_name: str,
-    dashboard: Any,
+    dashboard_info: Any,
 ):
     logging.info(f"Generating lookml for dashboard {dashboard_name} in {namespace}")
-    dashboard = DASHBOARD_TYPES[dashboard["type"]].from_dict(
-        namespace, dashboard_name, dashboard
+    dashboard = DASHBOARD_TYPES[dashboard_info["type"]].from_dict(
+        namespace, dashboard_name, dashboard_info
     )
 
     dashboard_lookml = dashboard.to_lookml()
@@ -122,24 +121,27 @@ def _glean_apps_to_v1_map(glean_apps):
     return {d["name"]: d["v1_name"] for d in glean_apps}
 
 
-def _run_generation(metric_hub_repos, func):
+def _run_generation(func):
     """
     Run the partially applied generate function.
 
     For parallel execution.
     """
-    # metric hub repos need to be updated for each process
-    MetricsConfigLoader.update_repos(metric_hub_repos)
     return func()
+
+
+def _update_metric_repos(metric_hub_repos):
+    """Update metric hub repos when initializing the processes."""
+    MetricsConfigLoader.update_repos(metric_hub_repos)
 
 
 def _lookml(
     namespaces,
     glean_apps,
     target_dir,
+    dryrun,
     namespace_filter=[],
     parallelism: int = 8,
-    dryrun=None,
     metric_hub_repos=[],
 ):
     namespaces_content = namespaces.read()
@@ -152,12 +154,12 @@ def _lookml(
     with open(target / "namespaces.yaml", "w") as target_namespaces_file:
         target_namespaces_file.write(namespaces_content)
 
-    run_generation = partial(_run_generation, metric_hub_repos)
-
     generate_views = []
     generate_datagroups = []
+    generate_explores = []
+    generate_dashboards = []
     v1_mapping = _glean_apps_to_v1_map(glean_apps)
-    logging.info("  Generating views and datagroups")
+
     for namespace, lookml_objects in _namespaces.items():
         if len(namespace_filter) == 0 or namespace in namespace_filter:
             view_dir = target / namespace / "views"
@@ -187,20 +189,9 @@ def _lookml(
                     )
                 )
 
-    with Pool(parallelism) as pool:
-        pool.map(
-            run_generation,
-            generate_views + generate_datagroups,
-        )
-
-    generate_explores = []
-    for namespace, lookml_objects in _namespaces.items():
-        if len(namespace_filter) == 0 or namespace in namespace_filter:
-            view_dir = target / namespace / "views"
             explore_dir = target / namespace / "explores"
             explore_dir.mkdir(parents=True, exist_ok=True)
             explores = lookml_objects.get("explores", {})
-            v1_name = v1_mapping.get(namespace)
             generate_explores += [
                 partial(
                     _generate_explore,
@@ -214,17 +205,6 @@ def _lookml(
                 for explore_name, explore in explores.items()
             ]
 
-    logging.info("  Generating explores")
-    with Pool(parallelism) as pool:
-        pool.map(
-            run_generation,
-            generate_explores,
-        )
-
-    logging.info("  Generating dashboards")
-    generate_dashboards = []
-    for namespace, lookml_objects in _namespaces.items():
-        if len(namespace_filter) == 0 or namespace in namespace_filter:
             dashboard_dir = target / namespace / "dashboards"
             dashboard_dir.mkdir(parents=True, exist_ok=True)
             dashboards = lookml_objects.get("dashboards", {})
@@ -239,11 +219,37 @@ def _lookml(
                 for dashboard_name, dashboard in dashboards.items()
             ]
 
-    with Pool(parallelism) as pool:
-        pool.map(
-            run_generation,
-            generate_dashboards,
-        )
+    if parallelism == 1:
+        # run without using multiprocessing
+        # this is needed for the unit tests to work as mocks are not shared across processes
+        logging.info("  Generating views")
+        for generate_view_func in generate_views:
+            generate_view_func()
+        logging.info("  Generating datagroups")
+        for generate_datagroup_func in generate_datagroups:
+            generate_datagroup_func()
+        logging.info("  Generating explores")
+        for generate_explore_func in generate_explores:
+            generate_explore_func()
+        logging.info("  Generating dashboards")
+        for generate_dashboard_func in generate_dashboards:
+            generate_dashboard_func()
+    else:
+        with Pool(
+            parallelism, initializer=partial(_update_metric_repos, metric_hub_repos)
+        ) as pool:
+            logging.info("  Generating views and datagroups")
+            pool.map(_run_generation, generate_views + generate_datagroups)
+            logging.info("  Generating explores")
+            pool.map(
+                _run_generation,
+                generate_explores,
+            )
+            logging.info("  Generating dashboards")
+            pool.map(
+                _run_generation,
+                generate_dashboards,
+            )
 
 
 @click.command(help=__doc__)
@@ -305,17 +311,24 @@ def lookml(
     glean_apps = _get_glean_apps(app_listings_uri)
 
     dry_run_id_token = None
+    creds = None
     if use_cloud_function:
         dry_run_id_token = id_token()
+    else:
+        creds = credentials()
 
-    dryrun = functools.partial(DryRun, use_cloud_function, dry_run_id_token)
+    dryrun = DryRunContext(
+        use_cloud_function=use_cloud_function,
+        id_token=dry_run_id_token,
+        credentials=creds,
+    )
 
     return _lookml(
         namespaces,
         glean_apps,
         target_dir,
+        dryrun,
         only,
         parallelism,
-        dryrun,
         metric_hub_repos,
     )
