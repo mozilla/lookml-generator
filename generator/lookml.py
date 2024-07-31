@@ -15,7 +15,7 @@ from generator.dryrun import DryRun
 from generator.utils import get_file_from_looker_hub
 
 from .dashboards import DASHBOARD_TYPES
-from .dryrun import DryRunError, Errors, credentials, id_token
+from .dryrun import DryRunError, Errors, credentials, id_token, DryRunContext
 from .explores import EXPLORE_TYPES
 from .metrics_utils import LOOKER_METRIC_HUB_REPO, METRIC_HUB_REPO, MetricsConfigLoader
 from .namespaces import _get_glean_apps
@@ -319,7 +319,11 @@ def lookml(
     else:
         creds = credentials()
 
-    dryrun = functools.partial(DryRun, use_cloud_function, dry_run_id_token, creds)
+    dryrun = DryRunContext(
+        use_cloud_function=use_cloud_function,
+        id_token=dry_run_id_token,
+        credentials=creds,
+    )
 
     return _lookml(
         namespaces,

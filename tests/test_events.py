@@ -1,34 +1,14 @@
-import functools
-
 import lkml
 import pytest
 
 from generator.explores import EventsExplore
 from generator.views import EventsView
 
-from .utils import print_and_test
+from .utils import MockDryRun, MockDryRunContext, print_and_test
 
 
-class MockDryRun:
+class MockDryRunEvents(MockDryRun):
     """Mock dryrun.DryRun."""
-
-    def __init__(
-        self,
-        client,
-        use_cloud_function,
-        id_token,
-        sql=None,
-        project=None,
-        dataset=None,
-        table=None,
-    ):
-        self.sql = sql
-        self.project = project
-        self.dataset = dataset
-        self.table = table
-        self.use_cloud_function = use_cloud_function
-        self.client = client
-        self.id_token = id_token
 
     def get_table_schema(self):
         """Mock dryrun.DryRun.get_table_schema"""
@@ -205,7 +185,7 @@ def test_view_lookml(events_view):
         ],
     }
 
-    mock_dryrun = functools.partial(MockDryRun, None, False, None)
+    mock_dryrun = MockDryRunContext(MockDryRunEvents, False)
 
     actual = events_view.to_lookml(None, dryrun=mock_dryrun)
     print_and_test(expected=expected, actual=actual)

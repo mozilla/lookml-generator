@@ -106,7 +106,7 @@ def _get_datagroup_from_bigquery_view(
 
     source_table_id = ".".join(view_references[0])
     try:
-        table_metadata = dryrun(
+        table_metadata = dryrun.init(
             project=view_references[0][0],
             dataset=view_references[0][1],
             table=view_references[0][2],
@@ -152,7 +152,7 @@ def _generate_view_datagroup(
     )["table"]
 
     [project, dataset, table] = view_table.split(".")
-    table_metadata = dryrun(
+    table_metadata = dryrun.init(
         project=project,
         dataset=dataset,
         table=table,

@@ -122,7 +122,7 @@ def _generate_dimensions(table: str, dryrun) -> List[Dict[str, Any]]:
     """
     dimensions = {}
     [project, dataset, table] = table.split(".")
-    table_schema = dryrun(
+    table_schema = dryrun.init(
         project=project,
         dataset=dataset,
         table=table,
@@ -154,7 +154,7 @@ def _generate_dimensions(table: str, dryrun) -> List[Dict[str, Any]]:
 
 def _generate_dimensions_from_query(query: str, dryrun) -> List[Dict[str, Any]]:
     """Generate dimensions and dimension groups from a SQL query."""
-    schema = dryrun(sql=query).get_schema()
+    schema = dryrun.init(sql=query).get_schema()
     dimensions = {}
     for dimension in _generate_dimensions_helper(schema or []):
         name_key = dimension["name"]

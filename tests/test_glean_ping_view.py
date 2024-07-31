@@ -1,31 +1,14 @@
-import functools
 from unittest.mock import Mock, patch
 
 from mozilla_schema_generator.probes import GleanProbe
 
 from generator.views import GleanPingView
 
+from .utils import MockDryRun, MockDryRunContext
 
-class MockDryRun:
+
+class MockDryRunPingView(MockDryRun):
     """Mock dryrun.DryRun."""
-
-    def __init__(
-        self,
-        client,
-        use_cloud_function,
-        id_token,
-        sql=None,
-        project=None,
-        dataset=None,
-        table=None,
-    ):
-        self.sql = sql
-        self.project = project
-        self.dataset = dataset
-        self.table = table
-        self.use_cloud_function = use_cloud_function
-        self.client = client
-        self.id_token = id_token
 
     def get_table_schema(self):
         """Mock dryrun.DryRun.get_table_schema"""
@@ -101,7 +84,7 @@ def test_kebab_case(mock_glean_ping):
             },
         ),
     ]
-    mock_dryrun = functools.partial(MockDryRun, None, False, None)
+    mock_dryrun = MockDryRunContext(MockDryRunPingView, False)
     mock_glean_ping.return_value = glean_app
     view = GleanPingView(
         "glean_app",
@@ -122,7 +105,7 @@ def test_url_metric(mock_glean_ping):
     """
     Tests that we handle URL metrics
     """
-    mock_dryrun = functools.partial(MockDryRun, None, False, None)
+    mock_dryrun = MockDryRunContext(MockDryRunPingView, False)
     mock_glean_ping.get_repos.return_value = [{"name": "glean-app"}]
     glean_app = Mock()
     glean_app.get_probes.return_value = [
@@ -164,7 +147,7 @@ def test_datetime_metric(mock_glean_ping):
     """
     mock_glean_ping.get_repos.return_value = [{"name": "glean-app"}]
     glean_app = Mock()
-    mock_dryrun = functools.partial(MockDryRun, None, False, None)
+    mock_dryrun = MockDryRunContext(MockDryRunPingView, False)
     glean_app.get_probes.return_value = [
         GleanProbe(
             "fun.datetime_metric",
@@ -230,7 +213,7 @@ def test_undeployed_probe(mock_glean_ping):
         for name in ["counter_metric", "counter_metric2"]
     ]
     mock_glean_ping.return_value = glean_app
-    mock_dryrun = functools.partial(MockDryRun, None, False, None)
+    mock_dryrun = MockDryRunContext(MockDryRunPingView, False)
     view = GleanPingView(
         "glean_app",
         "dash_name",

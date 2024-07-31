@@ -75,6 +75,42 @@ class Errors(Enum):
     PERMISSION_DENIED = 4
 
 
+class DryRunContext:
+    """DryRun builder class."""
+
+    def __init__(
+        self,
+        use_cloud_function=False,
+        id_token=None,
+        credentials=None,
+        dry_run_url=DRY_RUN_URL,
+    ):
+        """Initialize dry run instance."""
+        self.use_cloud_function = use_cloud_function
+        self.dry_run_url = dry_run_url
+        self.id_token = id_token
+        self.credentials = credentials
+
+    def init(
+        self,
+        sql=None,
+        project="moz-fx-data-shared-prod",
+        dataset=None,
+        table=None,
+    ):
+        """Initialize a DryRun instance."""
+        return DryRun(
+            use_cloud_function=self.use_cloud_function,
+            id_token=self.id_token,
+            credentials=self.credentials,
+            sql=sql,
+            project=project,
+            dataset=dataset,
+            table=table,
+            dry_run_url=self.dry_run_url,
+        )
+
+
 class DryRun:
     """Dry run SQL."""
 
