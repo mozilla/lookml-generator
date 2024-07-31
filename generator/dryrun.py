@@ -16,6 +16,16 @@ DRY_RUN_URL = (
 )
 
 
+def credentials():
+    """Get GCP credentials."""
+    auth_req = GoogleAuthRequest()
+    creds, _ = google.auth.default(
+        scopes=["https://www.googleapis.com/auth/cloud-platform"]
+    )
+    creds.refresh(auth_req)
+    return creds
+
+
 def id_token():
     """Get token to authenticate against Cloud Function."""
     auth_req = GoogleAuthRequest()
@@ -23,6 +33,7 @@ def id_token():
         scopes=["https://www.googleapis.com/auth/cloud-platform"]
     )
     creds.refresh(auth_req)
+
     if hasattr(creds, "id_token"):
         # Get token from default credentials for the current environment created via Cloud SDK run
         id_token = creds.id_token
@@ -38,10 +49,21 @@ class DryRunError(Exception):
 
     def __init__(self, message, error, use_cloud_function, table_id):
         """Initialize DryRunError."""
-        super(DryRunError, self).__init__(message, error, use_cloud_function, table_id)
+        super().__init__(message)
         self.error = error
         self.use_cloud_function = use_cloud_function
         self.table_id = table_id
+
+    def __reduce__(self):
+        """
+        Override to ensure that all parameters are being passed when pickling.
+
+        Pickling happens when passing exception between processes (e.g. via multiprocessing)
+        """
+        return (
+            self.__class__,
+            self.args + (self.error, self.use_cloud_function, self.table_id),
+        )
 
 
 class Errors(Enum):
@@ -60,6 +82,7 @@ class DryRun:
         self,
         use_cloud_function=False,
         id_token=None,
+        credentials=None,
         sql=None,
         project="moz-fx-data-shared-prod",
         dataset=None,
@@ -74,11 +97,12 @@ class DryRun:
         self.table = table
         self.dry_run_url = dry_run_url
         self.id_token = id_token
+        self.credentials = credentials
 
     @cached_property
     def client(self):
         """Get BigQuery client instance."""
-        return bigquery.Client()
+        return bigquery.Client(credentials=self.credentials)
 
     @cached_property
     def dry_run_result(self):

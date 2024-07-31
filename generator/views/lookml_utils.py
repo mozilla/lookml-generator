@@ -1,6 +1,5 @@
 """Utils for generating lookml."""
 
-import os
 import re
 import tarfile
 import urllib.request
@@ -13,7 +12,7 @@ import click
 import yaml
 from jinja2 import Environment, FileSystemLoader
 
-PATH = Path(os.path.dirname(__file__)).parent
+GENERATOR_PATH = Path(__file__).parent.parent
 
 BIGQUERY_TYPE_TO_DIMENSION_TYPE = {
     "BIGNUMERIC": "string",
@@ -239,7 +238,9 @@ def _is_nested_dimension(dimension: dict):
 
 def render_template(filename, template_folder, **kwargs) -> str:
     """Render a given template using Jinja."""
-    env = Environment(loader=FileSystemLoader(PATH / f"{template_folder}/templates"))
+    env = Environment(
+        loader=FileSystemLoader(GENERATOR_PATH / f"{template_folder}/templates")
+    )
     template = env.get_template(filename)
     rendered = template.render(**kwargs)
     return rendered
