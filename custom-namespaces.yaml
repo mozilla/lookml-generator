@@ -595,6 +595,10 @@ firefox_accounts:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.accounts_frontend_derived.reg_engagement_funnel_v1
+    login_engagement_funnels_by_service:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.accounts_frontend_derived.login_engagement_funnel_v1
   explores:
     all_event_counts:
       type: events_explore
@@ -672,6 +676,10 @@ firefox_accounts:
       type: table_explore
       views:
         base_view: registration_engagement_funnels_by_service
+    login_engagement_funnels_by_service:
+      type: table_explore
+      views:
+        base_view: login_engagement_funnels_by_service
 revenue:
   glean_app: false
   connection: bigquery-oauth
