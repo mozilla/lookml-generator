@@ -1350,7 +1350,7 @@ websites:
     ga4_www_site_downloads:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.ga.www_site_downloads
+        - table: moz-fx-data-marketing-prod.mozilla_org.www_site_downloads
     ga4_sessions:
       type: table_view
       tables:
