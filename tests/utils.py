@@ -93,7 +93,7 @@ class MockDryRunContext:
         self.credentials = credentials
         self.cls = cls
 
-    def init(
+    def create(
         self,
         sql=None,
         project="moz-fx-data-shared-prod",

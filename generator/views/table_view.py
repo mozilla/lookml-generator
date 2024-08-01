@@ -104,7 +104,7 @@ class TableView(View):
                 )
 
         [project, dataset, table_id] = table.split(".")
-        table_schema = dryrun.init(
+        table_schema = dryrun.create(
             project=project,
             dataset=dataset,
             table=table_id,

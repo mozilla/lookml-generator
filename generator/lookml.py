@@ -67,15 +67,15 @@ def _generate_explore(
     out_dir: Path,
     namespace: str,
     explore_name: str,
-    explore: Any,
+    explore_info: Any,
     views_dir: Path,
     v1_name: Optional[
         str
     ],  # v1_name for Glean explores: see: https://mozilla.github.io/probe-scraper/#tag/library
 ) -> Path:
     logging.info(f"Generating lookml for explore {explore_name} in {namespace}")
-    explore_by_type = EXPLORE_TYPES[explore["type"]].from_dict(
-        explore_name, explore, views_dir
+    explore_by_type = EXPLORE_TYPES[explore_info["type"]].from_dict(
+        explore_name, explore_info, views_dir
     )
     file_lookml = {
         # Looker validates all included files,
@@ -294,7 +294,7 @@ def _lookml(
     "-p",
     default=8,
     type=int,
-    help="Number of threads to use for lookml generation",
+    help="Number of processes to use for LookML generation",
 )
 def lookml(
     namespaces,

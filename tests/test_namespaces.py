@@ -248,7 +248,7 @@ def test_namespaces_full(
 ):
     with patch("google.cloud.bigquery.Client", MockClient):
         with runner.isolated_filesystem():
-            r = Repo.init(tmp_path)
+            r = Repo.create(tmp_path)
             r.config_writer().set_value("user", "name", "test").release()
             r.config_writer().set_value("user", "email", "test@example.com").release()
             shutil.copytree(TEST_DIR / "data", tmp_path, dirs_exist_ok=True)

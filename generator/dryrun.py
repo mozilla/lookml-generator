@@ -16,9 +16,9 @@ DRY_RUN_URL = (
 )
 
 
-def credentials():
+def credentials(auth_req: Optional[GoogleAuthRequest] = None):
     """Get GCP credentials."""
-    auth_req = GoogleAuthRequest()
+    auth_req = auth_req or GoogleAuthRequest()
     creds, _ = google.auth.default(
         scopes=["https://www.googleapis.com/auth/cloud-platform"]
     )
@@ -29,10 +29,7 @@ def credentials():
 def id_token():
     """Get token to authenticate against Cloud Function."""
     auth_req = GoogleAuthRequest()
-    creds, _ = google.auth.default(
-        scopes=["https://www.googleapis.com/auth/cloud-platform"]
-    )
-    creds.refresh(auth_req)
+    creds = credentials(auth_req)
 
     if hasattr(creds, "id_token"):
         # Get token from default credentials for the current environment created via Cloud SDK run
@@ -91,7 +88,7 @@ class DryRunContext:
         self.id_token = id_token
         self.credentials = credentials
 
-    def init(
+    def create(
         self,
         sql=None,
         project="moz-fx-data-shared-prod",
