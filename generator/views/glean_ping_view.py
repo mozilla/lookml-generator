@@ -207,7 +207,7 @@ class GleanPingView(PingView):
         )
 
         [project, dataset, table] = table.split(".")
-        table_schema = dryrun(
+        table_schema = dryrun.create(
             project=project,
             dataset=dataset,
             table=table,

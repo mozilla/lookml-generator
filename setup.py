@@ -28,6 +28,7 @@ setup(
         ]
     },
     include_package_data=True,
+    package_data={"generator": ["*/templates/*.lkml"]},
     zip_safe=False,
     keywords="lookml-generator",
     classifiers=[

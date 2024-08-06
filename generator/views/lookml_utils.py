@@ -5,11 +5,14 @@ import tarfile
 import urllib.request
 from collections import defaultdict
 from io import BytesIO
+from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 import click
 import yaml
-from jinja2 import Environment, PackageLoader
+from jinja2 import Environment, FileSystemLoader
+
+GENERATOR_PATH = Path(__file__).parent.parent
 
 BIGQUERY_TYPE_TO_DIMENSION_TYPE = {
     "BIGNUMERIC": "string",
@@ -119,7 +122,7 @@ def _generate_dimensions(table: str, dryrun) -> List[Dict[str, Any]]:
     """
     dimensions = {}
     [project, dataset, table] = table.split(".")
-    table_schema = dryrun(
+    table_schema = dryrun.create(
         project=project,
         dataset=dataset,
         table=table,
@@ -151,7 +154,7 @@ def _generate_dimensions(table: str, dryrun) -> List[Dict[str, Any]]:
 
 def _generate_dimensions_from_query(query: str, dryrun) -> List[Dict[str, Any]]:
     """Generate dimensions and dimension groups from a SQL query."""
-    schema = dryrun(sql=query).get_schema()
+    schema = dryrun.create(sql=query).get_schema()
     dimensions = {}
     for dimension in _generate_dimensions_helper(schema or []):
         name_key = dimension["name"]
@@ -235,7 +238,9 @@ def _is_nested_dimension(dimension: dict):
 
 def render_template(filename, template_folder, **kwargs) -> str:
     """Render a given template using Jinja."""
-    env = Environment(loader=PackageLoader("generator", f"{template_folder}/templates"))
+    env = Environment(
+        loader=FileSystemLoader(GENERATOR_PATH / f"{template_folder}/templates")
+    )
     template = env.get_template(filename)
     rendered = template.render(**kwargs)
     return rendered

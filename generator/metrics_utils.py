@@ -13,7 +13,7 @@ class _MetricsConfigLoader:
     """Loads metric config files from an external repository."""
 
     config_collection: Optional[ConfigCollection] = None
-    repos: List[str] = [METRIC_HUB_REPO]
+    repos: List[str] = [METRIC_HUB_REPO, LOOKER_METRIC_HUB_REPO]
 
     @property
     def configs(self) -> ConfigCollection:
@@ -29,7 +29,7 @@ class _MetricsConfigLoader:
     def update_repos(self, repos: List[str]):
         """Change the repos to load configs from."""
         self.repos = repos
-        self.config_collection = ConfigCollection.from_github_repos(repos)
+        self.config_collection = None
 
     def metrics_of_data_source(
         self, data_source: str, namespace: str

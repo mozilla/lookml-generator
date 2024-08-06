@@ -140,7 +140,6 @@ class MockClient:
     def query(self, query):
         class QueryJob:
             def result(self):
-                print(query)
                 if "os AS option" in query:
                     return [
                         {

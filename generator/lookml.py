@@ -1,24 +1,24 @@
 """Generate lookml from namespaces."""
 
-import functools
 import logging
+from functools import partial
+from multiprocessing.pool import Pool
 from pathlib import Path
-from typing import Dict, Iterable, Optional
+from typing import Any, Dict, Iterable, Optional
 
 import click
 import lkml
 import yaml
-from google.cloud import bigquery
 
 from generator.utils import get_file_from_looker_hub
 
 from .dashboards import DASHBOARD_TYPES
-from .dryrun import DryRun, DryRunError, Errors, id_token
+from .dryrun import DryRunContext, DryRunError, Errors, credentials, id_token
 from .explores import EXPLORE_TYPES
 from .metrics_utils import LOOKER_METRIC_HUB_REPO, METRIC_HUB_REPO, MetricsConfigLoader
 from .namespaces import _get_glean_apps
 from .views import VIEW_TYPES, View, ViewDict
-from .views.datagroups import generate_datagroups
+from .views.datagroups import generate_datagroup
 
 FILE_HEADER = """
 # *Do not manually modify this file*
@@ -29,82 +29,85 @@ FILE_HEADER = """
 """
 
 
-def _generate_views(
+def _generate_view(
     out_dir: Path,
-    views: Iterable[View],
+    view: View,
     v1_name: Optional[str],
     dryrun,
-) -> Iterable[Path]:
-    for view in views:
-        logging.info(
-            f"Generating lookml for view {view.name} in {view.namespace} of type {view.view_type}"
-        )
-        path = out_dir / f"{view.name}.view.lkml"
-        try:
-            lookml = view.to_lookml(v1_name, dryrun)
-            if lookml == {}:
-                continue
+) -> Optional[Path]:
+    logging.info(
+        f"Generating lookml for view {view.name} in {view.namespace} of type {view.view_type}"
+    )
+    path = out_dir / f"{view.name}.view.lkml"
 
-            # lkml.dump may return None, in which case write an empty file
-            path.write_text(FILE_HEADER + (lkml.dump(lookml) or ""))
-            yield path
-        except DryRunError as e:
-            if e.error == Errors.PERMISSION_DENIED and e.use_cloud_function:
-                print(
-                    f"Permission error dry running {view.name}. Copy existing {path} file from looker-hub."
-                )
-                try:
-                    get_file_from_looker_hub(path)
-                    yield path
-                except Exception as ex:
-                    print(f"Skip generating view for {path}: {ex}")
-            else:
-                raise
+    try:
+        lookml = view.to_lookml(v1_name, dryrun)
+        if lookml == {}:
+            return None
+
+        # lkml.dump may return None, in which case write an empty file
+        path.write_text(FILE_HEADER + (lkml.dump(lookml) or ""))
+        return path
+    except DryRunError as e:
+        if e.error == Errors.PERMISSION_DENIED and e.use_cloud_function:
+            print(
+                f"Permission error dry running {view.name}. Copy existing {path} file from looker-hub."
+            )
+            try:
+                get_file_from_looker_hub(path)
+                return path
+            except Exception as ex:
+                print(f"Skip generating view for {path}: {ex}")
+                return None
+        else:
+            raise
 
 
-def _generate_explores(
+def _generate_explore(
     out_dir: Path,
     namespace: str,
-    explores: dict,
+    explore_name: str,
+    explore_info: Any,
     views_dir: Path,
     v1_name: Optional[
         str
     ],  # v1_name for Glean explores: see: https://mozilla.github.io/probe-scraper/#tag/library
-) -> Iterable[Path]:
-    for explore_name, defn in explores.items():
-        logging.info(f"Generating lookml for explore {explore_name} in {namespace}")
-        explore = EXPLORE_TYPES[defn["type"]].from_dict(explore_name, defn, views_dir)
-        file_lookml = {
-            # Looker validates all included files,
-            # so if we're not explicit about files here, validation takes
-            # forever as looker re-validates all views for every explore (if we used *).
-            "includes": [
-                f"/looker-hub/{namespace}/views/{view}.view.lkml"
-                for view in explore.get_dependent_views()
-            ],
-            "explores": explore.to_lookml(v1_name),
-        }
-        path = out_dir / (explore_name + ".explore.lkml")
-        # lkml.dump may return None, in which case write an empty file
-        path.write_text(FILE_HEADER + (lkml.dump(file_lookml) or ""))
-        yield path
+) -> Path:
+    logging.info(f"Generating lookml for explore {explore_name} in {namespace}")
+    explore_by_type = EXPLORE_TYPES[explore_info["type"]].from_dict(
+        explore_name, explore_info, views_dir
+    )
+    file_lookml = {
+        # Looker validates all included files,
+        # so if we're not explicit about files here, validation takes
+        # forever as looker re-validates all views for every explore (if we used *).
+        "includes": [
+            f"/looker-hub/{namespace}/views/{view}.view.lkml"
+            for view in explore_by_type.get_dependent_views()
+        ],
+        "explores": explore_by_type.to_lookml(v1_name),
+    }
+    path = out_dir / (explore_name + ".explore.lkml")
+    # lkml.dump may return None, in which case write an empty file
+    path.write_text(FILE_HEADER + (lkml.dump(file_lookml) or ""))
+    return path
 
 
-def _generate_dashboards(
+def _generate_dashboard(
     dash_dir: Path,
     namespace: str,
-    dashboards: dict,
+    dashboard_name: str,
+    dashboard_info: Any,
 ):
-    for dashboard_name, dashboard_info in dashboards.items():
-        logging.info(f"Generating lookml for dashboard {dashboard_name} in {namespace}")
-        dashboard = DASHBOARD_TYPES[dashboard_info["type"]].from_dict(
-            namespace, dashboard_name, dashboard_info
-        )
+    logging.info(f"Generating lookml for dashboard {dashboard_name} in {namespace}")
+    dashboard = DASHBOARD_TYPES[dashboard_info["type"]].from_dict(
+        namespace, dashboard_name, dashboard_info
+    )
 
-        dashboard_lookml = dashboard.to_lookml()
-        dash_path = dash_dir / f"{dashboard_name}.dashboard.lookml"
-        dash_path.write_text(FILE_HEADER + dashboard_lookml)
-        yield dash_path
+    dashboard_lookml = dashboard.to_lookml()
+    dash_path = dash_dir / f"{dashboard_name}.dashboard.lookml"
+    dash_path.write_text(FILE_HEADER + dashboard_lookml)
+    return dash_path
 
 
 def _get_views_from_dict(views: Dict[str, ViewDict], namespace: str) -> Iterable[View]:
@@ -118,7 +121,29 @@ def _glean_apps_to_v1_map(glean_apps):
     return {d["name"]: d["v1_name"] for d in glean_apps}
 
 
-def _lookml(namespaces, glean_apps, target_dir, dryrun, namespace_filter=[]):
+def _run_generation(func):
+    """
+    Run the partially applied generate function.
+
+    For parallel execution.
+    """
+    return func()
+
+
+def _update_metric_repos(metric_hub_repos):
+    """Update metric hub repos when initializing the processes."""
+    MetricsConfigLoader.update_repos(metric_hub_repos)
+
+
+def _lookml(
+    namespaces,
+    glean_apps,
+    target_dir,
+    dryrun,
+    namespace_filter=[],
+    parallelism: int = 8,
+    metric_hub_repos=[],
+):
     namespaces_content = namespaces.read()
     _namespaces = yaml.safe_load(namespaces_content)
     target = Path(target_dir)
@@ -129,42 +154,102 @@ def _lookml(namespaces, glean_apps, target_dir, dryrun, namespace_filter=[]):
     with open(target / "namespaces.yaml", "w") as target_namespaces_file:
         target_namespaces_file.write(namespaces_content)
 
+    generate_views = []
+    generate_datagroups = []
+    generate_explores = []
+    generate_dashboards = []
     v1_mapping = _glean_apps_to_v1_map(glean_apps)
+
     for namespace, lookml_objects in _namespaces.items():
         if len(namespace_filter) == 0 or namespace in namespace_filter:
-            logging.info(f"\nGenerating namespace {namespace}")
-
             view_dir = target / namespace / "views"
             view_dir.mkdir(parents=True, exist_ok=True)
             views = list(
                 _get_views_from_dict(lookml_objects.get("views", {}), namespace)
             )
 
-            logging.info("  Generating views")
             v1_name: Optional[str] = v1_mapping.get(namespace)
-            for view_path in _generate_views(view_dir, views, v1_name, dryrun=dryrun):
-                logging.info(f"    ...Generating {view_path}")
-
-            logging.info("  Generating datagroups")
-            generate_datagroups(views, target, namespace, dryrun=dryrun)
+            for view in views:
+                generate_views.append(
+                    partial(
+                        _generate_view,
+                        view_dir,
+                        view,
+                        v1_name,
+                        dryrun,
+                    )
+                )
+                generate_datagroups.append(
+                    partial(
+                        generate_datagroup,
+                        view,
+                        target,
+                        namespace,
+                        dryrun,
+                    )
+                )
 
             explore_dir = target / namespace / "explores"
             explore_dir.mkdir(parents=True, exist_ok=True)
             explores = lookml_objects.get("explores", {})
-            logging.info("  Generating explores")
-            for explore_path in _generate_explores(
-                explore_dir, namespace, explores, view_dir, v1_name
-            ):
-                logging.info(f"    ...Generating {explore_path}")
+            generate_explores += [
+                partial(
+                    _generate_explore,
+                    explore_dir,
+                    namespace,
+                    explore_name,
+                    explore,
+                    view_dir,
+                    v1_name,
+                )
+                for explore_name, explore in explores.items()
+            ]
 
-            logging.info("  Generating dashboards")
             dashboard_dir = target / namespace / "dashboards"
             dashboard_dir.mkdir(parents=True, exist_ok=True)
             dashboards = lookml_objects.get("dashboards", {})
-            for dashboard_path in _generate_dashboards(
-                dashboard_dir, namespace, dashboards
-            ):
-                logging.info(f"    ...Generating {dashboard_path}")
+            generate_dashboards += [
+                partial(
+                    _generate_dashboard,
+                    dashboard_dir,
+                    namespace,
+                    dashboard_name,
+                    dashboard,
+                )
+                for dashboard_name, dashboard in dashboards.items()
+            ]
+
+    if parallelism == 1:
+        # run without using multiprocessing
+        # this is needed for the unit tests to work as mocks are not shared across processes
+        logging.info("  Generating views")
+        for generate_view_func in generate_views:
+            generate_view_func()
+        logging.info("  Generating datagroups")
+        for generate_datagroup_func in generate_datagroups:
+            generate_datagroup_func()
+        logging.info("  Generating explores")
+        for generate_explore_func in generate_explores:
+            generate_explore_func()
+        logging.info("  Generating dashboards")
+        for generate_dashboard_func in generate_dashboards:
+            generate_dashboard_func()
+    else:
+        with Pool(
+            parallelism, initializer=partial(_update_metric_repos, metric_hub_repos)
+        ) as pool:
+            logging.info("  Generating views and datagroups")
+            pool.map(_run_generation, generate_views + generate_datagroups)
+            logging.info("  Generating explores")
+            pool.map(
+                _run_generation,
+                generate_explores,
+            )
+            logging.info("  Generating dashboards")
+            pool.map(
+                _run_generation,
+                generate_dashboards,
+            )
 
 
 @click.command(help=__doc__)
@@ -204,16 +289,46 @@ def _lookml(namespaces, glean_apps, target_dir, dryrun, namespace_filter=[]):
     help="Use the Cloud Function to run dry runs during LookML generation.",
     type=bool,
 )
+@click.option(
+    "--parallelism",
+    "-p",
+    default=8,
+    type=int,
+    help="Number of processes to use for LookML generation",
+)
 def lookml(
-    namespaces, app_listings_uri, target_dir, metric_hub_repos, only, use_cloud_function
+    namespaces,
+    app_listings_uri,
+    target_dir,
+    metric_hub_repos,
+    only,
+    use_cloud_function,
+    parallelism,
 ):
     """Generate lookml from namespaces."""
     if metric_hub_repos:
         MetricsConfigLoader.update_repos(metric_hub_repos)
-
     glean_apps = _get_glean_apps(app_listings_uri)
 
-    dryrun = functools.partial(
-        DryRun, bigquery.Client(), use_cloud_function, id_token()
+    dry_run_id_token = None
+    creds = None
+    if use_cloud_function:
+        dry_run_id_token = id_token()
+    else:
+        creds = credentials()
+
+    dryrun = DryRunContext(
+        use_cloud_function=use_cloud_function,
+        id_token=dry_run_id_token,
+        credentials=creds,
     )
-    return _lookml(namespaces, glean_apps, target_dir, dryrun, only)
+
+    return _lookml(
+        namespaces,
+        glean_apps,
+        target_dir,
+        dryrun,
+        only,
+        parallelism,
+        metric_hub_repos,
+    )
