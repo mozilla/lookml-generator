@@ -595,6 +595,10 @@ firefox_accounts:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.accounts_frontend_derived.reg_engagement_funnel_v1
+    login_engagement_funnels_by_service:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.accounts_frontend_derived.login_engagement_funnel_v1
   explores:
     all_event_counts:
       type: events_explore
@@ -672,6 +676,10 @@ firefox_accounts:
       type: table_explore
       views:
         base_view: registration_engagement_funnels_by_service
+    login_engagement_funnels_by_service:
+      type: table_explore
+      views:
+        base_view: login_engagement_funnels_by_service
 revenue:
   glean_app: false
   connection: bigquery-oauth
@@ -695,7 +703,7 @@ revenue:
         - table: mozdata.ltv.firefox_ios_client_ltv
     firefox_desktop_ltv:
       type: table_view
-      tables: 
+      tables:
         - table: mozdata.ltv.firefox_desktop_client_ltv
     revenue_google_top10_row_data:
       type: table_view
@@ -1342,7 +1350,7 @@ websites:
     ga4_www_site_downloads:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.ga.www_site_downloads
+        - table: moz-fx-data-shared-prod.mozilla_org.www_site_downloads
     ga4_sessions:
       type: table_view
       tables:
@@ -1638,3 +1646,42 @@ firefox_metrics:
   owners:
     - vsabino@mozilla.com
   glean_app: false
+fxci:
+  pretty_name: Firefox-CI Taskcluster
+  owners:
+    - ahalberstadt@mozilla.com
+  glean_app: false
+  explores:
+    tasks:
+      type: table_explore
+      views:
+        base_view: tasks
+    task_runs:
+      type: table_explore
+      views:
+        base_view: task_runs
+    worker_costs:
+      type: table_explore
+      views:
+        base_view: worker_costs
+    worker_metrics:
+      type: table_explore
+      views:
+        base_view: worker_metrics
+  views:
+    tasks:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.fxci.tasks_v1
+    task_runs:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.fxci.task_runs_v1
+    worker_costs:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.fxci_derived.worker_costs_v1
+    worker_metrics:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.fxci.worker_metrics_v1
