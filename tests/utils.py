@@ -1,9 +1,6 @@
 """Utility functions for tests."""
-import pprint
-from typing import List
 
-from google.cloud import bigquery
-from google.cloud.bigquery.schema import SchemaField
+import pprint
 
 
 def get_differences(expected, result, path="", sep="."):
@@ -80,14 +77,59 @@ def print_and_test(expected, result=None, actual=None):
     assert result == expected
 
 
-def get_mock_bq_client(schema: List[SchemaField]):
-    """Get a mock BQ client that will return a specified schema."""
+class MockDryRunContext:
+    """Mock DryRunContext."""
 
-    class MockClient:
-        """Mock bigquery.Client."""
+    def __init__(
+        self,
+        cls,
+        use_cloud_function=False,
+        id_token=None,
+        credentials=None,
+    ):
+        """Initialize dry run instance."""
+        self.use_cloud_function = use_cloud_function
+        self.id_token = id_token
+        self.credentials = credentials
+        self.cls = cls
 
-        def get_table(self, table_ref):
-            """Mock bigquery.Client.get_table."""
-            return bigquery.Table(table_ref, schema=schema)
+    def create(
+        self,
+        sql=None,
+        project="moz-fx-data-shared-prod",
+        dataset=None,
+        table=None,
+    ):
+        """Initialize passed MockDryRun instance."""
+        return self.cls(
+            use_cloud_function=self.use_cloud_function,
+            id_token=self.id_token,
+            credentials=self.credentials,
+            sql=sql,
+            project=project,
+            dataset=dataset,
+            table=table,
+        )
 
-    return MockClient()
+
+class MockDryRun:
+    """Mock dryrun.DryRun."""
+
+    def __init__(
+        self,
+        use_cloud_function,
+        id_token,
+        credentials,
+        sql=None,
+        project=None,
+        dataset=None,
+        table=None,
+    ):
+        """Create MockDryRun instance."""
+        self.sql = sql
+        self.project = project
+        self.dataset = dataset
+        self.table = table
+        self.use_cloud_function = use_cloud_function
+        self.credentials = credentials
+        self.id_token = id_token

@@ -1,4 +1,5 @@
 """Class to describe a Ping View."""
+
 from __future__ import annotations
 
 from collections import defaultdict
@@ -63,7 +64,7 @@ class PingView(View):
         """Get a view from a name and dict definition."""
         return klass(namespace, name, _dict["tables"])
 
-    def to_lookml(self, bq_client, v1_name: Optional[str]) -> Dict[str, Any]:
+    def to_lookml(self, v1_name: Optional[str], dryrun) -> Dict[str, Any]:
         """Generate LookML for this view."""
         view_defn: Dict[str, Any] = {"name": self.name}
 
@@ -73,7 +74,7 @@ class PingView(View):
             self.tables[0],
         )["table"]
 
-        dimensions = self.get_dimensions(bq_client, table, v1_name)
+        dimensions = self.get_dimensions(table, v1_name, dryrun=dryrun)
 
         # set document id field as a primary key for joins
         view_defn["dimensions"] = [
@@ -88,8 +89,14 @@ class PingView(View):
         # add measures
         view_defn["measures"] = self.get_measures(dimensions, table, v1_name)
 
+        [project, dataset, table_id] = table.split(".")
+        table_schema = dryrun.create(
+            project=project,
+            dataset=dataset,
+            table=table_id,
+        ).get_table_schema()
         nested_views = lookml_utils._generate_nested_dimension_views(
-            bq_client.get_table(table).schema, self.name
+            table_schema, self.name
         )
 
         # Round-tripping through a dict to get an ordered deduped list.
@@ -116,11 +123,11 @@ class PingView(View):
         return {"views": [view_defn] + nested_views}
 
     def get_dimensions(
-        self, bq_client, table, v1_name: Optional[str]
+        self, table, v1_name: Optional[str], dryrun
     ) -> List[Dict[str, Any]]:
         """Get the set of dimensions for this view."""
         # add dimensions and dimension groups
-        return lookml_utils._generate_dimensions(bq_client, table)
+        return lookml_utils._generate_dimensions(table, dryrun=dryrun)
 
     def get_measures(
         self, dimensions: List[dict], table: str, v1_name: Optional[str]

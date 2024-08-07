@@ -1,4 +1,5 @@
 """Generic dashboard type."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -28,6 +29,6 @@ class Dashboard(object):
             }
         }
 
-    def to_lookml(self, client):
+    def to_lookml(self):
         """Generate Lookml for this dashboard."""
         raise NotImplementedError("Only implemented in subclass.")

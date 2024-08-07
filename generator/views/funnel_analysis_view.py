@@ -19,6 +19,7 @@ That lets us find out whether the user completed those funnel steps:
 The `funnel_analysis` view has some nice dimensions to hide these details from the end user,
 e.g. `completed_funnel_step_N`. We can then count those users across dimensions.
 """
+
 from __future__ import annotations
 
 from textwrap import dedent
@@ -88,7 +89,7 @@ class FunnelAnalysisView(View):
         """Get a FunnalAnalysisView from a dict representation."""
         return FunnelAnalysisView(namespace, _dict["tables"])
 
-    def to_lookml(self, bq_client, v1_name: Optional[str]) -> Dict[str, Any]:
+    def to_lookml(self, v1_name: Optional[str], dryrun) -> Dict[str, Any]:
         """Get this view as LookML."""
         return {
             "includes": [f"{self.tables[0]['funnel_analysis']}.view.lkml"],

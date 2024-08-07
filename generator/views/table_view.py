@@ -1,4 +1,5 @@
 """Class to describe a Table View."""
+
 from __future__ import annotations
 
 from collections import defaultdict
@@ -60,7 +61,7 @@ class TableView(View):
         """Get a view from a name and dict definition."""
         return TableView(namespace, name, _dict["tables"], _dict.get("measures"))
 
-    def to_lookml(self, bq_client, v1_name: Optional[str]) -> Dict[str, Any]:
+    def to_lookml(self, v1_name: Optional[str], dryrun) -> Dict[str, Any]:
         """Generate LookML for this view."""
         view_defn: Dict[str, Any] = {"name": self.name}
 
@@ -71,7 +72,7 @@ class TableView(View):
         )["table"]
 
         # add dimensions and dimension groups
-        dimensions = lookml_utils._generate_dimensions(bq_client, table)
+        dimensions = lookml_utils._generate_dimensions(table, dryrun=dryrun)
         view_defn["dimensions"] = list(
             filterfalse(lookml_utils._is_dimension_group, dimensions)
         )
@@ -102,8 +103,14 @@ class TableView(View):
                     f"time_partitioning_field {field_name!r} not found in {self.name!r}"
                 )
 
+        [project, dataset, table_id] = table.split(".")
+        table_schema = dryrun.create(
+            project=project,
+            dataset=dataset,
+            table=table_id,
+        ).get_table_schema()
         nested_views = lookml_utils._generate_nested_dimension_views(
-            bq_client.get_table(table).schema, self.name
+            table_schema, self.name
         )
 
         if self.measures:

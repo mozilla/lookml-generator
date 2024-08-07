@@ -1,15 +1,18 @@
 """Utils for generating lookml."""
+
 import re
 import tarfile
 import urllib.request
 from collections import defaultdict
 from io import BytesIO
+from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 import click
 import yaml
-from google.cloud import bigquery
-from jinja2 import Environment, PackageLoader
+from jinja2 import Environment, FileSystemLoader
+
+GENERATOR_PATH = Path(__file__).parent.parent
 
 BIGQUERY_TYPE_TO_DIMENSION_TYPE = {
     "BIGNUMERIC": "string",
@@ -94,19 +97,22 @@ def _get_dimension(
     return result
 
 
-def _generate_dimensions_helper(
-    schema: List[bigquery.SchemaField], *prefix: str
-) -> Iterable[dict]:
-    for field in sorted(schema, key=lambda f: f.name):
-        if field.field_type == "RECORD" and not field.mode == "REPEATED":
-            yield from _generate_dimensions_helper(field.fields, *prefix, field.name)
+def _generate_dimensions_helper(schema: List[Any], *prefix: str) -> Iterable[dict]:
+    for field in sorted(schema, key=lambda f: f["name"]):
+        if field["type"] == "RECORD" and not field.get("mode", "") == "REPEATED":
+            yield from _generate_dimensions_helper(
+                field["fields"], *prefix, field["name"]
+            )
         else:
             yield _get_dimension(
-                (*prefix, field.name), field.field_type, field.mode, field.description
+                (*prefix, field["name"]),
+                field["type"],
+                field.get("mode", ""),
+                field.get("description", ""),
             )
 
 
-def _generate_dimensions(client: bigquery.Client, table: str) -> List[Dict[str, Any]]:
+def _generate_dimensions(table: str, dryrun) -> List[Dict[str, Any]]:
     """Generate dimensions and dimension groups from a bigquery table.
 
     When schema contains both submission_timestamp and submission_date, only produce
@@ -115,26 +121,66 @@ def _generate_dimensions(client: bigquery.Client, table: str) -> List[Dict[str, 
     Raise ClickException if schema results in duplicate dimensions.
     """
     dimensions = {}
-    for dimension in _generate_dimensions_helper(client.get_table(table).schema):
-        name = dimension["name"]
+    [project, dataset, table] = table.split(".")
+    table_schema = dryrun.create(
+        project=project,
+        dataset=dataset,
+        table=table,
+    ).get_table_schema()
+
+    for dimension in _generate_dimensions_helper(table_schema):
+        name_key = dimension["name"]
+
+        # This prevents `time` dimension groups from overwriting other dimensions below
+        if dimension.get("type") == "time":
+            name_key += "_time"
         # overwrite duplicate "submission", "end", "start" dimension group, thus picking the
         # last value sorted by field name, which is submission_timestamp
         # See also https://github.com/mozilla/lookml-generator/issues/471
-        if (
-            name in dimensions
-            and name != "submission"
-            and not name.endswith("end")
-            and not name.endswith("start")
+        if name_key in dimensions and not (
+            dimension.get("type") == "time"
+            and (
+                dimension["name"] == "submission"
+                or dimension["name"].endswith("end")
+                or dimension["name"].endswith("start")
+            )
         ):
             raise click.ClickException(
-                f"duplicate dimension {name!r} for table {table!r}"
+                f"duplicate dimension {name_key!r} for table {table!r}"
             )
-        dimensions[name] = dimension
+        dimensions[name_key] = dimension
+    return list(dimensions.values())
+
+
+def _generate_dimensions_from_query(query: str, dryrun) -> List[Dict[str, Any]]:
+    """Generate dimensions and dimension groups from a SQL query."""
+    schema = dryrun.create(sql=query).get_schema()
+    dimensions = {}
+    for dimension in _generate_dimensions_helper(schema or []):
+        name_key = dimension["name"]
+
+        # This prevents `time` dimension groups from overwriting other dimensions below
+        if dimension.get("type") == "time":
+            name_key += "_time"
+
+        # overwrite duplicate "submission", "end", "start" dimension group, thus picking the
+        # last value sorted by field name, which is submission_timestamp
+        # See also https://github.com/mozilla/lookml-generator/issues/471
+        if name_key in dimensions and not (
+            dimension.get("type") == "time"
+            and (
+                dimension["name"] == "submission"
+                or dimension["name"].endswith("end")
+                or dimension["name"].endswith("start")
+            )
+        ):
+            raise click.ClickException(f"duplicate dimension {name_key!r} in query")
+        dimensions[name_key] = dimension
     return list(dimensions.values())
 
 
 def _generate_nested_dimension_views(
-    schema: List[bigquery.SchemaField], view_name: str
+    schema: List[dict], view_name: str
 ) -> List[Dict[str, Any]]:
     """
     Recursively generate views for nested fields.
@@ -142,14 +188,14 @@ def _generate_nested_dimension_views(
     Nested fields are created as views, with dimensions and optionally measures.
     """
     views: List[Dict[str, Any]] = []
-    for field in sorted(schema, key=lambda f: f.name):
-        if field.field_type == "RECORD" and field.name != "labeled_counter":
+    for field in sorted(schema, key=lambda f: f["name"]):
+        if field["type"] == "RECORD" and field["name"] != "labeled_counter":
             # labeled_counter is handled explicitly in glean ping views; hidden for other views
-            if field.mode == "REPEATED":
+            if field.get("mode") == "REPEATED":
                 nested_field_view: Dict[str, Any] = {
-                    "name": f"{view_name}__{field.name}"
+                    "name": f"{view_name}__{field['name']}"
                 }
-                dimensions = _generate_dimensions_helper(schema=field.fields)
+                dimensions = _generate_dimensions_helper(schema=field["fields"])
                 nested_field_view["dimensions"] = [
                     d for d in dimensions if not _is_dimension_group(d)
                 ]
@@ -160,12 +206,12 @@ def _generate_nested_dimension_views(
                     views
                     + [nested_field_view]
                     + _generate_nested_dimension_views(
-                        field.fields, f"{view_name}__{field.name}"
+                        field["fields"], f"{view_name}__{field['name']}"
                     )
                 )
             else:
                 views = views + _generate_nested_dimension_views(
-                    field.fields, f"{view_name}__{field.name}"
+                    field["fields"], f"{view_name}__{field['name']}"
                 )
 
     return views
@@ -192,23 +238,12 @@ def _is_nested_dimension(dimension: dict):
 
 def render_template(filename, template_folder, **kwargs) -> str:
     """Render a given template using Jinja."""
-    env = Environment(loader=PackageLoader("generator", f"{template_folder}/templates"))
+    env = Environment(
+        loader=FileSystemLoader(GENERATOR_PATH / f"{template_folder}/templates")
+    )
     template = env.get_template(filename)
     rendered = template.render(**kwargs)
     return rendered
-
-
-def get_distinct_vals(bq_client: bigquery.Client, table: str, column: str):
-    """Given a table and column name, return all distinct values for that column."""
-    query_job = bq_client.query(
-        f"""
-            SELECT DISTINCT {column}
-            FROM {table}
-            ORDER BY {column}
-        """
-    )
-    distinct_values = query_job.result().to_dataframe()[column].tolist()
-    return distinct_values
 
 
 def slug_to_title(slug):

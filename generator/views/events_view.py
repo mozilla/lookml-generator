@@ -1,4 +1,5 @@
 """Class to describe an Events view."""
+
 from __future__ import annotations
 
 from copy import deepcopy
@@ -60,7 +61,7 @@ class EventsView(View):
         """Get a view from a name and dict definition."""
         return EventsView(namespace, name, _dict["tables"])
 
-    def to_lookml(self, bq_client, v1_name: Optional[str]) -> Dict[str, Any]:
+    def to_lookml(self, v1_name: Optional[str], dryrun) -> Dict[str, Any]:
         """Generate LookML for this view."""
         view_defn: Dict[str, Any] = {
             "extends": [self.tables[0]["events_table_view"]],
@@ -69,17 +70,15 @@ class EventsView(View):
 
         # add measures
         dimensions = lookml_utils._generate_dimensions(
-            bq_client, self.tables[0]["base_table"]
+            self.tables[0]["base_table"], dryrun=dryrun
         )
         view_defn["measures"] = self.get_measures(dimensions)
 
         # set document_id as primary key if it exists in the underlying table
         # this will allow one_to_many joins
-        document_id_field = self.get_document_id(dimensions, "events")
-        if document_id_field is not None:
-            view_defn["dimensions"] = [
-                {"name": document_id_field, "primary_key": "yes"}
-            ]
+        event_id_dimension = self.generate_event_id_dimension(dimensions)
+        if event_id_dimension is not None:
+            view_defn["dimensions"] = [event_id_dimension]
 
         return {
             "includes": [f"{self.tables[0]['events_table_view']}.view.lkml"],
@@ -103,3 +102,15 @@ class EventsView(View):
             )
 
         return measures
+
+    def generate_event_id_dimension(
+        self, dimensions: list[dict]
+    ) -> Optional[Dict[str, str]]:
+        """Generate the event_id dimension to be used as a primary key for a one to many join."""
+        event_id = self.select_dimension("event_id", dimensions, "events")
+        if event_id:
+            return {
+                "name": "event_id",
+                "primary_key": "yes",
+            }
+        return None

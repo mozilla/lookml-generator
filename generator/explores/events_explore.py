@@ -1,10 +1,9 @@
 """An explore for Events Views."""
+
 from __future__ import annotations
 
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional
-
-from google.cloud import bigquery
 
 from ..views import EventsView, View
 from .explore import Explore
@@ -33,9 +32,7 @@ class EventsExplore(Explore):
         """Get an instance of this explore from a dictionary definition."""
         return EventsExplore(name, defn["views"], views_path)
 
-    def _to_lookml(
-        self, client: bigquery.Client, v1_name: Optional[str]
-    ) -> List[Dict[str, Any]]:
+    def _to_lookml(self, v1_name: Optional[str]) -> List[Dict[str, Any]]:
         name = self.name
         if not name.endswith("_counts"):
             name = "event_counts"

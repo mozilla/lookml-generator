@@ -1,4 +1,5 @@
 """Generate namespaces.yaml."""
+
 import fnmatch
 import json
 import re
@@ -18,7 +19,7 @@ from google.cloud import bigquery
 from generator import operational_monitoring_utils
 
 from .explores import EXPLORE_TYPES
-from .metrics_utils import METRIC_HUB_REPO, MetricsConfigLoader
+from .metrics_utils import LOOKER_METRIC_HUB_REPO, METRIC_HUB_REPO, MetricsConfigLoader
 from .views import VIEW_TYPES, View, lookml_utils
 
 DEFAULT_GENERATED_SQL_URI = (
@@ -70,7 +71,7 @@ def _get_opmon(bq_client: bigquery.Client, namespaces: Dict[str, Any]):
         return {}
 
     projects_table = projects_view["tables"][0]["table"]
-    projects = operational_monitoring_utils.get_projects(
+    projects = operational_monitoring_utils.get_active_projects(
         bq_client, project_table=projects_table
     )
 
@@ -156,50 +157,18 @@ def _get_metric_hub_namespaces(existing_namespaces):
 
     metric_hub_namespaces = {}
     for namespace, metric_hub_data_sources in metric_hub_data_sources.items():
-        # each data source definition is represented by a view
-        views = {
-            f"metric_definitions_{data_source}": {"type": "metric_definitions_view"}
-            for data_source in metric_hub_data_sources
-        }
-
-        # there is a single explore per namespace that joins all the data source views
-        explore_views = {}
-        for i, data_source in enumerate(sorted(metric_hub_data_sources)):
-            if i == 0:
-                if (
-                    namespace in existing_namespaces
-                    and "client_counts" in existing_namespaces[namespace]["views"]
-                ):
-                    # If there is a clients counts view in the namespace, use it as basis.
-                    # The advantage of this is that client counts is guaranteed to have
-                    # client_ids of all clients that were active on a given day and it exposes
-                    # some useful fields, like channel, users might want to filter on.
-                    explore_views["base_view"] = "client_counts"
-                elif (
-                    namespace in existing_namespaces
-                    and "baseline_clients_daily_table"
-                    in existing_namespaces[namespace]["views"]
-                ):
-                    # for Glean it's baseline_clients_daily
-                    explore_views["base_view"] = "baseline_clients_daily_table"
-                else:
-                    # If no client_counts view exists, simply use first view as base view
-                    explore_views["base_view"] = f"metric_definitions_{data_source}"
-
-            # generate entries for views that need to be joined on
-            if "joined_views" not in explore_views:
-                explore_views["joined_views"] = [f"metric_definitions_{data_source}"]
-            else:
-                explore_views["joined_views"].append(
-                    f"metric_definitions_{data_source}"
-                )
-
-        explores = {
-            f"metric_definitions_{namespace}": {
-                "type": "metric_definitions_explore",
-                "views": explore_views,
+        # each data source definition is represented by a view and an explore
+        explores = {}
+        views = {}
+        for data_source in sorted(metric_hub_data_sources):
+            views[f"metric_definitions_{data_source}"] = {
+                "type": "metric_definitions_view"
             }
-        }
+
+            explores[f"metric_definitions_{data_source}"] = {
+                "type": "metric_definitions_explore",
+                "views": {"base_view": f"metric_definitions_{data_source}"},
+            }
 
         metric_hub_namespaces[namespace] = {
             "pretty_name": lookml_utils.slug_to_title(namespace),
@@ -250,12 +219,16 @@ def _get_glean_apps(
         channels = [
             {
                 "channel": channel.get("app_channel"),
-                "dataset": channel.get("app_name").replace("-", "_")
-                if channel.get("app_channel") == "release"
-                else channel.get("bq_dataset_family"),
-                "source_dataset": channel.get("bq_dataset_family")
-                if channel.get("app_channel") == "release"
-                else channel.get("bq_dataset_family") + "_stable",
+                "dataset": (
+                    channel.get("app_name").replace("-", "_")
+                    if channel.get("app_channel") == "release"
+                    else channel.get("bq_dataset_family")
+                ),
+                "source_dataset": (
+                    channel.get("bq_dataset_family")
+                    if channel.get("app_channel") == "release"
+                    else channel.get("bq_dataset_family") + "_stable"
+                ),
             }
             for channel in variants
             if not channel.get("deprecated")
@@ -357,16 +330,32 @@ def _get_metric_hub_data_sources() -> Dict[str, List[str]]:
     help="Path to namespace disallow list",
 )
 @click.option(
-    "--metric-hub-repo",
-    default=METRIC_HUB_REPO,
-    help="Repo to load metric configs from.",
+    "--metric-hub-repos",
+    "--metric_hub_repos",
+    multiple=True,
+    default=[METRIC_HUB_REPO, LOOKER_METRIC_HUB_REPO],
+    help="Repos to load metric configs from.",
+)
+@click.option(
+    "--ignore",
+    multiple=True,
+    default=[],
+    help="Namespaces to ignore during generation.",
+)
+@click.option(
+    "--use_cloud_function",
+    "--use-cloud-function",
+    help="Use the Cloud Function to run dry runs during LookML generation.",
+    type=bool,
 )
 def namespaces(
     custom_namespaces,
     generated_sql_uri,
     app_listings_uri,
     disallowlist,
-    metric_hub_repo,
+    metric_hub_repos,
+    ignore,
+    use_cloud_function,
 ):
     """Generate namespaces.yaml."""
     warnings.filterwarnings("ignore", module="google.auth._default")
@@ -375,31 +364,39 @@ def namespaces(
 
     namespaces = {}
     for app in glean_apps:
-        looker_views = _get_looker_views(app, db_views)
-        explores = _get_explores(looker_views)
-        views_as_dict = {view.name: view.as_dict() for view in looker_views}
+        if app["name"] not in ignore:
+            looker_views = _get_looker_views(app, db_views)
+            explores = _get_explores(looker_views)
+            views_as_dict = {view.name: view.as_dict() for view in looker_views}
 
-        namespaces[app["name"]] = {
-            "owners": app["owners"],
-            "pretty_name": app["pretty_name"],
-            "views": views_as_dict,
-            "explores": explores,
-            "glean_app": True,
-        }
+            namespaces[app["name"]] = {
+                "owners": app["owners"],
+                "pretty_name": app["pretty_name"],
+                "views": views_as_dict,
+                "explores": explores,
+                "glean_app": True,
+            }
 
     if custom_namespaces is not None:
         custom_namespaces = yaml.safe_load(custom_namespaces.read()) or {}
+        # remove namespaces that should be ignored
+        for ignored_namespace in ignore:
+            if ignored_namespace in custom_namespaces:
+                del custom_namespaces[ignored_namespace]
 
         # generating operational monitoring namespace, if available
         if "operational_monitoring" in custom_namespaces:
+            if use_cloud_function:
+                raise Exception("Cannot generate OpMon using dry run Cloud Function")
+
             client = bigquery.Client()
             opmon = _get_opmon(bq_client=client, namespaces=custom_namespaces)
             custom_namespaces["operational_monitoring"].update(opmon)
 
         _merge_namespaces(namespaces, custom_namespaces)
 
-    if metric_hub_repo:
-        MetricsConfigLoader.update_repos([metric_hub_repo])
+    if metric_hub_repos:
+        MetricsConfigLoader.update_repos(metric_hub_repos)
 
     _merge_namespaces(namespaces, _get_metric_hub_namespaces(namespaces))
 
@@ -411,7 +408,10 @@ def namespaces(
 
     updated_namespaces = {}
     for namespace, _ in namespaces.items():
-        if not disallowed_namespaces_pattern.fullmatch(namespace):
+        if (
+            not disallowed_namespaces_pattern.fullmatch(namespace)
+            and namespace not in ignore
+        ):
             if "spoke" not in namespaces[namespace]:
                 namespaces[namespace]["spoke"] = DEFAULT_SPOKE
             if "glean_app" not in namespaces[namespace]:

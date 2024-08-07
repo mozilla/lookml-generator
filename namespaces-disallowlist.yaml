@@ -11,3 +11,17 @@
 - pioneer_*
 - rally_*
 - reference_browser
+- tiktokreporter_*
+- org_mozilla_ios_tiktok_reporter*
+- org_mozilla_tiktokreporter
+- moso_*
+- regrets_reporter
+- mozphab
+- mozregression
+- pine
+- treeherder
+- sync
+- mozillavpn_backend_cirrus
+- glean_dictionary
+- mach
+- "*_cirrus"

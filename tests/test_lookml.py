@@ -7,14 +7,12 @@ import lkml
 import pytest
 from click import ClickException
 from click.testing import CliRunner
-from google.cloud import bigquery
-from google.cloud.bigquery.schema import SchemaField
 from mozilla_schema_generator.probes import GleanProbe
 
 from generator.lookml import _lookml
 from generator.views import ClientCountsView, GrowthAccountingView
 
-from .utils import print_and_test
+from .utils import MockDryRun, MockDryRunContext, print_and_test
 
 
 @pytest.fixture
@@ -28,497 +26,462 @@ class MockGleanPing:
         return [{"name": "glean-app-release"}]
 
 
-class MockClient:
-    """Mock bigquery.Client."""
+class MockDryRunLookml(MockDryRun):
+    """Mock dryrun.DryRun."""
 
-    def get_table(self, table_ref):
+    def get_table_metadata(self):
+        """Mock dryrun.DryRun.get_table_metadata"""
+
+        return {}
+
+    def get_table_schema(self):
         """Mock bigquery.Client.get_table."""
 
+        table_ref = f"{self.project}.{self.dataset}.{self.table}"
+
         if table_ref == "mozdata.custom.baseline":
-            return bigquery.Table(
-                table_ref,
-                schema=[
-                    SchemaField(name="app_build", field_type="STRING"),
-                    SchemaField(name="client_id", field_type="STRING"),
-                    SchemaField(name="country", field_type="STRING"),
-                    SchemaField(
-                        name="document_id",
-                        field_type="STRING",
-                        description="The document ID specified in the URI when the client sent this message",
-                    ),
-                ],
-            )
+            return [
+                {"name": "app_build", "type": "STRING"},
+                {"name": "client_id", "type": "STRING"},
+                {"name": "country", "type": "STRING"},
+                {
+                    "name": "document_id",
+                    "type": "STRING",
+                    "description": "The document ID specified in the URI when the client sent this message",
+                },
+            ]
         if table_ref == "mozdata.glean_app.baseline_clients_daily":
-            return bigquery.Table(
-                table_ref,
-                schema=[
-                    SchemaField(name="app_build", field_type="STRING"),
-                    SchemaField(name="client_id", field_type="STRING"),
-                    SchemaField(name="submission_date", field_type="DATE"),
-                    SchemaField(name="country", field_type="STRING"),
-                    SchemaField(name="document_id", field_type="STRING"),
-                ],
-            )
+            return [
+                {"name": "app_build", "type": "STRING"},
+                {"name": "client_id", "type": "STRING"},
+                {"name": "submission_date", "type": "DATE"},
+                {"name": "country", "type": "STRING"},
+                {"name": "document_id", "type": "STRING"},
+            ]
         if table_ref == "mozdata.glean_app.baseline_clients_last_seen":
-            return bigquery.Table(
-                table_ref,
-                schema=[
-                    SchemaField(name="client_id", field_type="STRING"),
-                    SchemaField(name="country", field_type="STRING"),
-                    SchemaField(name="document_id", field_type="STRING"),
-                ],
-            )
+            return [
+                {"name": "client_id", "type": "STRING"},
+                {"name": "country", "type": "STRING"},
+                {"name": "document_id", "type": "STRING"},
+            ]
         if table_ref == "mozdata.glean_app.baseline":
-            return bigquery.Table(
-                table_ref,
-                schema=[
-                    SchemaField(
-                        name="client_info",
-                        field_type="RECORD",
-                        fields=[
-                            SchemaField(name="client_id", field_type="STRING"),
-                            SchemaField(
-                                name="parsed_first_run_date", field_type="DATE"
-                            ),
-                        ],
-                    ),
-                    SchemaField(
-                        name="metadata",
-                        field_type="RECORD",
-                        fields=[
-                            SchemaField(
-                                name="geo",
-                                field_type="RECORD",
-                                fields=[
-                                    SchemaField(name="country", field_type="STRING"),
-                                ],
-                            ),
-                            SchemaField(
-                                name="header",
-                                field_type="RECORD",
-                                fields=[
-                                    SchemaField(name="date", field_type="STRING"),
-                                    SchemaField(
-                                        name="parsed_date", field_type="TIMESTAMP"
-                                    ),
-                                ],
-                            ),
-                        ],
-                    ),
-                    SchemaField(
-                        name="metrics",
-                        field_type="RECORD",
-                        fields=[
-                            SchemaField(
-                                name="counter",
-                                field_type="RECORD",
-                                fields=[
-                                    SchemaField(
-                                        name="test_counter", field_type="INTEGER"
-                                    )
-                                ],
-                            )
-                        ],
-                    ),
-                    SchemaField(name="parsed_timestamp", field_type="TIMESTAMP"),
-                    SchemaField(name="submission_timestamp", field_type="TIMESTAMP"),
-                    SchemaField(name="submission_date", field_type="DATE"),
-                    SchemaField(name="test_bignumeric", field_type="BIGNUMERIC"),
-                    SchemaField(name="test_bool", field_type="BOOLEAN"),
-                    SchemaField(name="test_bytes", field_type="BYTES"),
-                    SchemaField(name="test_float64", field_type="FLOAT"),
-                    SchemaField(name="test_int64", field_type="INTEGER"),
-                    SchemaField(name="test_numeric", field_type="NUMERIC"),
-                    SchemaField(name="test_string", field_type="STRING"),
-                    SchemaField(name="additional_properties", field_type="STRING"),
-                ],
-            )
+            return [
+                {
+                    "name": "client_info",
+                    "type": "RECORD",
+                    "fields": [
+                        {"name": "client_id", "type": "STRING"},
+                        {"name": "parsed_first_run_date", "type": "DATE"},
+                    ],
+                },
+                {
+                    "name": "metadata",
+                    "type": "RECORD",
+                    "fields": [
+                        {
+                            "name": "geo",
+                            "type": "RECORD",
+                            "fields": [
+                                {"name": "country", "type": "STRING"},
+                            ],
+                        },
+                        {
+                            "name": "header",
+                            "type": "RECORD",
+                            "fields": [
+                                {"name": "date", "type": "STRING"},
+                                {"name": "parsed_date", "type": "TIMESTAMP"},
+                            ],
+                        },
+                    ],
+                },
+                {
+                    "name": "metrics",
+                    "type": "RECORD",
+                    "fields": [
+                        {
+                            "name": "counter",
+                            "type": "RECORD",
+                            "fields": [{"name": "test_counter", "type": "INTEGER"}],
+                        }
+                    ],
+                },
+                {"name": "parsed_timestamp", "type": "TIMESTAMP"},
+                {"name": "submission_timestamp", "type": "TIMESTAMP"},
+                {"name": "submission_date", "type": "DATE"},
+                {"name": "test_bignumeric", "type": "BIGNUMERIC"},
+                {"name": "test_bool", "type": "BOOLEAN"},
+                {"name": "test_bytes", "type": "BYTES"},
+                {"name": "test_float64", "type": "FLOAT"},
+                {"name": "test_int64", "type": "INTEGER"},
+                {"name": "test_numeric", "type": "NUMERIC"},
+                {"name": "test_string", "type": "STRING"},
+                {"name": "additional_properties", "type": "STRING"},
+            ]
         if table_ref == "mozdata.glean_app.metrics":
-            return bigquery.Table(
-                table_ref,
-                schema=[
-                    SchemaField(
-                        name="client_info",
-                        field_type="RECORD",
-                        fields=[
-                            SchemaField(name="client_id", field_type="STRING"),
-                        ],
-                    ),
-                    SchemaField(
-                        name="metrics",
-                        field_type="RECORD",
-                        fields=[
-                            SchemaField(
-                                name="boolean",
-                                field_type="RECORD",
-                                fields=[
-                                    SchemaField(
-                                        name="test_boolean", field_type="BOOLEAN"
-                                    ),
-                                    SchemaField(
-                                        name="test_boolean_not_in_source",
-                                        field_type="BOOLEAN",
-                                    ),
-                                ],
-                            ),
-                            SchemaField(
-                                name="counter",
-                                field_type="RECORD",
-                                fields=[
-                                    SchemaField(
-                                        name="test_counter", field_type="INTEGER"
-                                    ),
-                                    SchemaField(
-                                        name="glean_validation_metrics_ping_count",
-                                        field_type="INTEGER",
-                                    ),
-                                    SchemaField(
-                                        name="no_category_counter", field_type="INTEGER"
-                                    ),
-                                ],
-                            ),
-                            SchemaField(
-                                name="labeled_counter",
-                                field_type="RECORD",
-                                fields=[
-                                    SchemaField(
-                                        name="test_labeled_counter",
-                                        field_type="RECORD",
-                                        mode="REPEATED",
-                                        fields=[
-                                            SchemaField(
-                                                name="key", field_type="STRING"
-                                            ),
-                                            SchemaField(
-                                                name="value", field_type="INTEGER"
-                                            ),
-                                        ],
-                                    ),
-                                    SchemaField(
-                                        name="test_labeled_counter_not_in_source",
-                                        field_type="RECORD",
-                                        mode="REPEATED",
-                                        fields=[
-                                            SchemaField(
-                                                name="key", field_type="STRING"
-                                            ),
-                                            SchemaField(
-                                                name="value", field_type="INTEGER"
-                                            ),
-                                        ],
-                                    ),
-                                ],
-                            ),
-                            SchemaField(
-                                name="custom_distribution",
-                                field_type="RECORD",
-                                fields=[
-                                    SchemaField(
-                                        name="test_custom_distribution",
-                                        field_type="RECORD",
-                                        mode="NULLABLE",
-                                        default_value_expression=None,
-                                        fields=(
-                                            SchemaField(
-                                                name="sum",
-                                                field_type="INTEGER",
-                                                mode="NULLABLE",
-                                                default_value_expression=None,
-                                                fields=(),
-                                                policy_tags=None,
-                                            ),
-                                            SchemaField(
-                                                name="values",
-                                                field_type="RECORD",
-                                                mode="REPEATED",
-                                                default_value_expression=None,
-                                                fields=(
-                                                    SchemaField(
-                                                        name="key",
-                                                        field_type="STRING",
-                                                        mode="NULLABLE",
-                                                        default_value_expression=None,
-                                                        fields=(),
-                                                        policy_tags=None,
-                                                    ),
-                                                    SchemaField(
-                                                        name="value",
-                                                        field_type="INTEGER",
-                                                        mode="NULLABLE",
-                                                        default_value_expression=None,
-                                                        fields=(),
-                                                        policy_tags=None,
-                                                    ),
-                                                ),
-                                                policy_tags=None,
-                                            ),
-                                        ),
-                                        policy_tags=None,
-                                    )
-                                ],
-                            ),
-                            SchemaField(
-                                name="datetime",
-                                field_type="RECORD",
-                                fields=[
-                                    SchemaField(
-                                        name="test_datetime", field_type="STRING"
-                                    )
-                                ],
-                            ),
-                            SchemaField(
-                                name="jwe2",
-                                field_type="RECORD",
-                                fields=[
-                                    SchemaField(name="test_jwe", field_type="STRING")
-                                ],
-                            ),
-                            SchemaField(
-                                name="memory_distribution",
-                                field_type="RECORD",
-                                fields=[
-                                    SchemaField(
-                                        name="test_memory_distribution",
-                                        field_type="RECORD",
-                                        mode="NULLABLE",
-                                        default_value_expression=None,
-                                        fields=(
-                                            SchemaField(
-                                                name="sum",
-                                                field_type="INTEGER",
-                                                mode="NULLABLE",
-                                                default_value_expression=None,
-                                                fields=(),
-                                                policy_tags=None,
-                                            ),
-                                            SchemaField(
-                                                name="values",
-                                                field_type="RECORD",
-                                                mode="REPEATED",
-                                                default_value_expression=None,
-                                                fields=(
-                                                    SchemaField(
-                                                        name="key",
-                                                        field_type="STRING",
-                                                        mode="NULLABLE",
-                                                        default_value_expression=None,
-                                                        fields=(),
-                                                        policy_tags=None,
-                                                    ),
-                                                    SchemaField(
-                                                        name="value",
-                                                        field_type="INTEGER",
-                                                        mode="NULLABLE",
-                                                        default_value_expression=None,
-                                                        fields=(),
-                                                        policy_tags=None,
-                                                    ),
-                                                ),
-                                                policy_tags=None,
-                                            ),
-                                        ),
-                                        policy_tags=None,
-                                    )
-                                ],
-                            ),
-                            SchemaField(
-                                name="quantity",
-                                field_type="RECORD",
-                                fields=[
-                                    SchemaField(
-                                        name="test_quantity", field_type="INTEGER"
-                                    )
-                                ],
-                            ),
-                            SchemaField(
-                                name="string",
-                                field_type="RECORD",
-                                fields=[
-                                    SchemaField(name="test_string", field_type="STRING")
-                                ],
-                            ),
-                            SchemaField(
-                                name="timing_distribution",
-                                field_type="RECORD",
-                                fields=[
-                                    SchemaField(
-                                        name="test_timing_distribution",
-                                        field_type="RECORD",
-                                        mode="NULLABLE",
-                                        default_value_expression=None,
-                                        fields=(
-                                            SchemaField(
-                                                name="sum",
-                                                field_type="INTEGER",
-                                                mode="NULLABLE",
-                                                default_value_expression=None,
-                                                fields=(),
-                                                policy_tags=None,
-                                            ),
-                                            SchemaField(
-                                                name="values",
-                                                field_type="RECORD",
-                                                mode="REPEATED",
-                                                default_value_expression=None,
-                                                fields=(
-                                                    SchemaField(
-                                                        name="key",
-                                                        field_type="STRING",
-                                                        mode="NULLABLE",
-                                                        default_value_expression=None,
-                                                        fields=(),
-                                                        policy_tags=None,
-                                                    ),
-                                                    SchemaField(
-                                                        name="value",
-                                                        field_type="INTEGER",
-                                                        mode="NULLABLE",
-                                                        default_value_expression=None,
-                                                        fields=(),
-                                                        policy_tags=None,
-                                                    ),
-                                                ),
-                                                policy_tags=None,
-                                            ),
-                                        ),
-                                        policy_tags=None,
-                                    )
-                                ],
-                            ),
-                            SchemaField(
-                                name="rate",
-                                field_type="RECORD",
-                                fields=[
-                                    SchemaField(
-                                        name="test_rate",
-                                        field_type="RECORD",
-                                        fields=[
-                                            SchemaField(
-                                                name="denominator", field_type="INTEGER"
-                                            ),
-                                            SchemaField(
-                                                name="numerator", field_type="INTEGER"
-                                            ),
-                                        ],
-                                    )
-                                ],
-                            ),
-                            SchemaField(
-                                name="timespan",
-                                field_type="RECORD",
-                                fields=[
-                                    SchemaField(
-                                        name="test_timespan",
-                                        field_type="RECORD",
-                                        mode="NULLABLE",
-                                        default_value_expression=None,
-                                        fields=(
-                                            SchemaField(
-                                                name="time_unit",
-                                                field_type="STRING",
-                                                mode="NULLABLE",
-                                                default_value_expression=None,
-                                                fields=(),
-                                                policy_tags=None,
-                                            ),
-                                            SchemaField(
-                                                name="value",
-                                                field_type="INTEGER",
-                                                mode="NULLABLE",
-                                                default_value_expression=None,
-                                                fields=(),
-                                                policy_tags=None,
-                                            ),
-                                        ),
-                                        policy_tags=None,
-                                    )
-                                ],
-                            ),
-                            SchemaField(
-                                name="uuid",
-                                field_type="RECORD",
-                                fields=[
-                                    SchemaField(name="test_uuid", field_type="STRING")
-                                ],
-                            ),
-                            SchemaField(
-                                name="url2",
-                                field_type="RECORD",
-                                fields=[
-                                    SchemaField(name="test_url", field_type="STRING")
-                                ],
-                            ),
-                        ],
-                    ),
-                ],
-            )
+            return [
+                {
+                    "name": "client_info",
+                    "type": "RECORD",
+                    "fields": [
+                        {"name": "client_id", "type": "STRING"},
+                    ],
+                },
+                {
+                    "name": "metrics",
+                    "type": "RECORD",
+                    "fields": [
+                        {
+                            "name": "boolean",
+                            "type": "RECORD",
+                            "fields": [
+                                {"name": "test_boolean", "type": "BOOLEAN"},
+                                {
+                                    "name": "test_boolean_not_in_source",
+                                    "type": "BOOLEAN",
+                                },
+                            ],
+                        },
+                        {
+                            "name": "counter",
+                            "type": "RECORD",
+                            "fields": [
+                                {"name": "test_counter", "type": "INTEGER"},
+                                {
+                                    "name": "glean_validation_metrics_ping_count",
+                                    "type": "INTEGER",
+                                },
+                                {"name": "no_category_counter", "type": "INTEGER"},
+                            ],
+                        },
+                        {
+                            "name": "labeled_counter",
+                            "type": "RECORD",
+                            "fields": [
+                                {
+                                    "name": "test_labeled_counter",
+                                    "type": "RECORD",
+                                    "mode": "REPEATED",
+                                    "fields": [
+                                        {"name": "key", "type": "STRING"},
+                                        {"name": "value", "type": "INTEGER"},
+                                    ],
+                                },
+                                {
+                                    "name": "test_labeled_counter_not_in_source",
+                                    "type": "RECORD",
+                                    "mode": "REPEATED",
+                                    "fields": [
+                                        {"name": "key", "type": "STRING"},
+                                        {"name": "value", "type": "INTEGER"},
+                                    ],
+                                },
+                                {
+                                    "name": "glean_error_invalid_label",
+                                    "type": "RECORD",
+                                    "mode": "REPEATED",
+                                    "fields": [
+                                        {"name": "key", "type": "STRING"},
+                                        {"name": "value", "type": "INTEGER"},
+                                    ],
+                                },
+                            ],
+                        },
+                        {
+                            "name": "custom_distribution",
+                            "type": "RECORD",
+                            "fields": [
+                                {
+                                    "name": "test_custom_distribution",
+                                    "type": "RECORD",
+                                    "mode": "NULLABLE",
+                                    "default_value_expression": None,
+                                    "fields": [
+                                        {
+                                            "name": "sum",
+                                            "type": "INTEGER",
+                                            "mode": "NULLABLE",
+                                            "default_value_expression": None,
+                                            "fields": [],
+                                            "policy_tags": None,
+                                        },
+                                        {
+                                            "name": "values",
+                                            "type": "RECORD",
+                                            "mode": "REPEATED",
+                                            "default_value_expression": None,
+                                            "fields": [
+                                                {
+                                                    "name": "key",
+                                                    "type": "STRING",
+                                                    "mode": "NULLABLE",
+                                                    "default_value_expression": None,
+                                                    "fields": [],
+                                                    "policy_tags": None,
+                                                },
+                                                {
+                                                    "name": "value",
+                                                    "type": "INTEGER",
+                                                    "mode": "NULLABLE",
+                                                    "default_value_expression": None,
+                                                    "fields": [],
+                                                    "policy_tags": None,
+                                                },
+                                            ],
+                                            "policy_tags": None,
+                                        },
+                                    ],
+                                    "policy_tags": None,
+                                }
+                            ],
+                        },
+                        {
+                            "name": "datetime",
+                            "type": "RECORD",
+                            "fields": [{"name": "test_datetime", "type": "STRING"}],
+                        },
+                        {
+                            "name": "jwe2",
+                            "type": "RECORD",
+                            "fields": [{"name": "test_jwe", "type": "STRING"}],
+                        },
+                        {
+                            "name": "memory_distribution",
+                            "type": "RECORD",
+                            "fields": [
+                                {
+                                    "name": "test_memory_distribution",
+                                    "type": "RECORD",
+                                    "mode": "NULLABLE",
+                                    "default_value_expression": None,
+                                    "fields": [
+                                        {
+                                            "name": "sum",
+                                            "type": "INTEGER",
+                                            "mode": "NULLABLE",
+                                            "default_value_expression": None,
+                                            "fields": [],
+                                            "policy_tags": None,
+                                        },
+                                        {
+                                            "name": "values",
+                                            "type": "RECORD",
+                                            "mode": "REPEATED",
+                                            "default_value_expression": None,
+                                            "fields": [
+                                                {
+                                                    "name": "key",
+                                                    "type": "STRING",
+                                                    "mode": "NULLABLE",
+                                                    "default_value_expression": None,
+                                                    "fields": [],
+                                                    "policy_tags": None,
+                                                },
+                                                {
+                                                    "name": "value",
+                                                    "type": "INTEGER",
+                                                    "mode": "NULLABLE",
+                                                    "default_value_expression": None,
+                                                    "fields": [],
+                                                    "policy_tags": None,
+                                                },
+                                            ],
+                                            "policy_tags": None,
+                                        },
+                                    ],
+                                    "policy_tags": None,
+                                }
+                            ],
+                        },
+                        {
+                            "name": "quantity",
+                            "type": "RECORD",
+                            "fields": [{"name": "test_quantity", "type": "INTEGER"}],
+                        },
+                        {
+                            "name": "string",
+                            "type": "RECORD",
+                            "fields": [{"name": "test_string", "type": "STRING"}],
+                        },
+                        {
+                            "name": "timing_distribution",
+                            "type": "RECORD",
+                            "fields": [
+                                {
+                                    "name": "test_timing_distribution",
+                                    "type": "RECORD",
+                                    "mode": "NULLABLE",
+                                    "default_value_expression": None,
+                                    "fields": [
+                                        {
+                                            "name": "sum",
+                                            "type": "INTEGER",
+                                            "mode": "NULLABLE",
+                                            "default_value_expression": None,
+                                            "fields": [],
+                                            "policy_tags": None,
+                                        },
+                                        {
+                                            "name": "values",
+                                            "type": "RECORD",
+                                            "mode": "REPEATED",
+                                            "default_value_expression": None,
+                                            "fields": [
+                                                {
+                                                    "name": "key",
+                                                    "type": "STRING",
+                                                    "mode": "NULLABLE",
+                                                    "default_value_expression": None,
+                                                    "fields": [],
+                                                    "policy_tags": None,
+                                                },
+                                                {
+                                                    "name": "value",
+                                                    "type": "INTEGER",
+                                                    "mode": "NULLABLE",
+                                                    "default_value_expression": None,
+                                                    "fields": [],
+                                                    "policy_tags": None,
+                                                },
+                                            ],
+                                            "policy_tags": None,
+                                        },
+                                    ],
+                                    "policy_tags": None,
+                                }
+                            ],
+                        },
+                        {
+                            "name": "rate",
+                            "type": "RECORD",
+                            "fields": [
+                                {
+                                    "name": "test_rate",
+                                    "type": "RECORD",
+                                    "fields": [
+                                        {"name": "denominator", "type": "INTEGER"},
+                                        {"name": "numerator", "type": "INTEGER"},
+                                    ],
+                                }
+                            ],
+                        },
+                        {
+                            "name": "timespan",
+                            "type": "RECORD",
+                            "fields": [
+                                {
+                                    "name": "test_timespan",
+                                    "type": "RECORD",
+                                    "mode": "NULLABLE",
+                                    "default_value_expression": None,
+                                    "fields": [
+                                        {
+                                            "name": "time_unit",
+                                            "type": "STRING",
+                                            "mode": "NULLABLE",
+                                            "default_value_expression": None,
+                                            "fields": [],
+                                            "policy_tags": None,
+                                        },
+                                        {
+                                            "name": "value",
+                                            "type": "INTEGER",
+                                            "mode": "NULLABLE",
+                                            "default_value_expression": None,
+                                            "fields": [],
+                                            "policy_tags": None,
+                                        },
+                                    ],
+                                    "policy_tags": None,
+                                }
+                            ],
+                        },
+                        {
+                            "name": "uuid",
+                            "type": "RECORD",
+                            "fields": [{"name": "test_uuid", "type": "STRING"}],
+                        },
+                        {
+                            "name": "url2",
+                            "type": "RECORD",
+                            "fields": [{"name": "test_url", "type": "STRING"}],
+                        },
+                    ],
+                },
+            ]
         if table_ref == "mozdata.fail.duplicate_dimension":
-            return bigquery.Table(
-                table_ref,
-                schema=[
-                    SchemaField(name="parsed_timestamp", field_type="TIMESTAMP"),
-                    SchemaField(name="parsed_date", field_type="DATE"),
-                ],
-            )
+            return [
+                {
+                    "name": "parsed_timestamp",
+                    "type": "TIMESTAMP",
+                },
+                {
+                    "name": "parsed_date",
+                    "type": "DATE",
+                },
+            ]
+        if table_ref == "mozdata.pass.duplicate_event_dimension":
+            return [
+                {
+                    "name": "submission_timestamp",
+                    "type": "TIMESTAMP",
+                },
+                {
+                    "name": "event_timestamp",
+                    "type": "TIMESTAMP",
+                },
+                {
+                    "name": "event",
+                    "type": "STRING",
+                },
+            ]
         if table_ref == "mozdata.fail.duplicate_client":
-            return bigquery.Table(
-                table_ref,
-                schema=[
-                    SchemaField(
-                        name="client_info",
-                        field_type="RECORD",
-                        fields=[
-                            SchemaField(name="client_id", field_type="STRING"),
-                        ],
-                    ),
-                    SchemaField(name="client_id", field_type="STRING"),
-                ],
-            )
+            return [
+                {
+                    "name": "client_info",
+                    "type": "RECORD",
+                    "fields": [
+                        {"name": "client_id", "type": "STRING"},
+                    ],
+                },
+                {"name": "client_id", "type": "STRING"},
+            ]
         if table_ref == "mozdata.custom.context":
-            return bigquery.Table(
-                table_ref,
-                schema=[
-                    SchemaField(name="submission_date", field_type="DATE"),
-                    SchemaField(name="context_id", field_type="STRING"),
-                    SchemaField(
-                        name="contexts",
-                        field_type="RECORD",
-                        mode="REPEATED",
-                        fields=[
-                            SchemaField(name="key", field_type="STRING"),
-                            SchemaField(name="value", field_type="INTEGER"),
-                            SchemaField(
-                                name="position",
-                                field_type="RECORD",
-                                mode="REPEATED",
-                                fields=[
-                                    SchemaField(name="key", field_type="STRING"),
-                                    SchemaField(name="value", field_type="INTEGER"),
-                                ],
-                            ),
-                        ],
-                    ),
-                ],
-            )
+            return [
+                {"name": "submission_date", "type": "DATE"},
+                {"name": "context_id", "type": "STRING"},
+                {
+                    "name": "contexts",
+                    "type": "RECORD",
+                    "mode": "REPEATED",
+                    "fields": [
+                        {"name": "key", "type": "STRING"},
+                        {"name": "value", "type": "INTEGER"},
+                        {
+                            "name": "position",
+                            "type": "RECORD",
+                            "mode": "REPEATED",
+                            "fields": [
+                                {"name": "key", "type": "STRING"},
+                                {"name": "value", "type": "INTEGER"},
+                            ],
+                        },
+                    ],
+                },
+            ]
         if table_ref == "mozdata.glean_app.events_daily":
-            return bigquery.Table(
-                table_ref,
-                schema=[
-                    SchemaField(name="client_id", field_type="STRING"),
-                    SchemaField(name="submission_date", field_type="DATE"),
-                    SchemaField(name="country", field_type="STRING"),
-                    SchemaField(name="events", field_type="STRING"),
-                ],
-            )
+            return [
+                {"name": "client_id", "type": "STRING"},
+                {"name": "submission_date", "type": "DATE"},
+                {"name": "country", "type": "STRING"},
+                {"name": "events", "type": "STRING"},
+            ]
         if table_ref == "mozdata.glean_app.event_types":
-            return bigquery.Table(
-                table_ref,
-                schema=[
-                    SchemaField(name="category", field_type="STRING"),
-                    SchemaField(name="event", field_type="STRING"),
-                    SchemaField(name="index", field_type="STRING"),
-                ],
-            )
+            return [
+                {"name": "category", "type": "STRING"},
+                {"name": "event", "type": "STRING"},
+                {"name": "index", "type": "STRING"},
+            ]
         raise ValueError(f"Table not found: {table_ref}")
 
 
@@ -587,6 +550,15 @@ def msg_glean_probes():
                 "type": "labeled_counter",
                 "history": history,
                 "name": "test.labeled_counter_not_in_source",
+                "in-source": False,
+            },
+        ),
+        GleanProbe(
+            "glean_error.invalid_label",
+            {
+                "type": "labeled_counter",
+                "history": history,
+                "name": "glean_error.invalid_label",
                 "in-source": False,
             },
         ),
@@ -783,6 +755,8 @@ def _prepare_lookml_actual_test(
             """
     )
     namespaces.write_text(namespaces_text)
+
+    mock_dryrun = MockDryRunContext(MockDryRunLookml, False)
     for mock in [mock_glean_ping_view, mock_glean_ping_explore]:
         mock.get_repos.return_value = [{"name": "glean-app-release"}]
         glean_app = Mock()
@@ -793,9 +767,14 @@ def _prepare_lookml_actual_test(
         mock.return_value = glean_app
 
     with runner.isolated_filesystem():
-        with patch("google.cloud.bigquery.Client", MockClient):
-            _lookml(open(namespaces), glean_apps, "looker-hub/")
-            yield namespaces_text
+        _lookml(
+            open(namespaces),
+            glean_apps,
+            "looker-hub/",
+            dryrun=mock_dryrun,
+            parallelism=1,
+        )
+        yield namespaces_text
 
 
 @patch("generator.views.glean_ping_view.GleanPing")
@@ -1144,6 +1123,21 @@ def test_lookml_actual_metric_definitions_view(
                                     "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/test_labeled_counter_not_in_source",  # noqa: E501
                                 }
                             ],
+                        },
+                        {
+                            "group_item_label": "Invalid Label",
+                            "group_label": "Glean Error",
+                            "hidden": "yes",
+                            "label": "Glean Error Invalid Label",
+                            "links": [
+                                {
+                                    "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",
+                                    "label": "Glean Dictionary reference for Glean Error Invalid Label",
+                                    "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/glean_error_invalid_label",  # noqa: E501
+                                }
+                            ],
+                            "name": "metrics__labeled_counter__glean_error_invalid_label",
+                            "sql": "${TABLE}.metrics.labeled_counter.glean_error_invalid_label",
                         },
                         {
                             "group_item_label": "No Category Counter",
@@ -1496,11 +1490,51 @@ def test_lookml_actual_metric_definitions_view(
                             "type": "string",
                         },
                         {
+                            "hidden": "yes",
+                            "name": "value",
+                            "sql": "${TABLE}.value",
+                            "type": "number",
+                        },
+                        {
+                            "hidden": "yes",
                             "name": "label",
-                            "hidden": "no",
                             "sql": "${TABLE}.key",
-                            "suggest_dimension": "suggest__metrics__metrics__labeled_counter__test_labeled_counter.key",
-                            "suggest_explore": "suggest__metrics__metrics__labeled_counter__test_labeled_counter",
+                            "suggest_dimension": "suggest__metrics__metrics__labeled_counter__glean_error_invalid_label.key",  # noqa: E501
+                            "suggest_explore": "suggest__metrics__metrics__labeled_counter__glean_error_invalid_label",
+                            "type": "string",
+                        },
+                    ],
+                    "label": "Glean Error - Invalid Label",
+                    "measures": [
+                        {
+                            "hidden": "yes",
+                            "name": "count",
+                            "sql": "${value}",
+                            "type": "sum",
+                        },
+                        {
+                            "hidden": "yes",
+                            "name": "client_count",
+                            "sql": "case when ${value} > 0 then "
+                            "${metrics.client_info__client_id} end",
+                            "type": "count_distinct",
+                        },
+                    ],
+                    "name": "metrics__metrics__labeled_counter__glean_error_invalid_label",
+                },
+                {
+                    "dimensions": [
+                        {
+                            "hidden": "yes",
+                            "name": "document_id",
+                            "sql": "${metrics.document_id}",
+                            "type": "string",
+                        },
+                        {
+                            "hidden": "yes",
+                            "name": "document_label_id",
+                            "primary_key": "yes",
+                            "sql": "${metrics.document_id}-${label}",
                             "type": "string",
                         },
                         {
@@ -1508,6 +1542,12 @@ def test_lookml_actual_metric_definitions_view(
                             "name": "value",
                             "sql": "${TABLE}.value",
                             "type": "number",
+                        },
+                        {
+                            "name": "label",
+                            "hidden": "no",
+                            "sql": "${TABLE}.key",
+                            "type": "string",
                         },
                     ],
                     "label": "Test - Labeled Counter",
@@ -1544,18 +1584,16 @@ def test_lookml_actual_metric_definitions_view(
                             "type": "string",
                         },
                         {
-                            "name": "label",
-                            "hidden": "yes",
-                            "sql": "${TABLE}.key",
-                            "suggest_dimension": "suggest__metrics__metrics__labeled_counter__test_labeled_counter_not_in_source.key",  # noqa: E501
-                            "suggest_explore": "suggest__metrics__metrics__labeled_counter__test_labeled_counter_not_in_source",  # noqa: E501
-                            "type": "string",
-                        },
-                        {
                             "hidden": "yes",
                             "name": "value",
                             "sql": "${TABLE}.value",
                             "type": "number",
+                        },
+                        {
+                            "name": "label",
+                            "hidden": "yes",
+                            "sql": "${TABLE}.key",
+                            "type": "string",
                         },
                     ],
                     "label": "Test - Labeled Counter Not In Source",
@@ -1583,8 +1621,11 @@ def test_lookml_actual_metric_definitions_view(
                         "    count(*) as n\n"
                         "from mozdata.glean_app.metrics as "
                         "t,\n"
-                        "unnest(metrics.labeled_counter.test_labeled_counter) as m\n"
-                        "where date(submission_timestamp) > date_sub(current_date, interval 30 day)\n"
+                        "unnest(metrics.labeled_counter.glean_error_invalid_label) "
+                        "as m\n"
+                        "where date(submission_timestamp) > "
+                        "date_sub(current_date, interval 30 "
+                        "day)\n"
                         "    and sample_id = 0\n"
                         "group by key\n"
                         "order by n desc"
@@ -1592,25 +1633,28 @@ def test_lookml_actual_metric_definitions_view(
                     "dimensions": [
                         {"name": "key", "sql": "${TABLE}.key", "type": "string"}
                     ],
-                    "name": "suggest__metrics__metrics__labeled_counter__test_labeled_counter",
+                    "name": "suggest__metrics__metrics__labeled_counter__glean_error_invalid_label",
                 },
                 {
-                    "derived_table": {
-                        "sql": "select\n"
-                        "    m.key,\n"
-                        "    count(*) as n\n"
-                        "from mozdata.glean_app.metrics as "
-                        "t,\n"
-                        "unnest(metrics.labeled_counter.test_labeled_counter_not_in_source) as m\n"
-                        "where date(submission_timestamp) > date_sub(current_date, interval 30 day)\n"
-                        "    and sample_id = 0\n"
-                        "group by key\n"
-                        "order by n desc"
-                    },
                     "dimensions": [
-                        {"name": "key", "sql": "${TABLE}.key", "type": "string"}
+                        {"name": "key", "sql": "${TABLE}.key", "type": "string"},
+                        {"name": "value", "sql": "${TABLE}.value", "type": "number"},
                     ],
-                    "name": "suggest__metrics__metrics__labeled_counter__test_labeled_counter_not_in_source",
+                    "name": "metrics__metrics__custom_distribution__test_custom_distribution__values",
+                },
+                {
+                    "dimensions": [
+                        {"name": "key", "sql": "${TABLE}.key", "type": "string"},
+                        {"name": "value", "sql": "${TABLE}.value", "type": "number"},
+                    ],
+                    "name": "metrics__metrics__memory_distribution__test_memory_distribution__values",
+                },
+                {
+                    "dimensions": [
+                        {"name": "key", "sql": "${TABLE}.key", "type": "string"},
+                        {"name": "value", "sql": "${TABLE}.value", "type": "number"},
+                    ],
+                    "name": "metrics__metrics__timing_distribution__test_timing_distribution__values",
                 },
             ]
         }
@@ -1829,13 +1873,85 @@ def test_duplicate_dimension(runner, glean_apps, tmp_path):
             """
         )
     )
+    mock_dryrun = MockDryRunContext(MockDryRunLookml, False)
     with runner.isolated_filesystem():
-        with patch("google.cloud.bigquery.Client", MockClient):
-            with pytest.raises(ClickException):
-                _lookml(open(namespaces), glean_apps, "looker-hub/")
+        with pytest.raises(ClickException):
+            _lookml(open(namespaces), glean_apps, "looker-hub/", dryrun=mock_dryrun)
+
+
+def test_duplicate_dimension_event(runner, glean_apps, tmp_path):
+    namespaces = tmp_path / "namespaces.yaml"
+    namespaces.write_text(
+        dedent(
+            """
+            custom:
+              pretty_name: Custom
+              glean_app: false
+              views:
+                events_stream:
+                  type: table_view
+                  tables:
+                  - channel: release
+                    table: mozdata.pass.duplicate_event_dimension
+            """
+        )
+    )
+    with runner.isolated_filesystem():
+        mock_dryrun = MockDryRunContext(MockDryRunLookml, False)
+        namespaces = tmp_path / "namespaces.yaml"
+        _lookml(open(namespaces), glean_apps, "looker-hub/", dryrun=mock_dryrun)
+        expected = {
+            "views": [
+                {
+                    "dimension_groups": [
+                        {
+                            "name": "event",
+                            "sql": "${TABLE}.event_timestamp",
+                            "timeframes": [
+                                "raw",
+                                "time",
+                                "date",
+                                "week",
+                                "month",
+                                "quarter",
+                                "year",
+                            ],
+                            "type": "time",
+                        },
+                        {
+                            "sql": "${TABLE}.submission_timestamp",
+                            "type": "time",
+                            "timeframes": [
+                                "raw",
+                                "time",
+                                "date",
+                                "week",
+                                "month",
+                                "quarter",
+                                "year",
+                            ],
+                            "name": "submission",
+                        },
+                    ],
+                    "dimensions": [
+                        {"name": "event", "sql": "${TABLE}.event", "type": "string"}
+                    ],
+                    "name": "events_stream",
+                    "sql_table_name": "`mozdata.pass.duplicate_event_dimension`",
+                }
+            ]
+        }
+
+        print_and_test(
+            lkml.load(lkml.dump(expected)),
+            lkml.load(
+                Path("looker-hub/custom/views/events_stream.view.lkml").read_text()
+            ),
+        )
 
 
 def test_duplicate_client_id(runner, glean_apps, tmp_path):
+    mock_dryrun = MockDryRunContext(MockDryRunLookml, False)
     namespaces = tmp_path / "namespaces.yaml"
     namespaces.write_text(
         dedent(
@@ -1852,10 +1968,10 @@ def test_duplicate_client_id(runner, glean_apps, tmp_path):
             """
         )
     )
+    mock_dryrun = MockDryRunContext(MockDryRunLookml, False)
     with runner.isolated_filesystem():
-        with patch("google.cloud.bigquery.Client", MockClient):
-            with pytest.raises(ClickException):
-                _lookml(open(namespaces), glean_apps, "looker-hub/")
+        with pytest.raises(ClickException):
+            _lookml(open(namespaces), glean_apps, "looker-hub/", dryrun=mock_dryrun)
 
 
 def test_context_id(runner, glean_apps, tmp_path):
@@ -1881,9 +1997,9 @@ def test_context_id(runner, glean_apps, tmp_path):
         )
     )
 
+    mock_dryrun = MockDryRunContext(MockDryRunLookml, False)
     with runner.isolated_filesystem():
-        with patch("google.cloud.bigquery.Client", MockClient):
-            _lookml(open(namespaces), glean_apps, "looker-hub/")
+        _lookml(open(namespaces), glean_apps, "looker-hub/", dryrun=mock_dryrun)
         expected = {
             "views": [
                 {

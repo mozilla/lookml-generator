@@ -1,13 +1,14 @@
 """Table explore type."""
+
 from __future__ import annotations
 
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional
 
-from google.cloud import bigquery
-
-from ..views import View
+from ..views import TableView, View
 from . import Explore
+
+ALLOWED_VIEWS = {"events_stream_table"}
 
 
 class TableExplore(Explore):
@@ -15,9 +16,7 @@ class TableExplore(Explore):
 
     type: str = "table_explore"
 
-    def _to_lookml(
-        self, client: bigquery.Client, v1_name: Optional[str]
-    ) -> List[Dict[str, Any]]:
+    def _to_lookml(self, v1_name: Optional[str]) -> List[Dict[str, Any]]:
         """Generate LookML to represent this explore."""
         explore_lookml: Dict[str, Any] = {
             "name": self.name,
@@ -32,8 +31,11 @@ class TableExplore(Explore):
 
     @staticmethod
     def from_views(views: List[View]) -> Iterator[TableExplore]:
-        """Don't generate all possible TableExplores from the views."""
-        return iter([])
+        """Don't generate all possible TableExplores from the views, only generate for ALLOWED_VIEWS."""
+        for view in views:
+            if view.view_type == TableView.type:
+                if view.name in ALLOWED_VIEWS:
+                    yield TableExplore(view.name, {"base_view": view.name})
 
     @staticmethod
     def from_dict(name: str, defn: dict, views_path: Path) -> TableExplore:

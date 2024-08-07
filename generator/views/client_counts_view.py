@@ -1,4 +1,5 @@
 """Class to describe a Client Counts View."""
+
 from __future__ import annotations
 
 from copy import deepcopy
@@ -63,7 +64,7 @@ class ClientCountsView(View):
             "type": "number",
             "description": "The number of clients, "
             "determined by whether they sent a baseline ping on the day in question.",
-            "sql": "COUNT(DISTINCT client_id)",
+            "sql": "COUNT(DISTINCT ${TABLE}.client_id)",
         }
     ]
 
@@ -106,7 +107,7 @@ class ClientCountsView(View):
         """Get a view from a name and dict definition."""
         return ClientCountsView(namespace, _dict["tables"], name)
 
-    def to_lookml(self, bq_client, v1_name: Optional[str]) -> Dict[str, Any]:
+    def to_lookml(self, v1_name: Optional[str], dryrun) -> Dict[str, Any]:
         """Generate LookML for this view."""
         table = self.tables[0]["table"]
 

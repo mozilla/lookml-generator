@@ -1,4 +1,5 @@
 """Utils for operational monitoring."""
+
 from multiprocessing.pool import ThreadPool
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -52,13 +53,13 @@ def get_dimension_defaults(
         }
 
 
-def get_xaxis_val(bq_client: bigquery.Client, table: str) -> str:
+def get_xaxis_val(table: str, dryrun) -> str:
     """
     Return whether the x-axis should be build_id or submission_date.
 
     This is based on which one is found in the table provided.
     """
-    all_dimensions = lookml_utils._generate_dimensions(bq_client, table)
+    all_dimensions = lookml_utils._generate_dimensions(table, dryrun=dryrun)
     return (
         "build_id"
         if "build_id" in {dimension["name"] for dimension in all_dimensions}
@@ -66,7 +67,7 @@ def get_xaxis_val(bq_client: bigquery.Client, table: str) -> str:
     )
 
 
-def get_projects(
+def get_active_projects(
     bq_client: bigquery.Client, project_table: str
 ) -> List[Dict[str, Any]]:
     """Select all operational monitoring projects."""
@@ -75,6 +76,9 @@ def get_projects(
             f"""
                 SELECT *
                 FROM `{project_table}`
+                WHERE
+                    DATE_ADD(end_date, INTERVAL 90 DAY) > CURRENT_DATE() OR
+                    end_date IS NULL
             """
         )
 

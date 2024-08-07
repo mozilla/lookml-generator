@@ -1,10 +1,10 @@
 """Glean Ping explore type."""
+
 from __future__ import annotations
 
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional
 
-from google.cloud import bigquery
 from mozilla_schema_generator.glean_ping import GleanPing
 
 from ..views import GleanPingView, View
@@ -16,9 +16,7 @@ class GleanPingExplore(PingExplore):
 
     type: str = "glean_ping_explore"
 
-    def _to_lookml(
-        self, client: bigquery.Client, v1_name: Optional[str]
-    ) -> List[Dict[str, Any]]:
+    def _to_lookml(self, v1_name: Optional[str]) -> List[Dict[str, Any]]:
         """Generate LookML to represent this explore."""
         repo = next((r for r in GleanPing.get_repos() if r["name"] == v1_name))
         glean_app = GleanPing(repo)
@@ -42,16 +40,42 @@ class GleanPingExplore(PingExplore):
                 continue
             view_name = view["name"]
             metric = "__".join(view["name"].split("__")[1:])
-            joins.append(
-                {
-                    "name": view_name,
-                    "relationship": "one_to_many",
-                    "sql": (
-                        f"LEFT JOIN UNNEST(${{{base_name}.{metric}}}) AS {view_name} "
-                        f"ON ${{{base_name}.document_id}} = ${{{view_name}.document_id}}"
-                    ),
-                }
-            )
+
+            if "labeled_counter" in metric:
+                joins.append(
+                    {
+                        "name": view_name,
+                        "relationship": "one_to_many",
+                        "sql": (
+                            f"LEFT JOIN UNNEST(${{{base_name}.{metric}}}) AS {view_name} "
+                            f"ON ${{{base_name}.document_id}} = ${{{view_name}.document_id}}"
+                        ),
+                    }
+                )
+            else:
+                if metric.startswith("metrics__"):
+                    continue
+
+                try:
+                    # get repeated, nested fields that exist as separate views in lookml
+                    base_name, metric = self._get_base_name_and_metric(
+                        view_name=view_name,
+                        views=[v["name"] for v in views_lookml["views"]],
+                    )
+                    metric_name = view_name
+
+                    joins.append(
+                        {
+                            "name": view_name,
+                            "relationship": "one_to_many",
+                            "sql": (
+                                f"LEFT JOIN UNNEST(${{{base_name}.{metric}}}) AS {metric_name} "
+                            ),
+                        }
+                    )
+                except Exception:
+                    # ignore nested views that cannot be joined on to the base view
+                    continue
 
         base_explore = {
             "name": self.name,

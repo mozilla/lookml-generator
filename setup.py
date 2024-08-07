@@ -1,4 +1,5 @@
 """Installation for lookml-generator."""
+
 # -*- coding: utf-8 -*-
 
 # This Source Code Form is subject to the terms of the Mozilla Public
@@ -27,6 +28,7 @@ setup(
         ]
     },
     include_package_data=True,
+    package_data={"generator": ["*/templates/*.lkml"]},
     zip_safe=False,
     keywords="lookml-generator",
     classifiers=[

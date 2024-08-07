@@ -1,4 +1,5 @@
 """Class to describe an Operational Monitoring View."""
+
 from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Union
@@ -48,13 +49,15 @@ class OperationalMonitoringView(PingView):
         """Get a OperationalMonitoringView from a dict representation."""
         return klass(namespace, name, _dict["tables"])
 
-    def to_lookml(self, bq_client, v1_name: Optional[str]) -> Dict[str, Any]:
+    def to_lookml(self, v1_name: Optional[str], dryrun) -> Dict[str, Any]:
         """Get this view as LookML."""
         if len(self.tables) == 0:
             raise Exception((f"Operational Monitoring view {self.name} has no tables"))
 
         reference_table = self.tables[0]["table"]
-        all_dimensions = lookml_utils._generate_dimensions(bq_client, reference_table)
+        all_dimensions = lookml_utils._generate_dimensions(
+            reference_table, dryrun=dryrun
+        )
 
         filtered_dimensions = [
             d

@@ -140,7 +140,6 @@ class MockClient:
     def query(self, query):
         class QueryJob:
             def result(self):
-                print(query)
                 if "os AS option" in query:
                     return [
                         {
@@ -267,7 +266,7 @@ def test_namespaces_full(
                     app_listings_uri,
                     "--disallowlist",
                     namespace_disallowlist,
-                    "--metric-hub-repo",
+                    "--metric-hub-repos",
                     tmp_path / "metric-hub",
                 ],
             )
@@ -310,16 +309,14 @@ def test_namespaces_full(
                 },
                 "fenix": {
                     "explores": {
-                        "metric_definitions_fenix": {
+                        "metric_definitions_baseline": {
                             "type": "metric_definitions_explore",
-                            "views": {
-                                "base_view": "metric_definitions_baseline",
-                                "joined_views": [
-                                    "metric_definitions_baseline",
-                                    "metric_definitions_metrics",
-                                ],
-                            },
-                        }
+                            "views": {"base_view": "metric_definitions_baseline"},
+                        },
+                        "metric_definitions_metrics": {
+                            "type": "metric_definitions_explore",
+                            "views": {"base_view": "metric_definitions_metrics"},
+                        },
                     },
                     "glean_app": False,
                     "pretty_name": "Fenix",

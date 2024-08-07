@@ -1,4 +1,5 @@
 """Generic explore type."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -6,7 +7,6 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 import lkml
-from google.cloud import bigquery
 
 from ..views.lookml_utils import escape_filter_expr, slug_to_title
 
@@ -25,9 +25,7 @@ class Explore:
         """Explore instance represented as a dict."""
         return {self.name: {"type": self.type, "views": self.views}}
 
-    def to_lookml(
-        self, client: bigquery.Client, v1_name: Optional[str]
-    ) -> List[Dict[str, Any]]:
+    def to_lookml(self, v1_name: Optional[str]) -> List[Dict[str, Any]]:
         """
         Generate LookML for this explore.
 
@@ -57,12 +55,12 @@ class Explore:
             if "join" in view_type:
                 continue
             if time_partitioning_group := self.get_view_time_partitioning_group(view):
-                base_lookml[
-                    "sql_always_where"
-                ] = f"${{{base_view_name}.{time_partitioning_group}_date}} >= '2010-01-01'"
+                base_lookml["sql_always_where"] = (
+                    f"${{{base_view_name}.{time_partitioning_group}_date}} >= '2010-01-01'"
+                )
 
         # We only update the first returned explore
-        new_lookml = self._to_lookml(client, v1_name)
+        new_lookml = self._to_lookml(v1_name)
         base_lookml.update(new_lookml[0])
         new_lookml[0] = base_lookml
 
@@ -70,7 +68,6 @@ class Explore:
 
     def _to_lookml(
         self,
-        client: bigquery.Client,
         v1_name: Optional[str],
     ) -> List[Dict[str, Any]]:
         raise NotImplementedError("Only implemented in subclasses")
