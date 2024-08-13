@@ -431,7 +431,7 @@ mozilla_vpn:
       type: table_view
       tables:
         - channel: release
-          table: mozdata.mozilla_vpn.site_metrics_summary_v2
+          table: mozdata.mozilla_vpn_derived.site_metrics_summary_v2
     subscriptions:
       type: table_view
       tables:
