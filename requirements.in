@@ -1,5 +1,5 @@
 click==8.1.7
-flake8<5 # pytest-flake8 does not support flake8 5+
+flake8==7.1.1 
 exceptiongroup  # for pytest on python<=3.10
 google-cloud-bigquery==3.25.0
 google-cloud-storage==2.18.2
@@ -14,7 +14,6 @@ pip-tools==7.4.1
 pre-commit==3.8.0
 pyarrow==17.0.0
 pytest-black==0.3.12
-pytest-flake8==1.1.1
 pytest-isort==4.0.0
 pytest-mypy==0.10.3
 pytest-pydocstyle==2.3.2
