@@ -431,7 +431,7 @@ mozilla_vpn:
       type: table_view
       tables:
         - channel: release
-          table: mozdata.mozilla_vpn.site_metrics_summary_v2
+          table: moz-fx-data-shared-prod.mozilla_vpn_derived.site_metrics_summary_v2
     subscriptions:
       type: table_view
       tables:
@@ -599,6 +599,10 @@ firefox_accounts:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.accounts_frontend_derived.login_engagement_funnel_v1
+    health_issues:
+      type: table_view
+      tables:
+        - table: mozdata.analysis.wclouser_fxa_health_issues
   explores:
     all_event_counts:
       type: events_explore
@@ -680,6 +684,10 @@ firefox_accounts:
       type: table_explore
       views:
         base_view: login_engagement_funnels_by_service
+    health_issues:
+      type: table_explore
+      views:
+        base_view: health_issues
 revenue:
   glean_app: false
   connection: bigquery-oauth
