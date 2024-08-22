@@ -4,6 +4,10 @@
 #
 #    pip-compile --allow-unsafe --generate-hashes
 #
+aiocache==0.12.2 \
+    --hash=sha256:9b6fa30634ab0bfc3ecc44928a91ff07c6ea16d27d55469636b296ebc6eb5918 \
+    --hash=sha256:b41c9a145b050a5dcbae1599f847db6dd445193b1f3bd172d8e0fe0cb9e96684
+    # via spectacles
 analytics-python==1.4.post1 \
     --hash=sha256:33ab660150d0f37bb2fefc93fd19c9e7bd85e5b17db44df5e7e1139f63c14246 \
     --hash=sha256:b083e69c149c39e7ad17067f0e5c1742fbd15fdc469ade36c4d1ad5edf31ee5e
@@ -1006,9 +1010,9 @@ snowballstemmer==2.2.0 \
     --hash=sha256:09b16deb8547d3412ad7b590689584cd0fe25ec8db3be37788be3810cbf19cb1 \
     --hash=sha256:c8e1716e83cc398ae16824e5572ae04e0d9fc2c6b985fb0f900f5f0c96ecba1a
     # via pydocstyle
-spectacles==2.3.16 \
-    --hash=sha256:928f0e617d12f20df6d57f28462164185fcdd47535c211ff785c2b403b66fe34 \
-    --hash=sha256:ec34d2132c06ffe00d317c1d56b71a9a42a659556d7df29662f0c015059add4b
+spectacles==2.3.18 \
+    --hash=sha256:2cd4ade376a80a316cce224ad94a6c07810c4cb824fa568b21c8210662110cde \
+    --hash=sha256:8e5c0ecafda5fbf532e64627cfdc2cf8c19db8788bb409172bf809fb5fbef095
     # via -r requirements.in
 tabulate==0.9.0 \
     --hash=sha256:0095b12bf5966de529c0feb1fa08671671b3368eec77d7ef7ab114be2c068b3c \
