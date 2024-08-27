@@ -603,6 +603,14 @@ firefox_accounts:
       type: table_view
       tables:
         - table: mozdata.analysis.wclouser_fxa_health_issues
+    account_settings_page_engagement:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.accounts_frontend_derived.accounts_pref_engagement_v1
+    account_settings_delete_account_funnel:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.accounts_frontend_derived.account_pref_delete_funnel_v1
   explores:
     all_event_counts:
       type: events_explore
@@ -688,6 +696,14 @@ firefox_accounts:
       type: table_explore
       views:
         base_view: health_issues
+    account_settings_page_engagement:
+      type: table_explore
+      views:
+        base_view: account_settings_page_engagement
+    account_settings_delete_account_funnel:
+      type: table_explore
+      views:
+        base_view: account_settings_delete_account_funnel
 revenue:
   glean_app: false
   connection: bigquery-oauth
