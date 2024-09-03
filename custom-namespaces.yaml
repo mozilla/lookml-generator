@@ -1704,6 +1704,10 @@ fxci:
       type: table_explore
       views:
         base_view: task_runs
+    task_run_costs:
+      type: table_explore
+      views:
+        base_view: task_run_costs
     worker_costs:
       type: table_explore
       views:
@@ -1721,6 +1725,10 @@ fxci:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.fxci.task_runs_v1
+    task_run_costs:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.fxci_derived.task_run_costs_v1
     worker_costs:
       type: table_view
       tables:
