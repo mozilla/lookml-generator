@@ -1257,6 +1257,10 @@ monitoring:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.monitoring_derived.outerbounds_cost_per_flow_run_v1
+    mlops_rayserve_cost_fakespot_tenant:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.monitoring_derived.rayserve_cost_fakespot_tenant_v1
   explores:
     column_size:
       type: ping_explore
@@ -1382,39 +1386,39 @@ websites:
     moz_org_page_metrics:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.ga.www_site_page_metrics
+        - table: moz-fx-data-shared-prod.mozilla_org.www_site_page_metrics
     moz_org_metrics_summary:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.ga.www_site_metrics_summary
+        - table: moz-fx-data-shared-prod.mozilla_org.www_site_metrics_summary
     moz_org_landing_page_metrics:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.ga.www_site_landing_page_metrics
+        - table: moz-fx-data-shared-prod.mozilla_org.www_site_landing_page_metrics
     ga4_blogs_sessions:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.ga.blogs_sessions
+        - table: moz-fx-data-shared-prod.mozilla_org.blogs_sessions
     ga4_blogs_goals:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.ga.blogs_goals
+        - table: moz-fx-data-shared-prod.mozilla_org.blogs_goals
     blogs_daily_summary:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.ga.blogs_daily_summary
+        - table: moz-fx-data-shared-prod.mozilla_org.blogs_daily_summary
     blogs_landing_page_summary:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.ga.blogs_landing_page_summary
+        - table: moz-fx-data-shared-prod.mozilla_org.blogs_landing_page_summary
     www_site_events_metrics:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.ga.www_site_events_metrics
+        - table: moz-fx-data-shared-prod.mozilla_org.www_site_events_metrics
     firefox_whatsnew_summary:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.ga.firefox_whatsnew_summary
+        - table: moz-fx-data-shared-prod.mozilla_org.firefox_whatsnew_summary
     google_search_console_by_page:
       type: table_view
       tables:
