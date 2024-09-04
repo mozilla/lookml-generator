@@ -500,9 +500,9 @@ monotonic==1.6 \
     --hash=sha256:3a55207bcfed53ddd5c5bae174524062935efed17792e9de2ad0205ce9ad63f7 \
     --hash=sha256:68687e19a14f11f26d140dd5c86f3dba4bf5df58003000ed467e0e2a69bca96c
     # via analytics-python
-mozilla-metric-config-parser==2024.8.1 \
-    --hash=sha256:49fb6e67367809e3750108246e50dc1e68778564c2c158ba26bd4835b0b9c89c \
-    --hash=sha256:cadc4ba9fb8399be0b857abb4bdd1f12ff1943159463fec0d128b71b2e72b554
+mozilla-metric-config-parser==2024.9.1 \
+    --hash=sha256:019a0bccf6a126bdcc3a52527db5cf7b71a8eed48da015cc3523df6fe86b484f \
+    --hash=sha256:86b075a290bccc6c655acd43d89f0ebef421ef0b131879420696d43210a76dc3
     # via -r requirements.in
 mozilla-nimbus-schemas==2023.10.23 \
     --hash=sha256:84ddebf89d99754442676dc379c7eccc76de9adc13cbf8942ead85d8a6cde540 \
