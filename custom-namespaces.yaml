@@ -1736,11 +1736,26 @@ fxci:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.fxci_derived.task_run_costs_v1
+      measures:
+        total_cost:
+          type: sum
+          value_format_name: usd
+          sql: "${run_cost}"
     worker_costs:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.fxci_derived.worker_costs_v1
+      measures:
+        total_cost:
+          type: sum
+          value_format_name: usd
+          sql: "${total_cost}"
     worker_metrics:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.fxci.worker_metrics_v1
+      measures:
+        total_uptime:
+          type: sum
+          value_format_name: seconds
+          sql: "${uptime}"
