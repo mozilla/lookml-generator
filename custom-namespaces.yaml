@@ -1702,27 +1702,6 @@ fxci:
   owners:
     - ahalberstadt@mozilla.com
   glean_app: false
-  explores:
-    tasks:
-      type: table_explore
-      views:
-        base_view: tasks
-    task_runs:
-      type: table_explore
-      views:
-        base_view: task_runs
-    task_run_costs:
-      type: table_explore
-      views:
-        base_view: task_run_costs
-    worker_costs:
-      type: table_explore
-      views:
-        base_view: worker_costs
-    worker_metrics:
-      type: table_explore
-      views:
-        base_view: worker_metrics
   views:
     tasks:
       type: table_view
