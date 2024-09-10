@@ -1711,6 +1711,8 @@ firefox_okrs:
   glean_app: false
   owners:
     - vsabino@mozilla.com
+    - rbaffourawuah@mozilla.com
+    - kik@mozilla.com
   pretty_name: Firefox OKRs
   views:
     desktop_retention:
@@ -1729,6 +1731,10 @@ firefox_okrs:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.telemetry.mobile_engagement
+    mobile_new_profiles:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.telemetry.mobile_new_profiles
 fakespot:
   pretty_name: Fakespot
   owners:
