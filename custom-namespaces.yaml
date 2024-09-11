@@ -824,10 +824,6 @@ firefox_ios:
       type: table_view
       tables:
         - table: mozdata.firefox_ios.firefox_ios_clients
-    new_profiles:
-      type: table_view
-      tables:
-        - table: mozdata.firefox_ios.new_profiles
   explores:
     feature_usage_metrics:
       type: table_explore
@@ -841,26 +837,6 @@ firefox_ios:
       type: table_explore
       views:
         base_view: clients_activation
-focus_ios:
-  owners:
-    - loines@mozilla.com
-    - rbaffourawuah@mozilla.com
-    - kik@mozilla.com
-  views:
-    new_profiles:
-      type: table_view
-      tables:
-        - table: mozdata.focus_ios.new_profiles
-klar_ios:
-  owners:
-    - loines@mozilla.com
-    - rbaffourawuah@mozilla.com
-    - kik@mozilla.com
-  views:
-    new_profiles:
-      type: table_view
-      tables:
-        - table: mozdata.klar_ios.new_profiles
 fenix:
   pretty_name: Firefox Android
   owners:
@@ -893,10 +869,6 @@ fenix:
       type: table_view
       tables:
         - table: mozdata.fenix.firefox_android_clients
-    new_profiles:
-      type: table_view
-      tables:
-        - table: mozdata.fenix.new_profiles
   explores:
     feature_usage_metrics:
       type: table_explore
@@ -906,26 +878,6 @@ fenix:
       type: table_explore
       views:
         base_view: feature_usage_events
-focus_android:
-  owners:
-    - loines@mozilla.com
-    - rbaffourawuah@mozilla.com
-    - kik@mozilla.com
-  views:
-    new_profiles:
-      type: table_view
-      tables:
-        - table: mozdata.focus_android.new_profiles
-klar_android:
-  owners:
-    - loines@mozilla.com
-    - rbaffourawuah@mozilla.com
-    - kik@mozilla.com
-  views:
-    new_profiles:
-      type: table_view
-      tables:
-        - table: mozdata.klar_android.new_profiles
 newtab:
   glean_app: false
   connection: bigquery-oauth
