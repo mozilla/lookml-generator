@@ -1714,7 +1714,7 @@ fxci:
     task_run_costs:
       type: table_view
       tables:
-        - table: moz-fx-data-shared-prod.fxci_derived.task_run_costs_v1
+        - table: moz-fx-data-shared-prod.fxci.task_run_costs
       measures:
         total_cost:
           type: sum
@@ -1723,7 +1723,7 @@ fxci:
     worker_costs:
       type: table_view
       tables:
-        - table: moz-fx-data-shared-prod.fxci_derived.worker_costs_v1
+        - table: moz-fx-data-shared-prod.fxci.worker_costs
       measures:
         total_cost:
           type: sum
