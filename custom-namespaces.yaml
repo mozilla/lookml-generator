@@ -1702,27 +1702,6 @@ fxci:
   owners:
     - ahalberstadt@mozilla.com
   glean_app: false
-  explores:
-    tasks:
-      type: table_explore
-      views:
-        base_view: tasks
-    task_runs:
-      type: table_explore
-      views:
-        base_view: task_runs
-    task_run_costs:
-      type: table_explore
-      views:
-        base_view: task_run_costs
-    worker_costs:
-      type: table_explore
-      views:
-        base_view: worker_costs
-    worker_metrics:
-      type: table_explore
-      views:
-        base_view: worker_metrics
   views:
     tasks:
       type: table_view
@@ -1735,12 +1714,27 @@ fxci:
     task_run_costs:
       type: table_view
       tables:
-        - table: moz-fx-data-shared-prod.fxci_derived.task_run_costs_v1
+        - table: moz-fx-data-shared-prod.fxci.task_run_costs
+      measures:
+        total_cost:
+          type: sum
+          value_format_name: usd
+          sql: "${run_cost}"
     worker_costs:
       type: table_view
       tables:
-        - table: moz-fx-data-shared-prod.fxci_derived.worker_costs_v1
+        - table: moz-fx-data-shared-prod.fxci.worker_costs
+      measures:
+        total_cost:
+          type: sum
+          value_format_name: usd
+          sql: "${total_cost}"
     worker_metrics:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.fxci.worker_metrics_v1
+      measures:
+        total_uptime:
+          type: sum
+          value_format_name: seconds
+          sql: "${uptime}"
