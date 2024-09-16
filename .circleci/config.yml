@@ -153,11 +153,14 @@ jobs:
             # they don't show up as missing.
             # todo: update operational monitoring logic so BigQuery access is not needed
             cp -R /tmp/workspace/looker-hub/operational_monitoring /tmp/workspace/generated-lookml
+            yq eval -i 'del(.operational_monitoring)' /tmp/workspace/generated-lookml/namespaces.yaml
+            yq eval -i 'del(.operational_monitoring)' /tmp/workspace/looker-hub/namespaces.yaml
 
             # the following files are only in looker-hub/ (manually checked in) and can be ignored
             rm /tmp/workspace/looker-hub/README.md
             rm /tmp/workspace/looker-hub/hub.model.lkml
             rm /tmp/workspace/looker-hub/CODE_OF_CONDUCT.md
+            rm /tmp/workspace/looker-hub/firefox_ios/views/column_field_paths.view.lkml
 
             diff -x '.*' -qr --no-dereference \
               /tmp/workspace/looker-hub/ /tmp/workspace/generated-lookml/ \
