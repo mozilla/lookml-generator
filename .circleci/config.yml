@@ -42,6 +42,9 @@ jobs:
           name: PyTest with linters
           command: venv/bin/pytest
       - run:
+          name: Flake8
+          command: venv/bin/flake8 generator
+      - run:
           name: Lint YAML
           command: venv/bin/yamllint -c .yamllint.yaml .
       - save_cache:

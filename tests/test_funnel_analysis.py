@@ -177,12 +177,22 @@ def test_view_lookml(funnel_analysis_view):
                         SELECT
                           mozfun.event_analysis.aggregate_match_strings(
                             ARRAY_AGG(
-                              DISTINCT CONCAT(
-                                {% if _filters['property_name'] or _filters['property_value'] -%}
-                                COALESCE(mozfun.event_analysis.escape_metachars(property_value.value), ''),
-                                {% endif -%}
+                              DISTINCT
+                              {% if _filters['property_value'] -%}
+                                mozfun.event_analysis.event_property_value_to_match_string(
+                                  et.index,
+                                  properties.index,
+                                  property_value.value
+                                )
+                              {% elsif _filters['property_name'] -%}
+                                mozfun.event_analysis.event_property_index_to_match_string(
+                                  et.index,
+                                  properties.index
+                                )
+                              {% else -%}
                                 mozfun.event_analysis.event_index_to_match_string(et.index)
-                              )
+                              {% endif -%}
+                              IGNORE NULLS
                             )
                           ) AS match_string
                         FROM

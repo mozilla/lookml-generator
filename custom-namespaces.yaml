@@ -431,7 +431,7 @@ mozilla_vpn:
       type: table_view
       tables:
         - channel: release
-          table: mozdata.mozilla_vpn.site_metrics_summary_v2
+          table: moz-fx-data-shared-prod.mozilla_vpn_derived.site_metrics_summary_v2
     subscriptions:
       type: table_view
       tables:
@@ -599,6 +599,18 @@ firefox_accounts:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.accounts_frontend_derived.login_engagement_funnel_v1
+    health_issues:
+      type: table_view
+      tables:
+        - table: mozdata.analysis.wclouser_fxa_health_issues
+    account_settings_page_engagement:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.accounts_frontend_derived.accounts_pref_engagement_v1
+    account_settings_delete_account_funnel:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.accounts_frontend_derived.account_pref_delete_funnel_v1
   explores:
     all_event_counts:
       type: events_explore
@@ -680,6 +692,18 @@ firefox_accounts:
       type: table_explore
       views:
         base_view: login_engagement_funnels_by_service
+    health_issues:
+      type: table_explore
+      views:
+        base_view: health_issues
+    account_settings_page_engagement:
+      type: table_explore
+      views:
+        base_view: account_settings_page_engagement
+    account_settings_delete_account_funnel:
+      type: table_explore
+      views:
+        base_view: account_settings_delete_account_funnel
 revenue:
   glean_app: false
   connection: bigquery-oauth
@@ -817,7 +841,6 @@ fenix:
   pretty_name: Firefox Android
   owners:
     - vzare@mozilla.com
-    - ksiegler@mozilla.com
     - rbaffourawuah@mozilla.com
     - vsabino@mozilla.com
     - kik@mozilla.com
@@ -855,12 +878,6 @@ fenix:
       type: table_explore
       views:
         base_view: feature_usage_events
-focus_ios:
-  owners:
-    - loines@mozilla.com
-focus_android:
-  owners:
-    - loines@mozilla.com
 newtab:
   glean_app: false
   connection: bigquery-oauth
@@ -1053,6 +1070,14 @@ firefox_desktop:
       type: table_view
       tables:
         - table: mozdata.telemetry.desktop_cohort_daily_retention
+    desktop_new_profiles_aggregates:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.telemetry_derived.desktop_new_profiles_aggregates_v1
+    fenix_distribution_deal:
+      type: table_view
+      tables:
+        - table: mozdata.analysis.fenix_distribution_deal_v1
   explores:
     client_counts:
       type: client_counts_explore
@@ -1089,6 +1114,10 @@ firefox_desktop:
       type: table_explore
       views:
         base_view: serp_categorization_unnested_table
+    fenix_distribution_deal:
+      type: table_explore
+      views:
+        base_view: fenix_distribution_deal
 monitoring:
   glean_app: false
   owners:
@@ -1233,6 +1262,14 @@ monitoring:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.monitoring_derived.outerbounds_cost_per_flow_run_v1
+    mlops_rayserve_cost_fakespot_tenant:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.monitoring_derived.rayserve_cost_fakespot_tenant_v1
+    mlops_rayserve_cost_fakespot_tenant_prod:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.monitoring_derived.rayserve_cost_fakespot_tenant_prod_v1
   explores:
     column_size:
       type: ping_explore
@@ -1358,39 +1395,39 @@ websites:
     moz_org_page_metrics:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.ga.www_site_page_metrics
+        - table: moz-fx-data-shared-prod.mozilla_org.www_site_page_metrics
     moz_org_metrics_summary:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.ga.www_site_metrics_summary
+        - table: moz-fx-data-shared-prod.mozilla_org.www_site_metrics_summary
     moz_org_landing_page_metrics:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.ga.www_site_landing_page_metrics
+        - table: moz-fx-data-shared-prod.mozilla_org.www_site_landing_page_metrics
     ga4_blogs_sessions:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.ga.blogs_sessions
+        - table: moz-fx-data-shared-prod.mozilla_org.blogs_sessions
     ga4_blogs_goals:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.ga.blogs_goals
+        - table: moz-fx-data-shared-prod.mozilla_org.blogs_goals
     blogs_daily_summary:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.ga.blogs_daily_summary
+        - table: moz-fx-data-shared-prod.mozilla_org.blogs_daily_summary
     blogs_landing_page_summary:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.ga.blogs_landing_page_summary
+        - table: moz-fx-data-shared-prod.mozilla_org.blogs_landing_page_summary
     www_site_events_metrics:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.ga.www_site_events_metrics
+        - table: moz-fx-data-shared-prod.mozilla_org.www_site_events_metrics
     firefox_whatsnew_summary:
       type: table_view
       tables:
-        - table: moz-fx-data-marketing-prod.ga.firefox_whatsnew_summary
+        - table: moz-fx-data-shared-prod.mozilla_org.firefox_whatsnew_summary
     google_search_console_by_page:
       type: table_view
       tables:
@@ -1399,6 +1436,14 @@ websites:
       type: table_view
       tables:
         - table: mozdata.google_search_console.search_impressions_by_site
+    limited_historical_google_search_console_by_page:
+      type: table_view
+      tables:
+        - table: mozdata.google_search_console.limited_historical_search_impressions_by_page
+    limited_historical_google_search_console_by_site:
+      type: table_view
+      tables:
+        - table: mozdata.google_search_console.limited_historical_search_impressions_by_site
 marketing:
   glean_app: false
   pretty_name: Marketing
@@ -1618,6 +1663,8 @@ firefox_okrs:
   glean_app: false
   owners:
     - vsabino@mozilla.com
+    - rbaffourawuah@mozilla.com
+    - kik@mozilla.com
   pretty_name: Firefox OKRs
   views:
     desktop_retention:
@@ -1636,6 +1683,10 @@ firefox_okrs:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.telemetry.mobile_engagement
+    mobile_new_profiles:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.telemetry.mobile_new_profiles
 fakespot:
   pretty_name: Fakespot
   owners:
@@ -1651,23 +1702,6 @@ fxci:
   owners:
     - ahalberstadt@mozilla.com
   glean_app: false
-  explores:
-    tasks:
-      type: table_explore
-      views:
-        base_view: tasks
-    task_runs:
-      type: table_explore
-      views:
-        base_view: task_runs
-    worker_costs:
-      type: table_explore
-      views:
-        base_view: worker_costs
-    worker_metrics:
-      type: table_explore
-      views:
-        base_view: worker_metrics
   views:
     tasks:
       type: table_view
@@ -1677,11 +1711,30 @@ fxci:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.fxci.task_runs_v1
+    task_run_costs:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.fxci.task_run_costs
+      measures:
+        total_cost:
+          type: sum
+          value_format_name: usd
+          sql: "${run_cost}"
     worker_costs:
       type: table_view
       tables:
-        - table: moz-fx-data-shared-prod.fxci_derived.worker_costs_v1
+        - table: moz-fx-data-shared-prod.fxci.worker_costs
+      measures:
+        total_cost:
+          type: sum
+          value_format_name: usd
+          sql: "${total_cost}"
     worker_metrics:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.fxci.worker_metrics_v1
+      measures:
+        total_uptime:
+          type: sum
+          value_format_name: seconds
+          sql: "${uptime}"
