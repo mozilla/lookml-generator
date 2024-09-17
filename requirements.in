@@ -20,7 +20,7 @@ pytest-pydocstyle==2.3.2
 pytest==7.4.4
 PyYAML==6.0.2
 tomli==2.0.1  # for toml parsing on python<3.11
-types-PyYaml==6.0.12.20240808
+types-PyYaml==6.0.12.20240917
 yamllint==1.35.1
 gitpython==3.1.43
 spectacles==2.4.10
