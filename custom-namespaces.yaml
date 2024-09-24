@@ -1646,6 +1646,10 @@ growth:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.apple_ads_external.ios_app_campaign_stats_v1
+    rolling_28_day_dau:
+      type: table_view
+      tables:
+        - table: mozdata.telemetry.segmented_dau_28_day_rolling
 user_journey:
   pretty_name: User Journey
   owners:
