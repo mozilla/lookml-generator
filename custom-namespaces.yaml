@@ -1118,10 +1118,10 @@ firefox_desktop:
       type: table_view
       tables:
         - table: mozdata.telemetry.desktop_cohort_daily_retention
-    desktop_new_profiles_aggregates:
+    desktop_new_profiles:
       type: table_view
       tables:
-        - table: moz-fx-data-shared-prod.telemetry_derived.desktop_new_profiles_aggregates_v1
+        - table: moz-fx-data-shared-prod.telemetry.desktop_new_profiles
     fenix_distribution_deal:
       type: table_view
       tables:
