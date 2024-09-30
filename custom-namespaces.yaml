@@ -804,10 +804,6 @@ firefox_ios:
     - rbaffourawuah@mozilla.com
     - vsabino@mozilla.com
   views:
-    funnel_retention_week_4:
-      type: table_view
-      tables:
-        - table: mozdata.firefox_ios.funnel_retention_week_4
     feature_usage_metrics:
       type: table_view
       tables:
@@ -824,10 +820,6 @@ firefox_ios:
       type: table_view
       tables:
         - table: mozdata.firefox_ios.firefox_ios_clients
-    new_profiles:
-      type: table_view
-      tables:
-        - table: mozdata.firefox_ios.new_profiles
   explores:
     feature_usage_metrics:
       type: table_explore
@@ -841,26 +833,6 @@ firefox_ios:
       type: table_explore
       views:
         base_view: clients_activation
-focus_ios:
-  owners:
-    - loines@mozilla.com
-    - rbaffourawuah@mozilla.com
-    - kik@mozilla.com
-  views:
-    new_profiles:
-      type: table_view
-      tables:
-        - table: mozdata.focus_ios.new_profiles
-klar_ios:
-  owners:
-    - loines@mozilla.com
-    - rbaffourawuah@mozilla.com
-    - kik@mozilla.com
-  views:
-    new_profiles:
-      type: table_view
-      tables:
-        - table: mozdata.klar_ios.new_profiles
 fenix:
   pretty_name: Firefox Android
   owners:
@@ -873,10 +845,6 @@ fenix:
       type: table_view
       tables:
         - table: moz-fx-data-marketing-prod.google_play_store.Store_Performance_country_v1
-    funnel_retention_week_4:
-      type: table_view
-      tables:
-        - table: mozdata.fenix.funnel_retention_week_4
     android_onboarding:
       type: table_view
       tables:
@@ -893,10 +861,6 @@ fenix:
       type: table_view
       tables:
         - table: mozdata.fenix.firefox_android_clients
-    new_profiles:
-      type: table_view
-      tables:
-        - table: mozdata.fenix.new_profiles
   explores:
     feature_usage_metrics:
       type: table_explore
@@ -906,26 +870,6 @@ fenix:
       type: table_explore
       views:
         base_view: feature_usage_events
-focus_android:
-  owners:
-    - loines@mozilla.com
-    - rbaffourawuah@mozilla.com
-    - kik@mozilla.com
-  views:
-    new_profiles:
-      type: table_view
-      tables:
-        - table: mozdata.focus_android.new_profiles
-klar_android:
-  owners:
-    - loines@mozilla.com
-    - rbaffourawuah@mozilla.com
-    - kik@mozilla.com
-  views:
-    new_profiles:
-      type: table_view
-      tables:
-        - table: mozdata.klar_android.new_profiles
 newtab:
   glean_app: false
   connection: bigquery-oauth
@@ -1702,6 +1646,10 @@ growth:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.apple_ads_external.ios_app_campaign_stats_v1
+    rolling_28_day_dau:
+      type: table_view
+      tables:
+        - table: mozdata.telemetry.segmented_dau_28_day_rolling
 user_journey:
   pretty_name: User Journey
   owners:
@@ -1711,6 +1659,8 @@ firefox_okrs:
   glean_app: false
   owners:
     - vsabino@mozilla.com
+    - rbaffourawuah@mozilla.com
+    - kik@mozilla.com
   pretty_name: Firefox OKRs
   views:
     desktop_retention:
@@ -1729,6 +1679,10 @@ firefox_okrs:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.telemetry.mobile_engagement
+    mobile_new_profiles:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.telemetry.mobile_new_profiles
 fakespot:
   pretty_name: Fakespot
   owners:
@@ -1744,27 +1698,6 @@ fxci:
   owners:
     - ahalberstadt@mozilla.com
   glean_app: false
-  explores:
-    tasks:
-      type: table_explore
-      views:
-        base_view: tasks
-    task_runs:
-      type: table_explore
-      views:
-        base_view: task_runs
-    task_run_costs:
-      type: table_explore
-      views:
-        base_view: task_run_costs
-    worker_costs:
-      type: table_explore
-      views:
-        base_view: worker_costs
-    worker_metrics:
-      type: table_explore
-      views:
-        base_view: worker_metrics
   views:
     tasks:
       type: table_view
@@ -1777,12 +1710,27 @@ fxci:
     task_run_costs:
       type: table_view
       tables:
-        - table: moz-fx-data-shared-prod.fxci_derived.task_run_costs_v1
+        - table: moz-fx-data-shared-prod.fxci.task_run_costs
+      measures:
+        total_cost:
+          type: sum
+          value_format_name: usd
+          sql: "${run_cost}"
     worker_costs:
       type: table_view
       tables:
-        - table: moz-fx-data-shared-prod.fxci_derived.worker_costs_v1
+        - table: moz-fx-data-shared-prod.fxci.worker_costs
+      measures:
+        total_cost:
+          type: sum
+          value_format_name: usd
+          sql: "${total_cost}"
     worker_metrics:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.fxci.worker_metrics_v1
+      measures:
+        total_uptime:
+          type: sum
+          value_format_name: seconds
+          sql: "${uptime}"
