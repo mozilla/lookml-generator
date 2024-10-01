@@ -201,7 +201,7 @@ def test_explore_lookml(operational_monitoring_explore):
         }
     ]
 
-    actual = operational_monitoring_explore.to_lookml(None)
+    actual = operational_monitoring_explore.to_lookml(None, None)
     print_and_test(expected=expected, actual=actual)
 
 

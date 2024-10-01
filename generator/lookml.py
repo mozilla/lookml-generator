@@ -77,6 +77,9 @@ def _generate_explore(
     explore_by_type = EXPLORE_TYPES[explore_info["type"]].from_dict(
         explore_name, explore_info, views_dir
     )
+
+    hidden = explore_info.get("hidden", False)
+
     file_lookml = {
         # Looker validates all included files,
         # so if we're not explicit about files here, validation takes
@@ -85,7 +88,7 @@ def _generate_explore(
             f"/looker-hub/{namespace}/views/{view}.view.lkml"
             for view in explore_by_type.get_dependent_views()
         ],
-        "explores": explore_by_type.to_lookml(v1_name),
+        "explores": explore_by_type.to_lookml(v1_name, hidden),
     }
     path = out_dir / (explore_name + ".explore.lkml")
     # lkml.dump may return None, in which case write an empty file

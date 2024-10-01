@@ -219,5 +219,5 @@ def test_explore_lookml(time_partitioning_group, events_explore):
         },
     ]
 
-    actual = events_explore.to_lookml(None)
+    actual = events_explore.to_lookml(None, None)
     print_and_test(expected=expected, actual=actual)
