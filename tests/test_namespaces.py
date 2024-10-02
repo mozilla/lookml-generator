@@ -111,6 +111,12 @@ def custom_namespaces(tmp_path):
                   tables:
                   - table: mozdata.private.events
             glean-app:
+              explores:
+                deprecated_ping:
+                  hidden: true
+                  type: glean_ping_explore
+                  views:
+                    base_view: deprecated_ping
               owners:
               - glean-app-owner2@allizom.com
             """
@@ -233,6 +239,14 @@ def generated_sql_uri(tmp_path):
             f"sql/moz-fx-data-shared-prod/{dataset}/"
             "baseline_clients_last_seen/metadata.yaml"
         )
+        paths[path] = content
+
+        content = f"""
+            references:
+              view.sql:
+              - moz-fx-data-shared-prod.{source_dataset}.deprecated_ping_v1
+            """
+        path = f"sql/moz-fx-data-shared-prod/{dataset}/deprecated_ping/metadata.yaml"
         paths[path] = content
 
     return paths_to_tar(dest, paths)
@@ -366,6 +380,11 @@ def test_namespaces_full(
                             "type": "growth_accounting_explore",
                             "views": {"base_view": "growth_accounting"},
                         },
+                        "deprecated_ping": {
+                            "hidden": True,
+                            "type": "glean_ping_explore",
+                            "views": {"base_view": "deprecated_ping"},
+                        },
                     },
                     "glean_app": True,
                     "owners": [
@@ -423,6 +442,32 @@ def test_namespaces_full(
                                 {
                                     "channel": "beta",
                                     "table": "mozdata.glean_app_beta.baseline",
+                                },
+                            ],
+                            "type": "table_view",
+                        },
+                        "deprecated_ping": {
+                            "tables": [
+                                {
+                                    "channel": "release",
+                                    "table": "mozdata.glean_app.deprecated_ping",
+                                },
+                                {
+                                    "channel": "beta",
+                                    "table": "mozdata.glean_app_beta.deprecated_ping",
+                                },
+                            ],
+                            "type": "glean_ping_view",
+                        },
+                        "deprecated_ping_table": {
+                            "tables": [
+                                {
+                                    "channel": "release",
+                                    "table": "mozdata.glean_app.deprecated_ping",
+                                },
+                                {
+                                    "channel": "beta",
+                                    "table": "mozdata.glean_app_beta.deprecated_ping",
                                 },
                             ],
                             "type": "table_view",
@@ -556,6 +601,14 @@ def test_get_looker_views(glean_apps, generated_sql_uri):
                 {"channel": "beta", "table": "mozdata.glean_app_beta.baseline"},
             ],
         ),
+        GleanPingView(
+            namespace,
+            "deprecated_ping",
+            [
+                {"channel": "release", "table": "mozdata.glean_app.deprecated_ping"},
+                {"channel": "beta", "table": "mozdata.glean_app_beta.deprecated_ping"},
+            ],
+        ),
         GrowthAccountingView(
             namespace,
             [
@@ -598,6 +651,14 @@ def test_get_looker_views(glean_apps, generated_sql_uri):
                     "table": "mozdata.glean_app_beta.baseline_clients_last_seen",
                     "channel": "beta",
                 },
+            ],
+        ),
+        TableView(
+            namespace,
+            "deprecated_ping_table",
+            [
+                {"table": "mozdata.glean_app.deprecated_ping", "channel": "release"},
+                {"table": "mozdata.glean_app_beta.deprecated_ping", "channel": "beta"},
             ],
         ),
     ]
