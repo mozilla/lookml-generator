@@ -25,7 +25,9 @@ class Explore:
         """Explore instance represented as a dict."""
         return {self.name: {"type": self.type, "views": self.views}}
 
-    def to_lookml(self, v1_name: Optional[str]) -> List[Dict[str, Any]]:
+    def to_lookml(
+        self, v1_name: Optional[str], hidden: Optional[bool]
+    ) -> List[Dict[str, Any]]:
         """
         Generate LookML for this explore.
 
@@ -33,6 +35,8 @@ class Explore:
         `_to_lookml` takes precedence over these fields.
         """
         base_lookml = {}
+        if hidden:
+            base_lookml["hidden"] = "yes"
         base_view_name = next(
             (
                 view_name
