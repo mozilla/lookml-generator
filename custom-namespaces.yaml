@@ -1373,6 +1373,7 @@ shared_private:
   pretty_name: Shared Private
   owners:
     - ascholtz@mozilla.com
+  spoke: looker-spoke-private
   views:
     countries:
       type: table_view
