@@ -1744,3 +1744,17 @@ fxci:
           type: sum
           value_format_name: seconds
           sql: "${uptime}"
+accounts_backend:
+  explores:
+    accounts_events:
+      hidden: true
+      type: glean_ping_explore
+      views:
+        base_view: accounts_events
+accounts_frontend:
+  explores:
+    accounts_events:
+      hidden: true
+      type: glean_ping_explore
+      views:
+        base_view: accounts_events
