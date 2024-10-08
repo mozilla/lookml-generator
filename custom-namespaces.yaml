@@ -1177,6 +1177,10 @@ monitoring:
       type: table_view
       tables:
         - table: mozdata.static.monitoring_schema_errors_notes_v1
+    shredder_per_job_stats:
+      type: table_view
+      tables:
+        - table: mozdata.monitoring.shredder_per_job_stats
     # views for accessing Airflow metadata
     airflow_dag:
       type: table_view
