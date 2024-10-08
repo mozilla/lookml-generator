@@ -1185,6 +1185,18 @@ monitoring:
       type: table_view
       tables:
         - table: mozdata.static.monitoring_schema_errors_notes_v1
+    shredder_per_job_stats:
+      type: table_view
+      tables:
+        - table: mozdata.monitoring.shredder_per_job_stats
+    shredder_targets_new_mismatched_targets:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.monitoring_derived.shredder_targets_new_mismatched_v1
+    table_partition_expirations:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.monitoring_derived.table_partition_expirations_v1
     # views for accessing Airflow metadata
     airflow_dag:
       type: table_view
