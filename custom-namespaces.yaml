@@ -1492,11 +1492,6 @@ relay:
       type: table_view
       tables:
         - table: mozdata.relay.active_subscription_ids
-relay_backend:
-  glean_app: true
-  owners:
-    - srose@mozilla.com
-  pretty_name: Firefox Relay Backend
 fivetran:
   glean_app: false
   owners:
