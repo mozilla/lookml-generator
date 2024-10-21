@@ -422,10 +422,12 @@ jinja2==3.1.4 \
     # via
     #   -r requirements.in
     #   mozilla-metric-config-parser
-jsonschema==4.19.0 \
-    --hash=sha256:043dc26a3845ff09d20e4420d6012a9c91c9aa8999fa184e7efcfeccb41e32cb \
-    --hash=sha256:6e1e7569ac13be8139b2dd2c21a55d350066ee3f80df06c608b398cdc6f30e8f
-    # via mozilla-schema-generator
+jsonschema==4.23.0 \
+    --hash=sha256:d71497fef26351a33265337fa77ffeb82423f3ea21283cd9467bb03999266bc4 \
+    --hash=sha256:fbadb6f8b144a8f8cf9f0b89ba94501d143e50411a1278633f56a7acf7fd5566
+    # via
+    #   mozilla-nimbus-schemas
+    #   mozilla-schema-generator
 jsonschema-specifications==2023.7.1 \
     --hash=sha256:05adf340b659828a004220a9613be00fa3f223f2b82002e273dee62fd50524b1 \
     --hash=sha256:c91a50404e88a1f6ba40636778e2ee08f6e24c5613fe4c53ac24578a5a7f72bb
@@ -501,9 +503,9 @@ monotonic==1.6 \
 mozilla-metric-config-parser==2024.10.1 \
     --hash=sha256:7816d0a5a98d48bb5c9b236e147ecd76ca0f6029ed69dbaae0d309307dfd3897
     # via -r requirements.in
-mozilla-nimbus-schemas==2024.9.3 \
-    --hash=sha256:5e1196637308fb0241a209eee027a436e986fc6220ad416eebb06b7162e226bc \
-    --hash=sha256:e340325398e9d1227255c663f7e525e1390389bad5ce2230a3b2feae0a1a41f5
+mozilla-nimbus-schemas==2024.10.1 \
+    --hash=sha256:81fc65104a8a9c2db89f1f95b56971e7ce880d3206d25d1f00f6c49d6acb6581 \
+    --hash=sha256:e023e17a73a1e15d80a5af80d0c645ce416a9f41c9fa3b5fff05900d299a80fd
     # via
     #   -r requirements.in
     #   mozilla-metric-config-parser
@@ -1118,6 +1120,7 @@ typing-extensions==4.12.2 \
     #   cattrs
     #   filelock
     #   looker-sdk
+    #   mozilla-nimbus-schemas
     #   mypy
     #   polyfactory
     #   pydantic
