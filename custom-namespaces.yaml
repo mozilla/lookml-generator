@@ -1125,6 +1125,10 @@ monitoring:
       tables:
         - table: mozdata.monitoring.metadata_completeness
       type: table_view
+    metadata_completeness_summary: 
+      tables:
+        - table: mozdata.monitoring.metadata_completeness_summary
+      type: table_view
     bigquery_tables_inventory:
       tables:
         - table: moz-fx-data-shared-prod.monitoring.bigquery_tables_inventory
