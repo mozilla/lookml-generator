@@ -503,9 +503,9 @@ monotonic==1.6 \
 mozilla-metric-config-parser==2024.10.2 \
     --hash=sha256:f66540ce807718a0fa329207982eeb00d1b10e2937789d88872849b4271ff043
     # via -r requirements.in
-mozilla-nimbus-schemas==2024.10.1 \
-    --hash=sha256:81fc65104a8a9c2db89f1f95b56971e7ce880d3206d25d1f00f6c49d6acb6581 \
-    --hash=sha256:e023e17a73a1e15d80a5af80d0c645ce416a9f41c9fa3b5fff05900d299a80fd
+mozilla-nimbus-schemas==2024.10.2 \
+    --hash=sha256:246e8de8e9ee88b0a9764fcd670da9a96041fb65e7eca37adac86e49c60e99b5 \
+    --hash=sha256:b1e2aae701745a60a1c28a52f04de6a053419fee64da23e77c4ae9b59fbbe64e
     # via
     #   -r requirements.in
     #   mozilla-metric-config-parser
