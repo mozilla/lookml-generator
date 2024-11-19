@@ -36,6 +36,7 @@ ALLOWED_TYPES = DISTRIBUTION_TYPES | {
     "uuid",
     "url",
     "text",
+    "labeled_quantity",
 }
 
 # Bug 1737656 - some metric types are exposed under different names
