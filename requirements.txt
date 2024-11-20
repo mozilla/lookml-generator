@@ -500,8 +500,8 @@ monotonic==1.6 \
     --hash=sha256:3a55207bcfed53ddd5c5bae174524062935efed17792e9de2ad0205ce9ad63f7 \
     --hash=sha256:68687e19a14f11f26d140dd5c86f3dba4bf5df58003000ed467e0e2a69bca96c
     # via segment-analytics-python
-mozilla-metric-config-parser==2024.10.2 \
-    --hash=sha256:f66540ce807718a0fa329207982eeb00d1b10e2937789d88872849b4271ff043
+mozilla-metric-config-parser==2024.11.1 \
+    --hash=sha256:4f972b669cdaefc1ff5e7372a93bbd23151d7bbdf8f3dbe2b4c3ff4ab61b33bb
     # via -r requirements.in
 mozilla-nimbus-schemas==2024.11.5 \
     --hash=sha256:4b4e6835b1e8e142f79a7543238a7f8b9a5c5abd7178cb86d9f266f9eee5deb5 \
