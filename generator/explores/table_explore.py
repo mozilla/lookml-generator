@@ -52,8 +52,8 @@ class TableExplore(Explore):
 
         Return `None` if there is no datagroup for this explore.
         """
-        datagroups_path = self.views_path.parent / "datagroups"
-        if self.views_path and datagroups_path.exists():
+        if self.views_path and (self.views_path.parent / "datagroups").exists():
+            datagroups_path = self.views_path.parent / "datagroups"
             datagroup_file = (
                 datagroups_path
                 / f'{self.views["base_view"]}_last_updated.datagroup.lkml'

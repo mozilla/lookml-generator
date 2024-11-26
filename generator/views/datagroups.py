@@ -3,7 +3,7 @@
 import logging
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 import lkml
 
@@ -175,7 +175,7 @@ def _generate_view_datagroup(
     ).get_table_metadata()
 
     if "TABLE" == table_metadata.get("tableType"):
-        datagroups: Optional[Datagroup] = _get_datagroup_from_bigquery_table(
+        datagroups = _get_datagroup_from_bigquery_table(
             project, dataset, table, table_metadata, view
         )
         return datagroups
@@ -193,7 +193,7 @@ def generate_datagroup(
     target_dir: Path,
     namespace: str,
     dryrun,
-) -> List[Path]:
+) -> Any:
     """Generate and write a datagroups.lkml file to the namespace folder."""
     datagroups_folder_path = target_dir / namespace / "datagroups"
 
