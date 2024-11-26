@@ -27,6 +27,10 @@ class TableExplore(Explore):
             explore_lookml["always_filter"] = {
                 "filters": required_filters,
             }
+
+        if datagroup := self.get_datagroup():
+            explore_lookml["persist_with"] = datagroup
+
         return [explore_lookml]
 
     @staticmethod
@@ -41,3 +45,19 @@ class TableExplore(Explore):
     def from_dict(name: str, defn: dict, views_path: Path) -> TableExplore:
         """Get an instance of this explore from a name and dictionary definition."""
         return TableExplore(name, defn["views"], views_path)
+
+    def get_datagroup(self) -> Optional[str]:
+        """
+        Return the name of the associated datagroup.
+
+        Return `None` if there is no datagroup for this explore.
+        """
+        datagroups_path = self.views_path.parent / "datagroups"
+        if self.views_path and datagroups_path.exists():
+            datagroup_file = (
+                datagroups_path
+                / f'{self.views["base_view"]}_last_updated.datagroup.lkml'
+            )
+            if datagroup_file.exists():
+                return f'{self.views["base_view"]}_last_updated'
+        return None
