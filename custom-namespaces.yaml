@@ -894,6 +894,10 @@ firefox_ios:
       type: table_view
       tables:
         - table: mozdata.firefox_ios.firefox_ios_clients
+    app_store_choice_screen_engagement:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.firefox_ios.app_store_choice_screen_engagement
   explores:
     feature_usage_metrics:
       type: table_explore
