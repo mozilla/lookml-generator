@@ -12,14 +12,14 @@ mozilla-schema-generator==0.5.1
 pandas==2.2.3
 pip-tools==7.4.1
 pre-commit==4.0.1
-pyarrow==18.0.0
+pyarrow==18.1.0
 pytest-black==0.3.12
 pytest-isort==4.0.0
 pytest-mypy==0.10.3
 pytest-pydocstyle==2.4.0
 pytest==7.4.4
 PyYAML==6.0.2
-tomli==2.1.0  # for toml parsing on python<3.11
+tomli==2.2.1  # for toml parsing on python<3.11
 types-PyYaml==6.0.12.20240917
 yamllint==1.35.1
 gitpython==3.1.43

@@ -894,6 +894,10 @@ firefox_ios:
       type: table_view
       tables:
         - table: mozdata.firefox_ios.firefox_ios_clients
+    app_store_choice_screen_engagement:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.firefox_ios.app_store_choice_screen_engagement
   explores:
     feature_usage_metrics:
       type: table_explore
@@ -1852,3 +1856,50 @@ accounts_frontend:
       type: glean_ping_explore
       views:
         base_view: accounts_events
+jira_service_desk:
+  pretty_name: Jira Service Desk
+  owners:
+    - rantwan@mozilla.com
+  glean_app: false
+  views:
+    issue:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.jira_service_desk.issue
+    issue_type:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.jira_service_desk.issue_type
+    project:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.jira_service_desk.project
+    status:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.jira_service_desk.status
+    resolution:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.jira_service_desk.resolution
+  explores:
+    issue:
+      type: table_explore
+      views:
+        base_view: issue
+    issue_type:
+      type: table_explore
+      views:
+        base_view: issue_type
+    project:
+      type: table_explore
+      views:
+        base_view: project
+    status:
+      type: table_explore
+      views:
+        base_view: status
+    resolution:
+      type: table_explore
+      views:
+        base_view: resolution
