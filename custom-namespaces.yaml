@@ -576,8 +576,9 @@ firefox_accounts:
       tables:
         - table: moz-fx-data-shared-prod.accounts_backend.monitoring_db_counts
       measures:
-        count:
-          type: count
+        total_rows_sum:
+          type: sum
+          sql: ${total_rows}
     monitor_mozilla_accounts_funnels:
       type: table_view
       tables:
