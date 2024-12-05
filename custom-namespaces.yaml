@@ -574,7 +574,7 @@ firefox_accounts:
     database_counts:
       type: table_view
       tables:
-        - table: moz-fx-data-shared-prod.backend_derived.monitoring_db_counts_v1
+        - table: moz-fx-data-shared-prod.accounts_backend.monitoring_db_counts
       measures:
         count:
           type: count
