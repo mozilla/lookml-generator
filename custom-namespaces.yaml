@@ -701,10 +701,10 @@ firefox_accounts:
       type: table_explore
       views:
         base_view: accounts_oauth_clients
-    monitor_db_counts:
+    database_counts:
       type: table_explore
       views:
-        base_view: monitor_db_counts
+        base_view: database_counts
     monitor_mozilla_accounts_funnels:
       type: table_explore
       views:
