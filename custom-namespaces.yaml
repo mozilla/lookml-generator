@@ -571,6 +571,13 @@ firefox_accounts:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.accounts_db.fxa_oauth_clients
+    monitor_db_counts:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.backend_derived.monitoring_db_counts_v1
+      measures:
+        count:
+          type: count
     monitor_mozilla_accounts_funnels:
       type: table_view
       tables:
@@ -610,10 +617,10 @@ firefox_accounts:
       type: table_view
       tables:
         - table: mozdata.analysis.wclouser_fxa_health_counts
-    health_db_counts:
-      type: table_view
-      tables:
-        - table: mozdata.analysis.wclouser_fxa_health_db_counts
+      measures:  
+        count_sum:
+          type: sum
+          sql: ${count}
     health_issues:
       type: table_view
       tables:
@@ -694,6 +701,10 @@ firefox_accounts:
       type: table_explore
       views:
         base_view: accounts_oauth_clients
+    monitor_db_counts:
+      type: table_explore
+      views:
+        base_view: monitor_db_counts
     monitor_mozilla_accounts_funnels:
       type: table_explore
       views:
@@ -746,10 +757,6 @@ firefox_accounts:
       type: table_explore
       views:
         base_view: health_counts
-    health_db_counts:
-      type: table_explore
-      views:
-        base_view: health_db_counts
     health_issues:
       type: table_explore
       views:
