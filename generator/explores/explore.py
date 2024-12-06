@@ -99,6 +99,14 @@ class Explore:
             return lkml.load((self.views_path / f"{view}.view.lkml").read_text())
         raise Exception("Missing view path for get_view_lookml")
 
+    def get_datagroup(self) -> Optional[str]:
+        """
+        Return the name of the associated datagroup.
+
+        Return `None` if there is no datagroup for this explore.
+        """
+        return None
+
     def get_unnested_fields_joins_lookml(
         self,
     ) -> list:
