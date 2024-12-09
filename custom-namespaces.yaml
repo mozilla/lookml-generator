@@ -9,6 +9,26 @@ operational_monitoring:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.operational_monitoring_derived.projects_v1
+    bigeye_usage:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.monitoring.bigeye_usage
+      measures:
+        cost:
+          type: sum
+          sql: "${cost}"
+        total_terabytes_processed:
+          type: sum
+          sql: "${total_terabytes_processed}"
+        total_terabytes_billed:
+          type: sum
+          sql: "${total_terabytes_billed}"
+        total_slot_ms:
+          type: sum
+          sql: "${total_slot_ms}"
+        task_duration:
+          type: sum
+          sql: "${task_duration}"
 combined_browser_metrics:
   glean_app: false
   owners:
