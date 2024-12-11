@@ -1894,6 +1894,10 @@ jira_service_desk:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.jira_service_desk.issue_field_history
+    issue_multiselect_history:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.jira_service_desk.issue_multiselect_history
     request:
       type: table_view
       tables:
@@ -1935,6 +1939,10 @@ jira_service_desk:
       type: table_explore
       views:
         base_view: issue_field_history
+    issue_multiselect_history:
+      type: table_explore
+      views:
+        base_view: issue_multiselect_history
     request:
       type: table_explore
       views:
