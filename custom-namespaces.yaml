@@ -1325,19 +1325,19 @@ monitoring:
       tables:
         - table: moz-fx-data-shared-prod.monitoring.bigeye_usage
       measures:
-        cost:
+        cost_sum:
           type: sum
           sql: "${cost}"
-        total_terabytes_processed:
+        total_terabytes_processed_sum:
           type: sum
           sql: "${total_terabytes_processed}"
-        total_terabytes_billed:
+        total_terabytes_billed_sum:
           type: sum
           sql: "${total_terabytes_billed}"
-        total_slot_ms:
+        total_slot_ms_sum:
           type: sum
           sql: "${total_slot_ms}"
-        task_duration:
+        task_duration_sum:
           type: sum
           sql: "${task_duration}"
     event_monitoring_live:
