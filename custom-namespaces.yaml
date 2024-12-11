@@ -571,6 +571,14 @@ firefox_accounts:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.accounts_db.fxa_oauth_clients
+    database_counts:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.accounts_backend.monitoring_db_counts
+      measures:
+        total_rows_sum:
+          type: sum
+          sql: ${total_rows}
     monitor_mozilla_accounts_funnels:
       type: table_view
       tables:
@@ -599,10 +607,56 @@ firefox_accounts:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.accounts_frontend_derived.login_engagement_funnel_v1
+    health_cost:
+      type: table_view
+      tables:
+        - table: mozdata.analysis.wclouser_fxa_health_cost
+      measures:
+        count:
+          type: count
+    health_counts:
+      type: table_view
+      tables:
+        - table: mozdata.analysis.wclouser_fxa_health_counts
+      measures:  
+        count_sum:
+          type: sum
+          sql: ${count}
     health_issues:
       type: table_view
       tables:
         - table: mozdata.analysis.wclouser_fxa_health_issues
+      measures:
+        count:
+          type: count
+    health_pagerduty:
+      type: table_view
+      tables:
+        - table: mozdata.analysis.wclouser_fxa_health_pagerduty
+      measures:
+        count:
+          type: count
+    health_prs:
+      type: table_view
+      tables:
+        - table: mozdata.analysis.wclouser_fxa_health_prs
+      measures:
+        count:
+          type: count
+    health_tags:
+      type: table_view
+      tables:
+        - table: mozdata.analysis.wclouser_fxa_health_tags
+      measures:
+        count:
+          type: count
+    health_velocity:
+      type: table_view
+      tables:
+        - table: mozdata.analysis.wclouser_fxa_health_velocity
+      measures:
+        count:
+          type: count
     account_settings_page_engagement:
       type: table_view
       tables:
@@ -648,6 +702,10 @@ firefox_accounts:
       type: table_explore
       views:
         base_view: accounts_oauth_clients
+    database_counts:
+      type: table_explore
+      views:
+        base_view: database_counts
     monitor_mozilla_accounts_funnels:
       type: table_explore
       views:
@@ -692,10 +750,34 @@ firefox_accounts:
       type: table_explore
       views:
         base_view: login_engagement_funnels_by_service
+    health_cost:
+      type: table_explore
+      views:
+        base_view: health_cost
+    health_counts:
+      type: table_explore
+      views:
+        base_view: health_counts
     health_issues:
       type: table_explore
       views:
         base_view: health_issues
+    health_pagerduty:
+      type: table_explore
+      views:
+        base_view: health_pagerduty
+    health_prs:
+      type: table_explore
+      views:
+        base_view: health_prs
+    health_tags:
+      type: table_explore
+      views:
+        base_view: health_tags
+    health_velocity:
+      type: table_explore
+      views:
+        base_view: health_velocity
     account_settings_page_engagement:
       type: table_explore
       views:
@@ -926,31 +1008,11 @@ experimentation:
       tables:
         - channel: release
           table: mozdata.telemetry.experiment_enrollment_other_events_overall
-    experiment_cumulative_search_with_ads_count:
-      type: table_view
-      tables:
-        - channel: release
-          table: mozdata.telemetry.experiment_cumulative_search_with_ads_count
-    experiment_cumulative_search_count:
-      type: table_view
-      tables:
-        - channel: release
-          table: mozdata.telemetry.experiment_cumulative_search_count
-    experiment_cumulative_ad_clicks:
-      type: table_view
-      tables:
-        - channel: release
-          table: mozdata.telemetry.experiment_cumulative_ad_clicks
     experimenter_experiments:
       type: table_view
       tables:
         - channel: release
           table: moz-fx-data-experiments.monitoring.experimenter_experiments_v1
-    experiment_search_aggregates_live:
-      type: table_view
-      tables:
-        - channel: release
-          table: moz-fx-data-shared-prod.telemetry_derived.experiment_search_aggregates_live_v1
 firefox_desktop:
   glean_app: true
   views:
@@ -1123,6 +1185,14 @@ monitoring:
     - wichan@mozilla.com
   pretty_name: Monitoring (Data Pipeline)
   views:
+    metadata_completeness: 
+      tables:
+        - table: mozdata.monitoring.metadata_completeness
+      type: table_view
+    metadata_completeness_summary: 
+      tables:
+        - table: mozdata.monitoring.metadata_completeness_summary
+      type: table_view
     bigquery_tables_inventory:
       tables:
         - table: moz-fx-data-shared-prod.monitoring.bigquery_tables_inventory
@@ -1179,6 +1249,18 @@ monitoring:
       type: table_view
       tables:
         - table: mozdata.static.monitoring_schema_errors_notes_v1
+    shredder_per_job_stats:
+      type: table_view
+      tables:
+        - table: mozdata.monitoring.shredder_per_job_stats
+    shredder_targets_new_mismatched_targets:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.monitoring_derived.shredder_targets_new_mismatched_v1
+    table_partition_expirations:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.monitoring_derived.table_partition_expirations_v1
     # views for accessing Airflow metadata
     airflow_dag:
       type: table_view
@@ -1240,6 +1322,26 @@ monitoring:
       type: table_view
       tables:
         - table: mozdata.monitoring.airflow_user
+    bigeye_usage:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.monitoring.bigeye_usage
+      measures:
+        cost_sum:
+          type: sum
+          sql: "${cost}"
+        total_terabytes_processed_sum:
+          type: sum
+          sql: "${total_terabytes_processed}"
+        total_terabytes_billed_sum:
+          type: sum
+          sql: "${total_terabytes_billed}"
+        total_slot_ms_sum:
+          type: sum
+          sql: "${total_slot_ms}"
+        task_duration_sum:
+          type: sum
+          sql: "${task_duration}"
     event_monitoring_live:
       type: table_view
       tables:
@@ -1760,3 +1862,90 @@ accounts_frontend:
       type: glean_ping_explore
       views:
         base_view: accounts_events
+jira_service_desk:
+  pretty_name: Jira Service Desk
+  owners:
+    - rantwan@mozilla.com
+  glean_app: false
+  views:
+    issue:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.jira_service_desk.issue
+    issue_type:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.jira_service_desk.issue_type
+    project:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.jira_service_desk.project
+    status:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.jira_service_desk.status
+    resolution:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.jira_service_desk.resolution
+    field:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.jira_service_desk.field
+    issue_field_history:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.jira_service_desk.issue_field_history
+    request:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.jira_service_desk.request
+    request_type:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.jira_service_desk.request_type
+    status_category:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.jira_service_desk.status_category
+  explores:
+    issue:
+      type: table_explore
+      views:
+        base_view: issue
+    issue_type:
+      type: table_explore
+      views:
+        base_view: issue_type
+    project:
+      type: table_explore
+      views:
+        base_view: project
+    status:
+      type: table_explore
+      views:
+        base_view: status
+    resolution:
+      type: table_explore
+      views:
+        base_view: resolution
+    field:
+      type: table_explore
+      views:
+        base_view: field
+    issue_field_history:
+      type: table_explore
+      views:
+        base_view: issue_field_history
+    request:
+      type: table_explore
+      views:
+        base_view: request
+    request_type:
+      type: table_explore
+      views:
+        base_view: request_type
+    status_category:
+      type: table_explore
+      views:
+        base_view: status_category

@@ -315,7 +315,7 @@ def test_only_generates_one_datagroup_for_references_to_same_table(
             )
 
         assert Path(namespace_dir / "datagroups").exists()
-        assert len(list((namespace_dir / "datagroups").iterdir())) == 1
+        assert len(list((namespace_dir / "datagroups").iterdir())) == 2
         assert (
             Path(
                 namespace_dir

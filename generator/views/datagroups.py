@@ -3,7 +3,7 @@
 import logging
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List
 
 import lkml
 
@@ -57,22 +57,35 @@ class Datagroup:
 
 
 def _get_datagroup_from_bigquery_table(
-    project_id, dataset_id, table_id, table_metadata: Dict[str, Any]
-) -> Datagroup:
+    project_id, dataset_id, table_id, table_metadata: Dict[str, Any], view: View
+) -> List[Datagroup]:
     """Use template and default values to create a Datagroup from a BQ Table."""
     full_table_id = f"{project_id}.{dataset_id}.{table_id}"
-    return Datagroup(
-        name=f"{table_id}_last_updated",
-        label=f"{table_metadata.get('friendlyName', table_id) or table_id} Last Updated",
-        description=f"Updates when {full_table_id} is modified.",
-        sql_trigger=SQL_TRIGGER_TEMPLATE.format(
-            project_id=project_id,
-            dataset_id=dataset_id,
-            table_id=table_id,
+    return [
+        Datagroup(
+            name=f"{table_id}_last_updated",
+            label=f"{table_metadata.get('friendlyName', table_id) or table_id} Last Updated",
+            description=f"Updates when {full_table_id} is modified.",
+            sql_trigger=SQL_TRIGGER_TEMPLATE.format(
+                project_id=project_id,
+                dataset_id=dataset_id,
+                table_id=table_id,
+            ),
+            # Note: Ideally we'd use the table's ETL schedule as the `maximum_cache_age` but we don't have schedule
+            # metadata here.
         ),
-        # Note: Ideally we'd use the table's ETL schedule as the `maximum_cache_age` but we don't have schedule
-        # metadata here.
-    )
+        # create a datagroup associated to a view which will be used for caching
+        Datagroup(
+            name=f"{view.name}_last_updated",
+            label=f"{view.name} Last Updated",
+            description=f"Updates for {view.name} when {full_table_id} is modified.",
+            sql_trigger=SQL_TRIGGER_TEMPLATE.format(
+                project_id=project_id,
+                dataset_id=dataset_id,
+                table_id=table_id,
+            ),
+        ),
+    ]
 
 
 def _get_datagroup_from_bigquery_view(
@@ -82,19 +95,20 @@ def _get_datagroup_from_bigquery_view(
     table_metadata: Dict[str, Any],
     dataset_view_map: BQViewReferenceMap,
     dryrun,
-) -> Optional[Datagroup]:
+    view: View,
+) -> List[Datagroup]:
     # Dataset view map only contains references for shared-prod views.
     full_table_id = f"{project_id}.{dataset_id}.{table_id}"
     if project_id not in ("moz-fx-data-shared-prod", "mozdata"):
         logging.debug(
             f"Unable to get sources for non shared-prod/mozdata view: {full_table_id} in generated-sql."
         )
-        return None
+        return []
 
     dataset_view_references = dataset_view_map.get(dataset_id)
     if dataset_view_references is None:
         logging.debug(f"Unable to find dataset {dataset_id} in generated-sql.")
-        return None
+        return []
 
     view_references = dataset_view_references.get(table_id)
     if not view_references or len(view_references) > 1:
@@ -102,7 +116,7 @@ def _get_datagroup_from_bigquery_view(
         logging.debug(
             f"Unable to find a single source for {full_table_id} in generated-sql."
         )
-        return None
+        return []
 
     source_table_id = ".".join(view_references[0])
     try:
@@ -117,6 +131,7 @@ def _get_datagroup_from_bigquery_view(
                 view_references[0][1],
                 view_references[0][2],
                 table_metadata,
+                view,
             )
         elif "VIEW" == table_metadata.get("tableType"):
             return _get_datagroup_from_bigquery_view(
@@ -126,24 +141,25 @@ def _get_datagroup_from_bigquery_view(
                 table_metadata,
                 dataset_view_map,
                 dryrun=dryrun,
+                view=view,
             )
     except DryRunError as e:
         raise ValueError(
             f"Unable to find {source_table_id} referenced in {full_table_id}"
         ) from e
 
-    return None
+    return []
 
 
 def _generate_view_datagroup(
     view: View,
     dataset_view_map: BQViewReferenceMap,
     dryrun,
-) -> Optional[Datagroup]:
+) -> List[Datagroup]:
     """Generate the Datagroup LookML for a Looker View."""
     # Only generate datagroup for views that can be linked to a BigQuery table:
     if view.view_type != TableView.type:
-        return None
+        return []
 
     # Use the release channel table or the first available table (usually the only one):
     view_table = next(
@@ -159,22 +175,17 @@ def _generate_view_datagroup(
     ).get_table_metadata()
 
     if "TABLE" == table_metadata.get("tableType"):
-        datagroup: Optional[Datagroup] = _get_datagroup_from_bigquery_table(
-            project, dataset, table, table_metadata
+        datagroups = _get_datagroup_from_bigquery_table(
+            project, dataset, table, table_metadata, view
         )
-        return datagroup
+        return datagroups
     elif "VIEW" == table_metadata.get("tableType"):
-        datagroup = _get_datagroup_from_bigquery_view(
-            project,
-            dataset,
-            table,
-            table_metadata,
-            dataset_view_map,
-            dryrun,
+        datagroups = _get_datagroup_from_bigquery_view(
+            project, dataset, table, table_metadata, dataset_view_map, dryrun, view
         )
-        return datagroup
+        return datagroups
 
-    return None
+    return []
 
 
 def generate_datagroup(
@@ -182,13 +193,13 @@ def generate_datagroup(
     target_dir: Path,
     namespace: str,
     dryrun,
-) -> Optional[Path]:
+) -> Any:
     """Generate and write a datagroups.lkml file to the namespace folder."""
     datagroups_folder_path = target_dir / namespace / "datagroups"
 
-    datagroup = None
+    datagroups = None
     try:
-        datagroup = _generate_view_datagroup(view, DATASET_VIEW_MAP, dryrun)
+        datagroups = _generate_view_datagroup(view, DATASET_VIEW_MAP, dryrun)
     except DryRunError as e:
         if e.error == Errors.PERMISSION_DENIED and e.use_cloud_function:
             path = datagroups_folder_path / f"{e.table_id}_last_updated.datagroup.lkml"
@@ -202,12 +213,14 @@ def generate_datagroup(
         else:
             raise
 
-    if datagroup:
-        datagroups_folder_path.mkdir(exist_ok=True)
-        datagroup_lkml_path = (
-            datagroups_folder_path / f"{datagroup.name}.datagroup.lkml"
-        )
-        datagroup_lkml_path.write_text(FILE_HEADER + str(datagroup))
-        return datagroup_lkml_path
+    datagroup_paths = []
+    if datagroups:
+        for datagroup in datagroups:
+            datagroups_folder_path.mkdir(exist_ok=True)
+            datagroup_lkml_path = (
+                datagroups_folder_path / f"{datagroup.name}.datagroup.lkml"
+            )
+            datagroup_lkml_path.write_text(FILE_HEADER + str(datagroup))
+            datagroup_paths.append(datagroup_lkml_path)
 
-    return None
+    return datagroup_paths
