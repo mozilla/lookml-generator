@@ -836,9 +836,9 @@ revenue_private:
   connection: bigquery-oauth
   pretty_name: Revenue Private
   owners:
+    - akommasani@mozilla.com
     - akomarzewski@mozilla.com
     - skahmann@mozilla.com
-    - xluo@mozilla.com
   spoke: looker-spoke-private
   views:
     search_revenue_levers_daily:
@@ -859,6 +859,8 @@ ads:
   pretty_name: Ads
   owners:
     - cmorales@mozilla.com
+    - cbeck@mozilla.com
+    - lvargas@mozilla.com
     - sbetancourt@mozilla.com
   spoke: looker-spoke-private
   views:
