@@ -1912,6 +1912,10 @@ jira_service_desk:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.jira_service_desk.status_category
+    user:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.jira_service_desk.user
   explores:
     issue:
       type: table_explore
@@ -1957,3 +1961,7 @@ jira_service_desk:
       type: table_explore
       views:
         base_view: status_category
+    user:
+      type: table_explore
+      views:
+        base_view: user
