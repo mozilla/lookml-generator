@@ -702,10 +702,6 @@ firefox_accounts:
       type: table_explore
       views:
         base_view: monitor_mozilla_accounts_funnels
-    registration_funnels:
-      type: table_explore
-      views:
-        base_view: registration_funnels
     registration_funnels_legacy_events:
       type: table_explore
       views:
