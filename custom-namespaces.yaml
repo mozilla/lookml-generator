@@ -551,10 +551,6 @@ firefox_accounts:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.accounts_frontend.registration_funnels_by_service
-    registration_funnels:
-      type: table_view
-      tables:
-        - table: moz-fx-data-shared-prod.firefox_accounts_derived.registration_funnels_v1
     registration_funnels_legacy_events:
       type: table_view
       tables:
