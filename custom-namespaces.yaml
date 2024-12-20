@@ -702,10 +702,6 @@ firefox_accounts:
       type: table_explore
       views:
         base_view: monitor_mozilla_accounts_funnels
-    registration_funnels:
-      type: table_explore
-      views:
-        base_view: registration_funnels
     registration_funnels_legacy_events:
       type: table_explore
       views:
@@ -837,14 +833,6 @@ revenue_private:
       type: table_view
       tables:
         - table: mozdata.search.search_revenue_levers_daily
-    revenue_forecast_review_2022:
-      type: table_view
-      tables:
-        - table: mozdata.revenue_cat3_analysis.revenue_forecast_review_long
-    revenue_budget_2022:
-      type: table_view
-      tables:
-        - table: mozdata.revenue_cat3_analysis.budget_complete_2022
 ads:
   glean_app: false
   connection: bigquery-oauth
