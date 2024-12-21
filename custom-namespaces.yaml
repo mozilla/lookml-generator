@@ -1319,9 +1319,9 @@ monitoring:
         total_slot_ms_sum:
           type: sum
           sql: "${total_slot_ms}"
-        task_duration_sum:
+        task_duration_seconds_sum:
           type: sum
-          sql: "${task_duration}"
+          sql: "${task_duration_seconds}"
     event_monitoring_live:
       type: table_view
       tables:
