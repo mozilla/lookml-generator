@@ -1793,15 +1793,15 @@ fxci:
     - ahalberstadt@mozilla.com
   glean_app: false
   views:
-    tasks:
+    tasks_base:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.fxci.tasks_v1
-    task_runs:
+    task_runs_base:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.fxci.task_runs_v1
-    task_run_costs:
+    task_run_costs_base:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.fxci.task_run_costs
@@ -1810,7 +1810,7 @@ fxci:
           type: sum
           value_format_name: usd
           sql: "${run_cost}"
-    worker_costs:
+    worker_costs_base:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.fxci.worker_costs
@@ -1819,7 +1819,7 @@ fxci:
           type: sum
           value_format_name: usd
           sql: "${total_cost}"
-    worker_metrics:
+    worker_metrics_base:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.fxci.worker_metrics_v1
