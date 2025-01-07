@@ -64,16 +64,16 @@
 
                         <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="sd">&quot;&quot;&quot;Utils for operational monitoring.&quot;&quot;&quot;</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a>
-</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a><span class="kn">from</span> <span class="nn">multiprocessing.pool</span> <span class="kn">import</span> <span class="n">ThreadPool</span>
-</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">multiprocessing.pool</span><span class="w"> </span><span class="kn">import</span> <span class="n">ThreadPool</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 </span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a>
-</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="kn">from</span> <span class="nn">google.api_core</span> <span class="kn">import</span> <span class="n">exceptions</span>
-</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="kn">from</span> <span class="nn">google.cloud</span> <span class="kn">import</span> <span class="n">bigquery</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">google.api_core</span><span class="w"> </span><span class="kn">import</span> <span class="n">exceptions</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">google.cloud</span><span class="w"> </span><span class="kn">import</span> <span class="n">bigquery</span>
 </span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="kn">from</span> <span class="nn">.views</span> <span class="kn">import</span> <span class="n">lookml_utils</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">.views</span><span class="w"> </span><span class="kn">import</span> <span class="n">lookml_utils</span>
 </span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>
 </span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>
-</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="k">def</span> <span class="nf">_default_helper</span><span class="p">(</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="k">def</span><span class="w"> </span><span class="nf">_default_helper</span><span class="p">(</span>
 </span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>    <span class="n">bq_client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span> <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dimension</span><span class="p">:</span> <span class="nb">str</span>
 </span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">dict</span><span class="p">]:</span>
 </span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>    <span class="n">query_job</span> <span class="o">=</span> <span class="n">bq_client</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
@@ -97,7 +97,7 @@
 </span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a>    <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="p">{}</span>
 </span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a>
 </span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a>
-</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a><span class="k">def</span> <span class="nf">get_dimension_defaults</span><span class="p">(</span>
+</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a><span class="k">def</span><span class="w"> </span><span class="nf">get_dimension_defaults</span><span class="p">(</span>
 </span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a>    <span class="n">bq_client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span> <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 </span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 </span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -117,7 +117,7 @@
 </span><span id="L-53"><a href="#L-53"><span class="linenos">53</span></a>        <span class="p">}</span>
 </span><span id="L-54"><a href="#L-54"><span class="linenos">54</span></a>
 </span><span id="L-55"><a href="#L-55"><span class="linenos">55</span></a>
-</span><span id="L-56"><a href="#L-56"><span class="linenos">56</span></a><span class="k">def</span> <span class="nf">get_xaxis_val</span><span class="p">(</span><span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dryrun</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="L-56"><a href="#L-56"><span class="linenos">56</span></a><span class="k">def</span><span class="w"> </span><span class="nf">get_xaxis_val</span><span class="p">(</span><span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dryrun</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 </span><span id="L-57"><a href="#L-57"><span class="linenos">57</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-58"><a href="#L-58"><span class="linenos">58</span></a><span class="sd">    Return whether the x-axis should be build_id or submission_date.</span>
 </span><span id="L-59"><a href="#L-59"><span class="linenos">59</span></a>
@@ -131,7 +131,7 @@
 </span><span id="L-67"><a href="#L-67"><span class="linenos">67</span></a>    <span class="p">)</span>
 </span><span id="L-68"><a href="#L-68"><span class="linenos">68</span></a>
 </span><span id="L-69"><a href="#L-69"><span class="linenos">69</span></a>
-</span><span id="L-70"><a href="#L-70"><span class="linenos">70</span></a><span class="k">def</span> <span class="nf">get_active_projects</span><span class="p">(</span>
+</span><span id="L-70"><a href="#L-70"><span class="linenos">70</span></a><span class="k">def</span><span class="w"> </span><span class="nf">get_active_projects</span><span class="p">(</span>
 </span><span id="L-71"><a href="#L-71"><span class="linenos">71</span></a>    <span class="n">bq_client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span> <span class="n">project_table</span><span class="p">:</span> <span class="nb">str</span>
 </span><span id="L-72"><a href="#L-72"><span class="linenos">72</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 </span><span id="L-73"><a href="#L-73"><span class="linenos">73</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Select all operational monitoring projects.&quot;&quot;&quot;</span>
@@ -165,7 +165,7 @@
 
     </div>
     <a class="headerlink" href="#get_dimension_defaults"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="get_dimension_defaults-37"><a href="#get_dimension_defaults-37"><span class="linenos">37</span></a><span class="k">def</span> <span class="nf">get_dimension_defaults</span><span class="p">(</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="get_dimension_defaults-37"><a href="#get_dimension_defaults-37"><span class="linenos">37</span></a><span class="k">def</span><span class="w"> </span><span class="nf">get_dimension_defaults</span><span class="p">(</span>
 </span><span id="get_dimension_defaults-38"><a href="#get_dimension_defaults-38"><span class="linenos">38</span></a>    <span class="n">bq_client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span> <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 </span><span id="get_dimension_defaults-39"><a href="#get_dimension_defaults-39"><span class="linenos">39</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 </span><span id="get_dimension_defaults-40"><a href="#get_dimension_defaults-40"><span class="linenos">40</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -205,7 +205,7 @@ value and its top 10 most common to be used as dropdown options.</p>
 
     </div>
     <a class="headerlink" href="#get_xaxis_val"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="get_xaxis_val-57"><a href="#get_xaxis_val-57"><span class="linenos">57</span></a><span class="k">def</span> <span class="nf">get_xaxis_val</span><span class="p">(</span><span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dryrun</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="get_xaxis_val-57"><a href="#get_xaxis_val-57"><span class="linenos">57</span></a><span class="k">def</span><span class="w"> </span><span class="nf">get_xaxis_val</span><span class="p">(</span><span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dryrun</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 </span><span id="get_xaxis_val-58"><a href="#get_xaxis_val-58"><span class="linenos">58</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="get_xaxis_val-59"><a href="#get_xaxis_val-59"><span class="linenos">59</span></a><span class="sd">    Return whether the x-axis should be build_id or submission_date.</span>
 </span><span id="get_xaxis_val-60"><a href="#get_xaxis_val-60"><span class="linenos">60</span></a>
@@ -238,7 +238,7 @@ value and its top 10 most common to be used as dropdown options.</p>
 
     </div>
     <a class="headerlink" href="#get_active_projects"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="get_active_projects-71"><a href="#get_active_projects-71"><span class="linenos">71</span></a><span class="k">def</span> <span class="nf">get_active_projects</span><span class="p">(</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="get_active_projects-71"><a href="#get_active_projects-71"><span class="linenos">71</span></a><span class="k">def</span><span class="w"> </span><span class="nf">get_active_projects</span><span class="p">(</span>
 </span><span id="get_active_projects-72"><a href="#get_active_projects-72"><span class="linenos">72</span></a>    <span class="n">bq_client</span><span class="p">:</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span> <span class="n">project_table</span><span class="p">:</span> <span class="nb">str</span>
 </span><span id="get_active_projects-73"><a href="#get_active_projects-73"><span class="linenos">73</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 </span><span id="get_active_projects-74"><a href="#get_active_projects-74"><span class="linenos">74</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Select all operational monitoring projects.&quot;&quot;&quot;</span>

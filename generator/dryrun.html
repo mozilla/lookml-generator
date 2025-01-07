@@ -181,23 +181,23 @@
 
                         <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">  1</span></a><span class="sd">&quot;&quot;&quot;Dry Run method to get BigQuery metadata.&quot;&quot;&quot;</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos">  2</span></a>
-</span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a><span class="kn">import</span> <span class="nn">json</span>
-</span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
-</span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">cached_property</span>
-</span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
-</span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="kn">from</span> <span class="nn">urllib.request</span> <span class="kn">import</span> <span class="n">Request</span><span class="p">,</span> <span class="n">urlopen</span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+</span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">cached_property</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">urllib.request</span><span class="w"> </span><span class="kn">import</span> <span class="n">Request</span><span class="p">,</span> <span class="n">urlopen</span>
 </span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a>
-</span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a><span class="kn">import</span> <span class="nn">google.auth</span>
-</span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a><span class="kn">from</span> <span class="nn">google.auth.transport.requests</span> <span class="kn">import</span> <span class="n">Request</span> <span class="k">as</span> <span class="n">GoogleAuthRequest</span>
-</span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a><span class="kn">from</span> <span class="nn">google.cloud</span> <span class="kn">import</span> <span class="n">bigquery</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a><span class="kn">from</span> <span class="nn">google.oauth2.id_token</span> <span class="kn">import</span> <span class="n">fetch_id_token</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">google.auth</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">google.auth.transport.requests</span><span class="w"> </span><span class="kn">import</span> <span class="n">Request</span> <span class="k">as</span> <span class="n">GoogleAuthRequest</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">google.cloud</span><span class="w"> </span><span class="kn">import</span> <span class="n">bigquery</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">google.oauth2.id_token</span><span class="w"> </span><span class="kn">import</span> <span class="n">fetch_id_token</span>
 </span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a>
 </span><span id="L-14"><a href="#L-14"><span class="linenos"> 14</span></a><span class="n">DRY_RUN_URL</span> <span class="o">=</span> <span class="p">(</span>
 </span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a>    <span class="s2">&quot;https://us-central1-moz-fx-data-shared-prod.cloudfunctions.net/bigquery-etl-dryrun&quot;</span>
 </span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a><span class="p">)</span>
 </span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a>
 </span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a>
-</span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a><span class="k">def</span> <span class="nf">credentials</span><span class="p">(</span><span class="n">auth_req</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GoogleAuthRequest</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a><span class="k">def</span><span class="w"> </span><span class="nf">credentials</span><span class="p">(</span><span class="n">auth_req</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GoogleAuthRequest</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 </span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Get GCP credentials.&quot;&quot;&quot;</span>
 </span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a>    <span class="n">auth_req</span> <span class="o">=</span> <span class="n">auth_req</span> <span class="ow">or</span> <span class="n">GoogleAuthRequest</span><span class="p">()</span>
 </span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a>    <span class="n">creds</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">google</span><span class="o">.</span><span class="n">auth</span><span class="o">.</span><span class="n">default</span><span class="p">(</span>
@@ -207,7 +207,7 @@
 </span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a>    <span class="k">return</span> <span class="n">creds</span>
 </span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a>
 </span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a>
-</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a><span class="k">def</span> <span class="nf">id_token</span><span class="p">():</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a><span class="k">def</span><span class="w"> </span><span class="nf">id_token</span><span class="p">():</span>
 </span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Get token to authenticate against Cloud Function.&quot;&quot;&quot;</span>
 </span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a>    <span class="n">auth_req</span> <span class="o">=</span> <span class="n">GoogleAuthRequest</span><span class="p">()</span>
 </span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a>    <span class="n">creds</span> <span class="o">=</span> <span class="n">credentials</span><span class="p">(</span><span class="n">auth_req</span><span class="p">)</span>
@@ -222,17 +222,17 @@
 </span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a>    <span class="k">return</span> <span class="n">id_token</span>
 </span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a>
 </span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a>
-</span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a><span class="k">class</span> <span class="nc">DryRunError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+</span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a><span class="k">class</span><span class="w"> </span><span class="nc">DryRunError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
 </span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Exception raised on dry run errors.&quot;&quot;&quot;</span>
 </span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a>
-</span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">use_cloud_function</span><span class="p">,</span> <span class="n">table_id</span><span class="p">):</span>
+</span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">use_cloud_function</span><span class="p">,</span> <span class="n">table_id</span><span class="p">):</span>
 </span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize DryRunError.&quot;&quot;&quot;</span>
 </span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
 </span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">error</span> <span class="o">=</span> <span class="n">error</span>
 </span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">use_cloud_function</span> <span class="o">=</span> <span class="n">use_cloud_function</span>
 </span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">table_id</span> <span class="o">=</span> <span class="n">table_id</span>
 </span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a>
-</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a>    <span class="k">def</span> <span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a><span class="sd">        Override to ensure that all parameters are being passed when pickling.</span>
 </span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a>
@@ -244,7 +244,7 @@
 </span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a>        <span class="p">)</span>
 </span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a>
 </span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a>
-</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a><span class="k">class</span> <span class="nc">Errors</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a><span class="k">class</span><span class="w"> </span><span class="nc">Errors</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
 </span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;DryRun errors that require special handling.&quot;&quot;&quot;</span>
 </span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a>
 </span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a>    <span class="n">READ_ONLY</span> <span class="o">=</span> <span class="mi">1</span>
@@ -253,10 +253,10 @@
 </span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a>    <span class="n">PERMISSION_DENIED</span> <span class="o">=</span> <span class="mi">4</span>
 </span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a>
 </span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a>
-</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a><span class="k">class</span> <span class="nc">DryRunContext</span><span class="p">:</span>
+</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a><span class="k">class</span><span class="w"> </span><span class="nc">DryRunContext</span><span class="p">:</span>
 </span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;DryRun builder class.&quot;&quot;&quot;</span>
 </span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a>
-</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a>        <span class="bp">self</span><span class="p">,</span>
 </span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a>        <span class="n">use_cloud_function</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 </span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a>        <span class="n">id_token</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -269,7 +269,7 @@
 </span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">id_token</span> <span class="o">=</span> <span class="n">id_token</span>
 </span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">credentials</span> <span class="o">=</span> <span class="n">credentials</span>
 </span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a>
-</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a>    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span>
+</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span>
 </span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a>        <span class="bp">self</span><span class="p">,</span>
 </span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a>        <span class="n">sql</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 </span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a>        <span class="n">project</span><span class="o">=</span><span class="s2">&quot;moz-fx-data-shared-prod&quot;</span><span class="p">,</span>
@@ -289,10 +289,10 @@
 </span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a>        <span class="p">)</span>
 </span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a>
 </span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a>
-</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a><span class="k">class</span> <span class="nc">DryRun</span><span class="p">:</span>
+</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a><span class="k">class</span><span class="w"> </span><span class="nc">DryRun</span><span class="p">:</span>
 </span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Dry run SQL.&quot;&quot;&quot;</span>
 </span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>
-</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>        <span class="bp">self</span><span class="p">,</span>
 </span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>        <span class="n">use_cloud_function</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 </span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a>        <span class="n">id_token</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -314,12 +314,12 @@
 </span><span id="L-133"><a href="#L-133"><span class="linenos">133</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">credentials</span> <span class="o">=</span> <span class="n">credentials</span>
 </span><span id="L-134"><a href="#L-134"><span class="linenos">134</span></a>
 </span><span id="L-135"><a href="#L-135"><span class="linenos">135</span></a>    <span class="nd">@cached_property</span>
-</span><span id="L-136"><a href="#L-136"><span class="linenos">136</span></a>    <span class="k">def</span> <span class="nf">client</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-136"><a href="#L-136"><span class="linenos">136</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">client</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-137"><a href="#L-137"><span class="linenos">137</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get BigQuery client instance.&quot;&quot;&quot;</span>
 </span><span id="L-138"><a href="#L-138"><span class="linenos">138</span></a>        <span class="k">return</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span><span class="n">credentials</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">credentials</span><span class="p">)</span>
 </span><span id="L-139"><a href="#L-139"><span class="linenos">139</span></a>
 </span><span id="L-140"><a href="#L-140"><span class="linenos">140</span></a>    <span class="nd">@cached_property</span>
-</span><span id="L-141"><a href="#L-141"><span class="linenos">141</span></a>    <span class="k">def</span> <span class="nf">dry_run_result</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-141"><a href="#L-141"><span class="linenos">141</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">dry_run_result</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-142"><a href="#L-142"><span class="linenos">142</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the dry run result.&quot;&quot;&quot;</span>
 </span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a>        <span class="k">try</span><span class="p">:</span>
 </span><span id="L-144"><a href="#L-144"><span class="linenos">144</span></a>            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cloud_function</span><span class="p">:</span>
@@ -403,7 +403,7 @@
 </span><span id="L-222"><a href="#L-222"><span class="linenos">222</span></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ERROR </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </span><span id="L-223"><a href="#L-223"><span class="linenos">223</span></a>            <span class="k">return</span> <span class="kc">None</span>
 </span><span id="L-224"><a href="#L-224"><span class="linenos">224</span></a>
-</span><span id="L-225"><a href="#L-225"><span class="linenos">225</span></a>    <span class="k">def</span> <span class="nf">get_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-225"><a href="#L-225"><span class="linenos">225</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-226"><a href="#L-226"><span class="linenos">226</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the query schema by dry running the SQL file.&quot;&quot;&quot;</span>
 </span><span id="L-227"><a href="#L-227"><span class="linenos">227</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
 </span><span id="L-228"><a href="#L-228"><span class="linenos">228</span></a>
@@ -416,7 +416,7 @@
 </span><span id="L-235"><a href="#L-235"><span class="linenos">235</span></a>
 </span><span id="L-236"><a href="#L-236"><span class="linenos">236</span></a>        <span class="k">return</span> <span class="p">[]</span>
 </span><span id="L-237"><a href="#L-237"><span class="linenos">237</span></a>
-</span><span id="L-238"><a href="#L-238"><span class="linenos">238</span></a>    <span class="k">def</span> <span class="nf">get_table_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-238"><a href="#L-238"><span class="linenos">238</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_table_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-239"><a href="#L-239"><span class="linenos">239</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the schema of the provided table.&quot;&quot;&quot;</span>
 </span><span id="L-240"><a href="#L-240"><span class="linenos">240</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
 </span><span id="L-241"><a href="#L-241"><span class="linenos">241</span></a>
@@ -429,7 +429,7 @@
 </span><span id="L-248"><a href="#L-248"><span class="linenos">248</span></a>
 </span><span id="L-249"><a href="#L-249"><span class="linenos">249</span></a>        <span class="k">return</span> <span class="p">[]</span>
 </span><span id="L-250"><a href="#L-250"><span class="linenos">250</span></a>
-</span><span id="L-251"><a href="#L-251"><span class="linenos">251</span></a>    <span class="k">def</span> <span class="nf">get_table_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-251"><a href="#L-251"><span class="linenos">251</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_table_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-252"><a href="#L-252"><span class="linenos">252</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return table metadata.&quot;&quot;&quot;</span>
 </span><span id="L-253"><a href="#L-253"><span class="linenos">253</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
 </span><span id="L-254"><a href="#L-254"><span class="linenos">254</span></a>
@@ -442,7 +442,7 @@
 </span><span id="L-261"><a href="#L-261"><span class="linenos">261</span></a>
 </span><span id="L-262"><a href="#L-262"><span class="linenos">262</span></a>        <span class="k">return</span> <span class="p">{}</span>
 </span><span id="L-263"><a href="#L-263"><span class="linenos">263</span></a>
-</span><span id="L-264"><a href="#L-264"><span class="linenos">264</span></a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-264"><a href="#L-264"><span class="linenos">264</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-265"><a href="#L-265"><span class="linenos">265</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Dry run the provided SQL file and check if valid.&quot;&quot;&quot;</span>
 </span><span id="L-266"><a href="#L-266"><span class="linenos">266</span></a>        <span class="n">dry_run_error</span> <span class="o">=</span> <span class="n">DryRunError</span><span class="p">(</span>
 </span><span id="L-267"><a href="#L-267"><span class="linenos">267</span></a>            <span class="s2">&quot;Error when dry running SQL&quot;</span><span class="p">,</span>
@@ -469,13 +469,13 @@
 </span><span id="L-288"><a href="#L-288"><span class="linenos">288</span></a>            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ERROR</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run_result</span><span class="p">[</span><span class="s2">&quot;errors&quot;</span><span class="p">])</span>
 </span><span id="L-289"><a href="#L-289"><span class="linenos">289</span></a>            <span class="k">raise</span> <span class="n">dry_run_error</span>
 </span><span id="L-290"><a href="#L-290"><span class="linenos">290</span></a>
-</span><span id="L-291"><a href="#L-291"><span class="linenos">291</span></a>    <span class="k">def</span> <span class="nf">errors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-291"><a href="#L-291"><span class="linenos">291</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">errors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-292"><a href="#L-292"><span class="linenos">292</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Dry run the provided SQL file and return errors.&quot;&quot;&quot;</span>
 </span><span id="L-293"><a href="#L-293"><span class="linenos">293</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run_result</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="L-294"><a href="#L-294"><span class="linenos">294</span></a>            <span class="k">return</span> <span class="p">[]</span>
 </span><span id="L-295"><a href="#L-295"><span class="linenos">295</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run_result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;errors&quot;</span><span class="p">,</span> <span class="p">[])</span>
 </span><span id="L-296"><a href="#L-296"><span class="linenos">296</span></a>
-</span><span id="L-297"><a href="#L-297"><span class="linenos">297</span></a>    <span class="k">def</span> <span class="nf">get_error</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Errors</span><span class="p">]:</span>
+</span><span id="L-297"><a href="#L-297"><span class="linenos">297</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_error</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Errors</span><span class="p">]:</span>
 </span><span id="L-298"><a href="#L-298"><span class="linenos">298</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get specific errors for edge case handling.&quot;&quot;&quot;</span>
 </span><span id="L-299"><a href="#L-299"><span class="linenos">299</span></a>        <span class="n">errors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="p">()</span>
 </span><span id="L-300"><a href="#L-300"><span class="linenos">300</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
@@ -531,7 +531,7 @@
 
     </div>
     <a class="headerlink" href="#credentials"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="credentials-20"><a href="#credentials-20"><span class="linenos">20</span></a><span class="k">def</span> <span class="nf">credentials</span><span class="p">(</span><span class="n">auth_req</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GoogleAuthRequest</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="credentials-20"><a href="#credentials-20"><span class="linenos">20</span></a><span class="k">def</span><span class="w"> </span><span class="nf">credentials</span><span class="p">(</span><span class="n">auth_req</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GoogleAuthRequest</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 </span><span id="credentials-21"><a href="#credentials-21"><span class="linenos">21</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Get GCP credentials.&quot;&quot;&quot;</span>
 </span><span id="credentials-22"><a href="#credentials-22"><span class="linenos">22</span></a>    <span class="n">auth_req</span> <span class="o">=</span> <span class="n">auth_req</span> <span class="ow">or</span> <span class="n">GoogleAuthRequest</span><span class="p">()</span>
 </span><span id="credentials-23"><a href="#credentials-23"><span class="linenos">23</span></a>    <span class="n">creds</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">google</span><span class="o">.</span><span class="n">auth</span><span class="o">.</span><span class="n">default</span><span class="p">(</span>
@@ -558,7 +558,7 @@
 
     </div>
     <a class="headerlink" href="#id_token"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="id_token-30"><a href="#id_token-30"><span class="linenos">30</span></a><span class="k">def</span> <span class="nf">id_token</span><span class="p">():</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="id_token-30"><a href="#id_token-30"><span class="linenos">30</span></a><span class="k">def</span><span class="w"> </span><span class="nf">id_token</span><span class="p">():</span>
 </span><span id="id_token-31"><a href="#id_token-31"><span class="linenos">31</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Get token to authenticate against Cloud Function.&quot;&quot;&quot;</span>
 </span><span id="id_token-32"><a href="#id_token-32"><span class="linenos">32</span></a>    <span class="n">auth_req</span> <span class="o">=</span> <span class="n">GoogleAuthRequest</span><span class="p">()</span>
 </span><span id="id_token-33"><a href="#id_token-33"><span class="linenos">33</span></a>    <span class="n">creds</span> <span class="o">=</span> <span class="n">credentials</span><span class="p">(</span><span class="n">auth_req</span><span class="p">)</span>
@@ -590,17 +590,17 @@
 
     </div>
     <a class="headerlink" href="#DryRunError"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DryRunError-45"><a href="#DryRunError-45"><span class="linenos">45</span></a><span class="k">class</span> <span class="nc">DryRunError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DryRunError-45"><a href="#DryRunError-45"><span class="linenos">45</span></a><span class="k">class</span><span class="w"> </span><span class="nc">DryRunError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
 </span><span id="DryRunError-46"><a href="#DryRunError-46"><span class="linenos">46</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Exception raised on dry run errors.&quot;&quot;&quot;</span>
 </span><span id="DryRunError-47"><a href="#DryRunError-47"><span class="linenos">47</span></a>
-</span><span id="DryRunError-48"><a href="#DryRunError-48"><span class="linenos">48</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">use_cloud_function</span><span class="p">,</span> <span class="n">table_id</span><span class="p">):</span>
+</span><span id="DryRunError-48"><a href="#DryRunError-48"><span class="linenos">48</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">use_cloud_function</span><span class="p">,</span> <span class="n">table_id</span><span class="p">):</span>
 </span><span id="DryRunError-49"><a href="#DryRunError-49"><span class="linenos">49</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize DryRunError.&quot;&quot;&quot;</span>
 </span><span id="DryRunError-50"><a href="#DryRunError-50"><span class="linenos">50</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
 </span><span id="DryRunError-51"><a href="#DryRunError-51"><span class="linenos">51</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">error</span> <span class="o">=</span> <span class="n">error</span>
 </span><span id="DryRunError-52"><a href="#DryRunError-52"><span class="linenos">52</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">use_cloud_function</span> <span class="o">=</span> <span class="n">use_cloud_function</span>
 </span><span id="DryRunError-53"><a href="#DryRunError-53"><span class="linenos">53</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">table_id</span> <span class="o">=</span> <span class="n">table_id</span>
 </span><span id="DryRunError-54"><a href="#DryRunError-54"><span class="linenos">54</span></a>
-</span><span id="DryRunError-55"><a href="#DryRunError-55"><span class="linenos">55</span></a>    <span class="k">def</span> <span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="DryRunError-55"><a href="#DryRunError-55"><span class="linenos">55</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DryRunError-56"><a href="#DryRunError-56"><span class="linenos">56</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DryRunError-57"><a href="#DryRunError-57"><span class="linenos">57</span></a><span class="sd">        Override to ensure that all parameters are being passed when pickling.</span>
 </span><span id="DryRunError-58"><a href="#DryRunError-58"><span class="linenos">58</span></a>
@@ -627,7 +627,7 @@
 
     </div>
     <a class="headerlink" href="#DryRunError.__init__"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DryRunError.__init__-48"><a href="#DryRunError.__init__-48"><span class="linenos">48</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">use_cloud_function</span><span class="p">,</span> <span class="n">table_id</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DryRunError.__init__-48"><a href="#DryRunError.__init__-48"><span class="linenos">48</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">use_cloud_function</span><span class="p">,</span> <span class="n">table_id</span><span class="p">):</span>
 </span><span id="DryRunError.__init__-49"><a href="#DryRunError.__init__-49"><span class="linenos">49</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize DryRunError.&quot;&quot;&quot;</span>
 </span><span id="DryRunError.__init__-50"><a href="#DryRunError.__init__-50"><span class="linenos">50</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
 </span><span id="DryRunError.__init__-51"><a href="#DryRunError.__init__-51"><span class="linenos">51</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">error</span> <span class="o">=</span> <span class="n">error</span>
@@ -686,7 +686,7 @@
 
     </div>
     <a class="headerlink" href="#Errors"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Errors-67"><a href="#Errors-67"><span class="linenos">67</span></a><span class="k">class</span> <span class="nc">Errors</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Errors-67"><a href="#Errors-67"><span class="linenos">67</span></a><span class="k">class</span><span class="w"> </span><span class="nc">Errors</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
 </span><span id="Errors-68"><a href="#Errors-68"><span class="linenos">68</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;DryRun errors that require special handling.&quot;&quot;&quot;</span>
 </span><span id="Errors-69"><a href="#Errors-69"><span class="linenos">69</span></a>
 </span><span id="Errors-70"><a href="#Errors-70"><span class="linenos">70</span></a>    <span class="n">READ_ONLY</span> <span class="o">=</span> <span class="mi">1</span>
@@ -760,10 +760,10 @@
 
     </div>
     <a class="headerlink" href="#DryRunContext"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DryRunContext-76"><a href="#DryRunContext-76"><span class="linenos"> 76</span></a><span class="k">class</span> <span class="nc">DryRunContext</span><span class="p">:</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DryRunContext-76"><a href="#DryRunContext-76"><span class="linenos"> 76</span></a><span class="k">class</span><span class="w"> </span><span class="nc">DryRunContext</span><span class="p">:</span>
 </span><span id="DryRunContext-77"><a href="#DryRunContext-77"><span class="linenos"> 77</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;DryRun builder class.&quot;&quot;&quot;</span>
 </span><span id="DryRunContext-78"><a href="#DryRunContext-78"><span class="linenos"> 78</span></a>
-</span><span id="DryRunContext-79"><a href="#DryRunContext-79"><span class="linenos"> 79</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+</span><span id="DryRunContext-79"><a href="#DryRunContext-79"><span class="linenos"> 79</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="DryRunContext-80"><a href="#DryRunContext-80"><span class="linenos"> 80</span></a>        <span class="bp">self</span><span class="p">,</span>
 </span><span id="DryRunContext-81"><a href="#DryRunContext-81"><span class="linenos"> 81</span></a>        <span class="n">use_cloud_function</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 </span><span id="DryRunContext-82"><a href="#DryRunContext-82"><span class="linenos"> 82</span></a>        <span class="n">id_token</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -776,7 +776,7 @@
 </span><span id="DryRunContext-89"><a href="#DryRunContext-89"><span class="linenos"> 89</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">id_token</span> <span class="o">=</span> <span class="n">id_token</span>
 </span><span id="DryRunContext-90"><a href="#DryRunContext-90"><span class="linenos"> 90</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">credentials</span> <span class="o">=</span> <span class="n">credentials</span>
 </span><span id="DryRunContext-91"><a href="#DryRunContext-91"><span class="linenos"> 91</span></a>
-</span><span id="DryRunContext-92"><a href="#DryRunContext-92"><span class="linenos"> 92</span></a>    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span>
+</span><span id="DryRunContext-92"><a href="#DryRunContext-92"><span class="linenos"> 92</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span>
 </span><span id="DryRunContext-93"><a href="#DryRunContext-93"><span class="linenos"> 93</span></a>        <span class="bp">self</span><span class="p">,</span>
 </span><span id="DryRunContext-94"><a href="#DryRunContext-94"><span class="linenos"> 94</span></a>        <span class="n">sql</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 </span><span id="DryRunContext-95"><a href="#DryRunContext-95"><span class="linenos"> 95</span></a>        <span class="n">project</span><span class="o">=</span><span class="s2">&quot;moz-fx-data-shared-prod&quot;</span><span class="p">,</span>
@@ -811,7 +811,7 @@
 
     </div>
     <a class="headerlink" href="#DryRunContext.__init__"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DryRunContext.__init__-79"><a href="#DryRunContext.__init__-79"><span class="linenos">79</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DryRunContext.__init__-79"><a href="#DryRunContext.__init__-79"><span class="linenos">79</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="DryRunContext.__init__-80"><a href="#DryRunContext.__init__-80"><span class="linenos">80</span></a>        <span class="bp">self</span><span class="p">,</span>
 </span><span id="DryRunContext.__init__-81"><a href="#DryRunContext.__init__-81"><span class="linenos">81</span></a>        <span class="n">use_cloud_function</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 </span><span id="DryRunContext.__init__-82"><a href="#DryRunContext.__init__-82"><span class="linenos">82</span></a>        <span class="n">id_token</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -886,7 +886,7 @@
 
     </div>
     <a class="headerlink" href="#DryRunContext.create"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DryRunContext.create-92"><a href="#DryRunContext.create-92"><span class="linenos"> 92</span></a>    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DryRunContext.create-92"><a href="#DryRunContext.create-92"><span class="linenos"> 92</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span>
 </span><span id="DryRunContext.create-93"><a href="#DryRunContext.create-93"><span class="linenos"> 93</span></a>        <span class="bp">self</span><span class="p">,</span>
 </span><span id="DryRunContext.create-94"><a href="#DryRunContext.create-94"><span class="linenos"> 94</span></a>        <span class="n">sql</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 </span><span id="DryRunContext.create-95"><a href="#DryRunContext.create-95"><span class="linenos"> 95</span></a>        <span class="n">project</span><span class="o">=</span><span class="s2">&quot;moz-fx-data-shared-prod&quot;</span><span class="p">,</span>
@@ -924,10 +924,10 @@
 
     </div>
     <a class="headerlink" href="#DryRun"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DryRun-112"><a href="#DryRun-112"><span class="linenos">112</span></a><span class="k">class</span> <span class="nc">DryRun</span><span class="p">:</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DryRun-112"><a href="#DryRun-112"><span class="linenos">112</span></a><span class="k">class</span><span class="w"> </span><span class="nc">DryRun</span><span class="p">:</span>
 </span><span id="DryRun-113"><a href="#DryRun-113"><span class="linenos">113</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Dry run SQL.&quot;&quot;&quot;</span>
 </span><span id="DryRun-114"><a href="#DryRun-114"><span class="linenos">114</span></a>
-</span><span id="DryRun-115"><a href="#DryRun-115"><span class="linenos">115</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+</span><span id="DryRun-115"><a href="#DryRun-115"><span class="linenos">115</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="DryRun-116"><a href="#DryRun-116"><span class="linenos">116</span></a>        <span class="bp">self</span><span class="p">,</span>
 </span><span id="DryRun-117"><a href="#DryRun-117"><span class="linenos">117</span></a>        <span class="n">use_cloud_function</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 </span><span id="DryRun-118"><a href="#DryRun-118"><span class="linenos">118</span></a>        <span class="n">id_token</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -949,12 +949,12 @@
 </span><span id="DryRun-134"><a href="#DryRun-134"><span class="linenos">134</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">credentials</span> <span class="o">=</span> <span class="n">credentials</span>
 </span><span id="DryRun-135"><a href="#DryRun-135"><span class="linenos">135</span></a>
 </span><span id="DryRun-136"><a href="#DryRun-136"><span class="linenos">136</span></a>    <span class="nd">@cached_property</span>
-</span><span id="DryRun-137"><a href="#DryRun-137"><span class="linenos">137</span></a>    <span class="k">def</span> <span class="nf">client</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="DryRun-137"><a href="#DryRun-137"><span class="linenos">137</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">client</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DryRun-138"><a href="#DryRun-138"><span class="linenos">138</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get BigQuery client instance.&quot;&quot;&quot;</span>
 </span><span id="DryRun-139"><a href="#DryRun-139"><span class="linenos">139</span></a>        <span class="k">return</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span><span class="n">credentials</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">credentials</span><span class="p">)</span>
 </span><span id="DryRun-140"><a href="#DryRun-140"><span class="linenos">140</span></a>
 </span><span id="DryRun-141"><a href="#DryRun-141"><span class="linenos">141</span></a>    <span class="nd">@cached_property</span>
-</span><span id="DryRun-142"><a href="#DryRun-142"><span class="linenos">142</span></a>    <span class="k">def</span> <span class="nf">dry_run_result</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="DryRun-142"><a href="#DryRun-142"><span class="linenos">142</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">dry_run_result</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DryRun-143"><a href="#DryRun-143"><span class="linenos">143</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the dry run result.&quot;&quot;&quot;</span>
 </span><span id="DryRun-144"><a href="#DryRun-144"><span class="linenos">144</span></a>        <span class="k">try</span><span class="p">:</span>
 </span><span id="DryRun-145"><a href="#DryRun-145"><span class="linenos">145</span></a>            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cloud_function</span><span class="p">:</span>
@@ -1038,7 +1038,7 @@
 </span><span id="DryRun-223"><a href="#DryRun-223"><span class="linenos">223</span></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ERROR </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </span><span id="DryRun-224"><a href="#DryRun-224"><span class="linenos">224</span></a>            <span class="k">return</span> <span class="kc">None</span>
 </span><span id="DryRun-225"><a href="#DryRun-225"><span class="linenos">225</span></a>
-</span><span id="DryRun-226"><a href="#DryRun-226"><span class="linenos">226</span></a>    <span class="k">def</span> <span class="nf">get_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="DryRun-226"><a href="#DryRun-226"><span class="linenos">226</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DryRun-227"><a href="#DryRun-227"><span class="linenos">227</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the query schema by dry running the SQL file.&quot;&quot;&quot;</span>
 </span><span id="DryRun-228"><a href="#DryRun-228"><span class="linenos">228</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
 </span><span id="DryRun-229"><a href="#DryRun-229"><span class="linenos">229</span></a>
@@ -1051,7 +1051,7 @@
 </span><span id="DryRun-236"><a href="#DryRun-236"><span class="linenos">236</span></a>
 </span><span id="DryRun-237"><a href="#DryRun-237"><span class="linenos">237</span></a>        <span class="k">return</span> <span class="p">[]</span>
 </span><span id="DryRun-238"><a href="#DryRun-238"><span class="linenos">238</span></a>
-</span><span id="DryRun-239"><a href="#DryRun-239"><span class="linenos">239</span></a>    <span class="k">def</span> <span class="nf">get_table_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="DryRun-239"><a href="#DryRun-239"><span class="linenos">239</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_table_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DryRun-240"><a href="#DryRun-240"><span class="linenos">240</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the schema of the provided table.&quot;&quot;&quot;</span>
 </span><span id="DryRun-241"><a href="#DryRun-241"><span class="linenos">241</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
 </span><span id="DryRun-242"><a href="#DryRun-242"><span class="linenos">242</span></a>
@@ -1064,7 +1064,7 @@
 </span><span id="DryRun-249"><a href="#DryRun-249"><span class="linenos">249</span></a>
 </span><span id="DryRun-250"><a href="#DryRun-250"><span class="linenos">250</span></a>        <span class="k">return</span> <span class="p">[]</span>
 </span><span id="DryRun-251"><a href="#DryRun-251"><span class="linenos">251</span></a>
-</span><span id="DryRun-252"><a href="#DryRun-252"><span class="linenos">252</span></a>    <span class="k">def</span> <span class="nf">get_table_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="DryRun-252"><a href="#DryRun-252"><span class="linenos">252</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_table_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DryRun-253"><a href="#DryRun-253"><span class="linenos">253</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return table metadata.&quot;&quot;&quot;</span>
 </span><span id="DryRun-254"><a href="#DryRun-254"><span class="linenos">254</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
 </span><span id="DryRun-255"><a href="#DryRun-255"><span class="linenos">255</span></a>
@@ -1077,7 +1077,7 @@
 </span><span id="DryRun-262"><a href="#DryRun-262"><span class="linenos">262</span></a>
 </span><span id="DryRun-263"><a href="#DryRun-263"><span class="linenos">263</span></a>        <span class="k">return</span> <span class="p">{}</span>
 </span><span id="DryRun-264"><a href="#DryRun-264"><span class="linenos">264</span></a>
-</span><span id="DryRun-265"><a href="#DryRun-265"><span class="linenos">265</span></a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="DryRun-265"><a href="#DryRun-265"><span class="linenos">265</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DryRun-266"><a href="#DryRun-266"><span class="linenos">266</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Dry run the provided SQL file and check if valid.&quot;&quot;&quot;</span>
 </span><span id="DryRun-267"><a href="#DryRun-267"><span class="linenos">267</span></a>        <span class="n">dry_run_error</span> <span class="o">=</span> <span class="n">DryRunError</span><span class="p">(</span>
 </span><span id="DryRun-268"><a href="#DryRun-268"><span class="linenos">268</span></a>            <span class="s2">&quot;Error when dry running SQL&quot;</span><span class="p">,</span>
@@ -1104,13 +1104,13 @@
 </span><span id="DryRun-289"><a href="#DryRun-289"><span class="linenos">289</span></a>            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ERROR</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run_result</span><span class="p">[</span><span class="s2">&quot;errors&quot;</span><span class="p">])</span>
 </span><span id="DryRun-290"><a href="#DryRun-290"><span class="linenos">290</span></a>            <span class="k">raise</span> <span class="n">dry_run_error</span>
 </span><span id="DryRun-291"><a href="#DryRun-291"><span class="linenos">291</span></a>
-</span><span id="DryRun-292"><a href="#DryRun-292"><span class="linenos">292</span></a>    <span class="k">def</span> <span class="nf">errors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="DryRun-292"><a href="#DryRun-292"><span class="linenos">292</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">errors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DryRun-293"><a href="#DryRun-293"><span class="linenos">293</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Dry run the provided SQL file and return errors.&quot;&quot;&quot;</span>
 </span><span id="DryRun-294"><a href="#DryRun-294"><span class="linenos">294</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run_result</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="DryRun-295"><a href="#DryRun-295"><span class="linenos">295</span></a>            <span class="k">return</span> <span class="p">[]</span>
 </span><span id="DryRun-296"><a href="#DryRun-296"><span class="linenos">296</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run_result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;errors&quot;</span><span class="p">,</span> <span class="p">[])</span>
 </span><span id="DryRun-297"><a href="#DryRun-297"><span class="linenos">297</span></a>
-</span><span id="DryRun-298"><a href="#DryRun-298"><span class="linenos">298</span></a>    <span class="k">def</span> <span class="nf">get_error</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Errors</span><span class="p">]:</span>
+</span><span id="DryRun-298"><a href="#DryRun-298"><span class="linenos">298</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_error</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Errors</span><span class="p">]:</span>
 </span><span id="DryRun-299"><a href="#DryRun-299"><span class="linenos">299</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get specific errors for edge case handling.&quot;&quot;&quot;</span>
 </span><span id="DryRun-300"><a href="#DryRun-300"><span class="linenos">300</span></a>        <span class="n">errors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="p">()</span>
 </span><span id="DryRun-301"><a href="#DryRun-301"><span class="linenos">301</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
@@ -1156,7 +1156,7 @@
 
     </div>
     <a class="headerlink" href="#DryRun.__init__"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DryRun.__init__-115"><a href="#DryRun.__init__-115"><span class="linenos">115</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DryRun.__init__-115"><a href="#DryRun.__init__-115"><span class="linenos">115</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="DryRun.__init__-116"><a href="#DryRun.__init__-116"><span class="linenos">116</span></a>        <span class="bp">self</span><span class="p">,</span>
 </span><span id="DryRun.__init__-117"><a href="#DryRun.__init__-117"><span class="linenos">117</span></a>        <span class="n">use_cloud_function</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 </span><span id="DryRun.__init__-118"><a href="#DryRun.__init__-118"><span class="linenos">118</span></a>        <span class="n">id_token</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1282,7 +1282,7 @@
     </div>
     <a class="headerlink" href="#DryRun.client"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DryRun.client-136"><a href="#DryRun.client-136"><span class="linenos">136</span></a>    <span class="nd">@cached_property</span>
-</span><span id="DryRun.client-137"><a href="#DryRun.client-137"><span class="linenos">137</span></a>    <span class="k">def</span> <span class="nf">client</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="DryRun.client-137"><a href="#DryRun.client-137"><span class="linenos">137</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">client</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DryRun.client-138"><a href="#DryRun.client-138"><span class="linenos">138</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get BigQuery client instance.&quot;&quot;&quot;</span>
 </span><span id="DryRun.client-139"><a href="#DryRun.client-139"><span class="linenos">139</span></a>        <span class="k">return</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span><span class="n">credentials</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">credentials</span><span class="p">)</span>
 </span></pre></div>
@@ -1303,7 +1303,7 @@
     </div>
     <a class="headerlink" href="#DryRun.dry_run_result"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DryRun.dry_run_result-141"><a href="#DryRun.dry_run_result-141"><span class="linenos">141</span></a>    <span class="nd">@cached_property</span>
-</span><span id="DryRun.dry_run_result-142"><a href="#DryRun.dry_run_result-142"><span class="linenos">142</span></a>    <span class="k">def</span> <span class="nf">dry_run_result</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="DryRun.dry_run_result-142"><a href="#DryRun.dry_run_result-142"><span class="linenos">142</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">dry_run_result</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DryRun.dry_run_result-143"><a href="#DryRun.dry_run_result-143"><span class="linenos">143</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the dry run result.&quot;&quot;&quot;</span>
 </span><span id="DryRun.dry_run_result-144"><a href="#DryRun.dry_run_result-144"><span class="linenos">144</span></a>        <span class="k">try</span><span class="p">:</span>
 </span><span id="DryRun.dry_run_result-145"><a href="#DryRun.dry_run_result-145"><span class="linenos">145</span></a>            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cloud_function</span><span class="p">:</span>
@@ -1405,7 +1405,7 @@
 
     </div>
     <a class="headerlink" href="#DryRun.get_schema"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DryRun.get_schema-226"><a href="#DryRun.get_schema-226"><span class="linenos">226</span></a>    <span class="k">def</span> <span class="nf">get_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DryRun.get_schema-226"><a href="#DryRun.get_schema-226"><span class="linenos">226</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DryRun.get_schema-227"><a href="#DryRun.get_schema-227"><span class="linenos">227</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the query schema by dry running the SQL file.&quot;&quot;&quot;</span>
 </span><span id="DryRun.get_schema-228"><a href="#DryRun.get_schema-228"><span class="linenos">228</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
 </span><span id="DryRun.get_schema-229"><a href="#DryRun.get_schema-229"><span class="linenos">229</span></a>
@@ -1436,7 +1436,7 @@
 
     </div>
     <a class="headerlink" href="#DryRun.get_table_schema"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DryRun.get_table_schema-239"><a href="#DryRun.get_table_schema-239"><span class="linenos">239</span></a>    <span class="k">def</span> <span class="nf">get_table_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DryRun.get_table_schema-239"><a href="#DryRun.get_table_schema-239"><span class="linenos">239</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_table_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DryRun.get_table_schema-240"><a href="#DryRun.get_table_schema-240"><span class="linenos">240</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the schema of the provided table.&quot;&quot;&quot;</span>
 </span><span id="DryRun.get_table_schema-241"><a href="#DryRun.get_table_schema-241"><span class="linenos">241</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
 </span><span id="DryRun.get_table_schema-242"><a href="#DryRun.get_table_schema-242"><span class="linenos">242</span></a>
@@ -1467,7 +1467,7 @@
 
     </div>
     <a class="headerlink" href="#DryRun.get_table_metadata"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DryRun.get_table_metadata-252"><a href="#DryRun.get_table_metadata-252"><span class="linenos">252</span></a>    <span class="k">def</span> <span class="nf">get_table_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DryRun.get_table_metadata-252"><a href="#DryRun.get_table_metadata-252"><span class="linenos">252</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_table_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DryRun.get_table_metadata-253"><a href="#DryRun.get_table_metadata-253"><span class="linenos">253</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return table metadata.&quot;&quot;&quot;</span>
 </span><span id="DryRun.get_table_metadata-254"><a href="#DryRun.get_table_metadata-254"><span class="linenos">254</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
 </span><span id="DryRun.get_table_metadata-255"><a href="#DryRun.get_table_metadata-255"><span class="linenos">255</span></a>
@@ -1498,7 +1498,7 @@
 
     </div>
     <a class="headerlink" href="#DryRun.validate"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DryRun.validate-265"><a href="#DryRun.validate-265"><span class="linenos">265</span></a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DryRun.validate-265"><a href="#DryRun.validate-265"><span class="linenos">265</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DryRun.validate-266"><a href="#DryRun.validate-266"><span class="linenos">266</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Dry run the provided SQL file and check if valid.&quot;&quot;&quot;</span>
 </span><span id="DryRun.validate-267"><a href="#DryRun.validate-267"><span class="linenos">267</span></a>        <span class="n">dry_run_error</span> <span class="o">=</span> <span class="n">DryRunError</span><span class="p">(</span>
 </span><span id="DryRun.validate-268"><a href="#DryRun.validate-268"><span class="linenos">268</span></a>            <span class="s2">&quot;Error when dry running SQL&quot;</span><span class="p">,</span>
@@ -1543,7 +1543,7 @@
 
     </div>
     <a class="headerlink" href="#DryRun.errors"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DryRun.errors-292"><a href="#DryRun.errors-292"><span class="linenos">292</span></a>    <span class="k">def</span> <span class="nf">errors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DryRun.errors-292"><a href="#DryRun.errors-292"><span class="linenos">292</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">errors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DryRun.errors-293"><a href="#DryRun.errors-293"><span class="linenos">293</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Dry run the provided SQL file and return errors.&quot;&quot;&quot;</span>
 </span><span id="DryRun.errors-294"><a href="#DryRun.errors-294"><span class="linenos">294</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run_result</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="DryRun.errors-295"><a href="#DryRun.errors-295"><span class="linenos">295</span></a>            <span class="k">return</span> <span class="p">[]</span>
@@ -1567,7 +1567,7 @@
 
     </div>
     <a class="headerlink" href="#DryRun.get_error"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DryRun.get_error-298"><a href="#DryRun.get_error-298"><span class="linenos">298</span></a>    <span class="k">def</span> <span class="nf">get_error</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Errors</span><span class="p">]:</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DryRun.get_error-298"><a href="#DryRun.get_error-298"><span class="linenos">298</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_error</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Errors</span><span class="p">]:</span>
 </span><span id="DryRun.get_error-299"><a href="#DryRun.get_error-299"><span class="linenos">299</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get specific errors for edge case handling.&quot;&quot;&quot;</span>
 </span><span id="DryRun.get_error-300"><a href="#DryRun.get_error-300"><span class="linenos">300</span></a>        <span class="n">errors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="p">()</span>
 </span><span id="DryRun.get_error-301"><a href="#DryRun.get_error-301"><span class="linenos">301</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>

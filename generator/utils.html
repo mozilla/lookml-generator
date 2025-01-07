@@ -61,13 +61,13 @@
 
                         <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="sd">&quot;&quot;&quot;Utils.&quot;&quot;&quot;</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a>
-</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a><span class="kn">import</span> <span class="nn">urllib.request</span>
-</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">urllib.request</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 </span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a>
 </span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="n">LOOKER_HUB_URL</span> <span class="o">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/mozilla/looker-hub/main&quot;</span>
 </span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a>
 </span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="k">def</span> <span class="nf">get_file_from_looker_hub</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="k">def</span><span class="w"> </span><span class="nf">get_file_from_looker_hub</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
 </span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Download a specific lookml artifact from looker-hub.&quot;&quot;&quot;</span>
 </span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>    <span class="n">file</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">name</span>
 </span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>    <span class="n">artifact_type</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span>
@@ -106,7 +106,7 @@
 
     </div>
     <a class="headerlink" href="#get_file_from_looker_hub"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="get_file_from_looker_hub-10"><a href="#get_file_from_looker_hub-10"><span class="linenos">10</span></a><span class="k">def</span> <span class="nf">get_file_from_looker_hub</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="get_file_from_looker_hub-10"><a href="#get_file_from_looker_hub-10"><span class="linenos">10</span></a><span class="k">def</span><span class="w"> </span><span class="nf">get_file_from_looker_hub</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
 </span><span id="get_file_from_looker_hub-11"><a href="#get_file_from_looker_hub-11"><span class="linenos">11</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Download a specific lookml artifact from looker-hub.&quot;&quot;&quot;</span>
 </span><span id="get_file_from_looker_hub-12"><a href="#get_file_from_looker_hub-12"><span class="linenos">12</span></a>    <span class="n">file</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">name</span>
 </span><span id="get_file_from_looker_hub-13"><a href="#get_file_from_looker_hub-13"><span class="linenos">13</span></a>    <span class="n">artifact_type</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span>

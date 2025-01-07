@@ -112,19 +112,19 @@
 
                         <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">  1</span></a><span class="sd">&quot;&quot;&quot;Generate directories and models for new namespaces.&quot;&quot;&quot;</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos">  2</span></a>
-</span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a><span class="kn">import</span> <span class="nn">logging</span>
-</span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a><span class="kn">import</span> <span class="nn">os</span>
-</span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="kn">import</span> <span class="nn">shutil</span>
-</span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
-</span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-</span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">TypedDict</span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+</span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+</span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">TypedDict</span>
 </span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a>
-</span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a><span class="kn">import</span> <span class="nn">click</span>
-</span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a><span class="kn">import</span> <span class="nn">lkml</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a><span class="kn">import</span> <span class="nn">looker_sdk</span>
-</span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a><span class="kn">import</span> <span class="nn">yaml</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">click</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">lkml</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">looker_sdk</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
 </span><span id="L-14"><a href="#L-14"><span class="linenos"> 14</span></a>
-</span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a><span class="kn">from</span> <span class="nn">.lookml</span> <span class="kn">import</span> <span class="n">ViewDict</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">.lookml</span><span class="w"> </span><span class="kn">import</span> <span class="n">ViewDict</span>
 </span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a>
 </span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a><span class="n">MODEL_SETS_BY_INSTANCE</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
 </span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a>    <span class="s2">&quot;https://mozilladev.cloud.looker.com&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;mozilla_confidential&quot;</span><span class="p">],</span>
@@ -135,14 +135,14 @@
 </span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a><span class="n">DEFAULT_DB_CONNECTION</span> <span class="o">=</span> <span class="s2">&quot;telemetry&quot;</span>
 </span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a>
 </span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a>
-</span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a><span class="k">class</span> <span class="nc">ExploreDict</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a><span class="k">class</span><span class="w"> </span><span class="nc">ExploreDict</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
 </span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Represent an explore definition.&quot;&quot;&quot;</span>
 </span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a>
 </span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a>    <span class="nb">type</span><span class="p">:</span> <span class="nb">str</span>
 </span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a>    <span class="n">views</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span>
 </span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a>
 </span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a>
-</span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a><span class="k">class</span> <span class="nc">NamespaceDict</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
+</span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a><span class="k">class</span><span class="w"> </span><span class="nc">NamespaceDict</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
 </span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Represent a Namespace definition.&quot;&quot;&quot;</span>
 </span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a>
 </span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a>    <span class="n">views</span><span class="p">:</span> <span class="n">ViewDict</span>
@@ -153,7 +153,7 @@
 </span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a>    <span class="n">spoke</span><span class="p">:</span> <span class="nb">str</span>
 </span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a>
 </span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a>
-</span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a><span class="k">def</span> <span class="nf">setup_env_with_looker_creds</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a><span class="k">def</span><span class="w"> </span><span class="nf">setup_env_with_looker_creds</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 </span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a><span class="sd">    Set up env with looker credentials.</span>
 </span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a>
@@ -176,7 +176,7 @@
 </span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a>    <span class="k">return</span> <span class="kc">True</span>
 </span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a>
 </span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a>
-</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a><span class="k">def</span> <span class="nf">generate_model</span><span class="p">(</span>
+</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a><span class="k">def</span><span class="w"> </span><span class="nf">generate_model</span><span class="p">(</span>
 </span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a>    <span class="n">spoke_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">namespace_defn</span><span class="p">:</span> <span class="n">NamespaceDict</span><span class="p">,</span> <span class="n">db_connection</span><span class="p">:</span> <span class="nb">str</span>
 </span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
 </span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -217,7 +217,7 @@
 </span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>    <span class="k">return</span> <span class="n">path</span>
 </span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a>
 </span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>
-</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a><span class="k">def</span> <span class="nf">configure_model</span><span class="p">(</span>
+</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a><span class="k">def</span><span class="w"> </span><span class="nf">configure_model</span><span class="p">(</span>
 </span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a>    <span class="n">sdk</span><span class="p">:</span> <span class="n">looker_sdk</span><span class="o">.</span><span class="n">methods40</span><span class="o">.</span><span class="n">Looker40SDK</span><span class="p">,</span>
 </span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a>    <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 </span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a>    <span class="n">db_connection</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -257,7 +257,7 @@
 </span><span id="L-145"><a href="#L-145"><span class="linenos">145</span></a>        <span class="p">)</span>
 </span><span id="L-146"><a href="#L-146"><span class="linenos">146</span></a>
 </span><span id="L-147"><a href="#L-147"><span class="linenos">147</span></a>
-</span><span id="L-148"><a href="#L-148"><span class="linenos">148</span></a><span class="k">def</span> <span class="nf">generate_directories</span><span class="p">(</span>
+</span><span id="L-148"><a href="#L-148"><span class="linenos">148</span></a><span class="k">def</span><span class="w"> </span><span class="nf">generate_directories</span><span class="p">(</span>
 </span><span id="L-149"><a href="#L-149"><span class="linenos">149</span></a>    <span class="n">namespaces</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NamespaceDict</span><span class="p">],</span> <span class="n">base_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">sdk_setup</span><span class="o">=</span><span class="kc">False</span>
 </span><span id="L-150"><a href="#L-150"><span class="linenos">150</span></a><span class="p">):</span>
 </span><span id="L-151"><a href="#L-151"><span class="linenos">151</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate directories and model for a namespace, if it doesn&#39;t exist.&quot;&quot;&quot;</span>
@@ -315,7 +315,7 @@
 </span><span id="L-203"><a href="#L-203"><span class="linenos">203</span></a>    <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">file_okay</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dir_okay</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">writable</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
 </span><span id="L-204"><a href="#L-204"><span class="linenos">204</span></a>    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Directory containing the Looker spoke.&quot;</span><span class="p">,</span>
 </span><span id="L-205"><a href="#L-205"><span class="linenos">205</span></a><span class="p">)</span>
-</span><span id="L-206"><a href="#L-206"><span class="linenos">206</span></a><span class="k">def</span> <span class="nf">update_spoke</span><span class="p">(</span><span class="n">namespaces</span><span class="p">,</span> <span class="n">spoke_dir</span><span class="p">):</span>
+</span><span id="L-206"><a href="#L-206"><span class="linenos">206</span></a><span class="k">def</span><span class="w"> </span><span class="nf">update_spoke</span><span class="p">(</span><span class="n">namespaces</span><span class="p">,</span> <span class="n">spoke_dir</span><span class="p">):</span>
 </span><span id="L-207"><a href="#L-207"><span class="linenos">207</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate updates to spoke project.&quot;&quot;&quot;</span>
 </span><span id="L-208"><a href="#L-208"><span class="linenos">208</span></a>    <span class="n">_namespaces</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">namespaces</span><span class="p">)</span>
 </span><span id="L-209"><a href="#L-209"><span class="linenos">209</span></a>    <span class="n">sdk_setup</span> <span class="o">=</span> <span class="n">setup_env_with_looker_creds</span><span class="p">()</span>
@@ -360,7 +360,7 @@
 
     </div>
     <a class="headerlink" href="#ExploreDict"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="ExploreDict-27"><a href="#ExploreDict-27"><span class="linenos">27</span></a><span class="k">class</span> <span class="nc">ExploreDict</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="ExploreDict-27"><a href="#ExploreDict-27"><span class="linenos">27</span></a><span class="k">class</span><span class="w"> </span><span class="nc">ExploreDict</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
 </span><span id="ExploreDict-28"><a href="#ExploreDict-28"><span class="linenos">28</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Represent an explore definition.&quot;&quot;&quot;</span>
 </span><span id="ExploreDict-29"><a href="#ExploreDict-29"><span class="linenos">29</span></a>
 </span><span id="ExploreDict-30"><a href="#ExploreDict-30"><span class="linenos">30</span></a>    <span class="nb">type</span><span class="p">:</span> <span class="nb">str</span>
@@ -406,7 +406,7 @@
 
     </div>
     <a class="headerlink" href="#NamespaceDict"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="NamespaceDict-34"><a href="#NamespaceDict-34"><span class="linenos">34</span></a><span class="k">class</span> <span class="nc">NamespaceDict</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="NamespaceDict-34"><a href="#NamespaceDict-34"><span class="linenos">34</span></a><span class="k">class</span><span class="w"> </span><span class="nc">NamespaceDict</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
 </span><span id="NamespaceDict-35"><a href="#NamespaceDict-35"><span class="linenos">35</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Represent a Namespace definition.&quot;&quot;&quot;</span>
 </span><span id="NamespaceDict-36"><a href="#NamespaceDict-36"><span class="linenos">36</span></a>
 </span><span id="NamespaceDict-37"><a href="#NamespaceDict-37"><span class="linenos">37</span></a>    <span class="n">views</span><span class="p">:</span> <span class="n">ViewDict</span>
@@ -500,7 +500,7 @@
 
     </div>
     <a class="headerlink" href="#setup_env_with_looker_creds"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="setup_env_with_looker_creds-45"><a href="#setup_env_with_looker_creds-45"><span class="linenos">45</span></a><span class="k">def</span> <span class="nf">setup_env_with_looker_creds</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="setup_env_with_looker_creds-45"><a href="#setup_env_with_looker_creds-45"><span class="linenos">45</span></a><span class="k">def</span><span class="w"> </span><span class="nf">setup_env_with_looker_creds</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 </span><span id="setup_env_with_looker_creds-46"><a href="#setup_env_with_looker_creds-46"><span class="linenos">46</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="setup_env_with_looker_creds-47"><a href="#setup_env_with_looker_creds-47"><span class="linenos">47</span></a><span class="sd">    Set up env with looker credentials.</span>
 </span><span id="setup_env_with_looker_creds-48"><a href="#setup_env_with_looker_creds-48"><span class="linenos">48</span></a>
@@ -542,7 +542,7 @@
 
     </div>
     <a class="headerlink" href="#generate_model"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="generate_model-68"><a href="#generate_model-68"><span class="linenos"> 68</span></a><span class="k">def</span> <span class="nf">generate_model</span><span class="p">(</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="generate_model-68"><a href="#generate_model-68"><span class="linenos"> 68</span></a><span class="k">def</span><span class="w"> </span><span class="nf">generate_model</span><span class="p">(</span>
 </span><span id="generate_model-69"><a href="#generate_model-69"><span class="linenos"> 69</span></a>    <span class="n">spoke_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">namespace_defn</span><span class="p">:</span> <span class="n">NamespaceDict</span><span class="p">,</span> <span class="n">db_connection</span><span class="p">:</span> <span class="nb">str</span>
 </span><span id="generate_model-70"><a href="#generate_model-70"><span class="linenos"> 70</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
 </span><span id="generate_model-71"><a href="#generate_model-71"><span class="linenos"> 71</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -607,7 +607,7 @@ be added one-by-one if they are included in an explore.</p>
 
     </div>
     <a class="headerlink" href="#configure_model"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="configure_model-109"><a href="#configure_model-109"><span class="linenos">109</span></a><span class="k">def</span> <span class="nf">configure_model</span><span class="p">(</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="configure_model-109"><a href="#configure_model-109"><span class="linenos">109</span></a><span class="k">def</span><span class="w"> </span><span class="nf">configure_model</span><span class="p">(</span>
 </span><span id="configure_model-110"><a href="#configure_model-110"><span class="linenos">110</span></a>    <span class="n">sdk</span><span class="p">:</span> <span class="n">looker_sdk</span><span class="o">.</span><span class="n">methods40</span><span class="o">.</span><span class="n">Looker40SDK</span><span class="p">,</span>
 </span><span id="configure_model-111"><a href="#configure_model-111"><span class="linenos">111</span></a>    <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 </span><span id="configure_model-112"><a href="#configure_model-112"><span class="linenos">112</span></a>    <span class="n">db_connection</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -664,7 +664,7 @@ be added one-by-one if they are included in an explore.</p>
 
     </div>
     <a class="headerlink" href="#generate_directories"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="generate_directories-149"><a href="#generate_directories-149"><span class="linenos">149</span></a><span class="k">def</span> <span class="nf">generate_directories</span><span class="p">(</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="generate_directories-149"><a href="#generate_directories-149"><span class="linenos">149</span></a><span class="k">def</span><span class="w"> </span><span class="nf">generate_directories</span><span class="p">(</span>
 </span><span id="generate_directories-150"><a href="#generate_directories-150"><span class="linenos">150</span></a>    <span class="n">namespaces</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NamespaceDict</span><span class="p">],</span> <span class="n">base_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">sdk_setup</span><span class="o">=</span><span class="kc">False</span>
 </span><span id="generate_directories-151"><a href="#generate_directories-151"><span class="linenos">151</span></a><span class="p">):</span>
 </span><span id="generate_directories-152"><a href="#generate_directories-152"><span class="linenos">152</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate directories and model for a namespace, if it doesn&#39;t exist.&quot;&quot;&quot;</span>
