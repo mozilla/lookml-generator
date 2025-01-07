@@ -996,8 +996,12 @@ experimentation:
     experiment_crash_rates:
       type: table_view
       tables:
-        - channel: release
-          table: moz-fx-data-shared-prod.telemetry.experiment_crash_rates_live
+        - table: moz-fx-data-shared-prod.telemetry.experiment_crash_rates_live
+  explores:
+    experiment_crash_rates:
+      type: table_explore
+      views:
+        base_view: experiment_crash_rates
 firefox_desktop:
   glean_app: true
   views:
