@@ -993,6 +993,15 @@ experimentation:
       tables:
         - channel: release
           table: moz-fx-data-experiments.monitoring.experimenter_experiments_v1
+    experiment_crash_rates:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.telemetry.experiment_crash_rates_live
+  explores:
+    experiment_crash_rates:
+      type: table_explore
+      views:
+        base_view: experiment_crash_rates
 firefox_desktop:
   glean_app: true
   views:
