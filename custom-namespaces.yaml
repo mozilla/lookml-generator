@@ -1898,6 +1898,10 @@ jira_service_desk:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.jira_service_desk.field
+    field_option:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.jira_service_desk.field_option
     issue_field_history:
       type: table_view
       tables:
@@ -1947,6 +1951,10 @@ jira_service_desk:
       type: table_explore
       views:
         base_view: field
+    field_option:
+      type: table_explore
+      views:
+        base_view: field_option
     issue_field_history:
       type: table_explore
       views:
