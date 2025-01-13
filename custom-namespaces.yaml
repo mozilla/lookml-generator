@@ -506,20 +506,6 @@ firefox_accounts:
         - channel: release
           table: mozdata.firefox_accounts.fxa_content_auth_stdout_events
           time_partitioning_field: "timestamp"
-    funnel_analysis:
-      type: funnel_analysis_view
-      tables:
-        - funnel_analysis: events_daily_table
-          event_types: mozdata.firefox_accounts.event_types
-          step_1: event_types
-          step_2: event_types
-          step_3: event_types
-          step_4: event_types
-    events_daily_table:
-      type: table_view
-      tables:
-        - channel: release
-          table: mozdata.firefox_accounts.events_daily
     growth_accounting:
       type: growth_accounting_view
       identifier_field: user_id_sha256
@@ -678,10 +664,6 @@ firefox_accounts:
       views:
         base_view: content_auth_stdout_events
         extended_view: fxa_content_auth_stdout_events_table
-    funnel_analysis:
-      type: funnel_analysis_explore
-      views:
-        base_view: funnel_analysis
     growth_accounting:
       type: growth_accounting_explore
       views:
