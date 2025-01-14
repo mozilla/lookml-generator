@@ -436,9 +436,9 @@ lkml==1.3.6 \
     --hash=sha256:1f68a44ba7935d56cd34514af7901a68b855328d09cf271ed54f9f2c520df217 \
     --hash=sha256:a1467799bcabe420ec3f238898b21e5be15b2cf8ecb741e28310d9761498673b
     # via -r requirements.in
-looker-sdk==24.20.0 \
-    --hash=sha256:4d09a8572d2b1c2df5a5e820b4275718a766e5024bb5d02b335cd85a4e4adcb8 \
-    --hash=sha256:de6e2b8beca5345e3538ea0d90c1044381e2c228d068aff372af0b1ff19313e2
+looker-sdk==25.0.0 \
+    --hash=sha256:4930288792a4024a5e661ff7756aa5e1fab1357a53aa6e32f8a7d16f94dd506d \
+    --hash=sha256:495704818b0af0cc1c18b9cfe16bc2429ca7d4a1a9f0f47fc6ae93c1c6bd6e33
     # via -r requirements.in
 markupsafe==2.1.3 \
     --hash=sha256:05fb21170423db021895e1ea1e1f3ab3adb85d1c2333cbc2310f2a26bc77272e \
