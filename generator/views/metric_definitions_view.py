@@ -130,7 +130,7 @@ class MetricDefinitionsView(View):
         if (
             data_source_definition.client_id_column == "NULL"
             or data_source_definition.columns_as_dimensions
-        ):
+        ) and not data_source_definition.joins:
             # if the metrics data source doesn't have any joins then use the dimensions
             # of the data source itself as base fields
             date_filter = None
