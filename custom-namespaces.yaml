@@ -607,6 +607,13 @@ firefox_accounts:
       measures:
         count:
           type: count
+    health_lighthouse:
+      type: table_view
+      tables:
+        - table: mozdata.analysis.wclouser_fxa_health_lighthouse
+      measures:
+        count:
+          type: count
     health_pagerduty:
       type: table_view
       tables:
@@ -732,6 +739,10 @@ firefox_accounts:
       type: table_explore
       views:
         base_view: health_issues
+    health_lighthouse:
+      type: table_explore
+      views:
+        base_view: health_lighthouse
     health_pagerduty:
       type: table_explore
       views:
