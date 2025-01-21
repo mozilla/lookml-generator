@@ -11,7 +11,7 @@ mozilla-nimbus-schemas==2024.12.2
 mozilla-schema-generator==0.5.1
 pandas==2.2.3
 pip-tools==7.4.1
-pre-commit==4.0.1
+pre-commit==4.1.0
 pyarrow==19.0.0
 pytest-black==0.6.0
 pytest-isort==4.0.0
