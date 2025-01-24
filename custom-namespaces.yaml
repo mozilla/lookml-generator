@@ -585,17 +585,10 @@ firefox_accounts:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.accounts_frontend_derived.login_engagement_funnel_v1
-    health_cost:
-      type: table_view
-      tables:
-        - table: mozdata.analysis.wclouser_fxa_health_cost
-      measures:
-        count:
-          type: count
     health_counts:
       type: table_view
       tables:
-        - table: mozdata.analysis.wclouser_fxa_health_counts
+        - table: moz-fx-data-shared-prod.firefox_accounts_derived.health_counts_v1
       measures:  
         count_sum:
           type: sum
@@ -603,42 +596,35 @@ firefox_accounts:
     health_issues:
       type: table_view
       tables:
-        - table: mozdata.analysis.wclouser_fxa_health_issues
+        - table: moz-fx-data-shared-prod.firefox_accounts_derived.health_issues_v1
       measures:
         count:
           type: count
     health_lighthouse:
       type: table_view
       tables:
-        - table: mozdata.analysis.wclouser_fxa_health_lighthouse
+        - table: moz-fx-data-shared-prod.firefox_accounts_derived.health_lighthouse_v1
       measures:
         count:
           type: count
-    health_pagerduty:
+    health_pingdom:
       type: table_view
       tables:
-        - table: mozdata.analysis.wclouser_fxa_health_pagerduty
+        - table: moz-fx-data-shared-prod.firefox_accounts_derived.health_pingdom_v1
       measures:
         count:
           type: count
     health_prs:
       type: table_view
       tables:
-        - table: mozdata.analysis.wclouser_fxa_health_prs
+        - table: moz-fx-data-shared-prod.firefox_accounts_derived.health_prs_v1
       measures:
         count:
           type: count
     health_tags:
       type: table_view
       tables:
-        - table: mozdata.analysis.wclouser_fxa_health_tags
-      measures:
-        count:
-          type: count
-    health_velocity:
-      type: table_view
-      tables:
-        - table: mozdata.analysis.wclouser_fxa_health_velocity
+        - table: moz-fx-data-shared-prod.firefox_accounts_derived.health_tags_v1
       measures:
         count:
           type: count
@@ -727,10 +713,6 @@ firefox_accounts:
       type: table_explore
       views:
         base_view: login_engagement_funnels_by_service
-    health_cost:
-      type: table_explore
-      views:
-        base_view: health_cost
     health_counts:
       type: table_explore
       views:
@@ -743,10 +725,10 @@ firefox_accounts:
       type: table_explore
       views:
         base_view: health_lighthouse
-    health_pagerduty:
+    health_pingdom:
       type: table_explore
       views:
-        base_view: health_pagerduty
+        base_view: health_pingdom
     health_prs:
       type: table_explore
       views:
@@ -755,10 +737,6 @@ firefox_accounts:
       type: table_explore
       views:
         base_view: health_tags
-    health_velocity:
-      type: table_explore
-      views:
-        base_view: health_velocity
     account_settings_page_engagement:
       type: table_explore
       views:
