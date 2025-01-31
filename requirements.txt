@@ -432,9 +432,9 @@ jsonschema-specifications==2023.7.1 \
     --hash=sha256:05adf340b659828a004220a9613be00fa3f223f2b82002e273dee62fd50524b1 \
     --hash=sha256:c91a50404e88a1f6ba40636778e2ee08f6e24c5613fe4c53ac24578a5a7f72bb
     # via jsonschema
-lkml==1.3.6 \
-    --hash=sha256:1f68a44ba7935d56cd34514af7901a68b855328d09cf271ed54f9f2c520df217 \
-    --hash=sha256:a1467799bcabe420ec3f238898b21e5be15b2cf8ecb741e28310d9761498673b
+lkml==1.3.7 \
+    --hash=sha256:51dc9f1b7e74cd7a00e0dbbf06fb573952015328f1f4a3a0730d444444a8ae7a \
+    --hash=sha256:ce54c517f81fbd21d452038be9e2504fa02951a5bc30f7d7f1eb552c1f3f2b39
     # via -r requirements.in
 looker-sdk==25.0.0 \
     --hash=sha256:4930288792a4024a5e661ff7756aa5e1fab1357a53aa6e32f8a7d16f94dd506d \
