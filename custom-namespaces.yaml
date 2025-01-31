@@ -959,11 +959,31 @@ experimentation:
       tables:
         - channel: release
           table: mozdata.telemetry.experiment_enrollment_other_events_overall
+    experiment_cumulative_search_with_ads_count:
+      type: table_view
+      tables:
+        - channel: release
+          table: mozdata.telemetry.experiment_cumulative_search_with_ads_count
+    experiment_cumulative_search_count:
+      type: table_view
+      tables:
+        - channel: release
+          table: mozdata.telemetry.experiment_cumulative_search_count
+    experiment_cumulative_ad_clicks:
+      type: table_view
+      tables:
+        - channel: release
+          table: mozdata.telemetry.experiment_cumulative_ad_clicks
     experimenter_experiments:
       type: table_view
       tables:
         - channel: release
           table: moz-fx-data-experiments.monitoring.experimenter_experiments_v1
+    experiment_search_aggregates_live:
+      type: table_view
+      tables:
+        - channel: release
+          table: moz-fx-data-shared-prod.telemetry_derived.experiment_search_aggregates_live_v1
     experiment_crash_rates:
       type: table_view
       tables:
