@@ -27,7 +27,5 @@
 - "*_cirrus"
 - bedrock
 - firefox_desktop_background_tasks
-- firefox_desktop_background_defaultagent
 - hubs
-- relay_backend
 - gleanjs_docs

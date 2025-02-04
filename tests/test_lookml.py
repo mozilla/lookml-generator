@@ -482,6 +482,11 @@ class MockDryRunLookml(MockDryRun):
                 {"name": "event", "type": "STRING"},
                 {"name": "index", "type": "STRING"},
             ]
+        if table_ref == "mozdata.glean_app.deprecated_ping":
+            return [
+                {"name": "client_id", "type": "STRING"},
+                {"name": "submission_date", "type": "DATE"},
+            ]
         raise ValueError(f"Table not found: {table_ref}")
 
 
@@ -738,6 +743,11 @@ def _prepare_lookml_actual_test(
                   type: client_counts_view
                   tables:
                   - table: mozdata.glean_app.baseline_clients_daily
+                deprecated_ping:
+                  type: glean_ping_view
+                  tables:
+                  - channel: release
+                    table: mozdata.glean_app.deprecated_ping
               explores:
                 baseline:
                   type: glean_ping_explore
@@ -752,6 +762,11 @@ def _prepare_lookml_actual_test(
                   views:
                     extended_view: baseline_clients_daily_table
                     base_view: client_counts
+                deprecated_ping:
+                  hidden: true
+                  type: glean_ping_explore
+                  views:
+                    base_view: deprecated_ping
             """
     )
     namespaces.write_text(namespaces_text)
@@ -1762,6 +1777,52 @@ def test_lookml_actual_baseline_explore(
             lkml.load(lkml.dump(expected)),
             lkml.load(
                 Path("looker-hub/glean-app/explores/baseline.explore.lkml").read_text()
+            ),
+        )
+
+
+@patch("generator.views.glean_ping_view.GleanPing")
+@patch("generator.explores.glean_ping_explore.GleanPing")
+def test_lookml_actual_hidden_explore(
+    mock_glean_ping_view,
+    mock_glean_ping_explore,
+    runner,
+    glean_apps,
+    tmp_path,
+    msg_glean_probes,
+):
+    with _prepare_lookml_actual_test(
+        mock_glean_ping_view,
+        mock_glean_ping_explore,
+        runner,
+        glean_apps,
+        tmp_path,
+        msg_glean_probes,
+    ):
+        expected = {
+            "includes": ["/looker-hub/glean-app/views/deprecated_ping.view.lkml"],
+            "explores": [
+                {
+                    "hidden": "yes",
+                    "name": "deprecated_ping",
+                    "description": "Explore for the deprecated_ping ping. ",
+                    "view_name": "deprecated_ping",
+                    "view_label": " Deprecated_Ping",
+                    "always_filter": {
+                        "filters": [
+                            {"submission_date": "28 days"},
+                        ]
+                    },
+                    "sql_always_where": "${deprecated_ping.submission_date} >= '2010-01-01'",
+                }
+            ],
+        }
+        print_and_test(
+            lkml.load(lkml.dump(expected)),
+            lkml.load(
+                Path(
+                    "looker-hub/glean-app/explores/deprecated_ping.explore.lkml"
+                ).read_text()
             ),
         )
 
