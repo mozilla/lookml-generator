@@ -1184,6 +1184,7 @@ monitoring:
     bigquery_shared_prod_table_storage_trends:
       tables:
         - table: mozdata.monitoring.table_storage_trends
+      type: table_view
     bigquery_table_storage_timeline_daily:
       tables:
         - table: moz-fx-data-shared-prod.monitoring.bigquery_table_storage_timeline_daily
