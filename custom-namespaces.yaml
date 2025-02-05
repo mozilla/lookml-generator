@@ -1846,6 +1846,7 @@ accounts_frontend:
         base_view: accounts_events
 jira_service_desk:
   pretty_name: Jira Service Desk
+  connection: bigquery-oauth
   owners:
     - rantwan@mozilla.com
   glean_app: false
