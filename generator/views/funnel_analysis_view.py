@@ -25,6 +25,7 @@ from __future__ import annotations
 from textwrap import dedent
 from typing import Any, Dict, Iterator, List, Optional
 
+from .lookml_utils import DEFAULT_MAX_SUGGEST_PERSIST_FOR
 from .view import View, ViewDict
 
 DEFAULT_NUM_FUNNEL_STEPS: int = 4
@@ -205,6 +206,7 @@ class FunnelAnalysisView(View):
                             "type": "string",
                             "suggest_explore": "event_names",
                             "suggest_dimension": "event_names.category",
+                            "suggest_persist_for": DEFAULT_MAX_SUGGEST_PERSIST_FOR,
                         },
                         {
                             "name": "event",
@@ -212,6 +214,7 @@ class FunnelAnalysisView(View):
                             "type": "string",
                             "suggest_explore": "event_names",
                             "suggest_dimension": "event_names.event",
+                            "suggest_persist_for": DEFAULT_MAX_SUGGEST_PERSIST_FOR,
                         },
                         {
                             "name": "property_name",
@@ -219,6 +222,7 @@ class FunnelAnalysisView(View):
                             "type": "string",
                             "suggest_explore": "event_names",
                             "suggest_dimension": "event_names.property_name",
+                            "suggest_persist_for": DEFAULT_MAX_SUGGEST_PERSIST_FOR,
                         },
                         {
                             "name": "property_value",
@@ -226,6 +230,7 @@ class FunnelAnalysisView(View):
                             "type": "string",
                             "suggest_explore": "event_names",
                             "suggest_dimension": "event_names.property_value",
+                            "suggest_persist_for": DEFAULT_MAX_SUGGEST_PERSIST_FOR,
                         },
                     ],
                     "dimensions": [

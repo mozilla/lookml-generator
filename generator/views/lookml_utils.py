@@ -41,6 +41,8 @@ MAP_LAYER_NAMES = {
     ("metadata", "geo", "country"): "countries",
 }
 
+DEFAULT_MAX_SUGGEST_PERSIST_FOR = "24 hours"
+
 
 def _get_dimension(
     path: Tuple[str, ...], field_type: str, mode: str, description: Optional[str]
@@ -56,6 +58,7 @@ def _get_dimension(
         result["hidden"] = "yes"
     else:
         result["type"] = BIGQUERY_TYPE_TO_DIMENSION_TYPE[field_type]
+        result["suggest_persist_for"] = DEFAULT_MAX_SUGGEST_PERSIST_FOR
 
         group_label, group_item_label = None, None
         if len(path) > 1:
