@@ -1960,3 +1960,26 @@ jira_service_desk:
       type: table_explore
       views:
         base_view: user
+zoom:
+  pretty_name: Zoom
+  connection: bigquery-oauth
+  owners:
+    - rantwan@mozilla.com
+  glean_app: false
+  views:
+    meetings:
+      type: table_view
+      tables:
+        - table: mozdata.zoom.meetings
+    meeting_reports:
+      type: table_view
+      tables:
+        - table: mozdata.zoom.meeting_reports
+    meeting_participants:
+      type: table_view
+      tables:
+        - table: mozdata.zoom.meeting_participants
+    users:
+      type: table_view
+      tables:
+        - table: mozdata.zoom.users
