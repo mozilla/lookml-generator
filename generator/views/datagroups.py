@@ -144,9 +144,14 @@ def _get_datagroup_from_bigquery_view(
                 view=view,
             )
     except DryRunError as e:
-        raise ValueError(
-            f"Unable to find {source_table_id} referenced in {full_table_id}"
-        ) from e
+        if e.error == Errors.PERMISSION_DENIED and e.use_cloud_function:
+            print(
+                f"Skip datagroup creation for {source_table_id} due to permission error"
+            )
+        else:
+            raise ValueError(
+                f"Unable to find {source_table_id} referenced in {full_table_id}"
+            ) from e
 
     return []
 
