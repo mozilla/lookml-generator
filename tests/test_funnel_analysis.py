@@ -216,6 +216,7 @@ def test_view_lookml(funnel_analysis_view):
                         "description": "The event category, as defined in metrics.yaml.",
                         "suggest_explore": "event_names",
                         "suggest_dimension": "event_names.category",
+                        "suggest_persist_for": "24 hours",
                     },
                     {
                         "name": "event",
@@ -223,6 +224,7 @@ def test_view_lookml(funnel_analysis_view):
                         "type": "string",
                         "suggest_explore": "event_names",
                         "suggest_dimension": "event_names.event",
+                        "suggest_persist_for": "24 hours",
                     },
                     {
                         "name": "property_name",
@@ -230,6 +232,7 @@ def test_view_lookml(funnel_analysis_view):
                         "type": "string",
                         "suggest_explore": "event_names",
                         "suggest_dimension": "event_names.property_name",
+                        "suggest_persist_for": "24 hours",
                     },
                     {
                         "name": "property_value",
@@ -237,6 +240,7 @@ def test_view_lookml(funnel_analysis_view):
                         "type": "string",
                         "suggest_explore": "event_names",
                         "suggest_dimension": "event_names.property_value",
+                        "suggest_persist_for": "24 hours",
                     },
                 ],
                 "dimensions": [

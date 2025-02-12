@@ -819,6 +819,7 @@ def test_lookml_actual_baseline_view(
                         {
                             "name": "app_build",
                             "sql": "${TABLE}.app_build",
+                            "suggest_persist_for": "24 hours",
                             "type": "string",
                         },
                         {
@@ -830,6 +831,7 @@ def test_lookml_actual_baseline_view(
                             "name": "country",
                             "map_layer_name": "countries",
                             "sql": "${TABLE}.country",
+                            "suggest_persist_for": "24 hours",
                             "type": "string",
                         },
                         {
@@ -911,6 +913,7 @@ def test_lookml_actual_baseline_view_parameterized(
                             "group_item_label": "Country",
                             "group_label": "Metadata Geo",
                             "sql": "${TABLE}.metadata.geo.country",
+                            "suggest_persist_for": "24 hours",
                             "type": "string",
                         },
                         {
@@ -918,41 +921,49 @@ def test_lookml_actual_baseline_view_parameterized(
                             "group_item_label": "Date",
                             "group_label": "Metadata Header",
                             "sql": "${TABLE}.metadata.header.date",
+                            "suggest_persist_for": "24 hours",
                             "type": "string",
                         },
                         {
                             "name": "test_bignumeric",
                             "sql": "${TABLE}.test_bignumeric",
+                            "suggest_persist_for": "24 hours",
                             "type": "string",
                         },
                         {
                             "name": "test_bool",
                             "sql": "${TABLE}.test_bool",
+                            "suggest_persist_for": "24 hours",
                             "type": "yesno",
                         },
                         {
                             "name": "test_bytes",
                             "sql": "${TABLE}.test_bytes",
+                            "suggest_persist_for": "24 hours",
                             "type": "string",
                         },
                         {
                             "name": "test_float64",
                             "sql": "${TABLE}.test_float64",
+                            "suggest_persist_for": "24 hours",
                             "type": "number",
                         },
                         {
                             "name": "test_int64",
                             "sql": "${TABLE}.test_int64",
+                            "suggest_persist_for": "24 hours",
                             "type": "number",
                         },
                         {
                             "name": "test_numeric",
                             "sql": "${TABLE}.test_numeric",
+                            "suggest_persist_for": "24 hours",
                             "type": "number",
                         },
                         {
                             "name": "test_string",
                             "sql": "${TABLE}.test_string",
+                            "suggest_persist_for": "24 hours",
                             "type": "string",
                         },
                     ],
@@ -963,6 +974,7 @@ def test_lookml_actual_baseline_view_parameterized(
                             "datatype": "date",
                             "label": "Client Info: Parsed First Run Date",
                             "sql": "${TABLE}.client_info.parsed_first_run_date",
+                            "suggest_persist_for": "24 hours",
                             "timeframes": [
                                 "raw",
                                 "date",
@@ -977,6 +989,7 @@ def test_lookml_actual_baseline_view_parameterized(
                             "name": "metadata__header__parsed",
                             "label": "Metadata Header: Parsed Date",
                             "sql": "${TABLE}.metadata.header.parsed_date",
+                            "suggest_persist_for": "24 hours",
                             "timeframes": [
                                 "raw",
                                 "time",
@@ -991,6 +1004,7 @@ def test_lookml_actual_baseline_view_parameterized(
                         {
                             "name": "parsed",
                             "sql": "${TABLE}.parsed_timestamp",
+                            "suggest_persist_for": "24 hours",
                             "timeframes": [
                                 "raw",
                                 "time",
@@ -1005,6 +1019,7 @@ def test_lookml_actual_baseline_view_parameterized(
                         {
                             "name": "submission",
                             "sql": "${TABLE}.submission_timestamp",
+                            "suggest_persist_for": "24 hours",
                             "timeframes": [
                                 "raw",
                                 "time",
@@ -1652,22 +1667,52 @@ def test_lookml_actual_metric_definitions_view(
                 },
                 {
                     "dimensions": [
-                        {"name": "key", "sql": "${TABLE}.key", "type": "string"},
-                        {"name": "value", "sql": "${TABLE}.value", "type": "number"},
+                        {
+                            "name": "key",
+                            "sql": "${TABLE}.key",
+                            "suggest_persist_for": "24 hours",
+                            "type": "string",
+                        },
+                        {
+                            "name": "value",
+                            "sql": "${TABLE}.value",
+                            "suggest_persist_for": "24 hours",
+                            "type": "number",
+                        },
                     ],
                     "name": "metrics__metrics__custom_distribution__test_custom_distribution__values",
                 },
                 {
                     "dimensions": [
-                        {"name": "key", "sql": "${TABLE}.key", "type": "string"},
-                        {"name": "value", "sql": "${TABLE}.value", "type": "number"},
+                        {
+                            "name": "key",
+                            "sql": "${TABLE}.key",
+                            "suggest_persist_for": "24 hours",
+                            "type": "string",
+                        },
+                        {
+                            "name": "value",
+                            "sql": "${TABLE}.value",
+                            "suggest_persist_for": "24 hours",
+                            "type": "number",
+                        },
                     ],
                     "name": "metrics__metrics__memory_distribution__test_memory_distribution__values",
                 },
                 {
                     "dimensions": [
-                        {"name": "key", "sql": "${TABLE}.key", "type": "string"},
-                        {"name": "value", "sql": "${TABLE}.value", "type": "number"},
+                        {
+                            "name": "key",
+                            "sql": "${TABLE}.key",
+                            "suggest_persist_for": "24 hours",
+                            "type": "string",
+                        },
+                        {
+                            "name": "value",
+                            "sql": "${TABLE}.value",
+                            "suggest_persist_for": "24 hours",
+                            "type": "number",
+                        },
                     ],
                     "name": "metrics__metrics__timing_distribution__test_timing_distribution__values",
                 },
@@ -1711,6 +1756,7 @@ def test_lookml_actual_growth_accounting_view(
                         {
                             "name": "country",
                             "map_layer_name": "countries",
+                            "suggest_persist_for": "24 hours",
                             "sql": "${TABLE}.country",
                             "type": "string",
                         },
@@ -1968,6 +2014,7 @@ def test_duplicate_dimension_event(runner, glean_apps, tmp_path):
                         {
                             "name": "event",
                             "sql": "${TABLE}.event_timestamp",
+                            "suggest_persist_for": "24 hours",
                             "timeframes": [
                                 "raw",
                                 "time",
@@ -1982,6 +2029,7 @@ def test_duplicate_dimension_event(runner, glean_apps, tmp_path):
                         {
                             "sql": "${TABLE}.submission_timestamp",
                             "type": "time",
+                            "suggest_persist_for": "24 hours",
                             "timeframes": [
                                 "raw",
                                 "time",
@@ -1995,7 +2043,12 @@ def test_duplicate_dimension_event(runner, glean_apps, tmp_path):
                         },
                     ],
                     "dimensions": [
-                        {"name": "event", "sql": "${TABLE}.event", "type": "string"}
+                        {
+                            "name": "event",
+                            "sql": "${TABLE}.event",
+                            "suggest_persist_for": "24 hours",
+                            "type": "string",
+                        }
                     ],
                     "name": "events_stream",
                     "sql_table_name": "`mozdata.pass.duplicate_event_dimension`",
@@ -2072,6 +2125,7 @@ def test_context_id(runner, glean_apps, tmp_path):
                             "datatype": "date",
                             "name": "submission",
                             "sql": "${TABLE}.submission_date",
+                            "suggest_persist_for": "24 hours",
                             "timeframes": [
                                 "raw",
                                 "date",
@@ -2105,20 +2159,40 @@ def test_context_id(runner, glean_apps, tmp_path):
                 },
                 {
                     "dimensions": [
-                        {"name": "key", "sql": "${TABLE}.key", "type": "string"},
+                        {
+                            "name": "key",
+                            "sql": "${TABLE}.key",
+                            "type": "string",
+                            "suggest_persist_for": "24 hours",
+                        },
                         {
                             "hidden": "yes",
                             "name": "position",
                             "sql": "${TABLE}.position",
                         },
-                        {"name": "value", "sql": "${TABLE}.value", "type": "number"},
+                        {
+                            "name": "value",
+                            "sql": "${TABLE}.value",
+                            "type": "number",
+                            "suggest_persist_for": "24 hours",
+                        },
                     ],
                     "name": "context__contexts",
                 },
                 {
                     "dimensions": [
-                        {"name": "key", "sql": "${TABLE}.key", "type": "string"},
-                        {"name": "value", "sql": "${TABLE}.value", "type": "number"},
+                        {
+                            "name": "key",
+                            "sql": "${TABLE}.key",
+                            "type": "string",
+                            "suggest_persist_for": "24 hours",
+                        },
+                        {
+                            "name": "value",
+                            "sql": "${TABLE}.value",
+                            "type": "number",
+                            "suggest_persist_for": "24 hours",
+                        },
                     ],
                     "name": "context__contexts__position",
                 },
