@@ -1358,6 +1358,10 @@ monitoring:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.monitoring_derived.rayserve_cost_fakespot_tenant_prod_v1
+    looker_dashboard_load_times:
+      type: table_view
+      tables:
+        - table: mozdata.monitoring.looker_dashboard_load_times
   explores:
     column_size:
       type: ping_explore
@@ -1395,6 +1399,10 @@ monitoring:
       type: table_explore
       views:
         base_view: glean_event_counts
+    looker_dashboard_load_times:
+      type: table_explore
+      views:
+        base_view: looker_dashboard_load_times
 
 casa:
   glean_app: false
