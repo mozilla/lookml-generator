@@ -1825,11 +1825,11 @@ fxci:
     tasks_base:
       type: table_view
       tables:
-        - table: moz-fx-data-shared-prod.fxci.tasks_v1
+        - table: moz-fx-data-shared-prod.fxci_derived.tasks_v1
     task_runs_base:
       type: table_view
       tables:
-        - table: moz-fx-data-shared-prod.fxci.task_runs_v1
+        - table: moz-fx-data-shared-prod.fxci_derived.task_runs_v1
     task_run_costs_base:
       type: table_view
       tables:
@@ -1841,7 +1841,7 @@ fxci:
     worker_metrics_base:
       type: table_view
       tables:
-        - table: moz-fx-data-shared-prod.fxci.worker_metrics_v1
+        - table: moz-fx-data-shared-prod.fxci_derived.worker_metrics_v1
 accounts_backend:
   explores:
     accounts_events:
