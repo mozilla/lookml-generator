@@ -26,10 +26,6 @@ DATASET_VIEW_MAP = lookml_utils.get_bigquery_view_reference_map(
     DEFAULT_GENERATED_SQL_URI
 )
 
-DATASET_TABLE_MAP = lookml_utils.get_bigquery_table_reference_map(
-    DEFAULT_GENERATED_SQL_URI, DATASET_VIEW_MAP
-)
-
 FILE_HEADER = """# *Do not manually modify this file*
 
 # This file has been generated via https://github.com/mozilla/lookml-generator
@@ -90,7 +86,7 @@ def _get_datagroup_from_bigquery_view(
     table_id,
     dataset_view_map: BQViewReferenceMap,
     view: View,
-) -> List[Datagroup]:
+) -> Datagroup:
     # Dataset view map only contains references for shared-prod views.
     full_table_id = f"{project_id}.{dataset_id}.{table_id}"
     if project_id not in ("moz-fx-data-shared-prod", "mozdata"):
@@ -112,33 +108,50 @@ def _get_datagroup_from_bigquery_view(
 
 
 def _get_referenced_tables(
-    project_id, dataset_id, table_id, dataset_view_map: BQViewReferenceMap
+    project_id,
+    dataset_id,
+    table_id,
+    dataset_view_map: BQViewReferenceMap,
+    seen: List[List[str]] = [],
 ) -> List[List[str]]:
     """
     Return a list of all tables referenced by the provided view.
 
     Recursively, resolve references of referenced views to only get table dependencies.
     """
+    if [project_id, dataset_id, table_id] in seen:
+        return []
+
+    seen += [[project_id, dataset_id, table_id]]
+
     dataset_view_references = dataset_view_map.get(dataset_id)
 
     if dataset_view_references is None:
-        return []
+        return [[project_id, dataset_id, table_id]]
 
     view_references = dataset_view_references.get(table_id)
-    return {
+    if view_references is None:
+        return [[project_id, dataset_id, table_id]]
+
+    return [
         ref
         for view_reference in view_references
         for ref in _get_referenced_tables(
-            project_id, view_reference[1], view_reference[2], dataset_view_map
+            project_id,
+            view_reference[1],
+            view_reference[2],
+            dataset_view_map,
+            seen + view_references,
         )
-    }
+        if view_reference not in seen
+    ]
 
 
 def _generate_view_datagroup(
     view: View,
     dataset_view_map: BQViewReferenceMap,
     dryrun,
-) -> List[Datagroup]:
+) -> Datagroup:
     """Generate the Datagroup LookML for a Looker View."""
     # Only generate datagroup for views that can be linked to a BigQuery table:
     if view.view_type != TableView.type:
@@ -180,9 +193,9 @@ def generate_datagroup(
     """Generate and write a datagroups.lkml file to the namespace folder."""
     datagroups_folder_path = target_dir / namespace / "datagroups"
 
-    datagroups = None
+    datagroup = None
     try:
-        datagroups = _generate_view_datagroup(view, DATASET_VIEW_MAP, dryrun)
+        datagroup = _generate_view_datagroup(view, DATASET_VIEW_MAP, dryrun)
     except DryRunError as e:
         if e.error == Errors.PERMISSION_DENIED and e.use_cloud_function:
             path = datagroups_folder_path / f"{e.table_id}_last_updated.datagroup.lkml"
@@ -197,13 +210,12 @@ def generate_datagroup(
             raise
 
     datagroup_paths = []
-    if datagroups:
-        for datagroup in datagroups:
-            datagroups_folder_path.mkdir(exist_ok=True)
-            datagroup_lkml_path = (
-                datagroups_folder_path / f"{datagroup.name}.datagroup.lkml"
-            )
-            datagroup_lkml_path.write_text(FILE_HEADER + str(datagroup))
-            datagroup_paths.append(datagroup_lkml_path)
+    if datagroup:
+        datagroups_folder_path.mkdir(exist_ok=True)
+        datagroup_lkml_path = (
+            datagroups_folder_path / f"{datagroup.name}.datagroup.lkml"
+        )
+        datagroup_lkml_path.write_text(FILE_HEADER + str(datagroup))
+        datagroup_paths.append(datagroup_lkml_path)
 
     return datagroup_paths

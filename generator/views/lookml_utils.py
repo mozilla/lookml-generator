@@ -11,7 +11,6 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple
 import click
 import yaml
 from jinja2 import Environment, FileSystemLoader
-from generator.namespaces import DEFAULT_GENERATED_SQL_URI
 
 GENERATOR_PATH = Path(__file__).parent.parent
 
@@ -279,28 +278,3 @@ def get_bigquery_view_reference_map(
                         ref.split(".") for ref in references["view.sql"]
                     ]
     return views
-
-
-def get_bigquery_table_references(
-    dataset_id: str,
-    table_id: str,
-    dataset_view_map: Optional[BQViewReferenceMap] = None,
-) -> List[List[str]]:
-    """
-    Return referenced tables.
-
-    Extracts referenced tables from referenced views.
-    """
-    dataset_view_references = dataset_view_map.get(dataset_id)
-    if dataset_view_references is None:
-        return []
-
-    view_references = dataset_view_references.get(table_id)
-    if view_references is None:
-        return []
-
-    return {
-        ref
-        for view_reference in view_references
-        for ref in get_bigquery_table_references(view_reference[0], view_reference[1])
-    }
