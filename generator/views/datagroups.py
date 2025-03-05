@@ -3,7 +3,7 @@
 import logging
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, List
 
 import lkml
 
@@ -18,13 +18,16 @@ DEFAULT_MAX_CACHE_AGE = "24 hours"
 SQL_TRIGGER_TEMPLATE = """
     SELECT MAX(storage_last_modified_time)
     FROM `{project_id}`.`region-us`.INFORMATION_SCHEMA.TABLE_STORAGE
-    WHERE table_schema = '{dataset_id}'
-    AND table_name = '{table_id}'
+    WHERE {tables}
 """
 
 # To map views to their underlying tables:
 DATASET_VIEW_MAP = lookml_utils.get_bigquery_view_reference_map(
     DEFAULT_GENERATED_SQL_URI
+)
+
+DATASET_TABLE_MAP = lookml_utils.get_bigquery_table_reference_map(
+    DEFAULT_GENERATED_SQL_URI, DATASET_VIEW_MAP
 )
 
 FILE_HEADER = """# *Do not manually modify this file*
@@ -56,45 +59,36 @@ class Datagroup:
         return self.name < other.name
 
 
-def _get_datagroup_from_bigquery_table(
-    project_id, dataset_id, table_id, table_metadata: Dict[str, Any], view: View
-) -> List[Datagroup]:
+def _get_datagroup_from_bigquery_tables(project_id, tables, view: View) -> Datagroup:
     """Use template and default values to create a Datagroup from a BQ Table."""
-    full_table_id = f"{project_id}.{dataset_id}.{table_id}"
-    return [
-        Datagroup(
-            name=f"{table_id}_last_updated",
-            label=f"{table_metadata.get('friendlyName', table_id) or table_id} Last Updated",
-            description=f"Updates when {full_table_id} is modified.",
-            sql_trigger=SQL_TRIGGER_TEMPLATE.format(
-                project_id=project_id,
-                dataset_id=dataset_id,
-                table_id=table_id,
-            ),
-            # Note: Ideally we'd use the table's ETL schedule as the `maximum_cache_age` but we don't have schedule
-            # metadata here.
+    if len(tables) == 0:
+        return []
+
+    datagroup_tables = []
+    for table in tables:
+        dataset_id = table[1]
+        table_id = table[2]
+
+        datagroup_tables.append(
+            f"(table_schema = '{dataset_id}' AND table_name = '{table_id}')"
+        )
+
+    # create a datagroup associated to a view which will be used for caching
+    return Datagroup(
+        name=f"{view.name}_last_updated",
+        label=f"{view.name} Last Updated",
+        description=f"Updates for {view.name} when referenced tables are is modified.",
+        sql_trigger=SQL_TRIGGER_TEMPLATE.format(
+            project_id=project_id, tables=" OR ".join(datagroup_tables)
         ),
-        # create a datagroup associated to a view which will be used for caching
-        Datagroup(
-            name=f"{view.name}_last_updated",
-            label=f"{view.name} Last Updated",
-            description=f"Updates for {view.name} when {full_table_id} is modified.",
-            sql_trigger=SQL_TRIGGER_TEMPLATE.format(
-                project_id=project_id,
-                dataset_id=dataset_id,
-                table_id=table_id,
-            ),
-        ),
-    ]
+    )
 
 
 def _get_datagroup_from_bigquery_view(
     project_id,
     dataset_id,
     table_id,
-    table_metadata: Dict[str, Any],
     dataset_view_map: BQViewReferenceMap,
-    dryrun,
     view: View,
 ) -> List[Datagroup]:
     # Dataset view map only contains references for shared-prod views.
@@ -105,55 +99,39 @@ def _get_datagroup_from_bigquery_view(
         )
         return []
 
+    view_references = _get_referenced_tables(
+        project_id, dataset_id, table_id, dataset_view_map
+    )
+
+    if not view_references or len(view_references) == 0:
+        # Some views might not reference a source table
+        logging.debug(f"Unable to find a source for {full_table_id} in generated-sql.")
+        return []
+
+    return _get_datagroup_from_bigquery_tables(project_id, view_references, view)
+
+
+def _get_referenced_tables(
+    project_id, dataset_id, table_id, dataset_view_map: BQViewReferenceMap
+) -> List[List[str]]:
+    """
+    Return a list of all tables referenced by the provided view.
+
+    Recursively, resolve references of referenced views to only get table dependencies.
+    """
     dataset_view_references = dataset_view_map.get(dataset_id)
+
     if dataset_view_references is None:
-        logging.debug(f"Unable to find dataset {dataset_id} in generated-sql.")
         return []
 
     view_references = dataset_view_references.get(table_id)
-    if not view_references or len(view_references) > 1:
-        # For views with multiple sources it's unclear which table to check for updates.
-        logging.debug(
-            f"Unable to find a single source for {full_table_id} in generated-sql."
+    return {
+        ref
+        for view_reference in view_references
+        for ref in _get_referenced_tables(
+            project_id, view_reference[1], view_reference[2], dataset_view_map
         )
-        return []
-
-    source_table_id = ".".join(view_references[0])
-    try:
-        table_metadata = dryrun.create(
-            project=view_references[0][0],
-            dataset=view_references[0][1],
-            table=view_references[0][2],
-        ).get_table_metadata()
-        if "TABLE" == table_metadata.get("tableType"):
-            return _get_datagroup_from_bigquery_table(
-                view_references[0][0],
-                view_references[0][1],
-                view_references[0][2],
-                table_metadata,
-                view,
-            )
-        elif "VIEW" == table_metadata.get("tableType"):
-            return _get_datagroup_from_bigquery_view(
-                view_references[0][0],
-                view_references[0][1],
-                view_references[0][2],
-                table_metadata,
-                dataset_view_map,
-                dryrun=dryrun,
-                view=view,
-            )
-    except DryRunError as e:
-        if e.error == Errors.PERMISSION_DENIED and e.use_cloud_function:
-            print(
-                f"Skip datagroup creation for {source_table_id} due to permission error"
-            )
-        else:
-            raise ValueError(
-                f"Unable to find {source_table_id} referenced in {full_table_id}"
-            ) from e
-
-    return []
+    }
 
 
 def _generate_view_datagroup(
@@ -180,13 +158,13 @@ def _generate_view_datagroup(
     ).get_table_metadata()
 
     if "TABLE" == table_metadata.get("tableType"):
-        datagroups = _get_datagroup_from_bigquery_table(
-            project, dataset, table, table_metadata, view
+        datagroups = _get_datagroup_from_bigquery_tables(
+            project, [project, dataset, table], view
         )
         return datagroups
     elif "VIEW" == table_metadata.get("tableType"):
         datagroups = _get_datagroup_from_bigquery_view(
-            project, dataset, table, table_metadata, dataset_view_map, dryrun, view
+            project, dataset, table, dataset_view_map, view
         )
         return datagroups
 
