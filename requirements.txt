@@ -1177,9 +1177,9 @@ wheel==0.41.2 \
     --hash=sha256:0c5ac5ff2afb79ac23ab82bab027a0be7b5dbcf2e54dc50efe4bf507de1f7985 \
     --hash=sha256:75909db2664838d015e3d9139004ee16711748a52c8f336b52882266540215d8
     # via pip-tools
-yamllint==1.35.1 \
-    --hash=sha256:2e16e504bb129ff515b37823b472750b36b6de07963bd74b307341ef5ad8bdc3 \
-    --hash=sha256:7a003809f88324fd2c877734f2d575ee7881dd9043360657cc8049c809eba6cd
+yamllint==1.36.0 \
+    --hash=sha256:22ab6a7db9d5f0954bd7a50ef70a41c1465c61f955893070b0767c0ec6693b7b \
+    --hash=sha256:3835a65994858679ea06fd998dd968c3f71935cd93742990405999d888e21130
     # via -r requirements.in
 
 # The following packages are considered to be unsafe in a requirements file:
