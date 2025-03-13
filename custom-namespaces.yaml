@@ -31,6 +31,10 @@ combined_browser_metrics:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.telemetry.cohort_daily_statistics
+    cohort_weekly_statistics:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.telemetry.cohort_weekly_statistics
     fenix_and_firefox_use_counters:
       type: table_view
       tables:
@@ -1829,11 +1833,11 @@ fxci:
     tasks_base:
       type: table_view
       tables:
-        - table: moz-fx-data-shared-prod.fxci.tasks_v1
+        - table: moz-fx-data-shared-prod.fxci.tasks
     task_runs_base:
       type: table_view
       tables:
-        - table: moz-fx-data-shared-prod.fxci.task_runs_v1
+        - table: moz-fx-data-shared-prod.fxci.task_runs
     task_run_costs_base:
       type: table_view
       tables:
@@ -1845,7 +1849,7 @@ fxci:
     worker_metrics_base:
       type: table_view
       tables:
-        - table: moz-fx-data-shared-prod.fxci.worker_metrics_v1
+        - table: moz-fx-data-shared-prod.fxci.worker_metrics
 accounts_backend:
   explores:
     accounts_events:
@@ -1995,3 +1999,15 @@ zoom:
       type: table_view
       tables:
         - table: mozdata.zoom.users
+device_manufacturer_partnerships:
+  glean_app: false
+  pretty_name: Device Manufacturer Partnerships
+  owners:
+    - mbowerman@mozilla.com
+    - kik@mozilla.com
+  spoke: looker-spoke-default
+  views:
+    shipment_and_activation_vivo:
+      type: table_view
+      tables:
+        - table: mozdata.device_manufacturer_partnerships.shipment_and_activation_vivo

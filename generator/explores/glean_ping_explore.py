@@ -77,17 +77,18 @@ class GleanPingExplore(PingExplore):
                     # ignore nested views that cannot be joined on to the base view
                     continue
 
-        base_explore = {
+        base_explore: Dict[str, Any] = {
             "name": self.name,
             # list the base explore first by prefixing with a space
             "view_label": f" {self.name.title()}",
             "description": f"Explore for the {self.name} ping. {ping_description}",
             "view_name": self.views["base_view"],
-            "always_filter": {
-                "filters": self.get_required_filters("base_view"),
-            },
             "joins": joins,
         }
+
+        required_filters = self.get_required_filters("base_view")
+        if len(required_filters) > 0:
+            base_explore["always_filter"] = {"filters": required_filters}
 
         suggests = []
         for view in views_lookml["views"][1:]:
