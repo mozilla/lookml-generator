@@ -589,7 +589,7 @@ firefox_accounts:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.firefox_accounts_derived.health_counts_v1
-      measures:  
+      measures:
         count_sum:
           type: sum
           sql: ${count}
@@ -1165,11 +1165,11 @@ monitoring:
     - wichan@mozilla.com
   pretty_name: Monitoring (Data Pipeline)
   views:
-    metadata_completeness: 
+    metadata_completeness:
       tables:
         - table: mozdata.monitoring.metadata_completeness
       type: table_view
-    metadata_completeness_summary: 
+    metadata_completeness_summary:
       tables:
         - table: mozdata.monitoring.metadata_completeness_summary
       type: table_view
@@ -1181,7 +1181,7 @@ monitoring:
       tables:
         - table: moz-fx-data-shared-prod.monitoring.bigquery_table_storage
       type: table_view
-    bigquery_shared_prod_table_storage: 
+    bigquery_shared_prod_table_storage:
       tables:
         - table: mozdata.monitoring.table_storage
       type: table_view
@@ -1995,3 +1995,15 @@ zoom:
       type: table_view
       tables:
         - table: mozdata.zoom.users
+device_manufacturer_partnerships:
+  glean_app: false
+  pretty_name: Device Manufacturer Partnerships
+  owners:
+    - mbowerman@mozilla.com
+    - kik@mozilla.com
+  spoke: looker-spoke-default
+  views:
+    shipment_and_activation_vivo:
+      type: table_view
+      tables:
+        - table: mozdata.device_manufacturer_partnerships.shipment_and_activation_vivo
