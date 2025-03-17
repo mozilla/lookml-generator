@@ -23,6 +23,10 @@ combined_browser_metrics:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.telemetry.active_users_aggregates
+    firefox_desktop_baseline_active_users_aggregates:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.firefox_desktop.baseline_active_users_aggregates
     active_users_aggregates_device:
       type: table_view
       tables:
