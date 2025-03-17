@@ -3,21 +3,21 @@
 import logging
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, List
+from typing import Any, List, Optional
 
 import lkml
 
 from generator.dryrun import DryRunError, Errors
 from generator.namespaces import DEFAULT_GENERATED_SQL_URI
 from generator.utils import get_file_from_looker_hub
-from generator.views import TableView, View, lookml_utils
+from generator.views import View, lookml_utils
 from generator.views.lookml_utils import BQViewReferenceMap
 
 DEFAULT_MAX_CACHE_AGE = "24 hours"
 
 SQL_TRIGGER_TEMPLATE = """
     SELECT MAX(storage_last_modified_time)
-    FROM `{project_id}`.`region-us`.INFORMATION_SCHEMA.TABLE_STORAGE
+    FROM `moz-fx-data-shared-prod`.`region-us`.INFORMATION_SCHEMA.TABLE_STORAGE
     WHERE {tables}
 """
 
@@ -55,10 +55,12 @@ class Datagroup:
         return self.name < other.name
 
 
-def _get_datagroup_from_bigquery_tables(project_id, tables, view: View) -> Datagroup:
+def _get_datagroup_from_bigquery_tables(
+    project_id, tables, view: View
+) -> Optional[Datagroup]:
     """Use template and default values to create a Datagroup from a BQ Table."""
     if len(tables) == 0:
-        return []
+        return None
 
     datagroup_tables = []
     for table in tables:
@@ -73,7 +75,7 @@ def _get_datagroup_from_bigquery_tables(project_id, tables, view: View) -> Datag
     return Datagroup(
         name=f"{view.name}_last_updated",
         label=f"{view.name} Last Updated",
-        description=f"Updates for {view.name} when referenced tables are is modified.",
+        description=f"Updates for {view.name} when referenced tables are modified.",
         sql_trigger=SQL_TRIGGER_TEMPLATE.format(
             project_id=project_id, tables=" OR ".join(datagroup_tables)
         ),
@@ -86,14 +88,14 @@ def _get_datagroup_from_bigquery_view(
     table_id,
     dataset_view_map: BQViewReferenceMap,
     view: View,
-) -> Datagroup:
+) -> Optional[Datagroup]:
     # Dataset view map only contains references for shared-prod views.
     full_table_id = f"{project_id}.{dataset_id}.{table_id}"
     if project_id not in ("moz-fx-data-shared-prod", "mozdata"):
         logging.debug(
             f"Unable to get sources for non shared-prod/mozdata view: {full_table_id} in generated-sql."
         )
-        return []
+        return None
 
     view_references = _get_referenced_tables(
         project_id, dataset_id, table_id, dataset_view_map
@@ -102,7 +104,7 @@ def _get_datagroup_from_bigquery_view(
     if not view_references or len(view_references) == 0:
         # Some views might not reference a source table
         logging.debug(f"Unable to find a source for {full_table_id} in generated-sql.")
-        return []
+        return None
 
     return _get_datagroup_from_bigquery_tables(project_id, view_references, view)
 
@@ -137,7 +139,7 @@ def _get_referenced_tables(
         ref
         for view_reference in view_references
         for ref in _get_referenced_tables(
-            project_id,
+            view_reference[0],
             view_reference[1],
             view_reference[2],
             dataset_view_map,
@@ -151,17 +153,21 @@ def _generate_view_datagroup(
     view: View,
     dataset_view_map: BQViewReferenceMap,
     dryrun,
-) -> Datagroup:
+) -> Optional[Datagroup]:
     """Generate the Datagroup LookML for a Looker View."""
-    # Only generate datagroup for views that can be linked to a BigQuery table:
-    if view.view_type != TableView.type:
-        return []
+    if len(view.tables) == 0:
+        return None
 
     # Use the release channel table or the first available table (usually the only one):
-    view_table = next(
+    view_tables = next(
         (table for table in view.tables if table.get("channel") == "release"),
         view.tables[0],
-    )["table"]
+    )
+
+    if "table" not in view_tables:
+        return None
+
+    view_table = view_tables["table"]
 
     [project, dataset, table] = view_table.split(".")
     table_metadata = dryrun.create(
@@ -172,7 +178,7 @@ def _generate_view_datagroup(
 
     if "TABLE" == table_metadata.get("tableType"):
         datagroups = _get_datagroup_from_bigquery_tables(
-            project, [project, dataset, table], view
+            project, [[project, dataset, table]], view
         )
         return datagroups
     elif "VIEW" == table_metadata.get("tableType"):
@@ -181,7 +187,7 @@ def _generate_view_datagroup(
         )
         return datagroups
 
-    return []
+    return None
 
 
 def generate_datagroup(

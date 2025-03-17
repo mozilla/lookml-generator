@@ -52,6 +52,9 @@ class MetricDefinitionsExplore(Explore):
             "fields": exposed_fields,
         }
 
+        if datagroup := self.get_datagroup():
+            explore_lookml["persist_with"] = datagroup
+
         return [explore_lookml]
 
     def get_view_time_partitioning_group(self, view: str) -> Optional[str]:

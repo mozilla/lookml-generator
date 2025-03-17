@@ -59,17 +59,20 @@ class OperationalMonitoringExplore(Explore):
             if "default" in info:
                 filters.append({f"{base_view_name}.{dimension}": info["default"]})
 
-        defn: List[Dict[str, Any]] = [
-            {
-                "name": self.views["base_view"],
-                "always_filter": {
-                    "filters": [
-                        {"branch": self.branches},
-                    ]
-                },
-                "hidden": "yes",
+        explore_lookml = {
+            "name": self.views["base_view"],
+            "always_filter": {
+                "filters": [
+                    {"branch": self.branches},
+                ]
             },
-        ]
+            "hidden": "yes",
+        }
+
+        if datagroup := self.get_datagroup():
+            explore_lookml["persist_with"] = datagroup
+
+        defn: List[Dict[str, Any]] = [explore_lookml]
 
         return defn
 
@@ -114,8 +117,11 @@ class OperationalMonitoringAlertingExplore(Explore):
         self,
         v1_name: Optional[str],
     ) -> List[Dict[str, Any]]:
-        defn: List[Dict[str, Any]] = [
-            {"name": self.views["base_view"], "hidden": "yes"},
-        ]
+        explore_lookml = {"name": self.views["base_view"], "hidden": "yes"}
+
+        if datagroup := self.get_datagroup():
+            explore_lookml["persist_with"] = datagroup
+
+        defn: List[Dict[str, Any]] = [explore_lookml]
 
         return defn
