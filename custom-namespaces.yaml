@@ -23,10 +23,6 @@ combined_browser_metrics:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.telemetry.active_users_aggregates
-    firefox_desktop_baseline_active_users_aggregates:
-      type: table_view
-      tables:
-        - table: moz-fx-data-shared-prod.firefox_desktop.baseline_active_users_aggregates
     active_users_aggregates_device:
       type: table_view
       tables:
@@ -1000,6 +996,10 @@ experimentation:
 firefox_desktop:
   glean_app: true
   views:
+    firefox_desktop_baseline_active_users_aggregates:
+      type: table_view
+      tables:
+        - table: mozdata.firefox_desktop.baseline_active_users_aggregates
     desktop_acquisition_funnel_table:
       type: table_view
       tables:
