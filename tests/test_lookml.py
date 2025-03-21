@@ -1236,17 +1236,17 @@ def test_lookml_actual_metric_definitions_view(
                             ],
                         },
                         {
-                            "group_item_label": "Jwe",
+                            "group_item_label": "JWE",
                             "group_label": "Test",
                             "name": "metrics__jwe2__test_jwe",
-                            "label": "Test Jwe",
+                            "label": "Test JWE",
                             "sql": "${TABLE}.metrics.jwe2.test_jwe",
                             "type": "string",
                             "hidden": "no",
                             "links": [
                                 {
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
-                                    "label": "Glean Dictionary reference for Test Jwe",
+                                    "label": "Glean Dictionary reference for Test JWE",
                                     "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/test_jwe",  # noqa: E501
                                 }
                             ],
@@ -1364,33 +1364,33 @@ def test_lookml_actual_metric_definitions_view(
                             ],
                         },
                         {
-                            "group_item_label": "Uuid",
+                            "group_item_label": "UUID",
                             "group_label": "Test",
                             "name": "metrics__uuid__test_uuid",
-                            "label": "Test Uuid",
+                            "label": "Test UUID",
                             "sql": "${TABLE}.metrics.uuid.test_uuid",
                             "type": "string",
                             "hidden": "no",
                             "links": [
                                 {
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
-                                    "label": "Glean Dictionary reference for Test Uuid",
+                                    "label": "Glean Dictionary reference for Test UUID",
                                     "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/test_uuid",  # noqa: E501
                                 }
                             ],
                         },
                         {
-                            "group_item_label": "Url",
+                            "group_item_label": "URL",
                             "group_label": "Test",
                             "name": "metrics__url2__test_url",
-                            "label": "Test Url",
+                            "label": "Test URL",
                             "sql": "${TABLE}.metrics.url2.test_url",
                             "type": "string",
                             "hidden": "no",
                             "links": [
                                 {
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
-                                    "label": "Glean Dictionary reference for Test Url",
+                                    "label": "Glean Dictionary reference for Test URL",
                                     "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/test_url",  # noqa: E501
                                 }
                             ],
