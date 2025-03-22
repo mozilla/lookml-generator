@@ -56,26 +56,24 @@ class MockDryRunDatagroups(MockDryRun):
 def test_generates_datagroups(reference_map_mock, runner):
     table_1_expected = (
         FILE_HEADER
-        + """datagroup: test_table_last_updated {
-  label: "Test Table Last Updated"
+        + """datagroup: table_1_last_updated {
+  label: "table_1 Last Updated"
   sql_trigger: SELECT MAX(storage_last_modified_time)
-    FROM `mozdata`.`region-us`.INFORMATION_SCHEMA.TABLE_STORAGE
-    WHERE table_schema = 'analysis'
-    AND table_name = 'test_table' ;;
-  description: "Updates when mozdata.analysis.test_table is modified."
+    FROM `moz-fx-data-shared-prod`.`region-us`.INFORMATION_SCHEMA.TABLE_STORAGE
+    WHERE (table_schema = 'analysis' AND table_name = 'test_table') ;;
+  description: "Updates for table_1 when referenced tables are modified."
   max_cache_age: "24 hours"
 }"""
     )
 
     table_2_expected = (
         FILE_HEADER
-        + """datagroup: test_table_2_last_updated {
-  label: "Test Table 2 Last Updated"
+        + """datagroup: table_2_last_updated {
+  label: "table_2 Last Updated"
   sql_trigger: SELECT MAX(storage_last_modified_time)
-    FROM `mozdata`.`region-us`.INFORMATION_SCHEMA.TABLE_STORAGE
-    WHERE table_schema = 'analysis'
-    AND table_name = 'test_table_2' ;;
-  description: "Updates when mozdata.analysis.test_table_2 is modified."
+    FROM `moz-fx-data-shared-prod`.`region-us`.INFORMATION_SCHEMA.TABLE_STORAGE
+    WHERE (table_schema = 'analysis' AND table_name = 'test_table_2') ;;
+  description: "Updates for table_2 when referenced tables are modified."
   max_cache_age: "24 hours"
 }"""
     )
@@ -114,20 +112,20 @@ def test_generates_datagroups(reference_map_mock, runner):
 
         assert Path(namespace_dir / "datagroups").exists()
         assert Path(
-            namespace_dir / "datagroups/test_table_last_updated.datagroup.lkml"
+            namespace_dir / "datagroups/table_1_last_updated.datagroup.lkml"
         ).exists()
         assert (
             Path(
-                namespace_dir / "datagroups/test_table_last_updated.datagroup.lkml"
+                namespace_dir / "datagroups/table_1_last_updated.datagroup.lkml"
             ).read_text()
             == table_1_expected
         )
         assert Path(
-            namespace_dir / "datagroups/test_table_2_last_updated.datagroup.lkml"
+            namespace_dir / "datagroups/table_2_last_updated.datagroup.lkml"
         ).exists()
         assert (
             Path(
-                namespace_dir / "datagroups/test_table_2_last_updated.datagroup.lkml"
+                namespace_dir / "datagroups/table_2_last_updated.datagroup.lkml"
             ).read_text()
             == table_2_expected
         )
@@ -144,26 +142,12 @@ def test_generates_datagroups(reference_map_mock, runner):
 def test_generates_datagroups_with_tables_and_views(runner):
     table_1_expected = (
         FILE_HEADER
-        + """datagroup: test_table_last_updated {
-  label: "Test Table Last Updated"
-  sql_trigger: SELECT MAX(storage_last_modified_time)
-    FROM `mozdata`.`region-us`.INFORMATION_SCHEMA.TABLE_STORAGE
-    WHERE table_schema = 'analysis'
-    AND table_name = 'test_table' ;;
-  description: "Updates when mozdata.analysis.test_table is modified."
-  max_cache_age: "24 hours"
-}"""
-    )
-
-    source_table_expected = (
-        FILE_HEADER
-        + """datagroup: view_1_source_last_updated {
-  label: "View Source Table Last Updated"
+        + """datagroup: table_1_last_updated {
+  label: "table_1 Last Updated"
   sql_trigger: SELECT MAX(storage_last_modified_time)
     FROM `moz-fx-data-shared-prod`.`region-us`.INFORMATION_SCHEMA.TABLE_STORAGE
-    WHERE table_schema = 'analysis'
-    AND table_name = 'view_1_source' ;;
-  description: "Updates when moz-fx-data-shared-prod.analysis.view_1_source is modified."
+    WHERE (table_schema = 'analysis' AND table_name = 'test_table') ;;
+  description: "Updates for table_1 when referenced tables are modified."
   max_cache_age: "24 hours"
 }"""
     )
@@ -201,23 +185,15 @@ def test_generates_datagroups_with_tables_and_views(runner):
             )
 
         assert Path("looker-hub/test_namespace/datagroups").exists()
+        assert len(list((namespace_dir / "datagroups").iterdir())) == 1
         assert Path(
-            namespace_dir / "datagroups/test_table_last_updated.datagroup.lkml"
+            namespace_dir / "datagroups/table_1_last_updated.datagroup.lkml"
         ).exists()
         assert (
             Path(
-                namespace_dir / "datagroups/test_table_last_updated.datagroup.lkml"
+                namespace_dir / "datagroups/table_1_last_updated.datagroup.lkml"
             ).read_text()
             == table_1_expected
-        )
-        assert Path(
-            namespace_dir / "datagroups/view_1_source_last_updated.datagroup.lkml"
-        ).exists()
-        assert (
-            Path(
-                namespace_dir / "datagroups/view_1_source_last_updated.datagroup.lkml"
-            ).read_text()
-            == source_table_expected
         )
 
 
@@ -256,13 +232,12 @@ def test_only_generates_one_datagroup_for_references_to_same_table(
 ):
     expected = (
         FILE_HEADER
-        + """datagroup: source_table_last_updated {
-  label: "Source Table Last Updated"
+        + """datagroup: test_table_last_updated {
+  label: "test_table Last Updated"
   sql_trigger: SELECT MAX(storage_last_modified_time)
     FROM `moz-fx-data-shared-prod`.`region-us`.INFORMATION_SCHEMA.TABLE_STORAGE
-    WHERE table_schema = 'analysis'
-    AND table_name = 'source_table' ;;
-  description: "Updates when moz-fx-data-shared-prod.analysis.source_table is modified."
+    WHERE (table_schema = 'analysis' AND table_name = 'source_table') ;;
+  description: "Updates for test_table when referenced tables are modified."
   max_cache_age: "24 hours"
 }"""
     )
@@ -315,12 +290,10 @@ def test_only_generates_one_datagroup_for_references_to_same_table(
             )
 
         assert Path(namespace_dir / "datagroups").exists()
-        assert len(list((namespace_dir / "datagroups").iterdir())) == 2
+        assert len(list((namespace_dir / "datagroups").iterdir())) == 1
         assert (
             Path(
-                namespace_dir
-                / "datagroups"
-                / "source_table_last_updated.datagroup.lkml"
+                namespace_dir / "datagroups" / "test_table_last_updated.datagroup.lkml"
             ).read_text()
             == expected
         )

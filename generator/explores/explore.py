@@ -105,6 +105,14 @@ class Explore:
 
         Return `None` if there is no datagroup for this explore.
         """
+        if self.views_path and (self.views_path.parent / "datagroups").exists():
+            datagroups_path = self.views_path.parent / "datagroups"
+            datagroup_file = (
+                datagroups_path
+                / f'{self.views["base_view"]}_last_updated.datagroup.lkml'
+            )
+            if datagroup_file.exists():
+                return f'{self.views["base_view"]}_last_updated'
         return None
 
     def get_unnested_fields_joins_lookml(

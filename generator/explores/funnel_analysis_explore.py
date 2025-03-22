@@ -38,26 +38,32 @@ class FunnelAnalysisExplore(Explore):
         view_lookml = self.get_view_lookml("funnel_analysis")
         views = view_lookml["views"]
         n_events = len([d for d in views if d["name"].startswith("step_")])
-        defn: List[Dict[str, Any]] = [
-            {
-                "name": "funnel_analysis",
-                "description": "Count funnel completion over time. Funnels are limited to a single day.",
-                "view_label": " User-Day Funnels",
-                "always_filter": {
-                    "filters": [
-                        {"submission_date": "14 days"},
-                    ]
-                },
-                "joins": [
-                    {
-                        "name": f"step_{n}",
-                        "relationship": "many_to_one",
-                        "type": "cross",
-                    }
-                    for n in range(1, n_events + 1)
-                ],
-                "sql_always_where": "${funnel_analysis.submission_date} >= '2010-01-01'",
+
+        explore_lookml = {
+            "name": "funnel_analysis",
+            "description": "Count funnel completion over time. Funnels are limited to a single day.",
+            "view_label": " User-Day Funnels",
+            "always_filter": {
+                "filters": [
+                    {"submission_date": "14 days"},
+                ]
             },
+            "joins": [
+                {
+                    "name": f"step_{n}",
+                    "relationship": "many_to_one",
+                    "type": "cross",
+                }
+                for n in range(1, n_events + 1)
+            ],
+            "sql_always_where": "${funnel_analysis.submission_date} >= '2010-01-01'",
+        }
+
+        if datagroup := self.get_datagroup():
+            explore_lookml["persist_with"] = datagroup
+
+        defn: List[Dict[str, Any]] = [
+            explore_lookml,
             {"name": "event_names", "hidden": "yes"},
         ]
 

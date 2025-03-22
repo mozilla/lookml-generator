@@ -16,16 +16,19 @@ class PingExplore(Explore):
 
     def _to_lookml(self, v1_name: Optional[str]) -> List[Dict[str, Any]]:
         """Generate LookML to represent this explore."""
-        return [
-            {
-                "name": self.name,
-                "view_name": self.views["base_view"],
-                "always_filter": {
-                    "filters": self.get_required_filters("base_view"),
-                },
-                "joins": self.get_unnested_fields_joins_lookml(),
-            }
-        ]
+        explore_lookml = {
+            "name": self.name,
+            "view_name": self.views["base_view"],
+            "always_filter": {
+                "filters": self.get_required_filters("base_view"),
+            },
+            "joins": self.get_unnested_fields_joins_lookml(),
+        }
+
+        if datagroup := self.get_datagroup():
+            explore_lookml["persist_with"] = datagroup
+
+        return [explore_lookml]
 
     @staticmethod
     def from_views(views: List[View]) -> Iterator[PingExplore]:

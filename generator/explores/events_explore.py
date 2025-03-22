@@ -60,4 +60,8 @@ class EventsExplore(Explore):
                     "name": "all_event_counts",
                 },
             ]
+
+        if datagroup := self.get_datagroup():
+            lookml["persist_with"] = datagroup
+
         return [lookml]
