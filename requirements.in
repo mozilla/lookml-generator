@@ -21,6 +21,6 @@ pytest==7.4.4
 PyYAML==6.0.2
 tomli==2.2.1  # for toml parsing on python<3.11
 types-PyYaml==6.0.12.20241230
-yamllint==1.36.2
+yamllint==1.37.0
 gitpython==3.1.44
 spectacles==2.4.11
