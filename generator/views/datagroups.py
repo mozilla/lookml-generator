@@ -122,7 +122,7 @@ def _get_referenced_tables(
     Recursively, resolve references of referenced views to only get table dependencies.
     """
     if [project_id, dataset_id, table_id] in seen:
-        return []
+        return [[project_id, dataset_id, table_id]]
 
     seen += [[project_id, dataset_id, table_id]]
 

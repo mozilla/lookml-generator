@@ -152,6 +152,18 @@ def test_generates_datagroups_with_tables_and_views(runner):
 }"""
     )
 
+    test_view_expected = (
+        FILE_HEADER
+        + """datagroup: test_view_last_updated {
+  label: "test_view Last Updated"
+  sql_trigger: SELECT MAX(storage_last_modified_time)
+    FROM `moz-fx-data-shared-prod`.`region-us`.INFORMATION_SCHEMA.TABLE_STORAGE
+    WHERE (table_schema = 'analysis' AND table_name = 'view_1_source') ;;
+  description: "Updates for test_view when referenced tables are modified."
+  max_cache_age: "24 hours"
+}"""
+    )
+
     views = [
         TableView(
             namespace="test_namespace",
@@ -185,7 +197,16 @@ def test_generates_datagroups_with_tables_and_views(runner):
             )
 
         assert Path("looker-hub/test_namespace/datagroups").exists()
-        assert len(list((namespace_dir / "datagroups").iterdir())) == 1
+        assert len(list((namespace_dir / "datagroups").iterdir())) == 2
+        assert Path(
+            namespace_dir / "datagroups/test_view_last_updated.datagroup.lkml"
+        ).exists()
+        assert (
+            Path(
+                namespace_dir / "datagroups/test_view_last_updated.datagroup.lkml"
+            ).read_text()
+            == test_view_expected
+        )
         assert Path(
             namespace_dir / "datagroups/table_1_last_updated.datagroup.lkml"
         ).exists()
@@ -230,7 +251,7 @@ def test_skips_non_table_views(runner):
 def test_only_generates_one_datagroup_for_references_to_same_table(
     reference_map_mock, runner
 ):
-    expected = (
+    test_table_expected = (
         FILE_HEADER
         + """datagroup: test_table_last_updated {
   label: "test_table Last Updated"
@@ -238,6 +259,18 @@ def test_only_generates_one_datagroup_for_references_to_same_table(
     FROM `moz-fx-data-shared-prod`.`region-us`.INFORMATION_SCHEMA.TABLE_STORAGE
     WHERE (table_schema = 'analysis' AND table_name = 'source_table') ;;
   description: "Updates for test_table when referenced tables are modified."
+  max_cache_age: "24 hours"
+}"""
+    )
+
+    view_1_expected = (
+        FILE_HEADER
+        + """datagroup: view_1_last_updated {
+  label: "view_1 Last Updated"
+  sql_trigger: SELECT MAX(storage_last_modified_time)
+    FROM `moz-fx-data-shared-prod`.`region-us`.INFORMATION_SCHEMA.TABLE_STORAGE
+    WHERE (table_schema = 'analysis' AND table_name = 'view_1') ;;
+  description: "Updates for view_1 when referenced tables are modified."
   max_cache_age: "24 hours"
 }"""
     )
@@ -290,10 +323,16 @@ def test_only_generates_one_datagroup_for_references_to_same_table(
             )
 
         assert Path(namespace_dir / "datagroups").exists()
-        assert len(list((namespace_dir / "datagroups").iterdir())) == 1
+        assert len(list((namespace_dir / "datagroups").iterdir())) == 2
         assert (
             Path(
                 namespace_dir / "datagroups" / "test_table_last_updated.datagroup.lkml"
             ).read_text()
-            == expected
+            == test_table_expected
+        )
+        assert (
+            Path(
+                namespace_dir / "datagroups" / "view_1_last_updated.datagroup.lkml"
+            ).read_text()
+            == view_1_expected
         )
