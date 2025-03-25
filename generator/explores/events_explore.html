@@ -130,7 +130,11 @@
 </span><span id="L-60"><a href="#L-60"><span class="linenos">60</span></a>                    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;all_event_counts&quot;</span><span class="p">,</span>
 </span><span id="L-61"><a href="#L-61"><span class="linenos">61</span></a>                <span class="p">},</span>
 </span><span id="L-62"><a href="#L-62"><span class="linenos">62</span></a>            <span class="p">]</span>
-</span><span id="L-63"><a href="#L-63"><span class="linenos">63</span></a>        <span class="k">return</span> <span class="p">[</span><span class="n">lookml</span><span class="p">]</span>
+</span><span id="L-63"><a href="#L-63"><span class="linenos">63</span></a>
+</span><span id="L-64"><a href="#L-64"><span class="linenos">64</span></a>        <span class="k">if</span> <span class="n">datagroup</span> <span class="o">:=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_datagroup</span><span class="p">():</span>
+</span><span id="L-65"><a href="#L-65"><span class="linenos">65</span></a>            <span class="n">lookml</span><span class="p">[</span><span class="s2">&quot;persist_with&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datagroup</span>
+</span><span id="L-66"><a href="#L-66"><span class="linenos">66</span></a>
+</span><span id="L-67"><a href="#L-67"><span class="linenos">67</span></a>        <span class="k">return</span> <span class="p">[</span><span class="n">lookml</span><span class="p">]</span>
 </span></pre></div>
 
 
@@ -197,7 +201,11 @@
 </span><span id="EventsExplore-61"><a href="#EventsExplore-61"><span class="linenos">61</span></a>                    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;all_event_counts&quot;</span><span class="p">,</span>
 </span><span id="EventsExplore-62"><a href="#EventsExplore-62"><span class="linenos">62</span></a>                <span class="p">},</span>
 </span><span id="EventsExplore-63"><a href="#EventsExplore-63"><span class="linenos">63</span></a>            <span class="p">]</span>
-</span><span id="EventsExplore-64"><a href="#EventsExplore-64"><span class="linenos">64</span></a>        <span class="k">return</span> <span class="p">[</span><span class="n">lookml</span><span class="p">]</span>
+</span><span id="EventsExplore-64"><a href="#EventsExplore-64"><span class="linenos">64</span></a>
+</span><span id="EventsExplore-65"><a href="#EventsExplore-65"><span class="linenos">65</span></a>        <span class="k">if</span> <span class="n">datagroup</span> <span class="o">:=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_datagroup</span><span class="p">():</span>
+</span><span id="EventsExplore-66"><a href="#EventsExplore-66"><span class="linenos">66</span></a>            <span class="n">lookml</span><span class="p">[</span><span class="s2">&quot;persist_with&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datagroup</span>
+</span><span id="EventsExplore-67"><a href="#EventsExplore-67"><span class="linenos">67</span></a>
+</span><span id="EventsExplore-68"><a href="#EventsExplore-68"><span class="linenos">68</span></a>        <span class="k">return</span> <span class="p">[</span><span class="n">lookml</span><span class="p">]</span>
 </span></pre></div>
 
 
