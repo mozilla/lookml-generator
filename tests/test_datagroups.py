@@ -59,8 +59,13 @@ def test_generates_datagroups(reference_map_mock, runner):
         + """datagroup: table_1_last_updated {
   label: "table_1 Last Updated"
   sql_trigger: SELECT MAX(storage_last_modified_time)
-    FROM `moz-fx-data-shared-prod`.`region-us`.INFORMATION_SCHEMA.TABLE_STORAGE
-    WHERE (table_schema = 'analysis' AND table_name = 'test_table') ;;
+    FROM (
+        
+    SELECT MAX(storage_last_modified_time) AS storage_last_modified_time
+    FROM `mozdata`.`region-us`.INFORMATION_SCHEMA.TABLE_STORAGE
+    WHERE (table_schema = 'analysis' AND table_name = 'test_table')
+
+    ) ;;
   description: "Updates for table_1 when referenced tables are modified."
   max_cache_age: "24 hours"
 }"""
@@ -71,8 +76,13 @@ def test_generates_datagroups(reference_map_mock, runner):
         + """datagroup: table_2_last_updated {
   label: "table_2 Last Updated"
   sql_trigger: SELECT MAX(storage_last_modified_time)
-    FROM `moz-fx-data-shared-prod`.`region-us`.INFORMATION_SCHEMA.TABLE_STORAGE
-    WHERE (table_schema = 'analysis' AND table_name = 'test_table_2') ;;
+    FROM (
+        
+    SELECT MAX(storage_last_modified_time) AS storage_last_modified_time
+    FROM `mozdata`.`region-us`.INFORMATION_SCHEMA.TABLE_STORAGE
+    WHERE (table_schema = 'analysis' AND table_name = 'test_table_2')
+
+    ) ;;
   description: "Updates for table_2 when referenced tables are modified."
   max_cache_age: "24 hours"
 }"""
@@ -145,8 +155,13 @@ def test_generates_datagroups_with_tables_and_views(runner):
         + """datagroup: table_1_last_updated {
   label: "table_1 Last Updated"
   sql_trigger: SELECT MAX(storage_last_modified_time)
-    FROM `moz-fx-data-shared-prod`.`region-us`.INFORMATION_SCHEMA.TABLE_STORAGE
-    WHERE (table_schema = 'analysis' AND table_name = 'test_table') ;;
+    FROM (
+        
+    SELECT MAX(storage_last_modified_time) AS storage_last_modified_time
+    FROM `mozdata`.`region-us`.INFORMATION_SCHEMA.TABLE_STORAGE
+    WHERE (table_schema = 'analysis' AND table_name = 'test_table')
+
+    ) ;;
   description: "Updates for table_1 when referenced tables are modified."
   max_cache_age: "24 hours"
 }"""
@@ -157,8 +172,13 @@ def test_generates_datagroups_with_tables_and_views(runner):
         + """datagroup: test_view_last_updated {
   label: "test_view Last Updated"
   sql_trigger: SELECT MAX(storage_last_modified_time)
+    FROM (
+        
+    SELECT MAX(storage_last_modified_time) AS storage_last_modified_time
     FROM `moz-fx-data-shared-prod`.`region-us`.INFORMATION_SCHEMA.TABLE_STORAGE
-    WHERE (table_schema = 'analysis' AND table_name = 'view_1_source') ;;
+    WHERE (table_schema = 'analysis' AND table_name = 'view_1_source')
+
+    ) ;;
   description: "Updates for test_view when referenced tables are modified."
   max_cache_age: "24 hours"
 }"""
@@ -256,8 +276,13 @@ def test_only_generates_one_datagroup_for_references_to_same_table(
         + """datagroup: test_table_last_updated {
   label: "test_table Last Updated"
   sql_trigger: SELECT MAX(storage_last_modified_time)
+    FROM (
+        
+    SELECT MAX(storage_last_modified_time) AS storage_last_modified_time
     FROM `moz-fx-data-shared-prod`.`region-us`.INFORMATION_SCHEMA.TABLE_STORAGE
-    WHERE (table_schema = 'analysis' AND table_name = 'source_table') ;;
+    WHERE (table_schema = 'analysis' AND table_name = 'source_table')
+
+    ) ;;
   description: "Updates for test_table when referenced tables are modified."
   max_cache_age: "24 hours"
 }"""
@@ -268,8 +293,13 @@ def test_only_generates_one_datagroup_for_references_to_same_table(
         + """datagroup: view_1_last_updated {
   label: "view_1 Last Updated"
   sql_trigger: SELECT MAX(storage_last_modified_time)
-    FROM `moz-fx-data-shared-prod`.`region-us`.INFORMATION_SCHEMA.TABLE_STORAGE
-    WHERE (table_schema = 'analysis' AND table_name = 'view_1') ;;
+    FROM (
+        
+    SELECT MAX(storage_last_modified_time) AS storage_last_modified_time
+    FROM `mozdata`.`region-us`.INFORMATION_SCHEMA.TABLE_STORAGE
+    WHERE (table_schema = 'analysis' AND table_name = 'view_1')
+
+    ) ;;
   description: "Updates for view_1 when referenced tables are modified."
   max_cache_age: "24 hours"
 }"""

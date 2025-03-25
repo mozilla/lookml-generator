@@ -15,10 +15,17 @@ from generator.views.lookml_utils import BQViewReferenceMap
 
 DEFAULT_MAX_CACHE_AGE = "24 hours"
 
-SQL_TRIGGER_TEMPLATE = """
+SQL_TRIGGER_TEMPLATE_SINGLE_TABLE = """
+    SELECT MAX(storage_last_modified_time) AS storage_last_modified_time
+    FROM `{project_id}`.`region-us`.INFORMATION_SCHEMA.TABLE_STORAGE
+    WHERE {table}
+"""
+
+SQL_TRIGGER_TEMPLATE_ALL_TABLES = """
     SELECT MAX(storage_last_modified_time)
-    FROM `moz-fx-data-shared-prod`.`region-us`.INFORMATION_SCHEMA.TABLE_STORAGE
-    WHERE {tables}
+    FROM (
+        {tables}
+    )
 """
 
 # To map views to their underlying tables:
@@ -68,7 +75,10 @@ def _get_datagroup_from_bigquery_tables(
         table_id = table[2]
 
         datagroup_tables.append(
-            f"(table_schema = '{dataset_id}' AND table_name = '{table_id}')"
+            SQL_TRIGGER_TEMPLATE_SINGLE_TABLE.format(
+                project_id=table[0],
+                table=f"(table_schema = '{dataset_id}' AND table_name = '{table_id}')",
+            )
         )
 
     # create a datagroup associated to a view which will be used for caching
@@ -76,8 +86,8 @@ def _get_datagroup_from_bigquery_tables(
         name=f"{view.name}_last_updated",
         label=f"{view.name} Last Updated",
         description=f"Updates for {view.name} when referenced tables are modified.",
-        sql_trigger=SQL_TRIGGER_TEMPLATE.format(
-            project_id=project_id, tables=" OR ".join(datagroup_tables)
+        sql_trigger=SQL_TRIGGER_TEMPLATE_ALL_TABLES.format(
+            project_id=project_id, tables=" UNION ALL ".join(datagroup_tables)
         ),
     )
 
@@ -91,14 +101,9 @@ def _get_datagroup_from_bigquery_view(
 ) -> Optional[Datagroup]:
     # Dataset view map only contains references for shared-prod views.
     full_table_id = f"{project_id}.{dataset_id}.{table_id}"
-    if project_id not in ("moz-fx-data-shared-prod", "mozdata"):
-        logging.debug(
-            f"Unable to get sources for non shared-prod/mozdata view: {full_table_id} in generated-sql."
-        )
-        return None
 
     view_references = _get_referenced_tables(
-        project_id, dataset_id, table_id, dataset_view_map
+        project_id, dataset_id, table_id, dataset_view_map, []
     )
 
     if not view_references or len(view_references) == 0:
@@ -114,7 +119,7 @@ def _get_referenced_tables(
     dataset_id,
     table_id,
     dataset_view_map: BQViewReferenceMap,
-    seen: List[List[str]] = [],
+    seen: List[List[str]],
 ) -> List[List[str]]:
     """
     Return a list of all tables referenced by the provided view.
@@ -143,7 +148,7 @@ def _get_referenced_tables(
             view_reference[1],
             view_reference[2],
             dataset_view_map,
-            seen + view_references,
+            seen.copy(),
         )
         if view_reference not in seen
     ]
