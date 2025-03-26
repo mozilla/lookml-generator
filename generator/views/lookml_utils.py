@@ -43,6 +43,42 @@ MAP_LAYER_NAMES = {
 
 DEFAULT_MAX_SUGGEST_PERSIST_FOR = "24 hours"
 
+UPPERCASE_INITIALISMS_PATTERN = re.compile(
+    (
+        r"\b("
+        + "|".join(
+            [
+                "CPU",
+                "DB",
+                "DNS",
+                "DNT",
+                "DOM",
+                "GC",
+                "GPU",
+                "HTTP",
+                "ID",
+                "IO",
+                "IP",
+                "ISP",
+                "JWE",
+                "LB",
+                "OS",
+                "SDK",
+                "SERP",
+                "SSL",
+                "TLS",
+                "UI",
+                "URI",
+                "URL",
+                "UTM",
+                "UUID",
+            ]
+        )
+        + r")\b"
+    ),
+    re.IGNORECASE,
+)
+
 
 def _get_dimension(
     path: Tuple[str, ...], field_type: str, mode: str, description: Optional[str]
@@ -250,8 +286,10 @@ def render_template(filename, template_folder, **kwargs) -> str:
 
 
 def slug_to_title(slug):
-    """Convert a slug to title case."""
-    return slug.replace("_", " ").title()
+    """Convert a slug to title case, with some common initialisms uppercased."""
+    return UPPERCASE_INITIALISMS_PATTERN.sub(
+        lambda match: match.group(0).upper(), slug.replace("_", " ").title()
+    )
 
 
 # Map from view to qualified references {dataset: {view: [[project, dataset, table],]}}

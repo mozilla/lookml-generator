@@ -31,6 +31,10 @@ combined_browser_metrics:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.telemetry.cohort_daily_statistics
+    cohort_weekly_statistics:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.telemetry.cohort_weekly_statistics
     fenix_and_firefox_use_counters:
       type: table_view
       tables:
@@ -581,11 +585,19 @@ firefox_accounts:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.accounts_frontend_derived.login_engagement_funnel_v1
+    recovery_phone_segments:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.accounts_backend_derived.monitoring_db_recovery_phones_counts_v1
+      measures:
+        total_rows_sum:
+          type: sum
+          sql: ${total_rows}
     health_counts:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.firefox_accounts_derived.health_counts_v1
-      measures:  
+      measures:
         count_sum:
           type: sum
           sql: ${count}
@@ -709,6 +721,10 @@ firefox_accounts:
       type: table_explore
       views:
         base_view: login_engagement_funnels_by_service
+    recovery_phone_segments:
+      type: table_explore
+      views:
+        base_view: recovery_phone_segments
     health_counts:
       type: table_explore
       views:
@@ -992,6 +1008,10 @@ experimentation:
 firefox_desktop:
   glean_app: true
   views:
+    firefox_desktop_baseline_active_users_aggregates:
+      type: table_view
+      tables:
+        - table: mozdata.firefox_desktop.baseline_active_users_aggregates
     desktop_acquisition_funnel_table:
       type: table_view
       tables:
@@ -1161,11 +1181,11 @@ monitoring:
     - wichan@mozilla.com
   pretty_name: Monitoring (Data Pipeline)
   views:
-    metadata_completeness: 
+    metadata_completeness:
       tables:
         - table: mozdata.monitoring.metadata_completeness
       type: table_view
-    metadata_completeness_summary: 
+    metadata_completeness_summary:
       tables:
         - table: mozdata.monitoring.metadata_completeness_summary
       type: table_view
@@ -1177,7 +1197,7 @@ monitoring:
       tables:
         - table: moz-fx-data-shared-prod.monitoring.bigquery_table_storage
       type: table_view
-    bigquery_shared_prod_table_storage: 
+    bigquery_shared_prod_table_storage:
       tables:
         - table: mozdata.monitoring.table_storage
       type: table_view
@@ -1702,6 +1722,23 @@ subscription_platform:
       type: table_view
       tables:
         - table: mozdata.subscription_platform.monthly_active_logical_subscriptions
+    # Service subscriptions
+    service_subscriptions:
+      type: table_view
+      tables:
+        - table: mozdata.subscription_platform.service_subscriptions
+    service_subscription_events:
+      type: table_view
+      tables:
+        - table: mozdata.subscription_platform.service_subscription_events
+    daily_active_service_subscriptions:
+      type: table_view
+      tables:
+        - table: mozdata.subscription_platform.daily_active_service_subscriptions
+    monthly_active_service_subscriptions:
+      type: table_view
+      tables:
+        - table: mozdata.subscription_platform.monthly_active_service_subscriptions
   explores:
     # Using `_v1` explores to avoid breakages when v2 tables are deployed.
     apple_subscriptions_v1:
@@ -1825,11 +1862,11 @@ fxci:
     tasks_base:
       type: table_view
       tables:
-        - table: moz-fx-data-shared-prod.fxci_derived.tasks_v1
+        - table: moz-fx-data-shared-prod.fxci.tasks
     task_runs_base:
       type: table_view
       tables:
-        - table: moz-fx-data-shared-prod.fxci_derived.task_runs_v1
+        - table: moz-fx-data-shared-prod.fxci.task_runs
     task_run_costs_base:
       type: table_view
       tables:
@@ -1841,7 +1878,7 @@ fxci:
     worker_metrics_base:
       type: table_view
       tables:
-        - table: moz-fx-data-shared-prod.fxci_derived.worker_metrics_v1
+        - table: moz-fx-data-shared-prod.fxci.worker_metrics
 accounts_backend:
   explores:
     accounts_events:
@@ -1991,3 +2028,15 @@ zoom:
       type: table_view
       tables:
         - table: mozdata.zoom.users
+device_manufacturer_partnerships:
+  glean_app: false
+  pretty_name: Device Manufacturer Partnerships
+  owners:
+    - mbowerman@mozilla.com
+    - kik@mozilla.com
+  spoke: looker-spoke-default
+  views:
+    shipment_and_activation_vivo:
+      type: table_view
+      tables:
+        - table: mozdata.device_manufacturer_partnerships.shipment_and_activation_vivo

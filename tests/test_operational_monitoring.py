@@ -232,8 +232,8 @@ def test_dashboard_lookml(operational_monitoring_dashboard):
   preferred_viewer: dashboards-next
 
   elements:
-  - title: Gc Ms
-    name: Gc Ms_mean
+  - title: GC Ms
+    name: GC Ms_mean
     note_state: expanded
     note_display: above
     note_text: Mean
@@ -263,13 +263,13 @@ def test_dashboard_lookml(operational_monitoring_dashboard):
     listen:
       Date: fission.build_id
       Cores Count: fission.cores_count
-      Os: fission.os
+      OS: fission.os
 
     enabled: "#3FE1B0"
     disabled: "#0060E0"
     defaults_version: 0
-  - title: Gc Ms Content
-    name: Gc Ms Content_percentile
+  - title: GC Ms Content
+    name: GC Ms Content_percentile
     note_state: expanded
     note_display: above
     note_text: Percentile
@@ -302,7 +302,7 @@ def test_dashboard_lookml(operational_monitoring_dashboard):
       Date: fission.build_id
       Percentile: fission.parameter
       Cores Count: fission.cores_count
-      Os: fission.os
+      OS: fission.os
 
     enabled: "#3FE1B0"
     disabled: "#0060E0"
@@ -351,8 +351,8 @@ def test_dashboard_lookml(operational_monitoring_dashboard):
 
 
 
-  - title: Os
-    name: Os
+  - title: OS
+    name: OS
     type: string_filter
     default_value: 'Windows'
     allow_multiple_values: false
@@ -416,8 +416,8 @@ def test_dashboard_lookml_group_by_dimension(
   preferred_viewer: dashboards-next
 
   elements:
-  - title: Gc Ms - By os
-    name: Gc Ms - By os_mean
+  - title: GC Ms - By os
+    name: GC Ms - By os_mean
     note_state: expanded
     note_display: above
     note_text: Mean
@@ -447,13 +447,13 @@ def test_dashboard_lookml_group_by_dimension(
     listen:
       Date: fission.build_id
       Cores Count: fission.cores_count
-      Os: fission.os
+      OS: fission.os
 
     enabled: "#3FE1B0"
     disabled: "#0060E0"
     defaults_version: 0
-  - title: Gc Ms Content - By os
-    name: Gc Ms Content - By os_percentile
+  - title: GC Ms Content - By os
+    name: GC Ms Content - By os_percentile
     note_state: expanded
     note_display: above
     note_text: Percentile
@@ -486,7 +486,7 @@ def test_dashboard_lookml_group_by_dimension(
       Date: fission.build_id
       Percentile: fission.parameter
       Cores Count: fission.cores_count
-      Os: fission.os
+      OS: fission.os
 
     enabled: "#3FE1B0"
     disabled: "#0060E0"
@@ -535,8 +535,8 @@ def test_dashboard_lookml_group_by_dimension(
 
 
 
-  - title: Os
-    name: Os
+  - title: OS
+    name: OS
     type: string_filter
     default_value: 'Linux,Windows'
     allow_multiple_values: true
