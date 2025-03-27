@@ -585,6 +585,14 @@ firefox_accounts:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.accounts_frontend_derived.login_engagement_funnel_v1
+    recovery_phone_segments:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.accounts_backend_derived.monitoring_db_recovery_phones_counts_v1
+      measures:
+        total_rows_sum:
+          type: sum
+          sql: ${total_rows}
     health_counts:
       type: table_view
       tables:
@@ -713,6 +721,10 @@ firefox_accounts:
       type: table_explore
       views:
         base_view: login_engagement_funnels_by_service
+    recovery_phone_segments:
+      type: table_explore
+      views:
+        base_view: recovery_phone_segments
     health_counts:
       type: table_explore
       views:
@@ -1000,6 +1012,10 @@ experimentation:
 firefox_desktop:
   glean_app: true
   views:
+    firefox_desktop_baseline_active_users_aggregates:
+      type: table_view
+      tables:
+        - table: mozdata.firefox_desktop.baseline_active_users_aggregates
     desktop_acquisition_funnel_table:
       type: table_view
       tables:
@@ -1710,6 +1726,23 @@ subscription_platform:
       type: table_view
       tables:
         - table: mozdata.subscription_platform.monthly_active_logical_subscriptions
+    # Service subscriptions
+    service_subscriptions:
+      type: table_view
+      tables:
+        - table: mozdata.subscription_platform.service_subscriptions
+    service_subscription_events:
+      type: table_view
+      tables:
+        - table: mozdata.subscription_platform.service_subscription_events
+    daily_active_service_subscriptions:
+      type: table_view
+      tables:
+        - table: mozdata.subscription_platform.daily_active_service_subscriptions
+    monthly_active_service_subscriptions:
+      type: table_view
+      tables:
+        - table: mozdata.subscription_platform.monthly_active_service_subscriptions
   explores:
     # Using `_v1` explores to avoid breakages when v2 tables are deployed.
     apple_subscriptions_v1:

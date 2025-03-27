@@ -86,6 +86,9 @@ class GleanPingExplore(PingExplore):
             "joins": joins,
         }
 
+        if datagroup := self.get_datagroup():
+            base_explore["persist_with"] = datagroup
+
         required_filters = self.get_required_filters("base_view")
         if len(required_filters) > 0:
             base_explore["always_filter"] = {"filters": required_filters}

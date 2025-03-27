@@ -45,19 +45,3 @@ class TableExplore(Explore):
     def from_dict(name: str, defn: dict, views_path: Path) -> TableExplore:
         """Get an instance of this explore from a name and dictionary definition."""
         return TableExplore(name, defn["views"], views_path)
-
-    def get_datagroup(self) -> Optional[str]:
-        """
-        Return the name of the associated datagroup.
-
-        Return `None` if there is no datagroup for this explore.
-        """
-        if self.views_path and (self.views_path.parent / "datagroups").exists():
-            datagroups_path = self.views_path.parent / "datagroups"
-            datagroup_file = (
-                datagroups_path
-                / f'{self.views["base_view"]}_last_updated.datagroup.lkml'
-            )
-            if datagroup_file.exists():
-                return f'{self.views["base_view"]}_last_updated'
-        return None
