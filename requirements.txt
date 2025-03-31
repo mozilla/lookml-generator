@@ -24,7 +24,6 @@ attrs==23.1.0 \
     #   jsonschema
     #   looker-sdk
     #   mozilla-metric-config-parser
-    #   pytest-mypy
     #   referencing
 backoff==2.2.1 \
     --hash=sha256:03f829f5bb1923180821643f8753b0502c3b682293992485b0eef2807afa5cba \
@@ -863,9 +862,9 @@ pytest-isort==4.0.0 \
     --hash=sha256:00e99642e282b00b849cf9b49d9102a02ab8c4ec549ace57d7868b723713aaa9 \
     --hash=sha256:14bb3281bab587d6beb53129481e8885232249ec5cfeaf5d903a561ff0589620
     # via -r requirements.in
-pytest-mypy==0.10.3 \
-    --hash=sha256:7638d0d3906848fc1810cb2f5cc7fceb4cc5c98524aafcac58f28620e3102053 \
-    --hash=sha256:f8458f642323f13a2ca3e2e61509f7767966b527b4d8adccd5032c3e7b4fd3db
+pytest-mypy==1.0.0 \
+    --hash=sha256:790e52df3e872e0ade7a76cacf7257aae6d093bebab7837024d418fd01c30ccf \
+    --hash=sha256:e284a2e8d27bc16a3069c34ab601b2f48fceba9bd435d65f69b7d8f41c373d6e
     # via -r requirements.in
 pytest-pydocstyle==2.4.0 \
     --hash=sha256:3770689778ad8d0de8cb51264f3d9b807c11d0ecc31f95e7025426eec126c4d2
