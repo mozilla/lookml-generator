@@ -1454,7 +1454,7 @@ reference:
     macroeconomic_indices:
       type: table_view
       tables:
-        - table: mozdata.reference.macroeconomic_indices
+        - table: mozdata.external.macroeconomic_indices
 kpi:
   glean_app: false
   owners:
