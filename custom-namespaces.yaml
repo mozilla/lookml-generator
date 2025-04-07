@@ -1134,6 +1134,10 @@ firefox_desktop:
       type: table_view
       tables:
         - table: mozdata.analysis.fenix_distribution_deal_v1
+    newtab_items_daily:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.firefox_desktop_derived.newtab_items_daily_v1
   explores:
     client_counts:
       type: client_counts_explore
@@ -1174,6 +1178,10 @@ firefox_desktop:
       type: table_explore
       views:
         base_view: fenix_distribution_deal
+    newtab_items_daily:
+      type: table_explore
+      views:
+        base_view: newtab_items_daily
 monitoring:
   glean_app: false
   owners:
