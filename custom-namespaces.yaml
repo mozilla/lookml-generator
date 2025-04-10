@@ -1647,18 +1647,6 @@ marketing:
   owners:
     - kik@mozilla.com
   views:
-    acoustic_contact_change_events:
-      type: table_view
-      tables:
-        - table: mozdata.acoustic.contact
-    acoustic_contact_current_snapshot:
-      type: table_view
-      tables:
-        - table: mozdata.acoustic.contact_current_snapshot
-    acoustic_email_events:
-      type: table_view
-      tables:
-        - table: mozdata.acoustic.raw_recipient
     firefox_for_families_forecasted_expectations:
       type: table_view
       tables:
