@@ -636,6 +636,19 @@ firefox_accounts:
       measures:
         count:
           type: count
+    health_twilio:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.firefox_accounts_derived.health_twilio_v1
+      measures:
+        row_count:
+          type: count
+        count_sum:
+          type: sum
+          sql: ${count}
+        price_sum:
+          type: sum
+          sql: ${price}
     account_settings_page_engagement:
       type: table_view
       tables:
@@ -749,6 +762,10 @@ firefox_accounts:
       type: table_explore
       views:
         base_view: health_tags
+    health_twilio:
+      type: table_explore
+      views:
+        base_view: health_twilio
     account_settings_page_engagement:
       type: table_explore
       views:
