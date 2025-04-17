@@ -1480,6 +1480,38 @@ reference:
       type: table_view
       tables:
         - table: mozdata.external.macroeconomic_indices
+    calendar:
+      type: table_view
+      tables:
+        - table: mozdata.external.calendar
+    holiday:
+      type: table_view
+      tables:
+        - table: mozdata.external.holidays
+    chrome_extensions:
+      type: table_view
+      tables:
+        - table: mozdata.external.chrome_extensions
+    imf_gross_domestic_product:
+      type: table_view
+      tables:
+        - table: mozdata.external.gdp
+    imf_exchange_rates:
+      type: table_view
+      tables:
+        - table: mozdata.external.imf_exchange_rates
+    inflation_monthly:
+      type: table_view
+      tables:
+        - table: mozdata.external.monthly_inflation
+    inflation_quarterly:
+      type: table_view
+      tables:
+        - table: mozdata.external.quarterly_inflation
+    population_by_country:
+      type: table_view
+      tables:
+        - table: mozdata.external.population_by_country
 kpi:
   glean_app: false
   owners:
