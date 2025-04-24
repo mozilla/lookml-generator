@@ -842,6 +842,7 @@ ads:
     - cbeck@mozilla.com
     - lvargas@mozilla.com
     - sbetancourt@mozilla.com
+    - jsnyder@mozilla.com
   spoke: looker-spoke-private
   views:
     android_pocket_spocs:
@@ -864,6 +865,10 @@ ads:
       type: table_view
       tables:
         - table: mozdata.ads.amp_search_with
+    campaign_metrics_daily:
+      type: table_view
+      tables:
+        - table: mozdata.ads.campaign_metrics_daily
 firefox_ios:
   pretty_name: Firefox iOS
   owners:
