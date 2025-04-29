@@ -152,19 +152,27 @@ class MetricDefinitionsView(View):
                 lookml_utils._generate_dimensions_from_query(query, dryrun)
             )
 
+        # to prevent duplicate dimensions, especially when working with time dimensions
+        # where names are modified potentially causing naming collisions
+        seen_dimensions = set()
         # prepare base field data for query
-        base_view_fields = [
-            {
-                "name": f"{data_source}_{dimension['name']}",
-                "select_sql": f"{data_source}_{dimension['name']},\n",
-                "sql": f"{data_source}.{dimension['name'].replace('__', '.')} AS {data_source}_{dimension['name']},\n",
-            }
-            for data_source, dimensions in base_view_dimensions.items()
-            for dimension in dimensions
-            if dimension["name"] not in ignore_base_fields
-            and "hidden" not in dimension
-            and dimension["type"] != "time"
-        ]
+        base_view_fields = []
+        for data_source, dimensions in base_view_dimensions.items():
+            for dimension in dimensions:
+                if (
+                    dimension["name"] not in ignore_base_fields
+                    and dimension["name"] not in seen_dimensions
+                    and "hidden" not in dimension
+                ):
+                    base_view_fields.append(
+                        {
+                            "name": f"{data_source}_{dimension['name']}",
+                            "select_sql": f"{data_source}_{dimension['name']},\n",
+                            "sql": f"{data_source}.{dimension['name'].replace('__', '.')} AS"
+                            + f" {data_source}_{dimension['name']},\n",
+                        }
+                    )
+                    seen_dimensions.add(dimension["name"])
 
         client_id_field = (
             "NULL"
@@ -261,10 +269,7 @@ class MetricDefinitionsView(View):
         # add the Looker dimensions
         for data_source, dimensions in base_view_dimensions.items():
             for dimension in dimensions:
-                if (
-                    dimension["name"] not in ignore_base_fields
-                    and dimension.get("type", "") != "time"
-                ):
+                if dimension["name"] not in ignore_base_fields:
                     dimension["sql"] = (
                         "${TABLE}." + f"{data_source}_{dimension['name']}"
                     )
