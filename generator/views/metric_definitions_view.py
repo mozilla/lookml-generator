@@ -164,12 +164,26 @@ class MetricDefinitionsView(View):
                     and dimension["name"] not in seen_dimensions
                     and "hidden" not in dimension
                 ):
+                    sql = (
+                        f"{data_source}.{dimension['name'].replace('__', '.')} AS"
+                        + f" {data_source}_{dimension['name']},\n"
+                    )
+                    # date/time/timestamp suffixes are removed when generating lookml dimensions, however we
+                    # need the original field name for the derived view SQL
+                    if dimension["type"] == "time" and not dimension["sql"].endswith(
+                        dimension["name"]
+                    ):
+                        suffix = dimension["sql"].split(dimension["name"])[-1]
+                        sql = (
+                            f"{data_source}.{(dimension['name']+suffix).replace('__', '.')} AS"
+                            + f" {data_source}_{dimension['name']},\n"
+                        )
+
                     base_view_fields.append(
                         {
                             "name": f"{data_source}_{dimension['name']}",
                             "select_sql": f"{data_source}_{dimension['name']},\n",
-                            "sql": f"{data_source}.{dimension['name'].replace('__', '.')} AS"
-                            + f" {data_source}_{dimension['name']},\n",
+                            "sql": sql,
                         }
                     )
                     seen_dimensions.add(dimension["name"])
