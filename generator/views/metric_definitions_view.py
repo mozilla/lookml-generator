@@ -173,7 +173,9 @@ class MetricDefinitionsView(View):
                     if dimension["type"] == "time" and not dimension["sql"].endswith(
                         dimension["name"]
                     ):
-                        suffix = dimension["sql"].split(dimension["name"])[-1]
+                        suffix = dimension["sql"].split(
+                            dimension["name"].replace("__", ".")
+                        )[-1]
                         sql = (
                             f"{data_source}.{(dimension['name']+suffix).replace('__', '.')} AS"
                             + f" {data_source}_{dimension['name']},\n"
