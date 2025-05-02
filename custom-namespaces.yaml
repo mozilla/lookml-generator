@@ -1026,6 +1026,22 @@ experimentation:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.telemetry.experiment_crash_rates_live
+    firefox_ios_targeting_context:
+      type: table_view
+      tables:
+        - table: mozdata.org_mozilla_ios_firefox.nimbus_recorded_targeting_context_v1
+    firefox_ios_targeting_context_explore:
+      type: table_explore
+      views:
+        base_view: mozdata.org_mozilla_ios_firefox.nimbus_recorded_targeting_context
+    firefox_android_targeting_context:
+      type: table_view
+      tables:
+        - table: mozdata.org_mozilla_fenix.nimbus_recorded_targeting_context_v1
+    firefox_android_targeting_context_explore:
+      type: table_explore
+      views:
+        base_view: mozdata.org_mozilla_fenix.nimbus_recorded_targeting_context
   explores:
     experiment_crash_rates:
       type: table_explore
