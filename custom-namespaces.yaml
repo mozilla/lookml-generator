@@ -39,6 +39,10 @@ combined_browser_metrics:
       type: table_view
       tables:
         - table: mozilla-public-data.telemetry_derived.fenix_and_firefox_use_counters
+    glean_active_users_aggregates:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.glean_telemetry.active_users_aggregates
 review_checker_desktop:
   glean_app: false
   owners:
