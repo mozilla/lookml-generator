@@ -5,5 +5,4 @@ updates:
     directory: /
     schedule:
       interval: daily
-    reviewers:
-      - mozilla/data-looker
+
