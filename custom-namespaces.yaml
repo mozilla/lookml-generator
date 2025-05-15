@@ -849,7 +849,7 @@ ads:
     - jsnyder@mozilla.com
   spoke: looker-spoke-private
   views:
-    android_pocket_spocs:
+    android_pocket_spoc:
       type: table_view
       tables:
         - table: mozdata.ads.android_pocket_spocs
