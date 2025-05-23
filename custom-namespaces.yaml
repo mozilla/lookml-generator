@@ -1462,22 +1462,6 @@ monitoring:
       views:
         base_view: looker_dashboard_load_times
 
-casa:
-  glean_app: false
-  spoke: looker-spoke-private
-  connection: bigquery-casa
-  owners:
-    - anicholson@mozilla.com
-  pretty_name: CASA
-  views:
-    projects:
-      type: table_view
-      tables:
-        - table: mozdata.casa.projects
-    users:
-      type: table_view
-      tables:
-        - table: mozdata.casa.users
 reference:
   glean_app: false
   pretty_name: Reference
