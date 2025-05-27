@@ -1869,6 +1869,10 @@ firefox_okrs:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.telemetry.desktop_retention
+    glean_desktop_engagement:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.firefox_desktop.desktop_engagement
     desktop_engagement:
       type: table_view
       tables:
