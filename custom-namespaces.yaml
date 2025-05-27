@@ -1872,7 +1872,7 @@ firefox_okrs:
     glean_desktop_engagement:
       type: table_view
       tables:
-        - table: moz-fx-data-shared-prod.firefox_desktop.desktop_engagement
+        - table: moz-fx-data-shared-prod.firefox_desktop.desktop_engagement_aggregates
     desktop_engagement:
       type: table_view
       tables:
