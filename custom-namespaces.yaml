@@ -1852,6 +1852,10 @@ growth:
       type: table_view
       tables:
         - table: mozdata.telemetry.segmented_dau_28_day_rolling
+    fenix_new_profile_activation_clients:
+      type: table_view
+      tables:
+        - table: mozdata.fenix.new_profile_activation_clients
 user_journey:
   pretty_name: User Journey
   owners:
