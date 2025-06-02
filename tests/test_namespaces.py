@@ -80,6 +80,11 @@ def custom_namespaces(tmp_path):
                   tables:
                   - table: mozdata.custom.partitioned_table
                     time_partitioning_field: timestamp
+                nested_disallowed:
+                  type: ping_view
+                  tables:
+                  - channel: release
+                    table: mozdata.custom.disallowed
             disallowed:
               pretty_name: Disallowed
               owners:
@@ -134,6 +139,9 @@ def namespace_disallowlist(tmp_path):
             ---
             - disallowed
             - disallowed_*
+            - custom:
+                views:
+                  - nested_disallowed
             """
         )
     )

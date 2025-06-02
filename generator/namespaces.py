@@ -359,7 +359,7 @@ def namespaces(
     use_cloud_function,
 ):
     """Generate namespaces.yaml."""
-    # warnings.filterwarnings("ignore", module="google.auth._default")
+    warnings.filterwarnings("ignore", module="google.auth._default")
     glean_apps = _get_glean_apps(app_listings_uri)
     db_views = lookml_utils.get_bigquery_view_reference_map(generated_sql_uri)
 
