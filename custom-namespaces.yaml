@@ -1423,15 +1423,15 @@ monitoring:
     looker_usage_explores:
       type: table_view
       tables:
-        - table: moz-fx-data-shared-prod.monitoring_derived.looker_usage_explores_v1
+        - table: moz-fx-data-shared-prod.monitoring.looker_usage_explores
     looker_usage_models:
       type: table_view
       tables:
-        - table: moz-fx-data-shared-prod.monitoring_derived.looker_usage_models_v1
+        - table: moz-fx-data-shared-prod.monitoring.looker_usage_models
     looker_usage_unused_explores:
       type: table_view
       tables:
-        - table: moz-fx-data-shared-prod.monitoring_derived.looker_usage_unused_explores_v1
+        - table: moz-fx-data-shared-prod.monitoring.looker_usage_unused_explores
   explores:
     column_size:
       type: ping_explore
