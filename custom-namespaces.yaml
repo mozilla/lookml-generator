@@ -1420,18 +1420,6 @@ monitoring:
       type: table_view
       tables:
         - table: mozdata.monitoring.looker_dashboard_load_times
-    looker_usage_explores:
-      type: table_view
-      tables:
-        - table: moz-fx-data-shared-prod.monitoring_derived.looker_usage_explores_v1
-    looker_usage_models:
-      type: table_view
-      tables:
-        - table: moz-fx-data-shared-prod.monitoring_derived.looker_usage_models_v1
-    looker_usage_unused_explores:
-      type: table_view
-      tables:
-        - table: moz-fx-data-shared-prod.monitoring_derived.looker_usage_unused_explores_v1
   explores:
     column_size:
       type: ping_explore
@@ -1473,18 +1461,6 @@ monitoring:
       type: table_explore
       views:
         base_view: looker_dashboard_load_times
-    looker_usage_explores:
-      type: table_explore
-      views:
-        base_view: looker_usage_explores
-    looker_usage_models:
-      type: table_explore
-      views:
-        base_view: looker_usage_models
-    looker_usage_unused_explores:
-      type: table_explore
-      views:
-        base_view: looker_usage_unused_explores
 
 reference:
   glean_app: false
