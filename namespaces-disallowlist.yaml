@@ -29,3 +29,8 @@
 - firefox_desktop_background_tasks
 - hubs
 - gleanjs_docs
+- firefox_ios:
+    views:
+      - addresses_sync
+    explores:
+      - addresses_sync
