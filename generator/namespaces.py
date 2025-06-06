@@ -419,7 +419,7 @@ def _filter_disallowed(namespaces, disallowlist):
         return any(fnmatch.fnmatch(name, p) for p in patterns)
 
     # transform namespace disallowlist to a dict
-    disallowed_namespaces = yaml.safe_load(disallowlist.read()) or {}
+    disallowed_namespaces = yaml.safe_load(disallowlist.read()) or []
     disallowed_namespaces_dict = {}
     for ns in [
         {namespace: {}} if isinstance(namespace, str) else namespace
