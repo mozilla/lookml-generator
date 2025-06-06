@@ -402,7 +402,7 @@ def namespaces(
     _merge_namespaces(namespaces, _get_metric_hub_namespaces(namespaces))
 
     updated_namespaces = _filter_disallowed(namespaces, disallowlist)
-    for namespace, _ in updated_namespaces.items():
+    for namespace in updated_namespaces:
         if namespace not in ignore:
             if "spoke" not in updated_namespaces[namespace]:
                 updated_namespaces[namespace]["spoke"] = DEFAULT_SPOKE

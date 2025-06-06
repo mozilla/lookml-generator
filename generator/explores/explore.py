@@ -96,11 +96,8 @@ class Explore:
     def get_view_lookml(self, view: str) -> dict:
         """Get the LookML for a view."""
         if self.views_path is not None:
-            try:
-                return lkml.load((self.views_path / f"{view}.view.lkml").read_text())
-            except Exception as e:
-                print(e)
-                print(view)
+            return lkml.load((self.views_path / f"{view}.view.lkml").read_text())
+
         raise Exception("Missing view path for get_view_lookml")
 
     def get_datagroup(self) -> Optional[str]:
