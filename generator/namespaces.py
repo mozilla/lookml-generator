@@ -415,7 +415,7 @@ def namespaces(
 def _filter_disallowed(namespaces, disallowlist):
     """Filter models, explores and views from the generated namespaces config, based on the disallowlist."""
 
-    def match_any(patterns, name):
+    def match_any(name, patterns):
         return any(fnmatch.fnmatch(name, p) for p in patterns)
 
     # transform namespace disallowlist to a dict
@@ -443,7 +443,7 @@ def _filter_disallowed(namespaces, disallowlist):
                 for artifact_type, disallowed_artifact_names in sub_filters.items():
                     if artifact_type in entry:
                         for key in list(entry[artifact_type]):
-                            if match_any(disallowed_artifact_names, key):
+                            if match_any(key, disallowed_artifact_names):
                                 del entry[artifact_type][key]
 
     return filtered_namespaces
