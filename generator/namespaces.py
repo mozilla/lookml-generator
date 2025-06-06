@@ -190,7 +190,7 @@ def _get_glean_apps(
 
     get_app_name = itemgetter("app_name")
     with urllib.request.urlopen(app_listings_uri) as f:
-        # groupby requires input be sorted by key to produce one filtered_namespaces per key
+        # groupby requires input be sorted by key to produce one result per key
         app_listings = sorted(json.loads(f.read()), key=get_app_name)
 
     apps = []
@@ -413,6 +413,8 @@ def namespaces(
 
 
 def _filter_disallowed(namespaces, disallowlist):
+    """Filter models, explores and views from the generated namespaces config, based on the disallowlist."""
+
     def match_any(patterns, name):
         return any(fnmatch.fnmatch(name, p) for p in patterns)
 
