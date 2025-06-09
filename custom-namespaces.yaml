@@ -1601,22 +1601,42 @@ websites:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.mozilla_org.www_site_downloads
+    firefox_com_ga4_www_site_downloads:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.firefoxdotcom.www_site_downloads
     ga4_sessions:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.mozilla_org.ga_sessions_v2
+    firefox_com_ga4_sessions:
+      type: table_view
+      tables:
+        - table: mozdata.firefoxdotcom.ga_sessions
     moz_org_page_metrics:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.mozilla_org.www_site_page_metrics
+    firefox_com_page_metrics:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.firefoxdotcom.www_site_page_metrics
     moz_org_metrics_summary:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.mozilla_org.www_site_metrics_summary
+    firefox_com_metrics_summary:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.firefoxdotcom.wwww_site_metrics_summary
     moz_org_landing_page_metrics:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.mozilla_org.www_site_landing_page_metrics
+    firefox_com_landing_page_metrics:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.firefoxdotcom.www_site_landing_page_metrics
     ga4_blogs_sessions:
       type: table_view
       tables:
@@ -1637,10 +1657,18 @@ websites:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.mozilla_org.www_site_events_metrics
+    firefox_com_www_site_events_metrics:
+      type: table_view
+      tables:
+        - table: mozdata.firefoxdotcom.www_site_events_metrics
     firefox_whatsnew_summary:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.mozilla_org.firefox_whatsnew_summary
+    firefox_com_firefox_whatsnew_summary:
+      type: table_view
+      tables:
+        - table: mozdata.firefoxdotcom.firefox_whatsnew_summary
     google_search_console_by_page:
       type: table_view
       tables:
