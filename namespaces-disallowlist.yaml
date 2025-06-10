@@ -34,3 +34,10 @@
       - addresses_sync
     explores:
       - addresses_sync
+- fakespot
+- review_checker_desktop
+- review_checker
+- debug_ping_view
+- firefox_crashreporter
+- firefox_desktop_background_defaultagent
+- thunderbird_android
