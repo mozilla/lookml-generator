@@ -41,3 +41,33 @@
 - firefox_crashreporter
 - firefox_desktop_background_defaultagent
 - thunderbird_android
+- "*": # exclude these pings/views/explores from all namespaces
+    views:
+      - activation
+      - baseline_clients_daily
+      - baseline_clients_first_seen
+      - bounce_tracking_protection
+      - captcha_detection
+      - cookie_banner_report_site
+      - dau_reporting
+      - event_names
+      - feature_usage
+      - fog_validation
+      - hang_report
+      - pageload
+      - usage_deletion_request
+    explores:
+      - activation
+      - baseline_clients_daily
+      - baseline_clients_first_seen
+      - baseline_clients_last_seen
+      - bounce_tracking_protection
+      - captcha_detection
+      - cookie_banner_report_site
+      - dau_reporting
+      - event_names
+      - feature_usage
+      - fog_validation
+      - hang_report
+      - pageload
+      - usage_deletion_request
