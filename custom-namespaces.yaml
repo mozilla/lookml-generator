@@ -2175,3 +2175,15 @@ device_manufacturer_partnerships:
       type: table_view
       tables:
         - table: mozdata.device_manufacturer_partnerships.shipment_and_activation_vivo
+trust_and_safety:
+  glean_app: false
+  pretty_name: Trust and Safety
+  owners:
+    - mhirose@mozilla.com
+    - kik@mozilla.com
+  spoke: looker-spoke-private
+  views:
+    cinder_jobs_and_decisions:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.cinder_derived.jobs_decisions_v1
