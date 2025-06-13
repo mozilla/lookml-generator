@@ -4,7 +4,7 @@ import logging
 import re
 from collections import Counter
 from textwrap import dedent
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
+from typing import Any, Dict, Iterable, List, Optional, Set, Tuple, Union
 
 import click
 from mozilla_schema_generator.glean_ping import GleanPing
@@ -52,7 +52,7 @@ DISALLOWED_PINGS = {"events"}
 
 # List of labeled counter names for which a suggest explore should be generated.
 # Generating suggest explores for all labeled counters slows down Looker.
-SUGGESTS_FOR_LABELED_COUNTERS = {"metrics__labeled_counter__glean_error_invalid_label"}
+SUGGESTS_FOR_LABELED_COUNTERS: Set[str] = set()
 
 
 class GleanPingView(PingView):

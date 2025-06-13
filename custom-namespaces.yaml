@@ -549,10 +549,6 @@ firefox_accounts:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.accounts_db.accounts_aggregates
-    accounts_oauth_clients:
-      type: table_view
-      tables:
-        - table: moz-fx-data-shared-prod.accounts_db.fxa_oauth_clients
     database_counts:
       type: table_view
       tables:
@@ -619,27 +615,6 @@ firefox_accounts:
       measures:
         count:
           type: count
-    health_pingdom:
-      type: table_view
-      tables:
-        - table: moz-fx-data-shared-prod.firefox_accounts_derived.health_pingdom_v1
-      measures:
-        count:
-          type: count
-    health_prs:
-      type: table_view
-      tables:
-        - table: moz-fx-data-shared-prod.firefox_accounts_derived.health_prs_v1
-      measures:
-        count:
-          type: count
-    health_tags:
-      type: table_view
-      tables:
-        - table: moz-fx-data-shared-prod.firefox_accounts_derived.health_tags_v1
-      measures:
-        count:
-          type: count
     health_twilio:
       type: table_view
       tables:
@@ -657,10 +632,6 @@ firefox_accounts:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.accounts_frontend_derived.accounts_pref_engagement_v1
-    account_settings_delete_account_funnel:
-      type: table_view
-      tables:
-        - table: moz-fx-data-shared-prod.accounts_frontend_derived.account_pref_delete_funnel_v1
   explores:
     all_event_counts:
       type: events_explore
@@ -690,10 +661,6 @@ firefox_accounts:
       type: table_explore
       views:
         base_view: accounts_aggregates
-    accounts_oauth_clients:
-      type: table_explore
-      views:
-        base_view: accounts_oauth_clients
     database_counts:
       type: table_explore
       views:
@@ -754,18 +721,6 @@ firefox_accounts:
       type: table_explore
       views:
         base_view: health_lighthouse
-    health_pingdom:
-      type: table_explore
-      views:
-        base_view: health_pingdom
-    health_prs:
-      type: table_explore
-      views:
-        base_view: health_prs
-    health_tags:
-      type: table_explore
-      views:
-        base_view: health_tags
     health_twilio:
       type: table_explore
       views:
@@ -774,10 +729,6 @@ firefox_accounts:
       type: table_explore
       views:
         base_view: account_settings_page_engagement
-    account_settings_delete_account_funnel:
-      type: table_explore
-      views:
-        base_view: account_settings_delete_account_funnel
 revenue:
   glean_app: false
   connection: bigquery-oauth
@@ -889,10 +840,6 @@ firefox_ios:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.firefox_ios.feature_usage_events
-    clients_activation:
-      type: table_view
-      tables:
-        - table: mozdata.firefox_ios.clients_activation
     firefox_ios_clients:
       type: table_view
       tables:
@@ -906,10 +853,6 @@ firefox_ios:
       type: table_explore
       views:
         base_view: feature_usage_events
-    clients_activation:
-      type: table_explore
-      views:
-        base_view: clients_activation
 fenix:
   pretty_name: Firefox Android
   owners:
@@ -1165,10 +1108,6 @@ firefox_desktop:
       type: table_view
       tables:
         - table: mozdata.telemetry.newtab_visits
-    default_browser:
-      type: ping_view
-      tables:
-        - table: mozdata.default_browser_agent.default_browser
     clients_first_seen_v2:
       type: table_view
       tables:
@@ -1181,10 +1120,6 @@ firefox_desktop:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.telemetry.desktop_new_profiles
-    glean_desktop_new_profiles:
-      type: table_view
-      tables:
-        - table: mozdata.firefox_desktop.new_profiles_aggregates
     fenix_distribution_deal:
       type: table_view
       tables:
@@ -1217,10 +1152,6 @@ firefox_desktop:
       views:
         base_view: glean_events
         extended_view: events_unnested_table
-    default_browser:
-      type: ping_explore
-      views:
-        base_view: default_browser
     urlbar_events_daily:
       type: table_explore
       views:
@@ -1229,10 +1160,6 @@ firefox_desktop:
       type: table_explore
       views:
         base_view: serp_categorization_unnested_table
-    fenix_distribution_deal:
-      type: table_explore
-      views:
-        base_view: fenix_distribution_deal
     newtab_items_daily:
       type: table_explore
       views:

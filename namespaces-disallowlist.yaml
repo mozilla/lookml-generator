@@ -29,11 +29,6 @@
 - firefox_desktop_background_tasks
 - hubs
 - gleanjs_docs
-- firefox_ios:
-    views:
-      - addresses_sync
-    explores:
-      - addresses_sync
 - fakespot
 - review_checker_desktop
 - review_checker
@@ -41,33 +36,124 @@
 - firefox_crashreporter
 - firefox_desktop_background_defaultagent
 - thunderbird_android
+- fenix:
+    views:
+      - installation
+      - installation_table
+      - topsites_impression
+      - topsites_impression_table
+    explores:
+      - installation
+      - topsites_impression
+- firefox_ios:
+    views:
+      - temp_bookmarks_sync
+      - temp_bookmarks_sync_table
+      - temp_clients_sync
+      - temp_clients_sync_table
+      - temp_credit_cards_sync
+      - temp_credit_cards_sync_table
+      - temp_history_sync
+      - temp_history_sync_table
+      - temp_logins_sync
+      - temp_logins_sync_table
+      - temp_rust_tabs_sync
+      - temp_rust_tabs_sync_table
+      - temp_sync
+      - temp_sync_table
+      - temp_tabs_sync
+      - temp_tabs_sync_table
+      - topsites_impression
+      - topsites_impression_table
+    explores:
+      - temp_bookmarks_sync
+      - temp_clients_sync
+      - temp_credit_cards_sync
+      - temp_history_sync
+      - temp_logins_sync
+      - temp_rust_tabs_sync
+      - temp_sync
+      - temp_tabs_sync
+      - topsites_impression
 - "*": # exclude these pings/views/explores from all namespaces
     views:
+      - addresses_sync
+      - addresses_sync_table
+      - adjust_attribution
+      - adjust_attribution_table
       - activation
+      - activation_table
       - baseline_clients_daily
       - baseline_clients_first_seen
+      - baseline_clients_first_seen_table
       - bounce_tracking_protection
+      - bounce_tracking_protection_table
       - captcha_detection
+      - captcha_detection_table
+      - client_deduplication
+      - client_deduplication_table
+      - context_id_deletion_request
+      - context_id_deletion_request_table
       - cookie_banner_report_site
+      - cookie_banner_report_site_table
       - dau_reporting
+      - dau_reporting_table
       - event_names
       - feature_usage
+      - feature_usage_table
       - fog_validation
+      - fog_validation_table
+      - font_list
+      - font_list_table
       - hang_report
+      - hang_report_table
+      - heartbeat
+      - heartbeat_table
+      - home
+      - home_table
+      - logins_sync
+      - logins_sync_table
+      - new_metric_capture_emulation
+      - new_metric_capture_emulation_table
+      - nimbus
+      - nimbus_table
       - pageload
+      - pageload_table
+      - pocket_button
+      - pocket_button_table
+      - startup_timeline
+      - startup_timeline_table
+      - tabs_sync
+      - tabs_sync_table
       - usage_deletion_request
+      - usage_deletion_request_table
+      - usage_reporting_clients_*
     explores:
+      - addresses_sync
       - activation
+      - adjust_attribution
       - baseline_clients_daily
       - baseline_clients_first_seen
       - baseline_clients_last_seen
       - bounce_tracking_protection
       - captcha_detection
+      - client_deduplication
+      - context_id_deletion_request
       - cookie_banner_report_site
       - dau_reporting
       - event_names
       - feature_usage
       - fog_validation
+      - font_list
       - hang_report
+      - heartbeat
+      - home
+      - logins_sync
+      - new_metric_capture_emulation
+      - nimbus
       - pageload
+      - pocket_button
+      - startup_timeline
+      - tabs_sync
       - usage_deletion_request
+      - usage_reporting_clients_*
