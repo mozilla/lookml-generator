@@ -52,7 +52,7 @@ DISALLOWED_PINGS = {"events"}
 
 # List of labeled counter names for which a suggest explore should be generated.
 # Generating suggest explores for all labeled counters slows down Looker.
-SUGGESTS_FOR_LABELED_COUNTERS = {"metrics__labeled_counter__glean_error_invalid_label"}
+SUGGESTS_FOR_LABELED_COUNTERS = {}
 
 
 class GleanPingView(PingView):
