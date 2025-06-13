@@ -2104,6 +2104,7 @@ device_manufacturer_partnerships:
         - table: mozdata.device_manufacturer_partnerships.shipment_and_activation_vivo
 trust_and_safety:
   glean_app: false
+  connection: bigquery-oauth
   pretty_name: Trust and Safety
   owners:
     - mhirose@mozilla.com
