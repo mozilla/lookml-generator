@@ -1181,6 +1181,10 @@ firefox_desktop:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.telemetry.desktop_new_profiles
+    glean_desktop_new_profiles:
+      type: table_view
+      tables:
+        - table: mozdata.firefox_desktop.new_profiles_aggregates
     fenix_distribution_deal:
       type: table_view
       tables:
