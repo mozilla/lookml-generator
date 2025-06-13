@@ -2186,4 +2186,4 @@ trust_and_safety:
     cinder_jobs_and_decisions:
       type: table_view
       tables:
-        - table: moz-fx-data-shared-prod.cinder_derived.jobs_and_decisions_v1
+        - table: moz-fx-data-shared-prod.cinder_derived.jobs_decisions_v1`
