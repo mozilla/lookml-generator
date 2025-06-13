@@ -141,7 +141,7 @@
 </span><span id="L-77"><a href="#L-77"><span class="linenos">77</span></a><span class="s2">                SELECT *</span>
 </span><span id="L-78"><a href="#L-78"><span class="linenos">78</span></a><span class="s2">                FROM `</span><span class="si">{</span><span class="n">project_table</span><span class="si">}</span><span class="s2">`</span>
 </span><span id="L-79"><a href="#L-79"><span class="linenos">79</span></a><span class="s2">                WHERE</span>
-</span><span id="L-80"><a href="#L-80"><span class="linenos">80</span></a><span class="s2">                    DATE_ADD(end_date, INTERVAL 90 DAY) &gt; CURRENT_DATE() OR</span>
+</span><span id="L-80"><a href="#L-80"><span class="linenos">80</span></a><span class="s2">                    end_date &gt; CURRENT_DATE() OR</span>
 </span><span id="L-81"><a href="#L-81"><span class="linenos">81</span></a><span class="s2">                    end_date IS NULL</span>
 </span><span id="L-82"><a href="#L-82"><span class="linenos">82</span></a><span class="s2">            &quot;&quot;&quot;</span>
 </span><span id="L-83"><a href="#L-83"><span class="linenos">83</span></a>        <span class="p">)</span>
@@ -248,7 +248,7 @@ value and its top 10 most common to be used as dropdown options.</p>
 </span><span id="get_active_projects-78"><a href="#get_active_projects-78"><span class="linenos">78</span></a><span class="s2">                SELECT *</span>
 </span><span id="get_active_projects-79"><a href="#get_active_projects-79"><span class="linenos">79</span></a><span class="s2">                FROM `</span><span class="si">{</span><span class="n">project_table</span><span class="si">}</span><span class="s2">`</span>
 </span><span id="get_active_projects-80"><a href="#get_active_projects-80"><span class="linenos">80</span></a><span class="s2">                WHERE</span>
-</span><span id="get_active_projects-81"><a href="#get_active_projects-81"><span class="linenos">81</span></a><span class="s2">                    DATE_ADD(end_date, INTERVAL 90 DAY) &gt; CURRENT_DATE() OR</span>
+</span><span id="get_active_projects-81"><a href="#get_active_projects-81"><span class="linenos">81</span></a><span class="s2">                    end_date &gt; CURRENT_DATE() OR</span>
 </span><span id="get_active_projects-82"><a href="#get_active_projects-82"><span class="linenos">82</span></a><span class="s2">                    end_date IS NULL</span>
 </span><span id="get_active_projects-83"><a href="#get_active_projects-83"><span class="linenos">83</span></a><span class="s2">            &quot;&quot;&quot;</span>
 </span><span id="get_active_projects-84"><a href="#get_active_projects-84"><span class="linenos">84</span></a>        <span class="p">)</span>
