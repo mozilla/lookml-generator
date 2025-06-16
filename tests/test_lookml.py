@@ -1529,8 +1529,6 @@ def test_lookml_actual_metric_definitions_view(
                             "hidden": "yes",
                             "name": "label",
                             "sql": "${TABLE}.key",
-                            "suggest_dimension": "suggest__metrics__metrics__labeled_counter__glean_error_invalid_label.key",  # noqa: E501
-                            "suggest_explore": "suggest__metrics__metrics__labeled_counter__glean_error_invalid_label",
                             "type": "string",
                         },
                     ],
@@ -1643,27 +1641,6 @@ def test_lookml_actual_metric_definitions_view(
                         },
                     ],
                     "name": "metrics__metrics__labeled_counter__test_labeled_counter_not_in_source",
-                },
-                {
-                    "derived_table": {
-                        "sql": "select\n"
-                        "    m.key,\n"
-                        "    count(*) as n\n"
-                        "from mozdata.glean_app.metrics as "
-                        "t,\n"
-                        "unnest(metrics.labeled_counter.glean_error_invalid_label) "
-                        "as m\n"
-                        "where date(submission_timestamp) > "
-                        "date_sub(current_date, interval 30 "
-                        "day)\n"
-                        "    and sample_id = 0\n"
-                        "group by key\n"
-                        "order by n desc"
-                    },
-                    "dimensions": [
-                        {"name": "key", "sql": "${TABLE}.key", "type": "string"}
-                    ],
-                    "name": "suggest__metrics__metrics__labeled_counter__glean_error_invalid_label",
                 },
                 {
                     "dimensions": [
