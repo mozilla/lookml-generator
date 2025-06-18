@@ -264,12 +264,12 @@ workflows:
             branches:
               ignore: main
 
-      - generate-diff:
-          requires:
-            - generate-lookml
-          filters:
-            branches:
-              ignore: main
+      # - generate-diff:
+      #     requires:
+      #       - generate-lookml
+      #     filters:
+      #       branches:
+      #         ignore: main
 
       - docs-deploy:
           requires:
@@ -288,9 +288,9 @@ workflows:
             - verify-requirements
             - integration-tests
             - build-container
-          filters:
-            branches:
-              only: main
+          # filters:
+          #   branches:
+          #     only: main
 
       - looker-deploy:
           name: Trigger looker Airflow DAG to deploy lookml
