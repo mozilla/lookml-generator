@@ -8,6 +8,11 @@ orbs:
   python: circleci/python@2.1.1
   gcp-cli: circleci/gcp-cli@3.1.1
 
+executors:
+  ubuntu-machine-executor:
+    machine:
+      image: ubuntu-2404:current
+
 parameters:
   python-version:
     type: string
@@ -226,6 +231,20 @@ jobs:
       - checkout
       - setup_remote_docker
       - run: docker build -t app:build .
+  deploy-to-gcr:
+    executor: ubuntu-machine-executor
+    steps:
+      - checkout
+      - gcp-gcr/gcr-auth:
+          use_oidc: true
+      - gcp-gcr/build-image: &image
+          image: lookml-generator
+          tag: ${CIRCLE_TAG:-latest}
+      - gcp-gcr/push-image: *image
+      - gcp-gcr/tag-image:
+          image: lookml-generator
+          source-tag: latest
+          target-tag: $CIRCLE_SHA1
 
 workflows:
   version: 2
@@ -262,27 +281,13 @@ workflows:
             branches:
               only: main
 
-      - gcp-gcr/build-and-push-image:
-          name: Build and push lookml-generator
-          context: data-eng-airflow-gcr
+      - deploy-to-gcr:
+          context: dataeng-bqetl-gcr
           requires:
             - unit-tests
             - verify-requirements
             - integration-tests
             - build-container
-          image: lookml-generator
-          filters:
-            branches:
-              only: main
-
-      - gcp-gcr/add-image-tag:
-          name: Add commit hash as docker image tag
-          context: data-eng-airflow-gcr
-          requires:
-            - Build and push lookml-generator
-          image: lookml-generator
-          source-tag: latest
-          target-tag: $CIRCLE_SHA1
           filters:
             branches:
               only: main
@@ -291,7 +296,7 @@ workflows:
           name: Trigger looker Airflow DAG to deploy lookml
           context: gcpv2-workload-identity
           requires:
-            - Add commit hash as docker image tag
+            - deploy-to-gcr
           filters:
             branches:
               only:
