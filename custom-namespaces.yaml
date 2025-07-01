@@ -1477,6 +1477,10 @@ reference:
       type: table_view
       tables:
         - table: mozdata.external.population_by_country
+    unemployment_united_states:
+      type: table_view
+      tables:
+        - table: mozdata.external.us_unemployment
 kpi:
   glean_app: false
   owners:
