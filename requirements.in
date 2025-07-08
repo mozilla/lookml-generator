@@ -9,7 +9,7 @@ looker-sdk==25.10.0
 mozilla-metric-config-parser==2025.7.1
 mozilla-nimbus-schemas==3001.0.0
 mozilla-schema-generator==0.5.1
-pandas==2.3.0
+pandas==2.3.1
 pip-tools==7.4.1
 pre-commit==4.2.0
 pyarrow==20.0.0
