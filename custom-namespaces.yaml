@@ -191,10 +191,6 @@ activity_stream:
       type: ping_view
       tables:
         - table: mozdata.activity_stream.sessions
-    impression_stats_flat:
-      type: ping_view
-      tables:
-        - table: mozdata.activity_stream.impression_stats_flat
   explores:
     event_counts:
       type: ping_explore
