@@ -386,13 +386,6 @@ contextual_services:
       type: table_view
       tables:
         - table: mozdata.telemetry.sponsored_tiles_ad_request_fill
-mozilla_vpn_private:
-  glean_app: false
-  connection: bigquery-oauth
-  pretty_name: Mozilla VPN
-  owners:
-    - dthorn@mozilla.com
-  spoke: looker-spoke-private
 mozilla_vpn:
   glean_app: true
   owners:
@@ -878,14 +871,6 @@ fenix:
       type: table_explore
       views:
         base_view: feature_usage_events
-newtab:
-  glean_app: false
-  connection: bigquery-oauth
-  pretty_name: New Tab
-  owners:
-    - cmorales@mozilla.com
-    - mbowerman@mozilla.com
-  spoke: looker-spoke-private
 experimentation:
   glean_app: false
   owners:
@@ -1504,15 +1489,6 @@ kpi:
       type: ping_explore
       views:
         base_view: unified_metrics
-fpa:
-  glean_app: false
-  connection: bigquery-oauth
-  pretty_name: FP&A
-  owners:
-    - ngrammater@mozilla.com
-    - rmiller@mozilla.com
-    - lakshmimurugan@google.com
-  spoke: looker-spoke-private
 shared:
   glean_app: false
   pretty_name: Shared
