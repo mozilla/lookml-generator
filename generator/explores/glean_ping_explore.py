@@ -41,7 +41,7 @@ class GleanPingExplore(PingExplore):
             view_name = view["name"]
             metric = "__".join(view["name"].split("__")[1:])
 
-            if "labeled_counter" in metric:
+            if "__labeled_counter__" in metric:
                 joins.append(
                     {
                         "name": view_name,
