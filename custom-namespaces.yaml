@@ -35,6 +35,10 @@ combined_browser_metrics:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.telemetry.cohort_weekly_statistics
+    cohort_churn:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.telemetry.cohort_daily_churn
     fenix_and_firefox_use_counters:
       type: table_view
       tables:
@@ -250,14 +254,6 @@ search:
       type: table_view
       tables:
         - table: mozdata.search.desktop_mobile_search_clients_monthly
-    desktop_search_alert_records:
-      type: ping_view
-      tables:
-        - table: mozdata.analysis.desktop_search_alert_records
-    desktop_search_alert_latest_daily:
-      type: table_view
-      tables:
-        - table: mozdata.analysis.desktop_search_alert_latest_daily
   explores:
     desktop_search_counts:
       type: ping_explore
@@ -267,10 +263,6 @@ search:
       type: ping_explore
       views:
         base_view: mobile_search_clients_engines_sources_daily
-    desktop_search_alert_records:
-      type: ping_explore
-      views:
-        base_view: desktop_search_alert_records
 contextual_services_private:
   glean_app: false
   connection: bigquery-oauth
@@ -398,13 +390,6 @@ contextual_services:
       type: table_view
       tables:
         - table: mozdata.telemetry.sponsored_tiles_ad_request_fill
-mozilla_vpn_private:
-  glean_app: false
-  connection: bigquery-oauth
-  pretty_name: Mozilla VPN
-  owners:
-    - dthorn@mozilla.com
-  spoke: looker-spoke-private
 mozilla_vpn:
   glean_app: true
   owners:
@@ -890,14 +875,6 @@ fenix:
       type: table_explore
       views:
         base_view: feature_usage_events
-newtab:
-  glean_app: false
-  connection: bigquery-oauth
-  pretty_name: New Tab
-  owners:
-    - cmorales@mozilla.com
-    - mbowerman@mozilla.com
-  spoke: looker-spoke-private
 experimentation:
   glean_app: false
   owners:
@@ -1489,6 +1466,10 @@ reference:
       type: table_view
       tables:
         - table: mozdata.external.population_by_country
+    unemployment_united_states:
+      type: table_view
+      tables:
+        - table: mozdata.external.us_unemployment
 kpi:
   glean_app: false
   owners:
@@ -1512,15 +1493,6 @@ kpi:
       type: ping_explore
       views:
         base_view: unified_metrics
-fpa:
-  glean_app: false
-  connection: bigquery-oauth
-  pretty_name: FP&A
-  owners:
-    - ngrammater@mozilla.com
-    - rmiller@mozilla.com
-    - lakshmimurugan@google.com
-  spoke: looker-spoke-private
 shared:
   glean_app: false
   pretty_name: Shared
