@@ -2083,7 +2083,15 @@ trust_and_safety:
     - kik@mozilla.com
   spoke: looker-spoke-private
   views:
+    cinder_decisions:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.cinder_derived.decisions_v1
     cinder_jobs_and_decisions:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.cinder_derived.jobs_decisions_v1
+    cinder_jobs:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.cinder_derived.jobs_v1
