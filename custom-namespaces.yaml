@@ -2099,3 +2099,55 @@ trust_and_safety:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.cinder_derived.jobs_v1
+bigeye_derived:
+  glean_app: false
+  pretty_name: BigEye Derived
+  connection: bigquery-oauth
+  owners:
+    - phlee@mozilla.com
+  views:
+    dashboards:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.bigeye_derived.dashboard_service_v1
+    issues:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.bigeye_derived.issue_service_v1
+    metrics:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.bigeye_derived.metric_service_v1
+    collections:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.bigeye_derived.collection_service_v1
+    groups:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.bigeye_derived.group_service_v1
+    users:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.bigeye_derived.user_service_v1
+    workspaces:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.bigeye_derived.workspace_service_v1
+    virtual_tables:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.bigeye_derived.virtual_table_service_v1
+  explores:
+    metrics:
+      type: table_explore
+      views:
+        base_view: metrics
+    issues:
+      type: table_explore
+      views:
+        base_view: issues
+    dashboards:
+      type: table_explore
+      views:
+        base_view: dashboards
