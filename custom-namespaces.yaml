@@ -1101,10 +1101,6 @@ firefox_desktop:
       type: table_view
       tables:
         - table: mozdata.firefox_desktop.new_profiles_aggregates
-    fenix_distribution_deal:
-      type: table_view
-      tables:
-        - table: mozdata.analysis.fenix_distribution_deal_v1
     newtab_items_daily:
       type: table_view
       tables:
