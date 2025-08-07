@@ -2097,8 +2097,7 @@ trust_and_safety:
         - table: moz-fx-data-shared-prod.cinder_derived.jobs_v1
 bigeye:
   glean_app: false
-  pretty_name: BigEye
-  connection: bigquery-oauth
+  pretty_name: Bigeye
   owners:
     - phlee@mozilla.com
   views:
