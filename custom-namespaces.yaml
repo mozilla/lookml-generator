@@ -1133,10 +1133,6 @@ firefox_desktop:
       type: table_explore
       views:
         base_view: urlbar_events_daily_table
-    serp_categorization_unnested:
-      type: table_explore
-      views:
-        base_view: serp_categorization_unnested_table
     newtab_items_daily:
       type: table_explore
       views:
