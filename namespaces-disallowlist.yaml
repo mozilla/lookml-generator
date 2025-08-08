@@ -40,12 +40,21 @@
 - thunderbird_desktop
 - fenix:
     views:
+      - bookmarks_sync
+      - bookmarks_sync_table
+      - broken_site_report
+      - broken_site_report_table
       - installation
       - installation_table
+      - migration
+      - migration_table
       - topsites_impression
       - topsites_impression_table
     explores:
+      - bookmarks_sync
+      - broken_site_report
       - installation
+      - migration
       - topsites_impression
 - firefox_ios:
     views:
