@@ -36,14 +36,25 @@
 - firefox_crashreporter
 - firefox_desktop_background_defaultagent
 - thunderbird_android
+- firefox_desktop_background_update
+- thunderbird_desktop
 - fenix:
     views:
+      - bookmarks_sync
+      - bookmarks_sync_table
+      - broken_site_report
+      - broken_site_report_table
       - installation
       - installation_table
+      - migration
+      - migration_table
       - topsites_impression
       - topsites_impression_table
     explores:
+      - bookmarks_sync
+      - broken_site_report
       - installation
+      - migration
       - topsites_impression
 - firefox_ios:
     views:
@@ -75,6 +86,14 @@
       - temp_sync
       - temp_tabs_sync
       - topsites_impression
+- monitor_frontend:
+    views:
+      - deletion_request
+      - deletion_request_table
+      - events_stream_table
+    explores:
+      - deletion_request
+      - events_stream_table
 - "*": # exclude these pings/views/explores from all namespaces
     views:
       - addresses_sync
