@@ -1357,15 +1357,7 @@ monitoring:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.monitoring.looker_usage_models
-    looker_usage_unused_explores:
-      type: table_view
-      tables:
-        - table: moz-fx-data-shared-prod.monitoring.looker_usage_unused_explores
   explores:
-    column_size:
-      type: ping_explore
-      views:
-        base_view: column_size
     payload_bytes_error_all:
       type: ping_explore
       views:
@@ -1410,10 +1402,6 @@ monitoring:
       type: table_explore
       views:
         base_view: looker_usage_models
-    looker_usage_unused_explores:
-      type: table_explore
-      views:
-        base_view: looker_usage_unused_explores
 
 reference:
   glean_app: false
