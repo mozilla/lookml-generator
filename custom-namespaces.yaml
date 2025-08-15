@@ -1711,6 +1711,14 @@ subscription_platform:
       type: table_view
       tables:
         - table: mozdata.subscription_platform.stripe_products
+    exchange_rates:
+      type: table_view
+      tables:
+        - table: mozdata.subscription_platform.exchange_rates
+    vat_rates:
+      type: table_view
+      tables:
+        - table: mozdata.subscription_platform.vat_rates
     # Logical subscriptions
     logical_subscriptions:
       type: table_view
