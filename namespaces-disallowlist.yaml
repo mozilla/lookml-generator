@@ -59,10 +59,26 @@
 - firefox_desktop:
     views:
       - deletion_request
+      - events_stream_table
+      - pageload_domain
+      - pageload_base_domain
       - pseudo_main
+      - profiles
+      - quick_suggest_deletion_request
+      - serp_categorization
+      - third_party_modules
+      - top_sites
     explores:
       - deletion_request
+      - events_stream_table
+      - pageload_domain
+      - pageload_base_domain
       - pseudo_main
+      - profiles
+      - quick_suggest_deletion_request
+      - serp_categorization
+      - third_party_modules
+      - top_sites
 - firefox_ios:
     views:
       - temp_bookmarks_sync
