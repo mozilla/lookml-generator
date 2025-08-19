@@ -63,12 +63,14 @@
       - pageload_base_domain
       - pseudo_main
       - profiles
+      - quick_suggest_deletion_request
     explores:
       - deletion_request
       - pageload_domain
       - pageload_base_domain
       - pseudo_main
       - profiles
+      - quick_suggest_deletion_request
 - firefox_ios:
     views:
       - temp_bookmarks_sync
