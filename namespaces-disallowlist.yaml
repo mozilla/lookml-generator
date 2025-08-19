@@ -61,6 +61,7 @@
       - deletion_request
       - events_stream_table
       - nimbus_targeting_context
+      - onboarding_opt_out
       - pageload_domain
       - pageload_base_domain
       - pseudo_main
@@ -74,6 +75,7 @@
       - deletion_request
       - events_stream_table
       - nimbus_targeting_context
+      - onboarding_opt_out
       - pageload_domain
       - pageload_base_domain
       - pseudo_main
