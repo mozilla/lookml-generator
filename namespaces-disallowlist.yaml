@@ -60,6 +60,8 @@
     views:
       - deletion_request
       - events_stream_table
+      - nimbus_targeting_context
+      - onboarding_opt_out
       - pageload_domain
       - pageload_base_domain
       - pseudo_main
@@ -68,9 +70,12 @@
       - serp_categorization
       - third_party_modules
       - top_sites
+      - update
     explores:
       - deletion_request
       - events_stream_table
+      - nimbus_targeting_context
+      - onboarding_opt_out
       - pageload_domain
       - pageload_base_domain
       - pseudo_main
@@ -79,6 +84,7 @@
       - serp_categorization
       - third_party_modules
       - top_sites
+      - update
 - firefox_ios:
     views:
       - temp_bookmarks_sync
