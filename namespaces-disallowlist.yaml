@@ -64,6 +64,7 @@
       - pseudo_main
       - profiles
       - quick_suggest_deletion_request
+      - serp_categorization
     explores:
       - deletion_request
       - pageload_domain
@@ -71,6 +72,7 @@
       - pseudo_main
       - profiles
       - quick_suggest_deletion_request
+      - serp_categorization
 - firefox_ios:
     views:
       - temp_bookmarks_sync
