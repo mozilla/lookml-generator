@@ -59,6 +59,7 @@
 - firefox_desktop:
     views:
       - deletion_request
+      - events_stream_table
       - pageload_domain
       - pageload_base_domain
       - pseudo_main
@@ -67,6 +68,7 @@
       - serp_categorization
     explores:
       - deletion_request
+      - events_stream_table
       - pageload_domain
       - pageload_base_domain
       - pseudo_main
