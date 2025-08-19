@@ -68,6 +68,7 @@
       - serp_categorization
       - third_party_modules
       - top_sites
+      - update
     explores:
       - deletion_request
       - events_stream_table
@@ -79,6 +80,7 @@
       - serp_categorization
       - third_party_modules
       - top_sites
+      - update
 - firefox_ios:
     views:
       - temp_bookmarks_sync
