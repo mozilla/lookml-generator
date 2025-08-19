@@ -56,6 +56,13 @@
       - installation
       - migration
       - topsites_impression
+- firefox_desktop:
+    views:
+      - deletion_request
+      - pseudo_main
+    explores:
+      - deletion_request
+      - pseudo_main
 - firefox_ios:
     views:
       - temp_bookmarks_sync
