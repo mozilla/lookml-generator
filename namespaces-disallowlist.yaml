@@ -59,10 +59,16 @@
 - firefox_desktop:
     views:
       - deletion_request
+      - pageload_domain
+      - pageload_base_domain
       - pseudo_main
+      - profiles
     explores:
       - deletion_request
+      - pageload_domain
+      - pageload_base_domain
       - pseudo_main
+      - profiles
 - firefox_ios:
     views:
       - temp_bookmarks_sync
