@@ -66,6 +66,7 @@
       - profiles
       - quick_suggest_deletion_request
       - serp_categorization
+      - third_party_modules
     explores:
       - deletion_request
       - events_stream_table
@@ -75,6 +76,7 @@
       - profiles
       - quick_suggest_deletion_request
       - serp_categorization
+      - third_party_modules
 - firefox_ios:
     views:
       - temp_bookmarks_sync
