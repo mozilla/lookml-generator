@@ -62,6 +62,7 @@
       - events_stream_table
       - funnel_analysis
       - growth_accounting
+      - newtab_content
       - nimbus_targeting_context
       - onboarding_opt_out
       - pageload_domain
@@ -80,6 +81,7 @@
       - events_stream_table
       - funnel_analysis
       - growth_accounting
+      - newtab_content
       - nimbus_targeting_context
       - onboarding_opt_out
       - pageload_domain
