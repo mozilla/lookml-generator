@@ -66,6 +66,7 @@
       - onboarding_opt_out
       - pageload_domain
       - pageload_base_domain
+      - prototype_no_code_events
       - pseudo_main
       - profiles
       - quick_suggest_deletion_request
@@ -82,6 +83,7 @@
       - onboarding_opt_out
       - pageload_domain
       - pageload_base_domain
+      - prototype_no_code_events
       - pseudo_main
       - profiles
       - quick_suggest_deletion_request
