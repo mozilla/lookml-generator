@@ -72,6 +72,7 @@
       - profiles
       - quick_suggest_deletion_request
       - serp_categorization
+      - sync
       - third_party_modules
       - top_sites
       - update
@@ -91,6 +92,7 @@
       - profiles
       - quick_suggest_deletion_request
       - serp_categorization
+      - sync
       - third_party_modules
       - top_sites
       - update
