@@ -60,6 +60,7 @@
     views:
       - deletion_request
       - events_stream_table
+      - funnel_analysis
       - nimbus_targeting_context
       - onboarding_opt_out
       - pageload_domain
@@ -74,6 +75,7 @@
     explores:
       - deletion_request
       - events_stream_table
+      - funnel_analysis
       - nimbus_targeting_context
       - onboarding_opt_out
       - pageload_domain
