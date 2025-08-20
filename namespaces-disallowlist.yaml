@@ -74,6 +74,7 @@
       - third_party_modules
       - top_sites
       - update
+      - urlbar_potential_exposure
     explores:
       - deletion_request
       - events_stream_table
@@ -91,6 +92,7 @@
       - third_party_modules
       - top_sites
       - update
+      - urlbar_potential_exposure
 - firefox_ios:
     views:
       - temp_bookmarks_sync
