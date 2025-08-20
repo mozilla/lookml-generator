@@ -79,6 +79,7 @@
       - update
       - urlbar_keyword_exposure
       - urlbar_potential_exposure
+      - user_characteristics
     explores:
       - deletion_request
       - events_stream_table
@@ -101,6 +102,7 @@
       - update
       - urlbar_keyword_exposure
       - urlbar_potential_exposure
+      - user_characteristics
 - firefox_ios:
     views:
       - temp_bookmarks_sync
