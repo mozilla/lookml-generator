@@ -60,10 +60,14 @@
     views:
       - deletion_request
       - events_stream_table
+      - funnel_analysis
+      - growth_accounting
+      - newtab_content
       - nimbus_targeting_context
       - onboarding_opt_out
       - pageload_domain
       - pageload_base_domain
+      - prototype_no_code_events
       - pseudo_main
       - profiles
       - quick_suggest_deletion_request
@@ -71,13 +75,18 @@
       - third_party_modules
       - top_sites
       - update
+      - urlbar_potential_exposure
     explores:
       - deletion_request
       - events_stream_table
+      - funnel_analysis
+      - growth_accounting
+      - newtab_content
       - nimbus_targeting_context
       - onboarding_opt_out
       - pageload_domain
       - pageload_base_domain
+      - prototype_no_code_events
       - pseudo_main
       - profiles
       - quick_suggest_deletion_request
@@ -85,6 +94,7 @@
       - third_party_modules
       - top_sites
       - update
+      - urlbar_potential_exposure
 - firefox_ios:
     views:
       - temp_bookmarks_sync
