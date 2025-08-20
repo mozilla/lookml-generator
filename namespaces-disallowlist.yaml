@@ -76,6 +76,7 @@
       - third_party_modules
       - top_sites
       - update
+      - urlbar_keyword_exposure
       - urlbar_potential_exposure
     explores:
       - deletion_request
@@ -96,6 +97,7 @@
       - third_party_modules
       - top_sites
       - update
+      - urlbar_keyword_exposure
       - urlbar_potential_exposure
 - firefox_ios:
     views:
