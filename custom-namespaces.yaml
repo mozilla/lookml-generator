@@ -792,11 +792,11 @@ ads:
     consolidated_ad_metrics_daily_pt:
       type: table_view
       tables:
-        - table: mozdata.ads.consolidated_ad_metrics_daily_pt
+        - table: mozdata.ads.ad_metrics_daily_pt
     consolidated_ad_metrics_hourly:
       type: table_view
       tables:
-        - table: mozdata.ads.consolidated_ad_metrics_hourly
+        - table: mozdata.ads.ad_metrics
     tiles_addressable_inventory_hourly:
       type: table_view
       tables:
