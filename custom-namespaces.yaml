@@ -1101,6 +1101,10 @@ firefox_desktop:
       type: table_view
       tables:
         - table: mozdata.firefox_desktop.new_profiles_aggregates
+    report_content:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.firefox_desktop_derived.report_content_v1
     newtab_items_daily:
       type: table_view
       tables:
@@ -1133,6 +1137,10 @@ firefox_desktop:
       type: table_explore
       views:
         base_view: urlbar_events_daily_table
+    report_content:
+      type: table_explore
+      views:
+        base_view: report_content
     newtab_items_daily:
       type: table_explore
       views:
