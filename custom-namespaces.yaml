@@ -1520,7 +1520,7 @@ websites:
     ga4_sessions:
       type: table_view
       tables:
-        - table: moz-fx-data-shared-prod.mozilla_org.ga_sessions_v2
+        - table: moz-fx-data-shared-prod.mozilla_org.ga_sessions
     firefox_com_ga4_sessions:
       type: table_view
       tables:
