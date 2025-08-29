@@ -202,10 +202,13 @@ class MetricDefinitionsView(View):
                 f"""
                     {data_source.name}.{data_source.submission_date_column or "submission_date"}
                     BETWEEN
-                    COALESCE(
-                        SAFE_CAST(
-                            {{% date_start submission_date %}} AS DATE
-                        ), CURRENT_DATE()) AND
+                    DATE_SUB(
+                        COALESCE(
+                            SAFE_CAST(
+                                {{% date_start submission_date %}} AS DATE
+                            ), CURRENT_DATE()),
+                        INTERVAL {{% parameter lookback_days %}} DAY
+                    ) AND
                     COALESCE(
                         SAFE_CAST(
                             {{% date_end submission_date %}} AS DATE
@@ -350,8 +353,9 @@ class MetricDefinitionsView(View):
             {
                 "name": "submission",
                 "type": "time",
+                "datatype": "date",
                 "group_label": "Base Fields",
-                "sql": "CAST(${TABLE}.analysis_basis AS TIMESTAMP)",
+                "sql": "${TABLE}.analysis_basis",
                 "label": "Submission",
                 "timeframes": [
                     "raw",
@@ -411,6 +415,23 @@ class MetricDefinitionsView(View):
                 "type": "unquoted",
                 "default_value": "100",
                 "hidden": hide_sampling,
+            },
+            {
+                "name": "lookback_days",
+                "label": "Lookback (Days)",
+                "type": "unquoted",
+                "description": "Number of days added before the filtered date range. "
+                + "Useful for period-over-period comparisons.",
+                "default_value": "0",
+            },
+            {
+                "name": "date_groupby_position",
+                "label": "Date Group By Position",
+                "type": "unquoted",
+                "description": "Position of the date field in the group by clause. "
+                + "Required when submission_week, submission_month, submission_quarter, submission_year "
+                + "is selected as BigQuery can't correctly resolve the GROUP BY otherwise",
+                "default_value": "",
             },
         ]
 
@@ -563,20 +584,166 @@ class MetricDefinitionsView(View):
                             )
                     elif statistic_slug == "rolling_average":
                         aggregation = statistic_conf.get("aggregation", "sum")
+                        matching_measures = [
+                            m
+                            for m in measures
+                            if m["name"].startswith(
+                                f"{dimension['name']}_{aggregation}"
+                            )
+                        ]
                         if "window_sizes" in statistic_conf:
                             for window_size in statistic_conf["window_sizes"]:
-                                measures.append(
-                                    {
-                                        "name": f"{dimension['name']}_{window_size}_day_{statistic_slug}",
-                                        "type": "number",
-                                        "label": f"{dimension_label} {window_size} Day Rolling Average",
-                                        "sql": f"""
-                                            AVG({aggregation}(${{TABLE}}.{dimension["name"]} * {sampling})) OVER (
-                                                ROWS {window_size} PRECEDING
-                                        )""",
-                                        "group_label": "Statistics",
-                                        "description": f"{window_size} day rolling average of {dimension_label}",
-                                    }
-                                )
+                                for matching_measure in matching_measures:
+                                    measures.append(
+                                        {
+                                            "name": f"{matching_measure['name']}_{window_size}_day",
+                                            "type": "number",
+                                            "label": f"{matching_measure['label']} {window_size} Day Rolling Average",
+                                            "sql": f"""
+                                                {{% if {self.name}.submission_date._is_selected or
+                                                    {self.name}.submission_week._is_selected or
+                                                    {self.name}.submission_month._is_selected or
+                                                    {self.name}.submission_quarter._is_selected or
+                                                    {self.name}.submission_year._is_selected %}}
+                                                AVG(${{{matching_measure['name']}}}) OVER (
+                                                    {{% if date_groupby_position._parameter_value != "" %}}
+                                                    ORDER BY {{% parameter date_groupby_position %}}
+                                                    {{% elsif {self.name}.submission_date._is_selected %}}
+                                                    ORDER BY ${{TABLE}}.analysis_basis
+                                                    {{% else %}}
+                                                    ERROR("date_groupby_position needs to be set when using submission_week,
+                                                      submission_month, submission_quarter, or submission_year")
+                                                    {{% endif %}}
+                                                    ROWS BETWEEN {window_size} PRECEDING AND CURRENT ROW
+                                                {{% else %}}
+                                                ERROR('Please select a "submission_*" field to compute the rolling average')
+                                                {{% endif %}}
+                                            )""",
+                                            "group_label": "Statistics",
+                                            "description": f"{window_size} day rolling average of {dimension_label}",
+                                        }
+                                    )
+
+                    # period-over-period measures
+                    if "period_over_period" in statistic_conf:
+                        matching_measures = [
+                            m
+                            for m in measures
+                            if m["name"].startswith(
+                                f"{dimension['name']}_{statistic_slug}"
+                            )
+                            and "_period_over_period_" not in m["name"]
+                        ]
+                        for period in statistic_conf["period_over_period"].get(
+                            "periods", []
+                        ):
+                            for matching_measure in matching_measures:
+                                original_sql = matching_measure["sql"]
+                                if statistic_slug == "rolling_average":
+                                    rows_match = re.search(
+                                        r"ROWS BETWEEN (\d+) PRECEDING AND CURRENT ROW",
+                                        original_sql,
+                                    )
+
+                                    if rows_match:
+                                        original_window_size = int(rows_match.group(1))
+
+                                        # Create time-adjusted window sizes
+                                        time_conditions = []
+                                        for unit, divisor in [
+                                            ("date", 1),
+                                            ("week", 7),
+                                            ("month", 30),
+                                            ("quarter", 90),
+                                            ("year", 365),
+                                        ]:
+                                            adjusted_window = (
+                                                (original_window_size + period)
+                                                // divisor
+                                                if unit != "date"
+                                                else original_window_size + period
+                                            )
+                                            condition = (
+                                                f"{{% {'if' if unit == 'date' else 'elif'} "
+                                                + f"{self.name}.submission_{unit}._is_selected %}}"
+                                            )
+                                            modified_sql = re.sub(
+                                                r"ROWS BETWEEN \d+ PRECEDING AND CURRENT ROW",
+                                                f"ROWS BETWEEN {adjusted_window} PRECEDING AND CURRENT ROW",
+                                                original_sql,
+                                            )
+                                            time_conditions.append(
+                                                f"{condition}\n{modified_sql}"
+                                            )
+
+                                        sql = (
+                                            "\n".join(time_conditions)
+                                            + f"\n{{% else %}}\n{original_sql}\n{{% endif %}}"
+                                        )
+                                    else:
+                                        sql = original_sql
+                                else:
+                                    # Create LAG with time-adjusted periods and ORDER BY
+                                    time_conditions = []
+                                    for unit, divisor in [
+                                        ("date", 1),
+                                        ("week", 7),
+                                        ("month", 30),
+                                        ("quarter", 90),
+                                        ("year", 365),
+                                    ]:
+                                        adjusted_period = (
+                                            period // divisor
+                                            if unit != "date"
+                                            else period
+                                        )
+                                        order_by = (
+                                            f"${{submission_{unit}}}"
+                                            if unit != "date"
+                                            else "${submission_date}"
+                                        )
+                                        condition = (
+                                            f"{{% {'if' if unit == 'date' else 'elif'} "
+                                            + f"{self.name}.submission_{unit}._is_selected %}}"
+                                        )
+                                        lag_sql = f"""LAG(${{{matching_measure['name']}}}, {adjusted_period}) OVER (
+                                            {{% if date_groupby_position._parameter_value %}}
+                                            ORDER BY {{% parameter date_groupby_position %}}
+                                            {{% else %}}
+                                            ORDER BY {order_by}
+                                            {{% endif %}}
+                                        )"""
+                                        time_conditions.append(
+                                            f"{condition}\n{lag_sql}"
+                                        )
+
+                                    sql = (
+                                        "\n".join(time_conditions)
+                                        + f"\n{{% else %}}\nLAG({matching_measure['name']}, {period}) "
+                                        + "OVER (ORDER BY ${submission_date})\n{{% endif %}}"
+                                    )
+
+                                for kind in statistic_conf["period_over_period"].get(
+                                    "kinds", ["previous"]
+                                ):
+                                    if kind == "difference":
+                                        sql = f"({original_sql}) - ({sql})"
+                                    elif kind == "relative_change":
+                                        sql = f"SAFE_DIVIDE((({sql}) - ({original_sql})), NULLIF(({original_sql}), 0))"
+                                    elif kind == "previous":
+                                        pass
+
+                                    measures.append(
+                                        {
+                                            "name": f"{matching_measure['name']}_{period}_day_period_over_period_{kind}",
+                                            "type": "number",
+                                            "label": f"{matching_measure['label']} "
+                                            + f"{period} Day Period Over Period {kind.capitalize()}",
+                                            "description": f"Period over period {kind.capitalize()} of "
+                                            + f"{matching_measure['label']} over {period} days",
+                                            "group_label": "Statistics",
+                                            "sql": sql,
+                                        }
+                                    )
 
         return measures
