@@ -137,12 +137,10 @@
     views:
       - action
       - deletion_request
-      - event_counts
       - events_stream_table
     explores:
       - action
       - deletion_request
-      - event_counts
       - events_stream_table
 - monitor_frontend:
     views:
