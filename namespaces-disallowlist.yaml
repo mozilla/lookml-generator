@@ -133,6 +133,15 @@
       - temp_sync
       - temp_tabs_sync
       - topsites_impression
+- mdn_yari:
+    views:
+      - action
+      - deletion_request
+      - events_stream_table
+    explores:
+      - action
+      - deletion_request
+      - events_stream_table
 - monitor_frontend:
     views:
       - deletion_request
