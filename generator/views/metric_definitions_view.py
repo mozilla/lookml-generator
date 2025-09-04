@@ -210,7 +210,7 @@ class MetricDefinitionsView(View):
             [
                 f"""
                     {data_source.name}.{data_source.submission_date_column or "submission_date"}
-                    {{% if _filters['analysis_period'] != "" %}}
+                    {{% if analysis_period._is_filtered %}}
                     BETWEEN
                     DATE_SUB(
                         COALESCE(
