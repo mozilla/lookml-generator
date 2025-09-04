@@ -44,7 +44,9 @@ class MetricDefinitionsExplore(Explore):
 
         explore_lookml: Dict[str, Any] = {
             "name": self.name,
-            "always_filter": {"filters": [{"sampling": "1"}]},
+            "always_filter": {
+                "filters": [{"submission_date": "7 days"}, {"sampling": "1"}]
+            },
             # The base view is the only view that exposes the date and client_id fields.
             # All other views only expose the metric definitions.
             "fields": exposed_fields,
