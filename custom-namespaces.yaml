@@ -1104,7 +1104,7 @@ firefox_desktop:
     newtab_items_daily:
       type: table_view
       tables:
-        - table: moz-fx-data-shared-prod.firefox_desktop_derived.newtab_items_daily_v1
+        - table: moz-fx-data-shared-prod.firefox_desktop_derived.newtab_content_items_daily_combined_v1
   explores:
     client_counts:
       type: client_counts_explore
