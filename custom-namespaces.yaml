@@ -1407,13 +1407,9 @@ reference:
   glean_app: false
   pretty_name: Reference
   owners:
-    - cmorales@mozilla.com
+    - kwindau@mozilla.com
   spoke: looker-spoke-default
   views:
-    macroeconomic_indices:
-      type: table_view
-      tables:
-        - table: mozdata.external.macroeconomic_indices
     calendar:
       type: table_view
       tables:
