@@ -1105,6 +1105,10 @@ firefox_desktop:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.firefox_desktop_derived.newtab_content_items_daily_combined_v1
+    prototype_feature_segmentation:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.firefox_desktop.prototype_user_segmentation_tabgroups_v2
   explores:
     client_counts:
       type: client_counts_explore
@@ -1137,6 +1141,10 @@ firefox_desktop:
       type: table_explore
       views:
         base_view: newtab_items_daily
+    prototype_feature_segmentation:
+      type: table_explore
+      views:
+        base_view: prototype_feature_segmentation
 monitoring:
   glean_app: false
   owners:
@@ -1407,13 +1415,9 @@ reference:
   glean_app: false
   pretty_name: Reference
   owners:
-    - cmorales@mozilla.com
+    - kwindau@mozilla.com
   spoke: looker-spoke-default
   views:
-    macroeconomic_indices:
-      type: table_view
-      tables:
-        - table: mozdata.external.macroeconomic_indices
     calendar:
       type: table_view
       tables:
