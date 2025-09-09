@@ -1141,7 +1141,7 @@ firefox_desktop:
       type: table_explore
       views:
         base_view: newtab_items_daily
-    newtab_items_daily:
+    prototype_feature_segmentation:
       type: table_explore
       views:
         base_view: prototype_feature_segmentation
