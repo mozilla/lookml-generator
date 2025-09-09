@@ -1105,6 +1105,10 @@ firefox_desktop:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.firefox_desktop_derived.newtab_items_daily_v1
+    prototype_feature_segmentation:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.firefox_desktop.prototype_user_segmentation_tabgroups_v2
   explores:
     client_counts:
       type: client_counts_explore
@@ -1137,6 +1141,10 @@ firefox_desktop:
       type: table_explore
       views:
         base_view: newtab_items_daily
+    prototype_feature_segmentation:
+      type: table_explore
+      views:
+        base_view: prototype_feature_segmentation
 monitoring:
   glean_app: false
   owners:
