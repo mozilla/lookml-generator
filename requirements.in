@@ -1,4 +1,4 @@
-click==8.2.1
+click==8.3.0
 flake8==7.1.1 
 exceptiongroup  # for pytest on python<=3.10
 google-cloud-bigquery==3.38.0
