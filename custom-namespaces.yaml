@@ -1820,10 +1820,6 @@ growth:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.google_ads.android_app_campaign_stats
-    ios_app_campaign_stats:
-      type: table_view
-      tables:
-        - table: moz-fx-data-shared-prod.apple_ads_external.ios_app_campaign_stats_v1
     rolling_28_day_dau:
       type: table_view
       tables:
