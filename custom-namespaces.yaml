@@ -1561,6 +1561,10 @@ websites:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.mozilla_org.blogs_goals
+    ga4_blog_performance:
+      type: table_view
+      tables:
+        - table: mozdata.mozilla_org.blog_performance
     blogs_daily_summary:
       type: table_view
       tables:
