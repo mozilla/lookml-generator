@@ -813,7 +813,7 @@ ads:
 ads_monitoring:
   glean_app: false
   connection: bigquery-oauth
-  pretty_name: Ads
+  pretty_name: Ads Monitoring
   owners:
     - cbeck@mozilla.com
     - lvargas@mozilla.com
