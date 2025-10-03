@@ -778,11 +778,12 @@ ads:
   connection: bigquery-oauth
   pretty_name: Ads
   owners:
-    - cmorales@mozilla.com
     - cbeck@mozilla.com
     - lvargas@mozilla.com
+    - cmorales@mozilla.com
     - sbetancourt@mozilla.com
     - jsnyder@mozilla.com
+    - msun@mozilla.com
   spoke: looker-spoke-private
   views:
     android_pocket_spoc:
@@ -809,6 +810,18 @@ ads:
       type: table_view
       tables:
         - table: mozdata.ads.campaign_metrics_daily
+ads_monitoring:
+  glean_app: false
+  connection: bigquery-oauth
+  pretty_name: Ads Monitoring
+  owners:
+    - cbeck@mozilla.com
+    - lvargas@mozilla.com
+    - cmorales@mozilla.com
+    - sbetancourt@mozilla.com
+    - jsnyder@mozilla.com
+    - msun@mozilla.com
+  spoke: looker-spoke-private
 firefox_ios:
   pretty_name: Firefox iOS
   owners:
