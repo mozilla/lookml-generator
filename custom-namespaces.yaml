@@ -1906,6 +1906,10 @@ fxci:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.fxci.tasks
+    task_definitions_base:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.fxci.task_definitions
     task_runs_base:
       type: table_view
       tables:
