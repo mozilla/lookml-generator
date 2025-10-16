@@ -200,7 +200,7 @@ def test_explore_lookml(time_partitioning_group, events_explore):
             "description": "Event counts over time.",
             "always_filter": {
                 "filters": [
-                    {date_dimension: "28 days"},
+                    {date_dimension: "7 days"},
                 ]
             },
             "sql_always_where": f"${{events.{date_dimension}}} >= '2010-01-01'",

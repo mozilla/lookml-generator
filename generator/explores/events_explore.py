@@ -14,6 +14,26 @@ class EventsExplore(Explore):
 
     type: str = "events_explore"
 
+    def get_required_filters(self, view_name: str) -> List[Dict[str, str]]:
+        """Get required filters for this view.
+
+        Override the default to use 7 days instead of 28 days to avoid
+        "Query Exceeds Data Limit" errors for large event datasets.
+        """
+        filters = []
+        view = self.views[view_name]
+
+        # Add a default filter on channel, if it's present in the view
+        default_channel = self._get_default_channel(view)
+        if default_channel is not None:
+            filters.append({"channel": default_channel})
+
+        # Add submission filter with 7 days instead of the default 28 days
+        if time_partitioning_group := self.get_view_time_partitioning_group(view):
+            filters.append({f"{time_partitioning_group}_date": "7 days"})
+
+        return filters
+
     @staticmethod
     def from_views(views: List[View]) -> Iterator[EventsExplore]:
         """Where possible, generate EventsExplores for Views."""

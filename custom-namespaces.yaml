@@ -790,11 +790,12 @@ ads:
   connection: bigquery-oauth
   pretty_name: Ads
   owners:
-    - cmorales@mozilla.com
     - cbeck@mozilla.com
     - lvargas@mozilla.com
+    - cmorales@mozilla.com
     - sbetancourt@mozilla.com
     - jsnyder@mozilla.com
+    - msun@mozilla.com
   spoke: looker-spoke-private
   views:
     android_pocket_spoc:
@@ -804,11 +805,11 @@ ads:
     consolidated_ad_metrics_daily_pt:
       type: table_view
       tables:
-        - table: mozdata.ads.consolidated_ad_metrics_daily_pt
+        - table: mozdata.ads.ad_metrics_daily_pt
     consolidated_ad_metrics_hourly:
       type: table_view
       tables:
-        - table: mozdata.ads.consolidated_ad_metrics_hourly
+        - table: mozdata.ads.ad_metrics
     tiles_addressable_inventory_hourly:
       type: table_view
       tables:
@@ -821,6 +822,18 @@ ads:
       type: table_view
       tables:
         - table: mozdata.ads.campaign_metrics_daily
+ads_monitoring:
+  glean_app: false
+  connection: bigquery-oauth
+  pretty_name: Ads Monitoring
+  owners:
+    - cbeck@mozilla.com
+    - lvargas@mozilla.com
+    - cmorales@mozilla.com
+    - sbetancourt@mozilla.com
+    - jsnyder@mozilla.com
+    - msun@mozilla.com
+  spoke: looker-spoke-private
 firefox_ios:
   pretty_name: Firefox iOS
   owners:
@@ -1113,14 +1126,14 @@ firefox_desktop:
       type: table_view
       tables:
         - table: mozdata.firefox_desktop.new_profiles_aggregates
-    fenix_distribution_deal:
-      type: table_view
-      tables:
-        - table: mozdata.analysis.fenix_distribution_deal_v1
     newtab_items_daily:
       type: table_view
       tables:
-        - table: moz-fx-data-shared-prod.firefox_desktop_derived.newtab_items_daily_v1
+        - table: moz-fx-data-shared-prod.firefox_desktop_derived.newtab_content_items_daily_combined_v1
+    prototype_feature_segmentation:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.firefox_desktop.prototype_user_segmentation_tabgroups_v2
   explores:
     client_counts:
       type: client_counts_explore
@@ -1149,14 +1162,14 @@ firefox_desktop:
       type: table_explore
       views:
         base_view: urlbar_events_daily_table
-    serp_categorization_unnested:
-      type: table_explore
-      views:
-        base_view: serp_categorization_unnested_table
     newtab_items_daily:
       type: table_explore
       views:
         base_view: newtab_items_daily
+    prototype_feature_segmentation:
+      type: table_explore
+      views:
+        base_view: prototype_feature_segmentation
 monitoring:
   glean_app: false
   owners:
@@ -1377,15 +1390,7 @@ monitoring:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.monitoring.looker_usage_models
-    looker_usage_unused_explores:
-      type: table_view
-      tables:
-        - table: moz-fx-data-shared-prod.monitoring.looker_usage_unused_explores
   explores:
-    column_size:
-      type: ping_explore
-      views:
-        base_view: column_size
     payload_bytes_error_all:
       type: ping_explore
       views:
@@ -1430,22 +1435,14 @@ monitoring:
       type: table_explore
       views:
         base_view: looker_usage_models
-    looker_usage_unused_explores:
-      type: table_explore
-      views:
-        base_view: looker_usage_unused_explores
 
 reference:
   glean_app: false
   pretty_name: Reference
   owners:
-    - cmorales@mozilla.com
+    - kwindau@mozilla.com
   spoke: looker-spoke-default
   views:
-    macroeconomic_indices:
-      type: table_view
-      tables:
-        - table: mozdata.external.macroeconomic_indices
     calendar:
       type: table_view
       tables:
@@ -1552,7 +1549,7 @@ websites:
     ga4_sessions:
       type: table_view
       tables:
-        - table: moz-fx-data-shared-prod.mozilla_org.ga_sessions_v2
+        - table: moz-fx-data-shared-prod.mozilla_org.ga_sessions
     firefox_com_ga4_sessions:
       type: table_view
       tables:
@@ -1589,6 +1586,10 @@ websites:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.mozilla_org.blogs_goals
+    ga4_blog_performance:
+      type: table_view
+      tables:
+        - table: mozdata.mozilla_org.blog_performance
     blogs_daily_summary:
       type: table_view
       tables:
@@ -1743,6 +1744,14 @@ subscription_platform:
       type: table_view
       tables:
         - table: mozdata.subscription_platform.stripe_products
+    exchange_rates:
+      type: table_view
+      tables:
+        - table: mozdata.subscription_platform.exchange_rates
+    vat_rates:
+      type: table_view
+      tables:
+        - table: mozdata.subscription_platform.vat_rates
     # Logical subscriptions
     logical_subscriptions:
       type: table_view
@@ -1840,10 +1849,6 @@ growth:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.google_ads.android_app_campaign_stats
-    ios_app_campaign_stats:
-      type: table_view
-      tables:
-        - table: moz-fx-data-shared-prod.apple_ads_external.ios_app_campaign_stats_v1
     rolling_28_day_dau:
       type: table_view
       tables:
@@ -1913,6 +1918,10 @@ fxci:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.fxci.tasks
+    task_definitions_base:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.fxci.task_definitions
     task_runs_base:
       type: table_view
       tables:
@@ -2082,7 +2091,7 @@ device_manufacturer_partnerships:
   glean_app: false
   pretty_name: Device Manufacturer Partnerships
   owners:
-    - mbowerman@mozilla.com
+    - betling@mozilla.com
     - kik@mozilla.com
   spoke: looker-spoke-default
   views:
@@ -2090,6 +2099,14 @@ device_manufacturer_partnerships:
       type: table_view
       tables:
         - table: mozdata.device_manufacturer_partnerships.shipment_and_activation_vivo
+    fenix_distribution_deals:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.device_manufacturer_partnerships.fenix_distribution_deals
+    fenix_preload_and_open:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.device_manufacturer_partnerships.fenix_preload_and_open
 trust_and_safety:
   glean_app: false
   connection: bigquery-oauth
@@ -2111,3 +2128,54 @@ trust_and_safety:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.cinder_derived.jobs_v1
+bigeye:
+  glean_app: false
+  pretty_name: Bigeye
+  owners:
+    - phlee@mozilla.com
+  views:
+    dashboards:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.bigeye_derived.dashboard_service_v1
+    issues:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.bigeye_derived.issue_service_v1
+    metrics:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.bigeye_derived.metric_service_v1
+    collections:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.bigeye_derived.collection_service_v1
+    groups:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.bigeye_derived.group_service_v1
+    users:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.bigeye_derived.user_service_v1
+    workspaces:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.bigeye_derived.workspace_service_v1
+    virtual_tables:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.bigeye_derived.virtual_table_service_v1
+  explores:
+    metrics:
+      type: table_explore
+      views:
+        base_view: metrics
+    issues:
+      type: table_explore
+      views:
+        base_view: issues
+    dashboards:
+      type: table_explore
+      views:
+        base_view: dashboards

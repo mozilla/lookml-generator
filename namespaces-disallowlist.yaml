@@ -36,15 +36,73 @@
 - firefox_crashreporter
 - firefox_desktop_background_defaultagent
 - thunderbird_android
+- firefox_desktop_background_update
+- thunderbird_desktop
 - fenix:
     views:
+      - bookmarks_sync
+      - bookmarks_sync_table
+      - broken_site_report
+      - broken_site_report_table
       - installation
       - installation_table
+      - migration
+      - migration_table
       - topsites_impression
       - topsites_impression_table
     explores:
+      - bookmarks_sync
+      - broken_site_report
       - installation
+      - migration
       - topsites_impression
+- firefox_desktop:
+    views:
+      - deletion_request
+      - events_stream_table
+      - funnel_analysis
+      - growth_accounting
+      - newtab_content
+      - nimbus_targeting_context
+      - onboarding_opt_out
+      - pageload_domain
+      - pageload_base_domain
+      - prototype_no_code_events
+      - pseudo_main
+      - profiles
+      - quick_suggest_deletion_request
+      - serp_categorization
+      - sponsored_tiles_clients_daily
+      - sync
+      - third_party_modules
+      - top_sites
+      - update
+      - urlbar_keyword_exposure
+      - urlbar_potential_exposure
+      - user_characteristics
+    explores:
+      - deletion_request
+      - events_stream_table
+      - funnel_analysis
+      - growth_accounting
+      - newtab_content
+      - nimbus_targeting_context
+      - onboarding_opt_out
+      - pageload_domain
+      - pageload_base_domain
+      - prototype_no_code_events
+      - pseudo_main
+      - profiles
+      - quick_suggest_deletion_request
+      - serp_categorization
+      - sponsored_tiles_clients_daily
+      - sync
+      - third_party_modules
+      - top_sites
+      - update
+      - urlbar_keyword_exposure
+      - urlbar_potential_exposure
+      - user_characteristics
 - firefox_ios:
     views:
       - temp_bookmarks_sync
@@ -75,6 +133,24 @@
       - temp_sync
       - temp_tabs_sync
       - topsites_impression
+- mdn_yari:
+    views:
+      - action
+      - deletion_request
+      - events_stream_table
+    explores:
+      - action
+      - deletion_request
+      - event_counts
+      - events_stream_table
+- monitor_frontend:
+    views:
+      - deletion_request
+      - deletion_request_table
+      - events_stream_table
+    explores:
+      - deletion_request
+      - events_stream_table
 - "*": # exclude these pings/views/explores from all namespaces
     views:
       - addresses_sync
