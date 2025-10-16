@@ -47,6 +47,18 @@ combined_browser_metrics:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.glean_telemetry.active_users_aggregates
+    glean_cohort_daily_churn:
+      type: table_view
+      tables:
+        - table: mozdata.glean_telemetry.cohort_daily_churn
+    glean_cohort_daily_statistics:
+      type: table_view
+      tables:
+        - table: mozdata.glean_telemetry.cohort_daily_statistics
+    glean_cohort_weekly_statistics:
+      type: table_view
+      tables:
+        - table: mozdata.glean_telemetry.cohort_weekly_statistics
 review_checker_desktop:
   glean_app: false
   owners:
