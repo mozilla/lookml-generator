@@ -771,6 +771,10 @@ revenue:
       type: table_view
       tables:
         - table: mozdata.revenue.search_revenue_levers_monthly
+    search_revenue_cat1:
+      type: table_view
+      tables:
+        - table: mozdata.revenue.search_revenue_cat1_traditional
 revenue_private:
   glean_app: false
   connection: bigquery-oauth
