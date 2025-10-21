@@ -1,6 +1,7 @@
 """Dry Run method to get BigQuery metadata."""
 
 import json
+import os
 from enum import Enum
 from functools import cached_property
 from typing import Optional
@@ -28,16 +29,19 @@ def credentials(auth_req: Optional[GoogleAuthRequest] = None):
 
 def id_token():
     """Get token to authenticate against Cloud Function."""
-    auth_req = GoogleAuthRequest()
-    creds = credentials(auth_req)
+    # look for token created by the GitHub Actions workflow
+    id_token = os.environ.get("GOOGLE_GHA_ID_TOKEN")
 
-    if hasattr(creds, "id_token"):
-        # Get token from default credentials for the current environment created via Cloud SDK run
-        id_token = creds.id_token
-    else:
-        # If the environment variable GOOGLE_APPLICATION_CREDENTIALS is set to service account JSON file,
-        # then ID token is acquired using this service account credentials.
-        id_token = fetch_id_token(auth_req, DRY_RUN_URL)
+    if not id_token:
+        auth_req = GoogleAuthRequest()
+        creds = credentials(auth_req)
+        if hasattr(creds, "id_token"):
+            # Get token from default credentials for the current environment created via Cloud SDK run
+            id_token = creds.id_token
+        else:
+            # If the environment variable GOOGLE_APPLICATION_CREDENTIALS is set to service account JSON file,
+            # then ID token is acquired using this service account credentials.
+            id_token = fetch_id_token(auth_req, DRY_RUN_URL)
     return id_token
 
 
