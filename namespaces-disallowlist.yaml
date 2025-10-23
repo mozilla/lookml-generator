@@ -23,7 +23,6 @@
 - sync
 - mozillavpn_backend_cirrus
 - glean_dictionary
-- mach
 - "*_cirrus"
 - bedrock
 - firefox_desktop_background_tasks
@@ -133,6 +132,19 @@
       - temp_sync
       - temp_tabs_sync
       - topsites_impression
+- mach: # Mozilla Mach sends all of its telemetry via the `usage` ping, disable other views and explores
+    views:
+        - baseline
+        - deletion_request
+        - event_counts
+        - events_stream_table
+        - metrics
+    explores:
+        - baseline
+        - deletion_request
+        - event_counts
+        - events_stream_table
+        - metrics
 - mdn_yari:
     views:
       - action
