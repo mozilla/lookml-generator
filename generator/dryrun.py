@@ -2,9 +2,11 @@
 
 import json
 import os
+import time
 from enum import Enum
 from functools import cached_property
 from typing import Optional
+from urllib.error import URLError
 from urllib.request import Request, urlopen
 
 import google.auth
@@ -15,6 +17,43 @@ from google.oauth2.id_token import fetch_id_token
 DRY_RUN_URL = (
     "https://us-central1-moz-fx-data-shared-prod.cloudfunctions.net/bigquery-etl-dryrun"
 )
+
+
+def urlopen_with_retry(request, max_retries=5, initial_delay=2.0, timeout=30):
+    """
+    Perform urlopen with exponential backoff retry logic.
+
+    Args:
+        request: The urllib Request object
+        max_retries: Maximum number of retry attempts (default: 5)
+        initial_delay: Initial delay in seconds before first retry (default: 2.0)
+        timeout: Timeout in seconds for each request (default: 30)
+
+    Returns:
+        The response from urlopen
+
+    Raises:
+        URLError: If all retry attempts fail
+    """
+    last_error = None
+    delay = initial_delay
+
+    for attempt in range(max_retries + 1):
+        try:
+            return urlopen(request, timeout=timeout)
+        except URLError as e:
+            last_error = e
+            if attempt < max_retries:
+                print(
+                    f"Network request failed (attempt {attempt + 1}/{max_retries + 1}): {e}"
+                )
+                print(f"Retrying in {delay} seconds...")
+                time.sleep(delay)
+                delay *= 2  # Exponential backoff
+            else:
+                print(f"All {max_retries + 1} attempts failed")
+
+    raise last_error
 
 
 def credentials(auth_req: Optional[GoogleAuthRequest] = None):
@@ -155,17 +194,16 @@ class DryRun:
                 if self.table:
                     json_data["table"] = self.table
 
-                r = urlopen(
-                    Request(
-                        self.dry_run_url,
-                        headers={
-                            "Content-Type": "application/json",
-                            "Authorization": f"Bearer {self.id_token}",
-                        },
-                        data=json.dumps(json_data).encode("utf8"),
-                        method="POST",
-                    )
+                request = Request(
+                    self.dry_run_url,
+                    headers={
+                        "Content-Type": "application/json",
+                        "Authorization": f"Bearer {self.id_token}",
+                    },
+                    data=json.dumps(json_data).encode("utf8"),
+                    method="POST",
                 )
+                r = urlopen_with_retry(request)
                 return json.load(r)
             else:
                 query_schema = None
@@ -290,6 +328,7 @@ class DryRun:
             # (submission_date, submission_timestamp, etc.) to run
             return True
         else:
+            print(self)
             print("ERROR\n", self.dry_run_result["errors"])
             raise dry_run_error
 
