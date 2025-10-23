@@ -180,10 +180,14 @@ jobs:
         with:
           repository: mozilla/looker-hub
           ref: main
-          path: /tmp/workspace/looker-hub
+          path: looker-hub
           persist-credentials: false
       - name: Generate diff
         run: |
+          # Copy looker-hub to /tmp/workspace for consistency with generated-lookml location
+          mkdir -p /tmp/workspace
+          cp -R looker-hub /tmp/workspace/looker-hub
+
           find /tmp/workspace/generated-lookml -type d -empty -delete
 
           cp -R /tmp/workspace/looker-hub/operational_monitoring /tmp/workspace/generated-lookml
