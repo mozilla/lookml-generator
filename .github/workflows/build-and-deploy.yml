@@ -136,7 +136,15 @@ jobs:
         env:
           GOOGLE_GHA_ID_TOKEN: ${{ steps.auth.outputs.id_token }}
         run: echo "GOOGLE_GHA_ID_TOKEN=$GOOGLE_GHA_ID_TOKEN" >> $GITHUB_ENV
+      - name: Clone looker-hub
+        uses: actions/checkout@v4
+        with:
+          repository: mozilla/looker-hub
+          ref: main
+          path: looker-hub
       - name: Generate LookML
+        env:
+          LOOKER_HUB_DIR: ${{ github.workspace }}/looker-hub
         run: |
           ./bin/generator namespaces
           cat namespaces.yaml
