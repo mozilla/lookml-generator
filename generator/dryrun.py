@@ -261,7 +261,6 @@ class DryRun:
                     "tableMetadata": table_metadata,
                 }
         except Exception as e:
-            print(self.sql)
             print(f"ERROR {e}")
             return None
 
@@ -328,7 +327,6 @@ class DryRun:
             # (submission_date, submission_timestamp, etc.) to run
             return True
         else:
-            print(self)
             print("ERROR\n", self.dry_run_result["errors"])
             raise dry_run_error
 
