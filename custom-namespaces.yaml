@@ -1073,20 +1073,6 @@ firefox_desktop:
       type: table_view
       tables:
         - table: mozdata.telemetry.suggest_clients_daily
-    funnel_analysis:
-      type: funnel_analysis_view
-      tables:
-        - funnel_analysis: events_daily_table
-          event_types: mozdata.telemetry.event_types
-          step_1: event_types
-          step_2: event_types
-          step_3: event_types
-          step_4: event_types
-    events_daily_table:
-      type: table_view
-      tables:
-        - channel: release
-          table: mozdata.telemetry.events_daily
     growth_accounting:
       type: growth_accounting_view
       tables:
