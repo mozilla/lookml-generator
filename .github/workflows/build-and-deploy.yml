@@ -20,7 +20,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-      - name: Verify that requirements.txt contains the right dependencies for this python version
+      - name: Verify requirements.txt dependencies
         run: |
           pip install pip-tools --constraint requirements.in
           pip-compile --allow-unsafe --generate-hashes --quiet
@@ -140,7 +140,9 @@ jobs:
   generate-lookml:
     name: Generate LookML
     runs-on: ubuntu-latest
-    if: (github.event.pull_request.head.repo.full_name == github.repository || github.event_name != 'pull_request') && github.ref != 'refs/heads/main'
+    if: |
+      (github.event.pull_request.head.repo.full_name == github.repository || github.event_name != 'pull_request')
+      && github.ref != 'refs/heads/main'
     permissions:
       id-token: write
       contents: read
@@ -188,7 +190,9 @@ jobs:
     name: Generate and Post Diff
     runs-on: ubuntu-latest
     needs: generate-lookml
-    if: (github.event.pull_request.head.repo.full_name == github.repository || github.event_name != 'pull_request') && github.ref != 'refs/heads/main'
+    if: |
+      (github.event.pull_request.head.repo.full_name == github.repository || github.event_name != 'pull_request')
+      && github.ref != 'refs/heads/main'
     permissions:
       contents: read
       pull-requests: write
@@ -279,7 +283,9 @@ jobs:
       - name: Deploy docs to gh-pages branch
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh-pages --message "[skip ci] updates" --dist /tmp/_html --repo https://x-access-token:$GITHUB_TOKEN@github.com/${{ github.repository }}.git
+        run: |
+          gh-pages --message "[skip ci] updates" --dist /tmp/_html \
+          --repo https://x-access-token:$GITHUB_TOKEN@github.com/${{ github.repository }}.git
 
   deploy-to-gar:
     name: Deploy to GAR
@@ -296,15 +302,15 @@ jobs:
           persist-credentials: false
       - name: Build the Docker image
         run: |
-          docker build . -t us-docker.pkg.dev/moz-fx-data-artifacts-prod/lookml-generator/lookml-generator:latest \
-                         -t us-docker.pkg.dev/moz-fx-data-artifacts-prod/lookml-generator/lookml-generator:${{ github.sha }}
+          docker build . -t lookml-generator:latest \
+                         -t lookml-generator:${{ github.sha }}
       - name: Push Docker image to GAR
         uses: mozilla-it/deploy-actions/docker-push@v4.3.2
         with:
           project_id: moz-fx-data-artifacts-prod
           image_tags: |
-            us-docker.pkg.dev/moz-fx-data-artifacts-prod/lookml-generator/lookml-generator:latest
-            us-docker.pkg.dev/moz-fx-data-artifacts-prod/lookml-generator/lookml-generator:${{ github.sha }}
+            lookml-generator:latest
+            lookml-generator:${{ github.sha }}
           workload_identity_pool_project_number: ${{ vars.GCPV2_WORKLOAD_IDENTITY_POOL_PROJECT_NUMBER }}
           service_account_name: lookml-generator
 
@@ -329,13 +335,16 @@ jobs:
           id_token_include_email: true
           create_credentials_file: false
       - name: Prepare DAG run note
+        # yamllint disable
         run: |
           echo "DAGRUN_NOTE=DAG triggered by **[${{ github.actor }}](https://github.com/${{ github.actor }})** from ${{ github.repository }} CI build [${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_ENV
+        # yamllint enable
       - name: Trigger looker DAG in Airflow to deploy lookml
         env:
           ID_TOKEN: ${{ steps.auth.outputs.id_token }}
         run: |
-          curl --location --request POST "https://us-west1-moz-fx-telemetry-airflow-prod.cloudfunctions.net/ci-external-trigger"
-            -H "Authorization: bearer ${ID_TOKEN}"
-            -H "Content-Type:application/json"
+          curl --location --request POST \
+            "https://us-west1-moz-fx-telemetry-airflow-prod.cloudfunctions.net/ci-external-trigger" \
+            -H "Authorization: bearer ${ID_TOKEN}" \
+            -H "Content-Type:application/json" \
             -d "{\"dagrun_note\": \"${DAGRUN_NOTE}\", \"dag_id\":\"looker\"}"
