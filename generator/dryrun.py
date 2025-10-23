@@ -223,6 +223,7 @@ class DryRun:
                     "tableMetadata": table_metadata,
                 }
         except Exception as e:
+            print(self.sql)
             print(f"ERROR {e}")
             return None
 
