@@ -1120,6 +1120,10 @@ firefox_desktop:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.firefox_desktop.prototype_user_segmentation_tabgroups_v2
+    prototype_features_and_firefox_use_cases:
+      type: table_view
+      tables:
+        - table: mozdata.analysis.ctroy_prototype_step_4_one_month_with_fx_reasons
   explores:
     client_counts:
       type: client_counts_explore
@@ -1152,6 +1156,10 @@ firefox_desktop:
       type: table_explore
       views:
         base_view: prototype_feature_segmentation
+    prototype_features_and_firefox_use_cases:
+      type: table_explore
+      views:
+        base_view: prototype_features_and_firefox_use_cases
 monitoring:
   glean_app: false
   owners:
