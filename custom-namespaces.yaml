@@ -810,10 +810,6 @@ ads:
       type: table_view
       tables:
         - table: mozdata.ads.ad_metrics_daily_pt
-    consolidated_ad_metrics_hourly:
-      type: table_view
-      tables:
-        - table: mozdata.ads.ad_metrics
     tiles_addressable_inventory_hourly:
       type: table_view
       tables:
