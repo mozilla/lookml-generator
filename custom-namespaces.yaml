@@ -1126,10 +1126,6 @@ firefox_desktop:
       views:
         base_view: client_counts
         extended_view: clients_daily_table
-    funnel_analysis:
-      type: funnel_analysis_explore
-      views:
-        base_view: funnel_analysis
     growth_accounting:
       type: growth_accounting_explore
       views:
