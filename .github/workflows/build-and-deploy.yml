@@ -276,23 +276,20 @@ jobs:
       - name: Build the Docker image  
         # yamllint disable
         run: |
-          docker build . -t us-docker.pkg.dev/moz-fx-data-artifacts-prod/lookml-generator/lookml-generator:latest \
-                         -t us-docker.pkg.dev/moz-fx-data-artifacts-prod/lookml-generator/lookml-generator:${{ github.sha }}
+          docker build . -t us-docker.pkg.dev/moz-fx-data-artifacts-prod/lookml-generator/lookml-generator:latest
         # yamllint enable
       - name: Push Docker image latest to GAR
         uses: mozilla-it/deploy-actions/docker-push@v4.3.2
         with:
           project_id: moz-fx-data-artifacts-prod
-          image_tags: |
-            us-docker.pkg.dev/moz-fx-data-artifacts-prod/lookml-generator/lookml-generator:latest
+          image_tags: us-docker.pkg.dev/moz-fx-data-artifacts-prod/lookml-generator/lookml-generator:latest
           workload_identity_pool_project_number: ${{ vars.GCPV2_WORKLOAD_IDENTITY_POOL_PROJECT_NUMBER }}
           service_account_name: lookml-generator
       - name: Push Docker image tagged to GAR
         uses: mozilla-it/deploy-actions/docker-push@v4.3.2
         with:
           project_id: moz-fx-data-artifacts-prod
-          image_tags: |
-            us-docker.pkg.dev/moz-fx-data-artifacts-prod/lookml-generator/lookml-generator:${{ github.sha }}
+          image_tags: us-docker.pkg.dev/moz-fx-data-artifacts-prod/lookml-generator/lookml-generator:${{ github.sha }}
           workload_identity_pool_project_number: ${{ vars.GCPV2_WORKLOAD_IDENTITY_POOL_PROJECT_NUMBER }}
           service_account_name: lookml-generator
 
