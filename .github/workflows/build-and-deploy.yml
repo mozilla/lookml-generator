@@ -1,0 +1,323 @@
+name: Build, Test, and Deploy
+on:
+  push:
+    branches:
+  pull_request:
+  merge_group:
+
+jobs:
+  verify-requirements:
+    name: Verify Requirements
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Verify requirements.txt dependencies
+        run: |
+          pip install pip-tools --constraint requirements.in
+          pip-compile --allow-unsafe --generate-hashes --quiet
+          git diff --exit-code -G '^ *[^# ]' -- requirements.txt
+
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+      - name: Install dependencies
+        run: |
+          python -m venv venv/
+          venv/bin/pip install pip-tools --constraint requirements.in
+          venv/bin/pip-sync
+      - name: PyTest with linters
+        run: venv/bin/pytest
+      - name: Flake8
+        run: venv/bin/flake8 generator
+      - name: Lint YAML
+        run: venv/bin/yamllint -c .yamllint.yaml .
+
+  build-container:
+    name: Build Container
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build image
+        run: docker build -t app:build .
+
+  docs-build:
+    name: Build Docs
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+      - name: Install dependencies
+        run: |
+          python -m venv venv/
+          venv/bin/pip install pip-tools --constraint requirements.in
+          venv/bin/pip-sync
+      - name: Build docs
+        run: |
+          venv/bin/pip install pdoc
+          venv/bin/pdoc -o /tmp/_html generator
+      - name: Upload docs artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs-html
+          path: /tmp/_html
+
+  generate-lookml:
+    name: Generate LookML
+    runs-on: ubuntu-latest
+    if: |
+      (github.event.pull_request.head.repo.full_name == github.repository || github.event_name != 'pull_request')
+      && github.ref != 'refs/heads/main'
+    permissions:
+      id-token: write
+      contents: read
+    environment: GH Actions
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+      - name: Install dependencies
+        run: |
+          python -m venv venv/
+          venv/bin/pip install pip-tools --constraint requirements.in
+          venv/bin/pip-sync
+      - name: Authenticate to GCP and Generate ID Token
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCPV2_GITHUB_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_DRYRUN_SERVICE_ACCOUNT_EMAIL }}
+          token_format: 'id_token'
+          id_token_audience: 'https://us-central1-moz-fx-data-shared-prod.cloudfunctions.net/bigquery-etl-dryrun'
+          id_token_include_email: true
+      - name: Export ID Token for Python
+        env:
+          GOOGLE_GHA_ID_TOKEN: ${{ steps.auth.outputs.id_token }}
+        run: echo "GOOGLE_GHA_ID_TOKEN=$GOOGLE_GHA_ID_TOKEN" >> $GITHUB_ENV
+      - name: Clone looker-hub
+        uses: actions/checkout@v4
+        with:
+          repository: mozilla/looker-hub
+          ref: main
+          path: looker-hub
+      - name: Generate LookML
+        env:
+          LOOKER_HUB_DIR: ${{ github.workspace }}/looker-hub
+        run: |
+          ./bin/generator namespaces
+          cat namespaces.yaml
+          ./bin/generator lookml --target-dir=/tmp/workspace/generated-lookml --use_cloud_function=True
+      - name: Upload LookML artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-lookml
+          path: /tmp/workspace/generated-lookml
+
+  generate-diff:
+    name: Generate and Post Diff
+    runs-on: ubuntu-latest
+    needs: generate-lookml
+    if: |
+      (github.event.pull_request.head.repo.full_name == github.repository || github.event_name != 'pull_request')
+      && github.ref != 'refs/heads/main'
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Download LookML artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: generated-lookml
+          path: /tmp/workspace/generated-lookml
+      - name: Checkout looker-hub
+        uses: actions/checkout@v4
+        with:
+          repository: mozilla/looker-hub
+          ref: main
+          path: looker-hub
+          persist-credentials: false
+      - name: Generate diff
+        run: |
+          # Copy looker-hub to /tmp/workspace for consistency with generated-lookml location
+          mkdir -p /tmp/workspace
+          cp -R looker-hub /tmp/workspace/looker-hub
+
+          find /tmp/workspace/generated-lookml -type d -empty -delete
+
+          cp -R /tmp/workspace/looker-hub/operational_monitoring /tmp/workspace/generated-lookml
+          yq eval -i 'del(.operational_monitoring)' /tmp/workspace/generated-lookml/namespaces.yaml
+          yq eval -i 'del(.operational_monitoring)' /tmp/workspace/looker-hub/namespaces.yaml
+
+          rm /tmp/workspace/looker-hub/README.md
+          rm /tmp/workspace/looker-hub/hub.model.lkml
+          rm /tmp/workspace/looker-hub/CODE_OF_CONDUCT.md
+          rm /tmp/workspace/looker-hub/firefox_ios/views/column_field_paths.view.lkml
+
+          diff -x '.*' -qr --no-dereference \
+            /tmp/workspace/looker-hub/ /tmp/workspace/generated-lookml/ \
+            | grep '^Only in' \
+            >> /tmp/workspace/lookml.diff || true
+          diff -x '.*' -bur --no-dereference --new-file \
+            /tmp/workspace/looker-hub/ /tmp/workspace/generated-lookml/ \
+            >> /tmp/workspace/lookml.diff || true
+      - name: Upload diff artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: lookml-diff
+          path: /tmp/workspace/lookml.diff
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '21'
+      - name: Install diff dependencies
+        run: npm i @octokit/graphql@7.0.2
+      - name: Post diff to GitHub
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO_OWNER: ${{ github.repository_owner }}
+          REPO_NAME: ${{ github.event.repository.name }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          RUN_ID: ${{ github.run_id }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+        run: node .github/workflows/post-diff.js
+
+  docs-deploy:
+    name: Deploy Docs
+    runs-on: ubuntu-latest
+    needs: [docs-build, unit-tests, verify-requirements]
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Download docs artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docs-html
+          path: /tmp/_html
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '14'
+      - name: Install and configure dependencies
+        run: |
+          npm install -g --silent gh-pages@3.0.0
+          git config user.email "ci-build-docs@mozilla.com"
+          git config user.name "ci-build-docs"
+      - name: Deploy docs to gh-pages branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh-pages --message "[skip ci] updates" --dist /tmp/_html \
+          --repo https://x-access-token:$GITHUB_TOKEN@github.com/${{ github.repository }}.git
+
+  deploy-to-gar:
+    name: Deploy to GAR
+    runs-on: ubuntu-latest
+    needs: [unit-tests, verify-requirements, build-container]
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Build the Docker image
+        run: |
+          docker build . -t lookml-generator:latest \
+                         -t lookml-generator:${{ github.sha }}
+      - name: Push Docker image to GAR
+        uses: mozilla-it/deploy-actions/docker-push@v4.3.2
+        with:
+          project_id: moz-fx-data-artifacts-prod
+          image_tags: |
+            lookml-generator:latest
+            lookml-generator:${{ github.sha }}
+          workload_identity_pool_project_number: ${{ vars.GCPV2_WORKLOAD_IDENTITY_POOL_PROJECT_NUMBER }}
+          service_account_name: lookml-generator
+
+  looker-deploy:
+    name: Trigger Looker Deploy DAG
+    runs-on: ubuntu-latest
+    needs: deploy-to-gar
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      id-token: write
+      contents: read
+    environment: GH Actions
+    steps:
+      - name: Authenticate to GCP and Generate ID Token
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCPV2_GITHUB_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
+          token_format: id_token
+          id_token_audience: https://us-west1-moz-fx-telemetry-airflow-prod.cloudfunctions.net/ci-external-trigger
+          id_token_include_email: true
+          create_credentials_file: false
+      - name: Prepare DAG run note
+        # yamllint disable
+        run: |
+          echo "DAGRUN_NOTE=DAG triggered by **[${{ github.actor }}](https://github.com/${{ github.actor }})** from ${{ github.repository }} CI build [${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_ENV
+        # yamllint enable
+      - name: Trigger looker DAG in Airflow to deploy lookml
+        env:
+          ID_TOKEN: ${{ steps.auth.outputs.id_token }}
+        run: |
+          curl --location --request POST \
+            "https://us-west1-moz-fx-telemetry-airflow-prod.cloudfunctions.net/ci-external-trigger" \
+            -H "Authorization: bearer ${ID_TOKEN}" \
+            -H "Content-Type:application/json" \
+            -d "{\"dagrun_note\": \"${DAGRUN_NOTE}\", \"dag_id\":\"looker\"}"
