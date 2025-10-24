@@ -1123,7 +1123,7 @@ firefox_desktop:
     prototype_features_and_firefox_use_cases:
       type: table_view
       tables:
-        - table: mozdata.analysis.ctroy_prototype_step_4_one_month_with_fx_reasons
+        - table: moz-fx-data-shared-prod.analysis.ctroy_prototype_step_4_one_month_with_fx_reasons
   explores:
     client_counts:
       type: client_counts_explore
