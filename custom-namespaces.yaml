@@ -1120,6 +1120,10 @@ firefox_desktop:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.analysis.ctroy_prototype_step_4_one_month_with_fx_reasons
+    prototype_events_per_feature:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.analysis.ctroy_prototype_one_month_event_proportions
   explores:
     client_counts:
       type: client_counts_explore
@@ -1156,6 +1160,10 @@ firefox_desktop:
       type: table_explore
       views:
         base_view: prototype_features_and_firefox_use_cases
+    prototype_events_per_feature:
+      type: table_explore
+      views:
+        base_view: prototype_events_per_feature
 monitoring:
   glean_app: false
   owners:
