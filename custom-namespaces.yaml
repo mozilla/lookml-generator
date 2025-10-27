@@ -806,10 +806,6 @@ ads:
       type: table_view
       tables:
         - table: mozdata.ads.android_pocket_spocs
-    consolidated_ad_metrics_daily_pt:
-      type: table_view
-      tables:
-        - table: mozdata.ads.ad_metrics_daily_pt
     tiles_addressable_inventory_hourly:
       type: table_view
       tables:
