@@ -6,6 +6,7 @@ import re
 import urllib.request
 import warnings
 from collections.abc import Mapping
+from copy import deepcopy
 from datetime import datetime
 from itertools import groupby
 from operator import itemgetter
@@ -400,22 +401,49 @@ def namespaces(
 
     _merge_namespaces(namespaces, _get_metric_hub_namespaces(namespaces))
 
-    disallowed_namespaces = yaml.safe_load(disallowlist.read()) or {}
-    disallowed_regex = [
-        fnmatch.translate(namespace) for namespace in disallowed_namespaces
-    ]
-    disallowed_namespaces_pattern = re.compile("|".join(disallowed_regex))
-
-    updated_namespaces = {}
-    for namespace, _ in namespaces.items():
-        if (
-            not disallowed_namespaces_pattern.fullmatch(namespace)
-            and namespace not in ignore
-        ):
-            if "spoke" not in namespaces[namespace]:
-                namespaces[namespace]["spoke"] = DEFAULT_SPOKE
-            if "glean_app" not in namespaces[namespace]:
-                namespaces[namespace]["glean_app"] = False
-            updated_namespaces[namespace] = namespaces[namespace]
+    updated_namespaces = _filter_disallowed(namespaces, disallowlist)
+    for namespace in updated_namespaces:
+        if namespace not in ignore:
+            if "spoke" not in updated_namespaces[namespace]:
+                updated_namespaces[namespace]["spoke"] = DEFAULT_SPOKE
+            if "glean_app" not in updated_namespaces[namespace]:
+                updated_namespaces[namespace]["glean_app"] = False
 
     Path("namespaces.yaml").write_text(yaml.safe_dump(updated_namespaces))
+
+
+def _filter_disallowed(namespaces, disallowlist):
+    """Filter models, explores and views from the generated namespaces config, based on the disallowlist."""
+
+    def match_any(name, patterns):
+        return any(fnmatch.fnmatch(name, p) for p in patterns)
+
+    # transform namespace disallowlist to a dict
+    disallowed_namespaces = yaml.safe_load(disallowlist.read()) or []
+    disallowed_namespaces_dict = {}
+    for ns in [
+        {namespace: {}} if isinstance(namespace, str) else namespace
+        for namespace in disallowed_namespaces
+    ]:
+        disallowed_namespaces_dict.update(ns)
+
+    filtered_namespaces = deepcopy(namespaces)
+
+    for pattern, sub_filters in disallowed_namespaces_dict.items():
+        for key in list(filtered_namespaces):
+            if fnmatch.fnmatch(key, pattern):
+                # if no sub_filters, remove entire section
+                if not sub_filters:
+                    del filtered_namespaces[key]
+                    continue
+
+                entry = filtered_namespaces.get(key, {})
+
+                # remove matching artifact types (views, explores)
+                for artifact_type, disallowed_artifact_names in sub_filters.items():
+                    if artifact_type in entry:
+                        for key in list(entry[artifact_type]):
+                            if match_any(key, disallowed_artifact_names):
+                                del entry[artifact_type][key]
+
+    return filtered_namespaces

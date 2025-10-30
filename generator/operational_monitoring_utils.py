@@ -77,7 +77,7 @@ def get_active_projects(
                 SELECT *
                 FROM `{project_table}`
                 WHERE
-                    DATE_ADD(end_date, INTERVAL 90 DAY) > CURRENT_DATE() OR
+                    end_date > CURRENT_DATE() OR
                     end_date IS NULL
             """
         )

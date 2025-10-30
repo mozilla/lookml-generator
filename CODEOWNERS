@@ -1,0 +1,3 @@
+# Dependency updates (via dependabot)
+requirements.in @mozilla/data-looker
+requirements.txt @mozilla/data-looker
