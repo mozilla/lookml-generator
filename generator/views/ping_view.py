@@ -48,9 +48,18 @@ class PingView(View):
                 # or union together multiple ping source tables of the same name.
                 reference_table_names = set(r[-1] for r in references)
                 reference_dataset_names = set(r[-2] for r in references)
-                if (
-                    len(reference_table_names) != 1
-                    or channel["source_dataset"] not in reference_dataset_names
+                if len(reference_table_names) != 1 or (
+                    channel["source_dataset"] not in reference_dataset_names
+                    # Temporary hack to keep generating "ping views" for apps' `events_stream` union views which now
+                    # select from `events_stream_v1` derived tables after https://github.com/mozilla/bigquery-etl/pull/8361.
+                    # These `events_stream` "ping views" shouldn't have been generated in the first place, but they
+                    # are currently being relied on (https://bugzilla.mozilla.org/show_bug.cgi?id=1997588).
+                    # TODO: Remove this hack when implementing https://mozilla-hub.atlassian.net/browse/DENG-9548.
+                    and not (
+                        view_id == "events_stream"
+                        and (channel["source_dataset"] + "_derived")
+                        in reference_dataset_names
+                    )
                 ):
                     continue
 
