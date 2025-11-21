@@ -974,7 +974,6 @@ def test_lookml_actual_baseline_view_parameterized(
                             "datatype": "date",
                             "label": "Client Info: Parsed First Run Date",
                             "sql": "${TABLE}.client_info.parsed_first_run_date",
-                            "suggest_persist_for": "24 hours",
                             "timeframes": [
                                 "raw",
                                 "date",
@@ -989,7 +988,6 @@ def test_lookml_actual_baseline_view_parameterized(
                             "name": "metadata__header__parsed",
                             "label": "Metadata Header: Parsed Date",
                             "sql": "${TABLE}.metadata.header.parsed_date",
-                            "suggest_persist_for": "24 hours",
                             "timeframes": [
                                 "raw",
                                 "time",
@@ -1004,7 +1002,6 @@ def test_lookml_actual_baseline_view_parameterized(
                         {
                             "name": "parsed",
                             "sql": "${TABLE}.parsed_timestamp",
-                            "suggest_persist_for": "24 hours",
                             "timeframes": [
                                 "raw",
                                 "time",
@@ -1019,7 +1016,6 @@ def test_lookml_actual_baseline_view_parameterized(
                         {
                             "name": "submission",
                             "sql": "${TABLE}.submission_timestamp",
-                            "suggest_persist_for": "24 hours",
                             "timeframes": [
                                 "raw",
                                 "time",
@@ -1991,7 +1987,6 @@ def test_duplicate_dimension_event(runner, glean_apps, tmp_path):
                         {
                             "name": "event",
                             "sql": "${TABLE}.event_timestamp",
-                            "suggest_persist_for": "24 hours",
                             "timeframes": [
                                 "raw",
                                 "time",
@@ -2006,7 +2001,6 @@ def test_duplicate_dimension_event(runner, glean_apps, tmp_path):
                         {
                             "sql": "${TABLE}.submission_timestamp",
                             "type": "time",
-                            "suggest_persist_for": "24 hours",
                             "timeframes": [
                                 "raw",
                                 "time",
@@ -2102,7 +2096,6 @@ def test_context_id(runner, glean_apps, tmp_path):
                             "datatype": "date",
                             "name": "submission",
                             "sql": "${TABLE}.submission_date",
-                            "suggest_persist_for": "24 hours",
                             "timeframes": [
                                 "raw",
                                 "date",
