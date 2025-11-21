@@ -1263,6 +1263,18 @@ monitoring:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.monitoring_derived.shredder_targets_new_mismatched_v1
+    shredder_run_stats:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.monitoring.shredder_run_stats
+    shredder_targets:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.monitoring.shredder_targets
+    shredder_per_table_stats:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.monitoring.shredder_per_table_stats
     table_partition_expirations:
       type: table_view
       tables:
@@ -1392,14 +1404,6 @@ monitoring:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.monitoring.looker_usage_models
-    shredder_run_stats:
-      type: table_view
-      tables:
-        - table: moz-fx-data-shared-prod.monitoring.shredder_run_stats
-    shredder_targets:
-      type: table_view
-      tables:
-        - table: moz-fx-data-shared-prod.monitoring.shredder_targets_v1
   explores:
     payload_bytes_error_all:
       type: ping_explore
@@ -1453,6 +1457,10 @@ monitoring:
       type: table_explore
       views:
         base_view: shredder_targets
+    shredder_per_table_stats:
+      type: table_explore
+      views:
+        base_view: shredder_per_table_stats
 
 reference:
   glean_app: false
