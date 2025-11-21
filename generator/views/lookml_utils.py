@@ -123,6 +123,8 @@ def _get_dimension(
             if group_label and group_item_label:
                 # Dimension groups should not be nested, see issue #82
                 result["label"] = f"{group_label}: {group_item_label}"
+            # `suggest_persist_for` is not supported for dimension groups.
+            del result["suggest_persist_for"]
         elif len(path) > 1:
             result["group_label"] = group_label
             result["group_item_label"] = group_item_label
