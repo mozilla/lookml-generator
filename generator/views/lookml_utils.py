@@ -153,6 +153,20 @@ def _generate_dimensions_helper(schema: List[Any], *prefix: str) -> Iterable[dic
             )
 
 
+def _remove_conflicting_dimension_group_timeframes(
+    dimensions: list[dict[str, Any]]
+) -> None:
+    """Remove timeframes from dimension groups if the resulting dimension would conflict with an existing dimension."""
+    dimension_names = set(dimension["name"] for dimension in dimensions)
+    for dimension in dimensions:
+        if "timeframes" in dimension:
+            dimension["timeframes"] = [
+                timeframe
+                for timeframe in dimension["timeframes"]
+                if f"{dimension['name']}_{timeframe}" not in dimension_names
+            ]
+
+
 def _generate_dimensions(table: str, dryrun) -> List[Dict[str, Any]]:
     """Generate dimensions and dimension groups from a bigquery table.
 
@@ -190,7 +204,10 @@ def _generate_dimensions(table: str, dryrun) -> List[Dict[str, Any]]:
                 f"duplicate dimension {name_key!r} for table {table!r}"
             )
         dimensions[name_key] = dimension
-    return list(dimensions.values())
+
+    dimensions_list = list(dimensions.values())
+    _remove_conflicting_dimension_group_timeframes(dimensions_list)
+    return dimensions_list
 
 
 def _generate_dimensions_from_query(query: str, dryrun) -> List[Dict[str, Any]]:
@@ -217,7 +234,10 @@ def _generate_dimensions_from_query(query: str, dryrun) -> List[Dict[str, Any]]:
         ):
             raise click.ClickException(f"duplicate dimension {name_key!r} in query")
         dimensions[name_key] = dimension
-    return list(dimensions.values())
+
+    dimensions_list = list(dimensions.values())
+    _remove_conflicting_dimension_group_timeframes(dimensions_list)
+    return dimensions_list
 
 
 def _generate_nested_dimension_views(
@@ -236,7 +256,8 @@ def _generate_nested_dimension_views(
                 nested_field_view: Dict[str, Any] = {
                     "name": f"{view_name}__{field['name']}"
                 }
-                dimensions = _generate_dimensions_helper(schema=field["fields"])
+                dimensions = list(_generate_dimensions_helper(schema=field["fields"]))
+                _remove_conflicting_dimension_group_timeframes(dimensions)
                 nested_field_view["dimensions"] = [
                     d for d in dimensions if not _is_dimension_group(d)
                 ]

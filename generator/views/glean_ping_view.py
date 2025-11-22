@@ -340,13 +340,18 @@ class GleanPingView(PingView):
             # will add a _{type} suffix to its individual dimension name.
             lookml["name"] = re.sub("_(date|time(stamp)?)$", "", looker_name)
             lookml["timeframes"] = [
-                "raw",
-                "time",
-                "date",
-                "week",
-                "month",
-                "quarter",
-                "year",
+                timeframe
+                for timeframe in (
+                    "raw",
+                    "time",
+                    "date",
+                    "week",
+                    "month",
+                    "quarter",
+                    "year",
+                )
+                # Exclude timeframes where the resulting dimension would conflict with an existing dimension.
+                if f"{lookml['name']}_{timeframe}" not in sql_map
             ]
             # Dimension groups should not be nested (see issue #82).
             del lookml["group_label"]
