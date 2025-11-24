@@ -1404,6 +1404,10 @@ monitoring:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.monitoring.looker_usage_models
+    looker_user_reported_issues:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.monitoring_derived.looker_user_reported_issues_v1
   explores:
     payload_bytes_error_all:
       type: ping_explore
@@ -1461,6 +1465,10 @@ monitoring:
       type: table_explore
       views:
         base_view: shredder_per_table_stats
+    looker_user_reported_issues:
+      type: table_explore
+      views:
+        base_view: looker_user_reported_issues
 
 reference:
   glean_app: false
