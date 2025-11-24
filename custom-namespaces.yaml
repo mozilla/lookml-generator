@@ -2205,3 +2205,12 @@ bigeye:
       type: table_explore
       views:
         base_view: dashboards
+braze:
+  owners:
+    - lmcfall@mozilla.com
+  pretty_name: Braze Interactions
+  views:
+    braze_sends_combined:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.braze_external.braze_sends_combined_v1
