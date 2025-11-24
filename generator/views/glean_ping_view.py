@@ -48,7 +48,7 @@ RENAMED_METRIC_TYPES = {
 }
 
 
-DISALLOWED_PINGS = {"events"}
+DISALLOWED_PINGS = {"events", "events_stream"}
 
 # List of labeled counter names for which a suggest explore should be generated.
 # Generating suggest explores for all labeled counters slows down Looker.
