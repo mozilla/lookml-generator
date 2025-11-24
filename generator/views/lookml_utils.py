@@ -98,7 +98,7 @@ def _get_dimension(
 
         group_label, group_item_label = None, None
         if len(path) > 1:
-            group_label = slug_to_title(" ".join(path[:-1]))
+            group_label = ": ".join(slug_to_title(slug) for slug in path[:-1])
             group_item_label = slug_to_title(path[-1])
         if result["type"] == "time":
             # Remove _{type} suffix from the last path element for dimension group
