@@ -2208,7 +2208,7 @@ bigeye:
 braze:
   owners:
     - lmcfall@mozilla.com
-  pretty_name: Braze Sends Combined
+  pretty_name: Braze Interactions
   views:
     braze_sends_combined:
       type: table_view
