@@ -45,6 +45,16 @@ class EventsStreamExplore(Explore):
                     "measures": ["event_count"],
                     "filters": [{"submission_date": "7 days"}],
                 },
+                {
+                    "name": "sampled_recent_event_counts",
+                    "description": "A 1% sample of event counts during the past week.",
+                    "dimensions": ["event"],
+                    "measures": ["event_count"],
+                    "filters": [
+                        {"submission_date": "7 days"},
+                        {"sample_id": "[0, 0]"},
+                    ],
+                },
             ],
         }
 
