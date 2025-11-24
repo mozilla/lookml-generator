@@ -103,7 +103,7 @@ class GleanPingView(PingView):
                 category, name = [
                     slug_to_title(v) for v in self._get_category_and_name(metric)
                 ]
-                view_label = f"{category} - {name}"
+                view_label = f"{category}: {name}"
                 metric_hidden = "no" if metric.is_in_source() else "yes"
 
                 measures = [
@@ -312,7 +312,7 @@ class GleanPingView(PingView):
         if not group_label:
             group_label = "Glean"
 
-        friendly_name = f"{group_label} {group_item_label}"
+        friendly_name = f"{group_label}: {group_item_label}"
 
         lookml = {
             "name": looker_name,
