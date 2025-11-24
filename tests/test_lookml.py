@@ -434,6 +434,10 @@ class MockDryRunLookml(MockDryRun):
                     "name": "event",
                     "type": "STRING",
                 },
+                {
+                    "name": "event_year",
+                    "type": "INTEGER",
+                },
             ]
         if table_ref == "mozdata.fail.duplicate_client":
             return [
@@ -1994,7 +1998,6 @@ def test_duplicate_dimension_event(runner, glean_apps, tmp_path):
                                 "week",
                                 "month",
                                 "quarter",
-                                "year",
                             ],
                             "type": "time",
                         },
@@ -2019,7 +2022,13 @@ def test_duplicate_dimension_event(runner, glean_apps, tmp_path):
                             "sql": "${TABLE}.event",
                             "suggest_persist_for": "24 hours",
                             "type": "string",
-                        }
+                        },
+                        {
+                            "name": "event_year",
+                            "sql": "${TABLE}.event_year",
+                            "suggest_persist_for": "24 hours",
+                            "type": "number",
+                        },
                     ],
                     "name": "events_stream",
                     "sql_table_name": "`mozdata.pass.duplicate_event_dimension`",
