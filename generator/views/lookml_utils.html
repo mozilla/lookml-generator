@@ -186,7 +186,7 @@
 </span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>
 </span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>        <span class="n">group_label</span><span class="p">,</span> <span class="n">group_item_label</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
 </span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>            <span class="n">group_label</span> <span class="o">=</span> <span class="n">slug_to_title</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>            <span class="n">group_label</span> <span class="o">=</span> <span class="s2">&quot;: &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">slug_to_title</span><span class="p">(</span><span class="n">slug</span><span class="p">)</span> <span class="k">for</span> <span class="n">slug</span> <span class="ow">in</span> <span class="n">path</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 </span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>            <span class="n">group_item_label</span> <span class="o">=</span> <span class="n">slug_to_title</span><span class="p">(</span><span class="n">path</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 </span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a>        <span class="k">if</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;time&quot;</span><span class="p">:</span>
 </span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a>            <span class="c1"># Remove _{type} suffix from the last path element for dimension group</span>
@@ -460,7 +460,7 @@
                     <div class="attr variable">
             <span class="name">HIDDEN_DIMENSIONS</span>        =
 <input id="HIDDEN_DIMENSIONS-view-value" class="view-value-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-            <label class="view-value-button pdoc-button" for="HIDDEN_DIMENSIONS-view-value"></label><span class="default_value">{(&#39;context_id&#39;,), (&#39;document_id&#39;,), (&#39;additional_properties&#39;,), (&#39;client_info&#39;, &#39;client_id&#39;), (&#39;client_id&#39;,)}</span>
+            <label class="view-value-button pdoc-button" for="HIDDEN_DIMENSIONS-view-value"></label><span class="default_value">{(&#39;client_id&#39;,), (&#39;client_info&#39;, &#39;client_id&#39;), (&#39;context_id&#39;,), (&#39;document_id&#39;,), (&#39;additional_properties&#39;,)}</span>
 
         
     </div>
