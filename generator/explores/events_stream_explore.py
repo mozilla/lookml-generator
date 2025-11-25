@@ -36,7 +36,9 @@ class EventsStreamExplore(Explore):
             "name": self.name,
             "view_name": self.views["base_view"],
             "joins": self.get_unnested_fields_joins_lookml(),
-            "always_filter": self.get_required_filters("base_view"),
+            "always_filter": {
+                "filters": self.get_required_filters("base_view"),
+            },
             "queries": [
                 {
                     "name": "recent_event_counts",
