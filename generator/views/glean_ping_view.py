@@ -48,7 +48,7 @@ RENAMED_METRIC_TYPES = {
 }
 
 
-DISALLOWED_PINGS = {"events"}
+DISALLOWED_PINGS = {"events", "events_stream"}
 
 # List of labeled counter names for which a suggest explore should be generated.
 # Generating suggest explores for all labeled counters slows down Looker.
@@ -103,7 +103,7 @@ class GleanPingView(PingView):
                 category, name = [
                     slug_to_title(v) for v in self._get_category_and_name(metric)
                 ]
-                view_label = f"{category} - {name}"
+                view_label = f"{category}: {name}"
                 metric_hidden = "no" if metric.is_in_source() else "yes"
 
                 measures = [
@@ -312,7 +312,7 @@ class GleanPingView(PingView):
         if not group_label:
             group_label = "Glean"
 
-        friendly_name = f"{group_label} {group_item_label}"
+        friendly_name = f"{group_label}: {group_item_label}"
 
         lookml = {
             "name": looker_name,
@@ -340,13 +340,18 @@ class GleanPingView(PingView):
             # will add a _{type} suffix to its individual dimension name.
             lookml["name"] = re.sub("_(date|time(stamp)?)$", "", looker_name)
             lookml["timeframes"] = [
-                "raw",
-                "time",
-                "date",
-                "week",
-                "month",
-                "quarter",
-                "year",
+                timeframe
+                for timeframe in (
+                    "raw",
+                    "time",
+                    "date",
+                    "week",
+                    "month",
+                    "quarter",
+                    "year",
+                )
+                # Exclude timeframes where the resulting dimension would conflict with an existing dimension.
+                if f"{lookml['name']}_{timeframe}" not in sql_map
             ]
             # Dimension groups should not be nested (see issue #82).
             del lookml["group_label"]

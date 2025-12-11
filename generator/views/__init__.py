@@ -1,6 +1,7 @@
 """All available Looker views."""
 
 from .client_counts_view import ClientCountsView
+from .events_stream_view import EventsStreamView
 from .events_view import EventsView
 from .funnel_analysis_view import FunnelAnalysisView
 from .glean_ping_view import GleanPingView
@@ -14,6 +15,7 @@ from .view import View, ViewDict  # noqa: F401
 
 VIEW_TYPES = {
     ClientCountsView.type: ClientCountsView,
+    EventsStreamView.type: EventsStreamView,
     EventsView.type: EventsView,
     FunnelAnalysisView.type: FunnelAnalysisView,
     OperationalMonitoringView.type: OperationalMonitoringView,

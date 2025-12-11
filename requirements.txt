@@ -207,9 +207,9 @@ gitpython==3.1.45 \
     #   -r requirements.in
     #   mozilla-metric-config-parser
     #   mozilla-schema-generator
-google-api-core[grpc]==2.17.1 \
-    --hash=sha256:610c5b90092c360736baccf17bd3efbcb30dd380e7a6dc28a71059edb8bd0d8e \
-    --hash=sha256:9df18a1f87ee0df0bc4eea2770ebc4228392d8cc4066655b320e2cfccb15db95
+google-api-core[grpc]==2.28.1 \
+    --hash=sha256:2b405df02d68e68ce0fbc138559e6036559e685159d148ae5861013dc201baf8 \
+    --hash=sha256:4021b0f8ceb77a6fb4de6fde4502cecab45062e66ff4f2895169e0b35bc9466c
     # via
     #   google-cloud-bigquery
     #   google-cloud-core
@@ -232,9 +232,9 @@ google-cloud-core==2.4.2 \
     # via
     #   google-cloud-bigquery
     #   google-cloud-storage
-google-cloud-storage==3.4.1 \
-    --hash=sha256:6f041a297e23a4b485fad8c305a7a6e6831855c208bcbe74d00332a909f82268 \
-    --hash=sha256:972764cc0392aa097be8f49a5354e22eb47c3f62370067fb1571ffff4a1c1189
+google-cloud-storage==3.5.0 \
+    --hash=sha256:10b89e1d1693114b3e0ca921bdd28c5418701fd092e39081bb77e5cee0851ab7 \
+    --hash=sha256:e28fd6ad8764e60dbb9a398a7bc3296e7920c494bc329057d828127e5f9630d3
     # via -r requirements.in
 google-crc32c==1.5.0 \
     --hash=sha256:024894d9d3cfbc5943f8f230e23950cd4906b2fe004c72e29b209420a1e6b05a \
@@ -499,8 +499,8 @@ monotonic==1.6 \
     --hash=sha256:3a55207bcfed53ddd5c5bae174524062935efed17792e9de2ad0205ce9ad63f7 \
     --hash=sha256:68687e19a14f11f26d140dd5c86f3dba4bf5df58003000ed467e0e2a69bca96c
     # via segment-analytics-python
-mozilla-metric-config-parser==2025.8.1 \
-    --hash=sha256:659ec7ea9ab039557a821c5d012ab30e55b49608afc1216ecea7fa093bf7df09
+mozilla-metric-config-parser==2025.11.1 \
+    --hash=sha256:6fdecd8cf9a80f874659ff35067bd5c545822871b6cb777c98858239767424fa
     # via -r requirements.in
 mozilla-nimbus-schemas==3001.0.0 \
     --hash=sha256:25b89f8ce1e547b383e067023027b84bdbd01cc32b0375dcc5446df737ded533 \
@@ -667,10 +667,14 @@ polyfactory==2.8.0 \
     --hash=sha256:20346bb77f4a46deef7dcda5b65dd5bd51f606b2e53c6121aea3fdc50320c73a \
     --hash=sha256:cbd501a354659d8f281e13b78614c3010d21b457ae4b98165a157c838211c5b9
     # via mozilla-nimbus-schemas
-pre-commit==4.3.0 \
-    --hash=sha256:2b0747ad7e6e967169136edffee14c16e148a778a54e4f967921aa1ebf2308d8 \
-    --hash=sha256:499fe450cc9d42e9d58e606262795ecb64dd05438943c62b66f6a8673da30b16
+pre-commit==4.4.0 \
+    --hash=sha256:b35ea52957cbf83dcc5d8ee636cbead8624e3a15fbfa61a370e42158ac8a5813 \
+    --hash=sha256:f0233ebab440e9f17cabbb558706eb173d19ace965c68cdce2c081042b4fab15
     # via -r requirements.in
+proto-plus==1.26.1 \
+    --hash=sha256:13285478c2dcf2abb829db158e1047e2f1e8d63a077d94263c2b88b043c75a66 \
+    --hash=sha256:21a515a4c4c0088a773899e23c7bbade3d18f9c66c73edd4c7ee3816bc96a012
+    # via google-api-core
 protobuf==4.24.2 \
     --hash=sha256:237b9a50bd3b7307d0d834c1b0eb1a6cd47d3f4c2da840802cd03ea288ae8880 \
     --hash=sha256:25ae91d21e3ce8d874211110c2f7edd6384816fb44e06b2867afe35139e1fd1c \
@@ -689,6 +693,7 @@ protobuf==4.24.2 \
     #   google-api-core
     #   googleapis-common-protos
     #   grpcio-status
+    #   proto-plus
 pyarrow==20.0.0 \
     --hash=sha256:00138f79ee1b5aca81e2bdedb91e3739b987245e11fa3c826f9e57c5d102fb75 \
     --hash=sha256:11529a2283cb1f6271d7c23e4a8f9f8b7fd173f7360776b668e509d712a02eec \
@@ -1126,9 +1131,9 @@ snowballstemmer==2.2.0 \
     --hash=sha256:09b16deb8547d3412ad7b590689584cd0fe25ec8db3be37788be3810cbf19cb1 \
     --hash=sha256:c8e1716e83cc398ae16824e5572ae04e0d9fc2c6b985fb0f900f5f0c96ecba1a
     # via pydocstyle
-spectacles==2.4.13 \
-    --hash=sha256:88d94142f035869e5df558ca92ed5f286c290c2941e701e4188b8392fd413a32 \
-    --hash=sha256:f846e39b991b8fb49d63d39baad04df1eaf88717d67655f8777603a258af0c89
+spectacles==2.4.14 \
+    --hash=sha256:7eb94c11516294d834a13d89bea9e01f6fdec8b39830e1eecf7043f3194e5f82 \
+    --hash=sha256:80039b6ab5d8cb1fc075be7355b24ee697a270da8a4b9a89777fb2665dfb2e72
     # via -r requirements.in
 tabulate==0.9.0 \
     --hash=sha256:0095b12bf5966de529c0feb1fa08671671b3368eec77d7ef7ab114be2c068b3c \
@@ -1214,9 +1219,9 @@ tzdata==2023.3 \
     --hash=sha256:11ef1e08e54acb0d4f95bdb1be05da659673de4acbd21bf9c69e94cc5e907a3a \
     --hash=sha256:7e65763eef3120314099b6939b5546db7adce1e7d6f2e179e3df563c70511eda
     # via pandas
-urllib3==2.5.0 \
-    --hash=sha256:3fc47733c7e419d4bc3f6b3dc2b4f890bb743906a30d56ba4a5bfa4bbff92760 \
-    --hash=sha256:e6b01673c0fa6a13e374b50871808eb3bf7046c4b125b216f6bf1cc604cff0dc
+urllib3==2.6.0 \
+    --hash=sha256:c90f7a39f716c572c4e3e58509581ebd83f9b59cced005b7db7ad2d22b0db99f \
+    --hash=sha256:cb9bcef5a4b345d5da5d145dc3e30834f58e8018828cbc724d30b4cb7d4d49f1
     # via requests
 virtualenv==20.26.6 \
     --hash=sha256:280aede09a2a5c317e409a00102e7077c6432c5a38f0ef938e643805a7ad2c48 \

@@ -434,6 +434,10 @@ class MockDryRunLookml(MockDryRun):
                     "name": "event",
                     "type": "STRING",
                 },
+                {
+                    "name": "event_year",
+                    "type": "INTEGER",
+                },
             ]
         if table_ref == "mozdata.fail.duplicate_client":
             return [
@@ -911,7 +915,7 @@ def test_lookml_actual_baseline_view_parameterized(
                             "name": "metadata__geo__country",
                             "map_layer_name": "countries",
                             "group_item_label": "Country",
-                            "group_label": "Metadata Geo",
+                            "group_label": "Metadata: Geo",
                             "sql": "${TABLE}.metadata.geo.country",
                             "suggest_persist_for": "24 hours",
                             "type": "string",
@@ -919,7 +923,7 @@ def test_lookml_actual_baseline_view_parameterized(
                         {
                             "name": "metadata__header__date",
                             "group_item_label": "Date",
-                            "group_label": "Metadata Header",
+                            "group_label": "Metadata: Header",
                             "sql": "${TABLE}.metadata.header.date",
                             "suggest_persist_for": "24 hours",
                             "type": "string",
@@ -974,7 +978,6 @@ def test_lookml_actual_baseline_view_parameterized(
                             "datatype": "date",
                             "label": "Client Info: Parsed First Run Date",
                             "sql": "${TABLE}.client_info.parsed_first_run_date",
-                            "suggest_persist_for": "24 hours",
                             "timeframes": [
                                 "raw",
                                 "date",
@@ -987,9 +990,8 @@ def test_lookml_actual_baseline_view_parameterized(
                         },
                         {
                             "name": "metadata__header__parsed",
-                            "label": "Metadata Header: Parsed Date",
+                            "label": "Metadata: Header: Parsed Date",
                             "sql": "${TABLE}.metadata.header.parsed_date",
-                            "suggest_persist_for": "24 hours",
                             "timeframes": [
                                 "raw",
                                 "time",
@@ -1004,7 +1006,6 @@ def test_lookml_actual_baseline_view_parameterized(
                         {
                             "name": "parsed",
                             "sql": "${TABLE}.parsed_timestamp",
-                            "suggest_persist_for": "24 hours",
                             "timeframes": [
                                 "raw",
                                 "time",
@@ -1019,7 +1020,6 @@ def test_lookml_actual_baseline_view_parameterized(
                         {
                             "name": "submission",
                             "sql": "${TABLE}.submission_timestamp",
-                            "suggest_persist_for": "24 hours",
                             "timeframes": [
                                 "raw",
                                 "time",
@@ -1079,14 +1079,14 @@ def test_lookml_actual_metric_definitions_view(
                             "group_item_label": "Boolean",
                             "group_label": "Test",
                             "name": "metrics__boolean__test_boolean",
-                            "label": "Test Boolean",
+                            "label": "Test: Boolean",
                             "sql": "${TABLE}.metrics.boolean.test_boolean",
                             "type": "yesno",
                             "hidden": "no",
                             "links": [
                                 {
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
-                                    "label": "Glean Dictionary reference for Test Boolean",
+                                    "label": "Glean Dictionary reference for Test: Boolean",
                                     "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/test_boolean",  # noqa: E501
                                 }
                             ],
@@ -1095,14 +1095,14 @@ def test_lookml_actual_metric_definitions_view(
                             "group_item_label": "Boolean Not In Source",
                             "group_label": "Test",
                             "name": "metrics__boolean__test_boolean_not_in_source",
-                            "label": "Test Boolean Not In Source",
+                            "label": "Test: Boolean Not In Source",
                             "sql": "${TABLE}.metrics.boolean.test_boolean_not_in_source",
                             "type": "yesno",
                             "hidden": "yes",
                             "links": [
                                 {
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
-                                    "label": "Glean Dictionary reference for Test Boolean Not In Source",
+                                    "label": "Glean Dictionary reference for Test: Boolean Not In Source",
                                     "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/test_boolean_not_in_source",  # noqa: E501
                                 }
                             ],
@@ -1111,7 +1111,7 @@ def test_lookml_actual_metric_definitions_view(
                             "group_item_label": "Counter",
                             "group_label": "Test",
                             "name": "metrics__counter__test_counter",
-                            "label": "Test Counter",
+                            "label": "Test: Counter",
                             "description": "test counter description",
                             "sql": "${TABLE}.metrics.counter.test_counter",
                             "type": "number",
@@ -1119,7 +1119,7 @@ def test_lookml_actual_metric_definitions_view(
                             "links": [
                                 {
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
-                                    "label": "Glean Dictionary reference for Test Counter",
+                                    "label": "Glean Dictionary reference for Test: Counter",
                                     "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/test_counter",  # noqa: E501
                                 }
                             ],
@@ -1128,13 +1128,13 @@ def test_lookml_actual_metric_definitions_view(
                             "group_item_label": "Labeled Counter",
                             "group_label": "Test",
                             "name": "metrics__labeled_counter__test_labeled_counter",
-                            "label": "Test Labeled Counter",
+                            "label": "Test: Labeled Counter",
                             "sql": "${TABLE}.metrics.labeled_counter.test_labeled_counter",
                             "hidden": "yes",
                             "links": [
                                 {
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
-                                    "label": "Glean Dictionary reference for Test Labeled Counter",
+                                    "label": "Glean Dictionary reference for Test: Labeled Counter",
                                     "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/test_labeled_counter",  # noqa: E501
                                 }
                             ],
@@ -1143,13 +1143,13 @@ def test_lookml_actual_metric_definitions_view(
                             "group_item_label": "Labeled Counter Not In Source",
                             "group_label": "Test",
                             "name": "metrics__labeled_counter__test_labeled_counter_not_in_source",
-                            "label": "Test Labeled Counter Not In Source",
+                            "label": "Test: Labeled Counter Not In Source",
                             "sql": "${TABLE}.metrics.labeled_counter.test_labeled_counter_not_in_source",  # noqa: E501
                             "hidden": "yes",
                             "links": [
                                 {
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
-                                    "label": "Glean Dictionary reference for Test Labeled Counter Not In Source",  # noqa: E501
+                                    "label": "Glean Dictionary reference for Test: Labeled Counter Not In Source",  # noqa: E501
                                     "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/test_labeled_counter_not_in_source",  # noqa: E501
                                 }
                             ],
@@ -1158,11 +1158,11 @@ def test_lookml_actual_metric_definitions_view(
                             "group_item_label": "Invalid Label",
                             "group_label": "Glean Error",
                             "hidden": "yes",
-                            "label": "Glean Error Invalid Label",
+                            "label": "Glean Error: Invalid Label",
                             "links": [
                                 {
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",
-                                    "label": "Glean Dictionary reference for Glean Error Invalid Label",
+                                    "label": "Glean Dictionary reference for Glean Error: Invalid Label",
                                     "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/glean_error_invalid_label",  # noqa: E501
                                 }
                             ],
@@ -1176,14 +1176,12 @@ def test_lookml_actual_metric_definitions_view(
                             "links": [
                                 {
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",
-                                    "label": "Glean Dictionary "
-                                    "reference for Glean No "
-                                    "Category Counter",
+                                    "label": "Glean Dictionary reference for Glean: No Category Counter",
                                     "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/no_category_counter",  # noqa: 501
                                 }
                             ],
                             "name": "metrics__counter__no_category_counter",
-                            "label": "Glean No Category Counter",
+                            "label": "Glean: No Category Counter",
                             "sql": "${TABLE}.metrics.counter.no_category_counter",
                             "type": "number",
                         },
@@ -1191,14 +1189,14 @@ def test_lookml_actual_metric_definitions_view(
                             "group_item_label": "Metrics Ping Count",
                             "group_label": "Glean Validation",
                             "name": "metrics__counter__glean_validation_metrics_ping_count",
-                            "label": "Glean Validation Metrics Ping Count",
+                            "label": "Glean Validation: Metrics Ping Count",
                             "sql": "${TABLE}.metrics.counter.glean_validation_metrics_ping_count",  # noqa: E501
                             "type": "number",
                             "hidden": "no",
                             "links": [
                                 {
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
-                                    "label": "Glean Dictionary reference for Glean Validation Metrics Ping Count",  # noqa: E501
+                                    "label": "Glean Dictionary reference for Glean Validation: Metrics Ping Count",  # noqa: E501
                                     "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/glean_validation_metrics_ping_count",  # noqa: E501
                                 }
                             ],
@@ -1207,14 +1205,14 @@ def test_lookml_actual_metric_definitions_view(
                             "group_item_label": "Custom Distribution Sum",
                             "group_label": "Test",
                             "name": "metrics__custom_distribution__test_custom_distribution__sum",
-                            "label": "Test Custom Distribution Sum",
+                            "label": "Test: Custom Distribution Sum",
                             "sql": "${TABLE}.metrics.custom_distribution.test_custom_distribution.sum",
                             "type": "number",
                             "hidden": "no",
                             "links": [
                                 {
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
-                                    "label": "Glean Dictionary reference for Test Custom Distribution Sum",
+                                    "label": "Glean Dictionary reference for Test: Custom Distribution Sum",
                                     "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/test_custom_distribution",  # noqa: E501
                                 }
                             ],
@@ -1223,14 +1221,14 @@ def test_lookml_actual_metric_definitions_view(
                             "group_item_label": "Datetime",
                             "group_label": "Test",
                             "name": "metrics__datetime__test_datetime",
-                            "label": "Test Datetime",
+                            "label": "Test: Datetime",
                             "sql": "${TABLE}.metrics.datetime.test_datetime",
                             "type": "string",
                             "hidden": "no",
                             "links": [
                                 {
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
-                                    "label": "Glean Dictionary reference for Test Datetime",
+                                    "label": "Glean Dictionary reference for Test: Datetime",
                                     "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/test_datetime",  # noqa: E501
                                 }
                             ],
@@ -1239,14 +1237,14 @@ def test_lookml_actual_metric_definitions_view(
                             "group_item_label": "JWE",
                             "group_label": "Test",
                             "name": "metrics__jwe2__test_jwe",
-                            "label": "Test JWE",
+                            "label": "Test: JWE",
                             "sql": "${TABLE}.metrics.jwe2.test_jwe",
                             "type": "string",
                             "hidden": "no",
                             "links": [
                                 {
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
-                                    "label": "Glean Dictionary reference for Test JWE",
+                                    "label": "Glean Dictionary reference for Test: JWE",
                                     "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/test_jwe",  # noqa: E501
                                 }
                             ],
@@ -1255,14 +1253,14 @@ def test_lookml_actual_metric_definitions_view(
                             "group_item_label": "Memory Distribution Sum",
                             "group_label": "Test",
                             "name": "metrics__memory_distribution__test_memory_distribution__sum",
-                            "label": "Test Memory Distribution Sum",
+                            "label": "Test: Memory Distribution Sum",
                             "sql": "${TABLE}.metrics.memory_distribution.test_memory_distribution.sum",
                             "type": "number",
                             "hidden": "no",
                             "links": [
                                 {
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
-                                    "label": "Glean Dictionary reference for Test Memory Distribution Sum",
+                                    "label": "Glean Dictionary reference for Test: Memory Distribution Sum",
                                     "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/test_memory_distribution",  # noqa: E501
                                 }
                             ],
@@ -1271,14 +1269,14 @@ def test_lookml_actual_metric_definitions_view(
                             "group_item_label": "Quantity",
                             "group_label": "Test",
                             "name": "metrics__quantity__test_quantity",
-                            "label": "Test Quantity",
+                            "label": "Test: Quantity",
                             "sql": "${TABLE}.metrics.quantity.test_quantity",
                             "type": "number",
                             "hidden": "no",
                             "links": [
                                 {
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
-                                    "label": "Glean Dictionary reference for Test Quantity",
+                                    "label": "Glean Dictionary reference for Test: Quantity",
                                     "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/test_quantity",  # noqa: E501
                                 }
                             ],
@@ -1287,14 +1285,14 @@ def test_lookml_actual_metric_definitions_view(
                             "group_item_label": "String",
                             "group_label": "Test",
                             "name": "metrics__string__test_string",
-                            "label": "Test String",
+                            "label": "Test: String",
                             "sql": "${TABLE}.metrics.string.test_string",
                             "type": "string",
                             "hidden": "no",
                             "links": [
                                 {
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
-                                    "label": "Glean Dictionary reference for Test String",
+                                    "label": "Glean Dictionary reference for Test: String",
                                     "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/test_string",  # noqa: E501
                                 }
                             ],
@@ -1303,14 +1301,14 @@ def test_lookml_actual_metric_definitions_view(
                             "group_item_label": "Timing Distribution Sum",
                             "group_label": "Test",
                             "name": "metrics__timing_distribution__test_timing_distribution__sum",
-                            "label": "Test Timing Distribution Sum",
+                            "label": "Test: Timing Distribution Sum",
                             "sql": "${TABLE}.metrics.timing_distribution.test_timing_distribution.sum",
                             "type": "number",
                             "hidden": "no",
                             "links": [
                                 {
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
-                                    "label": "Glean Dictionary reference for Test Timing Distribution Sum",
+                                    "label": "Glean Dictionary reference for Test: Timing Distribution Sum",
                                     "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/test_timing_distribution",  # noqa: E501
                                 }
                             ],
@@ -1319,14 +1317,14 @@ def test_lookml_actual_metric_definitions_view(
                             "group_item_label": "Rate Numerator",
                             "group_label": "Test",
                             "name": "metrics__rate__test_rate__numerator",
-                            "label": "Test Rate Numerator",
+                            "label": "Test: Rate Numerator",
                             "sql": "${TABLE}.metrics.rate.test_rate.numerator",
                             "type": "number",
                             "hidden": "no",
                             "links": [
                                 {
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
-                                    "label": "Glean Dictionary reference for Test Rate Numerator",
+                                    "label": "Glean Dictionary reference for Test: Rate Numerator",
                                     "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/test_rate",  # noqa: E501
                                 }
                             ],
@@ -1335,14 +1333,14 @@ def test_lookml_actual_metric_definitions_view(
                             "group_item_label": "Rate Denominator",
                             "group_label": "Test",
                             "name": "metrics__rate__test_rate__denominator",
-                            "label": "Test Rate Denominator",
+                            "label": "Test: Rate Denominator",
                             "sql": "${TABLE}.metrics.rate.test_rate.denominator",
                             "type": "number",
                             "hidden": "no",
                             "links": [
                                 {
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
-                                    "label": "Glean Dictionary reference for Test Rate Denominator",
+                                    "label": "Glean Dictionary reference for Test: Rate Denominator",
                                     "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/test_rate",  # noqa: E501
                                 }
                             ],
@@ -1351,14 +1349,14 @@ def test_lookml_actual_metric_definitions_view(
                             "group_item_label": "Timespan Value",
                             "group_label": "Test",
                             "name": "metrics__timespan__test_timespan__value",
-                            "label": "Test Timespan Value",
+                            "label": "Test: Timespan Value",
                             "sql": "${TABLE}.metrics.timespan.test_timespan.value",
                             "type": "number",
                             "hidden": "no",
                             "links": [
                                 {
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
-                                    "label": "Glean Dictionary reference for Test Timespan Value",
+                                    "label": "Glean Dictionary reference for Test: Timespan Value",
                                     "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/test_timespan",  # noqa: E501
                                 }
                             ],
@@ -1367,14 +1365,14 @@ def test_lookml_actual_metric_definitions_view(
                             "group_item_label": "UUID",
                             "group_label": "Test",
                             "name": "metrics__uuid__test_uuid",
-                            "label": "Test UUID",
+                            "label": "Test: UUID",
                             "sql": "${TABLE}.metrics.uuid.test_uuid",
                             "type": "string",
                             "hidden": "no",
                             "links": [
                                 {
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
-                                    "label": "Glean Dictionary reference for Test UUID",
+                                    "label": "Glean Dictionary reference for Test: UUID",
                                     "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/test_uuid",  # noqa: E501
                                 }
                             ],
@@ -1383,14 +1381,14 @@ def test_lookml_actual_metric_definitions_view(
                             "group_item_label": "URL",
                             "group_label": "Test",
                             "name": "metrics__url2__test_url",
-                            "label": "Test URL",
+                            "label": "Test: URL",
                             "sql": "${TABLE}.metrics.url2.test_url",
                             "type": "string",
                             "hidden": "no",
                             "links": [
                                 {
                                     "icon_url": "https://dictionary.telemetry.mozilla.org/favicon.png",  # noqa: E501
-                                    "label": "Glean Dictionary reference for Test URL",
+                                    "label": "Glean Dictionary reference for Test: URL",
                                     "url": "https://dictionary.telemetry.mozilla.org/apps/glean-app/metrics/test_url",  # noqa: E501
                                 }
                             ],
@@ -1532,7 +1530,7 @@ def test_lookml_actual_metric_definitions_view(
                             "type": "string",
                         },
                     ],
-                    "label": "Glean Error - Invalid Label",
+                    "label": "Glean Error: Invalid Label",
                     "measures": [
                         {
                             "hidden": "yes",
@@ -1578,7 +1576,7 @@ def test_lookml_actual_metric_definitions_view(
                             "type": "string",
                         },
                     ],
-                    "label": "Test - Labeled Counter",
+                    "label": "Test: Labeled Counter",
                     "measures": [
                         {
                             "name": "count",
@@ -1624,7 +1622,7 @@ def test_lookml_actual_metric_definitions_view(
                             "type": "string",
                         },
                     ],
-                    "label": "Test - Labeled Counter Not In Source",
+                    "label": "Test: Labeled Counter Not In Source",
                     "measures": [
                         {
                             "name": "count",
@@ -1991,7 +1989,6 @@ def test_duplicate_dimension_event(runner, glean_apps, tmp_path):
                         {
                             "name": "event",
                             "sql": "${TABLE}.event_timestamp",
-                            "suggest_persist_for": "24 hours",
                             "timeframes": [
                                 "raw",
                                 "time",
@@ -1999,14 +1996,12 @@ def test_duplicate_dimension_event(runner, glean_apps, tmp_path):
                                 "week",
                                 "month",
                                 "quarter",
-                                "year",
                             ],
                             "type": "time",
                         },
                         {
                             "sql": "${TABLE}.submission_timestamp",
                             "type": "time",
-                            "suggest_persist_for": "24 hours",
                             "timeframes": [
                                 "raw",
                                 "time",
@@ -2025,7 +2020,13 @@ def test_duplicate_dimension_event(runner, glean_apps, tmp_path):
                             "sql": "${TABLE}.event",
                             "suggest_persist_for": "24 hours",
                             "type": "string",
-                        }
+                        },
+                        {
+                            "name": "event_year",
+                            "sql": "${TABLE}.event_year",
+                            "suggest_persist_for": "24 hours",
+                            "type": "number",
+                        },
                     ],
                     "name": "events_stream",
                     "sql_table_name": "`mozdata.pass.duplicate_event_dimension`",
@@ -2102,7 +2103,6 @@ def test_context_id(runner, glean_apps, tmp_path):
                             "datatype": "date",
                             "name": "submission",
                             "sql": "${TABLE}.submission_date",
-                            "suggest_persist_for": "24 hours",
                             "timeframes": [
                                 "raw",
                                 "date",
@@ -2192,13 +2192,13 @@ def test_context_id(runner, glean_apps, tmp_path):
                             "name": "context__contexts",
                             "relationship": "one_to_many",
                             "sql": "LEFT JOIN UNNEST(${context.contexts}) AS context__contexts",
-                            "view_label": "Context  Contexts",
+                            "view_label": "Context: Contexts",
                         },
                         {
                             "name": "context__contexts__position",
                             "relationship": "one_to_many",
                             "sql": "LEFT JOIN UNNEST(${context__contexts.position}) AS context__contexts__position",
-                            "view_label": "Context  Contexts  Position",
+                            "view_label": "Context: Contexts: Position",
                         },
                     ],
                     "name": "context",
