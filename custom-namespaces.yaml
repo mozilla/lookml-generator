@@ -1924,16 +1924,6 @@ firefox_metrics:
   owners:
     - vsabino@mozilla.com
   glean_app: false
-firefox_crash_metrics:
-  pretty_name: Firefox Crash Metrics
-  glean_app: false
-  owners:
-    - mhirose@mozilla.com
-  views:
-    crash_aggregations:
-      type: table_view
-      tables:
-        - table: moz-fx-data-shared-prod.telemetry_derived.crash_aggregations_v1
 fxci:
   pretty_name: Firefox-CI Taskcluster
   owners:
@@ -2154,7 +2144,17 @@ trust_and_safety:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.cinder_derived.jobs_v1
-bigeye:
+firefox_crash_metrics:
+  pretty_name: Firefox Crash Metrics
+  glean_app: false
+  owners:
+    - mhirose@mozilla.com
+  views:
+    crash_aggregations:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.telemetry_derived.crash_aggregates_v1
+  bigeye:
   glean_app: false
   pretty_name: Bigeye
   owners:
