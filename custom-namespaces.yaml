@@ -2150,7 +2150,7 @@ firefox_crash_metrics:
   owners:
     - mhirose@mozilla.com
   views:
-    crash_aggregations:
+    crash_aggregates:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.telemetry_derived.crash_aggregates_v1
