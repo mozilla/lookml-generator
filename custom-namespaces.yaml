@@ -2154,7 +2154,7 @@ firefox_crash_metrics:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.telemetry_derived.crash_aggregates_v1
-  bigeye:
+bigeye:
   glean_app: false
   pretty_name: Bigeye
   owners:
