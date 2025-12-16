@@ -186,9 +186,9 @@ faker==19.3.1 \
     --hash=sha256:a6624d9574623bb27dfca33fff94581cd7b23b562901db8ad59acbde9a52543e \
     --hash=sha256:e2722fdf622cf24e974aaba15a3dee97a6f8b98d869bd827ff1af9c87695af46
     # via polyfactory
-filelock==3.12.3 \
-    --hash=sha256:0ecc1dd2ec4672a10c8550a8182f1bd0c0a5088470ecd5a125e45f49472fac3d \
-    --hash=sha256:f067e40ccc40f2b48395a80fcbd4728262fab54e232e090a4063ab804179efeb
+filelock==3.20.1 \
+    --hash=sha256:15d9e9a67306188a44baa72f569d2bfd803076269365fdea0934385da4dc361a \
+    --hash=sha256:b8360948b351b80f420878d8516519a2204b07aefcdcfd24912a5d33127f188c
     # via
     #   pytest-mypy
     #   virtualenv
@@ -1207,7 +1207,6 @@ typing-extensions==4.12.2 \
     #   black
     #   cattrs
     #   exceptiongroup
-    #   filelock
     #   looker-sdk
     #   mozilla-nimbus-schemas
     #   mypy
