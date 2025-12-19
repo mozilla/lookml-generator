@@ -14,9 +14,7 @@ from google.auth.transport.requests import Request as GoogleAuthRequest
 from google.cloud import bigquery
 from google.oauth2.id_token import fetch_id_token
 
-DRY_RUN_URL = (
-    "https://us-central1-moz-fx-data-shared-prod.cloudfunctions.net/bigquery-etl-dryrun"
-)
+DRY_RUN_URL = "https://us-central1-moz-fx-data-shared-prod.cloudfunctions.net/dryrun"
 
 
 def urlopen_with_retry(request, max_retries=5, initial_delay=2.0, timeout=30):
