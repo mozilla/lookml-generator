@@ -65,6 +65,8 @@ class EventsStreamView(View):
         )
         for dimension in dimensions:
             if dimension["name"] == "event_id":
+                # `event_id` columns were added in https://github.com/mozilla/bigquery-etl/pull/8596.
+                dimension["sql"] = "COALESCE(${TABLE}.event_id, GENERATE_UUID())"
                 dimension["primary_key"] = "yes"
 
         measures = self.get_measures(dimensions)
