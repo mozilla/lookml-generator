@@ -185,6 +185,32 @@ function generate_hub_commit() {
   popd
 }
 
+function generate_hub_commit_latest() {
+  # Update main-latest branch using fast-forward merge from main.
+  # This ensures external changes to main-latest are preserved and prevents
+  # force push issues with Looker.
+
+  pushd .
+  cd /app/looker-hub
+
+  # Checkout or create main-latest from main branch
+  git checkout main-latest || git checkout -b main-latest main
+
+  # Attempt fast-forward merge from main branch
+  # This will fail if:
+  # - main-latest has commits not in main (external changes)
+  # - main-latest cannot be fast-forwarded (manual intervention required)
+  if ! git merge --ff-only main; then
+    echo "ERROR: Could not fast-forward merge main to main-latest."
+    echo "This may be due to external changes made directly to main-latest."
+    echo "Manual intervention is required to resolve the conflict."
+    popd
+    return 1
+  fi
+
+  popd
+}
+
 function update_dev_branches() {
   # Reset all dev branches to main
 
@@ -270,6 +296,10 @@ function main() {
   # Publish hub
   cd /app/looker-hub
   git push || git push --set-upstream origin "$HUB_BRANCH_PUBLISH"
+
+  # Generate and publish main-latest with fast-forward only
+  generate_hub_commit_latest
+  git push || git push --set-upstream origin main-latest
 
   # Update dev branches
   if [ "$UPDATE_DEV_BRANCHES" = "true" ] ; then
