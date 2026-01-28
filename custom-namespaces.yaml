@@ -798,6 +798,14 @@ ads:
       type: table_view
       tables:
         - table: mozdata.ads.native_advertiser_monthly_metrics
+    ads_finance_revenue_targets:
+      type: table_view
+      tables:
+        - table: mozdata.static.ads_finance_revenue_targets
+    campaigns_monthly:
+      type: table_view
+      tables:
+        - table: mozdata.ads.campaigns_monthly
 ads_monitoring:
   glean_app: false
   connection: bigquery-oauth
