@@ -806,6 +806,15 @@ ads:
       type: table_view
       tables:
         - table: mozdata.ads.campaigns_monthly
+  explores:
+    campaigns_monthly:
+      type: table_explore
+      views:
+        base_view: campaigns_monthly
+    ads_finance_revenue_targets:
+      type: table_explore
+      views:
+        - base_view: mozdata.static.ads_finance_revenue_targets
 ads_monitoring:
   glean_app: false
   connection: bigquery-oauth
