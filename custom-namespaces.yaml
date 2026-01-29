@@ -814,7 +814,7 @@ ads:
     ads_finance_revenue_targets:
       type: table_explore
       views:
-        base_view: mozdata.static.ads_finance_revenue_targets
+        base_view: ads_finance_revenue_targets
 ads_monitoring:
   glean_app: false
   connection: bigquery-oauth
