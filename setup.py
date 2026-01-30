@@ -12,7 +12,7 @@ readme = open("README.md").read()
 
 setup(
     name="lookml-generator",
-    python_requires=">=3.10.0",
+    python_requires=">=3.11",
     version="0.0.0",
     description="Generator LookML to represent Mozilla data.",
     long_description=readme,
@@ -34,6 +34,6 @@ setup(
     classifiers=[
         "Intended Audience :: Developers",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
     ],
 )

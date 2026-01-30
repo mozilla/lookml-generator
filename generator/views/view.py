@@ -9,7 +9,7 @@ from click import ClickException
 OMIT_VIEWS: Set[str] = set()
 
 
-# TODO: Once we upgrade to Python 3.11 mark just `measures` as non-required, not all keys.
+# TODO: Once we upgrade to Python 3.11 mark just `measures` as non-required, not all keys. -- TODO: need to follow-up on this.
 class ViewDict(TypedDict, total=False):
     """Represent a view definition."""
 
