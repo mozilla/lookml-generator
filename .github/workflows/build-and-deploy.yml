@@ -19,7 +19,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: '3.10'
+          python-version: '3.11'
           # Temporarily pin pip until https://github.com/jazzband/pip-tools/issues/2252 is fixed.
           pip-version: '25.2'
       - name: Verify requirements.txt dependencies
@@ -41,7 +41,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: '3.10'
+          python-version: '3.11'
           # Temporarily pin pip until https://github.com/jazzband/pip-tools/issues/2252 is fixed.
           pip-version: '25.2'
           cache: 'pip'
@@ -85,7 +85,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: '3.10'
+          python-version: '3.11'
           # Temporarily pin pip until https://github.com/jazzband/pip-tools/issues/2252 is fixed.
           pip-version: '25.2'
           cache: 'pip'
@@ -122,7 +122,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: '3.10'
+          python-version: '3.11'
           # Temporarily pin pip until https://github.com/jazzband/pip-tools/issues/2252 is fixed.
           pip-version: '25.2'
           cache: 'pip'
