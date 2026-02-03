@@ -806,6 +806,10 @@ ads:
       type: table_view
       tables:
         - table: mozdata.ads.campaigns_monthly
+    forecast_suggest_monthly:
+      type: table_view
+      tables:
+        - table: mozdata.ads.forecast_suggest_monthly
   explores:
     campaigns_monthly:
       type: table_explore
@@ -815,6 +819,10 @@ ads:
       type: table_explore
       views:
         base_view: ads_finance_revenue_targets
+    forecast_suggest_monthly:
+      type: table_explore
+      views:
+        base_view: forecast_suggest_monthly
 ads_monitoring:
   glean_app: false
   connection: bigquery-oauth
