@@ -1673,6 +1673,11 @@ websites:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.firefoxdotcom.site_engagement_events
+  explores:
+    site_engagement_events:
+      type: table_explore
+      views:
+        base_view: site_engagement_events
 marketing:
   glean_app: false
   pretty_name: Marketing
