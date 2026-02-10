@@ -806,6 +806,21 @@ ads:
       type: table_view
       tables:
         - table: mozdata.ads.campaigns_monthly
+    provider_request_stats_daily:
+      type: table_view
+      tables:
+        - table: mozdata.ads.provider_request_stats_daily
+      measures:
+        total_ads_requested_sum:
+          type: sum
+          sql: "${total_ads_requested}"
+        total_ads_returned_sum:
+          type: sum
+          sql: "${total_ads_returned}"
+        fill_rate_measure:
+          type: number
+          sql: "SAFE_DIVIDE(${total_ads_requested}, ${total_ads_returned})"
+      
   explores:
     campaigns_monthly:
       type: table_explore
@@ -815,6 +830,10 @@ ads:
       type: table_explore
       views:
         base_view: ads_finance_revenue_targets
+    provider_request_stats_daily:
+      type: table_explore
+      views:
+        base_view: provider_request_stats_daily
 ads_monitoring:
   glean_app: false
   connection: bigquery-oauth
