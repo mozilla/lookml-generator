@@ -826,6 +826,21 @@ ads:
         sold_quantity:
           type: sum
           sql: ${sold_quantity}
+    provider_request_stats_daily:
+      type: table_view
+      tables:
+        - table: mozdata.ads.provider_request_stats_daily
+      measures:
+        total_ads_requested_sum:
+          type: sum
+          sql: "${total_ads_requested}"
+        total_ads_returned_sum:
+          type: sum
+          sql: "${total_ads_returned}"
+        fill_rate_measure:
+          type: number
+          sql: "SAFE_DIVIDE(${total_ads_requested_sum}, ${total_ads_returned_sum})"
+      
     forecast_suggest_monthly:
       type: table_view
       tables:
@@ -839,6 +854,10 @@ ads:
       type: table_explore
       views:
         base_view: ads_finance_revenue_targets
+    provider_request_stats_daily:
+      type: table_explore
+      views:
+        base_view: provider_request_stats_daily
     forecast_suggest_monthly:
       type: table_explore
       views:
@@ -1689,6 +1708,15 @@ websites:
       type: table_view
       tables:
         - table: mozdata.google_search_console.limited_historical_search_impressions_by_site
+    site_engagement_events:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.firefoxdotcom.site_engagement_events
+  explores:
+    site_engagement_events:
+      type: table_explore
+      views:
+        base_view: site_engagement_events
 marketing:
   glean_app: false
   pretty_name: Marketing
