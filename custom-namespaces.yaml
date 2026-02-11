@@ -802,10 +802,30 @@ ads:
       type: table_view
       tables:
         - table: mozdata.static.ads_finance_revenue_targets
+      dimensions:
+        month_country_pk:
+          primary_key: yes
+          sql: CONCAT(${month} ${country_code})
     campaigns_monthly:
       type: table_view
       tables:
         - table: mozdata.ads.campaigns_monthly
+      measures:
+        budget:
+          type: sum
+          sql: ${budget}
+        delivered_revenue:
+          type: sum
+          sql: ${delivered_revenue}
+        budgeted_impressions:
+          type: sum
+          sql: ${budgeted_impressions}
+        budgeted_clicks:
+          type: sum
+          sql: ${budgeted_clicks}
+        sold_quantity:
+          type: sum
+          sql: ${sold_quantity}
     provider_request_stats_daily:
       type: table_view
       tables:
