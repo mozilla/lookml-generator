@@ -819,7 +819,7 @@ ads:
           sql: "${total_ads_returned}"
         fill_rate_measure:
           type: number
-          sql: "SAFE_DIVIDE(${total_ads_requested}, ${total_ads_returned})"
+          sql: "SAFE_DIVIDE(${total_ads_requested_sum}, ${total_ads_returned_sum})"
       
     forecast_suggest_monthly:
       type: table_view
