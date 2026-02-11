@@ -831,7 +831,7 @@ ads:
           sql: SAFE_DIVIDE(${booked_budget}, ${budgeted_clicks})
         cpm:
           type: number
-          sql: SAFE_DIVIDE(${booked_budget}, ${budgeted_impressions})
+          sql: SAFE_DIVIDE(${booked_budget}, ${budgeted_impressions}) * 1000
         booked_rate:
           type: number
           sql: SAFE_DIVIDE(${booked_budget}, ${sold_quantity})
