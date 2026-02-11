@@ -826,6 +826,15 @@ ads:
         total_sold_quantity:
           type: sum
           sql: ${sold_quantity}
+        cpc:
+          type: number
+          sql: SAFE_DIVIDE(${booked_budget}, ${budgeted_clicks})
+        cpm:
+          type: number
+          sql: SAFE_DIVIDE(${booked_budget}, ${budgeted_impressions})
+        booked_rate:
+          type: number
+          sql: SAFE_DIVIDE(${booked_budget}, ${sold_quantity})
     provider_request_stats_daily:
       type: table_view
       tables:
@@ -840,7 +849,7 @@ ads:
         fill_rate_measure:
           type: number
           sql: "SAFE_DIVIDE(${total_ads_returned_sum}, ${total_ads_requested_sum})"
-      
+
     forecast_suggest_monthly:
       type: table_view
       tables:
