@@ -811,19 +811,19 @@ ads:
       tables:
         - table: mozdata.ads.campaigns_monthly
       measures:
-        budget:
+        booked_budget:
           type: sum
           sql: ${budget}
-        delivered_revenue:
+        total_delivered_revenue:
           type: sum
           sql: ${delivered_revenue}
-        budgeted_impressions:
+        booked_impressions:
           type: sum
           sql: ${budgeted_impressions}
-        budgeted_clicks:
+        booked_clicks:
           type: sum
           sql: ${budgeted_clicks}
-        sold_quantity:
+        total_sold_quantity:
           type: sum
           sql: ${sold_quantity}
     provider_request_stats_daily:
@@ -840,7 +840,7 @@ ads:
         fill_rate_measure:
           type: number
           sql: "SAFE_DIVIDE(${total_ads_requested_sum}, ${total_ads_returned_sum})"
-      
+
     forecast_suggest_monthly:
       type: table_view
       tables:
