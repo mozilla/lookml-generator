@@ -828,13 +828,13 @@ ads:
           sql: ${sold_quantity}
         cpc:
           type: number
-          sql: SAFE_DIVIDE(${booked_budget}, ${budgeted_clicks})
+          sql: SAFE_DIVIDE(${booked_budget}, ${booked_clicks})
         cpm:
           type: number
-          sql: SAFE_DIVIDE(${booked_budget}, ${budgeted_impressions}) * 1000
+          sql: SAFE_DIVIDE(${booked_budget}, ${booked_impressions}) * 1000
         booked_rate:
           type: number
-          sql: SAFE_DIVIDE(${booked_budget}, ${sold_quantity})
+          sql: SAFE_DIVIDE(${booked_budget}, ${total_sold_quantity})
     provider_request_stats_daily:
       type: table_view
       tables:
