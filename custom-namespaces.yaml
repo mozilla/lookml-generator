@@ -810,6 +810,50 @@ ads:
         month_country_pk:
           primary_key: yes
           sql: CONCAT(${month} ${country_code})
+    equativ_line_item_delivery:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.ads.equativ_line_item_delivery
+      measures:
+        booked_budget:
+          type: sum
+          sql: ${budget}
+        booked_clicks:
+          type: sum
+          sql: ${budgeted_clicks}
+        booked_impressions:
+          type: sum
+          sql: ${budgeted_impressions}
+        total_sold_quantity:
+          type: sum
+          sql: ${sold_quantity}
+        booked_rate_measure:
+          type: number
+          sql: ${booked_rate}
+        total_impression_derived_actual_revenue_sum:
+          type: sum
+          sql: ${total_impression_derived_actual_revenue}
+        total_click_derived_actual_revenue_sum:
+          type: sum
+          sql: ${total_click_derived_actual_revenue}
+        total_impressions_after_contract_end:
+          type: sum
+          sql: ${impressions_after_contract_end}
+        total_clicks_after_contract_end:
+          type: sum
+          sql: ${clicks_after_contract_end}
+        total_oversold_impressions:
+          type: sum
+          sql: ${oversold_impressions}
+        total_oversold_clicks:
+          type: sum
+          sql: ${oversold_clicks}
+        total_underdelivered_impressions:
+          type: sum
+          sql: ${underdelivered_impressions}
+        total_underdelivered_clicks:
+          type: sum
+          sql: ${underdelivered_clicks}
     campaigns_monthly:
       type: table_view
       tables:
@@ -853,7 +897,6 @@ ads:
         fill_rate_measure:
           type: number
           sql: "SAFE_DIVIDE(${total_ads_returned_sum}, ${total_ads_requested_sum})"
-
     forecast_suggest_monthly:
       type: table_view
       tables:
@@ -875,6 +918,10 @@ ads:
       type: table_explore
       views:
         base_view: forecast_suggest_monthly
+    equativ_line_item_delivery:
+      type: table_explore
+      views:
+        base_view: equativ_line_item_delivery
 ads_monitoring:
   glean_app: false
   connection: bigquery-oauth
