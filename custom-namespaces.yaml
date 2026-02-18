@@ -809,7 +809,7 @@ ads:
       dimensions:
         month_country_pk:
           primary_key: yes
-          sql: sql: CONCAT(${month}, ${country})
+          sql: CONCAT(${month}, ${country})
     equativ_line_item_delivery:
       type: table_view
       tables:
