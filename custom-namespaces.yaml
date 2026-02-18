@@ -809,7 +809,7 @@ ads:
       dimensions:
         month_country_pk:
           primary_key: yes
-          sql: CONCAT(${month} ${country_code})
+          sql: CONCAT(${month}, ${country})
     campaigns_monthly:
       type: table_view
       tables:
