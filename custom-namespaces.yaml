@@ -829,7 +829,7 @@ ads:
           sql: ${sold_quantity}
         booked_rate_measure:
           type: number
-          sql: ${booked_rate}
+          sql: SAFE_DIVIDE(${booked_budget}, ${total_sold_quantity})
         total_impression_derived_actual_revenue_sum:
           type: sum
           sql: ${total_impression_derived_actual_revenue}
