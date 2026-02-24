@@ -2,16 +2,16 @@ click==8.3.0
 flake8==7.1.1 
 exceptiongroup  # for pytest on python<=3.10
 google-cloud-bigquery==3.38.0
-google-cloud-storage==3.4.1
+google-cloud-storage==3.5.0
 Jinja2==3.1.6
 lkml==1.3.7
 looker-sdk==25.10.0
-mozilla-metric-config-parser==2025.8.1
+mozilla-metric-config-parser==2025.11.1
 mozilla-nimbus-schemas==3001.0.0
 mozilla-schema-generator==0.5.1
 pandas==2.3.3
 pip-tools==7.5.1
-pre-commit==4.3.0
+pre-commit==4.4.0
 pyarrow==20.0.0
 pytest-black==0.6.0
 pytest-isort==4.0.0
@@ -23,4 +23,4 @@ tomli==2.3.0  # for toml parsing on python<3.11
 types-PyYaml==6.0.12.20250915
 yamllint==1.37.1
 gitpython==3.1.45
-spectacles==2.4.13
+spectacles==2.4.14

@@ -98,7 +98,7 @@ def _get_dimension(
 
         group_label, group_item_label = None, None
         if len(path) > 1:
-            group_label = slug_to_title(" ".join(path[:-1]))
+            group_label = ": ".join(slug_to_title(slug) for slug in path[:-1])
             group_item_label = slug_to_title(path[-1])
         if result["type"] == "time":
             # Remove _{type} suffix from the last path element for dimension group
@@ -123,6 +123,8 @@ def _get_dimension(
             if group_label and group_item_label:
                 # Dimension groups should not be nested, see issue #82
                 result["label"] = f"{group_label}: {group_item_label}"
+            # `suggest_persist_for` is not supported for dimension groups.
+            del result["suggest_persist_for"]
         elif len(path) > 1:
             result["group_label"] = group_label
             result["group_item_label"] = group_item_label
@@ -149,6 +151,20 @@ def _generate_dimensions_helper(schema: List[Any], *prefix: str) -> Iterable[dic
                 field.get("mode", ""),
                 field.get("description", ""),
             )
+
+
+def _remove_conflicting_dimension_group_timeframes(
+    dimensions: list[dict[str, Any]]
+) -> None:
+    """Remove timeframes from dimension groups if the resulting dimension would conflict with an existing dimension."""
+    dimension_names = set(dimension["name"] for dimension in dimensions)
+    for dimension in dimensions:
+        if "timeframes" in dimension:
+            dimension["timeframes"] = [
+                timeframe
+                for timeframe in dimension["timeframes"]
+                if f"{dimension['name']}_{timeframe}" not in dimension_names
+            ]
 
 
 def _generate_dimensions(table: str, dryrun) -> List[Dict[str, Any]]:
@@ -188,7 +204,10 @@ def _generate_dimensions(table: str, dryrun) -> List[Dict[str, Any]]:
                 f"duplicate dimension {name_key!r} for table {table!r}"
             )
         dimensions[name_key] = dimension
-    return list(dimensions.values())
+
+    dimensions_list = list(dimensions.values())
+    _remove_conflicting_dimension_group_timeframes(dimensions_list)
+    return dimensions_list
 
 
 def _generate_dimensions_from_query(query: str, dryrun) -> List[Dict[str, Any]]:
@@ -215,7 +234,10 @@ def _generate_dimensions_from_query(query: str, dryrun) -> List[Dict[str, Any]]:
         ):
             raise click.ClickException(f"duplicate dimension {name_key!r} in query")
         dimensions[name_key] = dimension
-    return list(dimensions.values())
+
+    dimensions_list = list(dimensions.values())
+    _remove_conflicting_dimension_group_timeframes(dimensions_list)
+    return dimensions_list
 
 
 def _generate_nested_dimension_views(
@@ -234,7 +256,8 @@ def _generate_nested_dimension_views(
                 nested_field_view: Dict[str, Any] = {
                     "name": f"{view_name}__{field['name']}"
                 }
-                dimensions = _generate_dimensions_helper(schema=field["fields"])
+                dimensions = list(_generate_dimensions_helper(schema=field["fields"]))
+                _remove_conflicting_dimension_group_timeframes(dimensions)
                 nested_field_view["dimensions"] = [
                     d for d in dimensions if not _is_dimension_group(d)
                 ]

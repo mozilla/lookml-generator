@@ -3,6 +3,7 @@
 from .explore import Explore  # noqa: F401 isort:skip
 from .client_counts_explore import ClientCountsExplore
 from .events_explore import EventsExplore
+from .events_stream_explore import EventsStreamExplore
 from .funnel_analysis_explore import FunnelAnalysisExplore
 from .glean_ping_explore import GleanPingExplore
 from .growth_accounting_explore import GrowthAccountingExplore
@@ -17,6 +18,7 @@ from .table_explore import TableExplore
 EXPLORE_TYPES = {
     ClientCountsExplore.type: ClientCountsExplore,
     EventsExplore.type: EventsExplore,
+    EventsStreamExplore.type: EventsStreamExplore,
     FunnelAnalysisExplore.type: FunnelAnalysisExplore,
     GleanPingExplore.type: GleanPingExplore,
     PingExplore.type: PingExplore,

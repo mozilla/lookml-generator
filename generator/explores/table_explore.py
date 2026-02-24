@@ -31,6 +31,11 @@ class TableExplore(Explore):
         if datagroup := self.get_datagroup():
             explore_lookml["persist_with"] = datagroup
 
+        # Now that purpose-built `events_stream` explores exist (DENG-9548), we'll hide the less functional
+        # `events_stream_table` explores until we can fully deprecate and remove them (DENG-9550).
+        if self.name == "events_stream_table":
+            explore_lookml["hidden"] = "yes"
+
         return [explore_lookml]
 
     @staticmethod

@@ -141,14 +141,16 @@ class Explore:
                 view_name=view_name, views=views
             )
             metric_name = view_name
-            metric_label = slug_to_title(metric_name)
+            metric_slug = metric_name
 
             if view_name in extended_views:
                 # names of extended views are overriden by the name of the view that is extending them
-                metric_label = slug_to_title(
-                    metric_name.replace(base_name, parent_base_name)
-                )
+                metric_slug = metric_name.replace(base_name, parent_base_name)
                 base_name = parent_base_name
+
+            metric_label = ": ".join(
+                slug_to_title(slug) for slug in metric_slug.split("__")
+            )
 
             joins.append(
                 {
