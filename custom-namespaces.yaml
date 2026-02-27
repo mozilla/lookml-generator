@@ -965,7 +965,7 @@ ads:
         base_view: equativ_line_item_delivery
     forecast_content_monthly:
       type: table_explore
-      views: 
+      views:
         base_view: forecast_content_monthly
 ads_monitoring:
   glean_app: false
@@ -1817,11 +1817,19 @@ websites:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.firefoxdotcom.site_engagement_events
+    semrush_domain_overview:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.semrush.domain_overview
   explores:
     site_engagement_events:
       type: table_explore
       views:
         base_view: site_engagement_events
+    semrush_domain_overview:
+      type: table_explore
+      views:
+        base_view: semrush_domain_overview
 marketing:
   glean_app: false
   pretty_name: Marketing
