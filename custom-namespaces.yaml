@@ -932,7 +932,7 @@ ads:
           sql: "${actual_native_glean_sponsored_content_impressions}"
         actual_uapi_impressions_excluding_house_ads_sum:
           type: sum
-          sql: "${actual_uapi_impressions_excluding_house_ads}"
+          sql: "${actual_uapi_impressions_excluding_house}"
         actual_revenue_sum:
           type: sum
           sql: "${actual_revenue}"
