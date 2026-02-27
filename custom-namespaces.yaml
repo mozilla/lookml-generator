@@ -938,10 +938,10 @@ ads:
           sql: "${actual_revenue}"
         actual_ecpm_avg:
           type: number
-          sql: "SAFE_DIVIDE(${actual_revenue_sum},${actual_uapi_impressions_excluding_house_ads})*1000"
+          sql: "SAFE_DIVIDE(${actual_revenue_sum},${actual_uapi_impressions_excluding_house_ads_sum})*1000"
         fill_rate:
           type: number
-          sql: "SAFE_DIVIDE(${actual_uapi_impressions_excluding_house_ads},${forecast_native_inventory})"
+          sql: "SAFE_DIVIDE(${actual_uapi_impressions_excluding_house_ads_sum},${forecast_native_inventory_sum})"
   explores:
     campaigns_monthly:
       type: table_explore
