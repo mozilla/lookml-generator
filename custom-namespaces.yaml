@@ -901,6 +901,47 @@ ads:
       type: table_view
       tables:
         - table: mozdata.ads.forecast_suggest_monthly
+    forecast_content_monthly:
+      type: table_view
+      tables:
+        - table: mozdata.ads.forecast_content_monthly
+      measures:
+        forecast_native_inventory_sum:
+          type: sum
+          sql: "${forecast_native_inventory}"
+        forecast_native_glean_inventory_sum:
+          type: sum
+          sql: "${forecast_native_glean_inventory}"
+        forecast_native_glean_sponsored_impressions_sum:
+          type: sum
+          sql: "${forecast_sponsored_impressions}"
+        forecast_uapi_impressions_excluding_house_ads_sum:
+          type: sum
+          sql: "${forecast_uapi_impressions_excluding_house_ads}"
+        forecast_revenue_sum:
+          type: sum
+          sql: "${forecast_revenue}"
+        forecast_ecpm_avg:
+          type: number
+          sql: "SAFE_DIVIDE(${forecast_revenue_sum},${forecast_uapi_impressions_excluding_house_ads})*1000"
+        actual_native_glean_inventory_sum:
+          type: sum
+          sql: "${actual_native_glean_inventory}"
+        actual_native_glean_sponsored_impressions_sum:
+          type: sum
+          sql: "${actual_native_glean_sponsored_content_impressions}"
+        actual_uapi_impressions_excluding_house_ads_sum:
+          type: sum
+          sql: "${actual_uapi_impressions_excluding_house_ads}"
+        actual_revenue_sum:
+          type: sum
+          sql: "${actual_revenue}"
+        actual_ecpm_avg:
+          type: number
+          sql: "SAFE_DIVIDE(${actual_revenue_sum},${actual_uapi_impressions_excluding_house_ads})*1000"
+        fill_rate:
+          type: number
+          sql: "SAFE_DIVIDE(${actual_uapi_impressions_excluding_house_ads},${forecast_native_inventory})"
   explores:
     campaigns_monthly:
       type: table_explore
