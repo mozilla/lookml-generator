@@ -942,6 +942,90 @@ ads:
         fill_rate:
           type: number
           sql: "SAFE_DIVIDE(${actual_uapi_impressions_excluding_house_ads_sum},${forecast_native_inventory_sum})"
+        forecast_revenue_difference_from_previous_forecast:
+          type: period_over_period
+          kind: difference
+          based_on: forecast_revenue_sum
+          based_on_time: forecast_month_date
+          period: month
+          value_to_date: "no"
+        forecast_revenue_perc_difference_from_previous_forecast:
+          type: period_over_period
+          kind: relative_change
+          based_on: forecast_revenue_sum
+          based_on_time: forecast_month_date
+          period: month
+          value_to_date: "no"
+        forecast_sponsored_impressions_nonhouse_difference_from_previous_forecast:
+          type: period_over_period
+          kind: difference
+          based_on: forecast_uapi_impressions_excluding_house_ads_sum
+          based_on_time: forecast_month_date
+          period: month
+          value_to_date: "no"
+        forecast_sponsored_impressions_nonhouse_perc_difference_from_previous_forecast:
+          type: period_over_period
+          kind: relative_change
+          based_on: forecast_uapi_impressions_excluding_house_ads_sum
+          based_on_time: forecast_month_date
+          period: month
+          value_to_date: "no"
+        forecast_ecpm_difference_from_previous_forecast:
+          type: period_over_period
+          kind: difference
+          based_on: forecast_ecpm_avg
+          based_on_time: forecast_month_date
+          period: month
+          value_to_date: "no"
+        forecast_ecpm_perc_difference_from_previous_forecast:
+          type: period_over_period
+          kind: relative_change
+          based_on: forecast_ecpm_avg
+          based_on_time: forecast_month_date
+          period: month
+          value_to_date: "no"
+        actual_revenue_difference_from_last_month:
+          type: period_over_period
+          kind: difference
+          based_on: actual_revenue_sum
+          based_on_time: submission_month_date
+          period: month
+          value_to_date: "no"
+        actual_revenue_perc_difference_from_last_month:
+          type: period_over_period
+          kind: relative_change
+          based_on: actual_revenue_sum
+          based_on_time: submission_month_date
+          period: month
+          value_to_date: "no"
+        actual_sponsored_impressions_difference_from_last_month:
+          type: period_over_period
+          kind: difference
+          based_on: actual_uapi_impressions_excluding_house_ads_sum
+          based_on_time: submission_month_date
+          period: month
+          value_to_date: "no"
+        actual_sponsored_impressions_perc_difference_from_last_month:
+          type: period_over_period
+          kind: relative_change
+          based_on: actual_uapi_impressions_excluding_house_ads_sum
+          based_on_time: submission_month_date
+          period: month
+          value_to_date: "no"
+        actual_ecpm_difference_from_last_month:
+          type: period_over_period
+          kind: difference
+          based_on: actual_ecpm_avg
+          based_on_time: submission_month_date
+          period: month
+          value_to_date: "no"
+        actual_ecpm_perc_difference_from_last_month:
+          type: period_over_period
+          kind: relative_change
+          based_on: actual_ecpm_avg
+          based_on_time: submission_month_date
+          period: month
+          value_to_date: "no"
   explores:
     campaigns_monthly:
       type: table_explore
