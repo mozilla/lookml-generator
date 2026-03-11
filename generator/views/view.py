@@ -2,20 +2,19 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, Iterator, List, Optional, Set, TypedDict
+from typing import Any, Dict, Iterator, List, NotRequired, Optional, Set, TypedDict
 
 from click import ClickException
 
 OMIT_VIEWS: Set[str] = set()
 
 
-# TODO: Once we upgrade to Python 3.11 mark just `measures` as non-required, not all keys.
-class ViewDict(TypedDict, total=False):
+class ViewDict(TypedDict):
     """Represent a view definition."""
 
     type: str
     tables: List[Dict[str, str]]
-    measures: Dict[str, Dict[str, Any]]
+    measures: NotRequired[Dict[str, Dict[str, Any]]]
 
 
 class View(object):

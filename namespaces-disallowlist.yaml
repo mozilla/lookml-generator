@@ -49,6 +49,8 @@
       - bookmarks_sync_table
       - broken_site_report
       - broken_site_report_table
+      - events_daily_table
+      - funnel_analysis
       - installation
       - installation_table
       - migration
@@ -58,6 +60,7 @@
     explores:
       - bookmarks_sync
       - broken_site_report
+      - funnel_analysis
       - installation
       - migration
       - topsites_impression
