@@ -31,6 +31,10 @@ combined_browser_metrics:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.telemetry.active_users_aggregates_tou_desktop
+    active_users_aggregates_tou_mobile:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.telemetry.active_users_aggregates_tou_mobile
     cohort_daily_statistics:
       type: table_view
       tables:
