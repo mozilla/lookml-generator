@@ -1097,6 +1097,10 @@ ads:
       type: table_explore
       views:
         base_view: forecast_content_monthly
+    equativ_monthly_with_line_item:
+      type: table_explore
+      views:
+        base_view: equativ_monthly_with_line_item
 ads_monitoring:
   glean_app: false
   connection: bigquery-oauth
