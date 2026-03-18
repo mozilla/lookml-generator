@@ -655,11 +655,12 @@ class MetricDefinitionsView(View):
                                                         ERROR("date_groupby_position needs to be set when using submission_week,
                                                         submission_month, submission_quarter, or submission_year")
                                                         {{% endif %}}
-                                                        ROWS BETWEEN {window_size} PRECEDING AND CURRENT ROW
+                                                        ROWS BETWEEN {window_size - 1} PRECEDING AND CURRENT ROW
+                                                    )
                                                     {{% else %}}
                                                     ERROR('Please select a "submission_*" field to compute the rolling average')
                                                     {{% endif %}}
-                                                )""",
+                                                """,
                                                 "group_label": "Statistics",
                                                 "description": f"{window_size} day rolling average of {dimension_label}",
                                             }
