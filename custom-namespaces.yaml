@@ -2514,3 +2514,29 @@ braze:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.braze_external.braze_sends_combined_v1
+ai_usage:
+  glean_app: false
+  owners:
+    - phlee@mozilla.com
+  pretty_name: AI Usage
+  views:
+    claude_api_keys:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.ai_usage_derived.claude_api_keys_v1
+    claude_costs:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.ai_usage_derived.claude_costs_v1
+    claude_usage:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.ai_usage_derived.claude_usage_v1
+    openai_completions:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.ai_usage_derived.openai_completions_v1
+    openai_costs:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.ai_usage_derived.openai_costs_v1
