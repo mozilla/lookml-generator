@@ -93,6 +93,7 @@
       - events_stream_table
       - funnel_analysis
       - growth_accounting
+      - microsurvey_redacted
       - newtab_content
       - nimbus_targeting_context
       - onboarding_opt_out

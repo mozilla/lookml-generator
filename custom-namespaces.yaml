@@ -27,6 +27,14 @@ combined_browser_metrics:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.telemetry.active_users_aggregates_device
+    active_users_aggregates_tou_desktop:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.telemetry.active_users_aggregates_tou_desktop
+    active_users_aggregates_tou_mobile:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.telemetry.active_users_aggregates_tou_mobile
     cohort_daily_statistics:
       type: table_view
       tables:
@@ -854,6 +862,44 @@ ads:
         total_underdelivered_clicks:
           type: sum
           sql: ${underdelivered_clicks}
+    equativ_monthly_with_line_item:
+      type: table_view
+      tables:
+        - table: mozdata.ads.equativ_monthly_with_line_item
+      measures:
+        total_impressions_sum:
+          type: sum
+          sql: ${total_impressions}
+        impressions_during_campaign_sum:
+          type: sum
+          sql: ${impressions_during_campaign}
+        total_clicks_sum:
+          type: sum
+          sql: ${total_clicks}
+        clicks_during_campaign_sum:
+          type: sum
+          sql: ${clicks_during_campaign}
+        total_impression_derived_actual_revenue_sum:
+          type: sum
+          sql: ${total_impression_derived_actual_revenue}
+        total_click_derived_actual_revenue_sum:
+          type: sum
+          sql: ${total_click_derived_actual_revenue}
+        max_impressions_sum:
+          type: sum
+          sql: ${max_impressions}
+        max_clicks_sum:
+          type: sum
+          sql: ${max_clicks}
+        budget_sum:
+          type: sum
+          sql: ${budget}
+        budgeted_impressions_sum:
+          type: sum
+          sql: ${budgeted_impressions}
+        budgeted_clicks_sum:
+          type: sum
+          sql: ${budgeted_clicks}
     campaigns_monthly:
       type: table_view
       tables:
@@ -1051,6 +1097,10 @@ ads:
       type: table_explore
       views:
         base_view: forecast_content_monthly
+    equativ_monthly_with_line_item:
+      type: table_explore
+      views:
+        base_view: equativ_monthly_with_line_item
 ads_monitoring:
   glean_app: false
   connection: bigquery-oauth
