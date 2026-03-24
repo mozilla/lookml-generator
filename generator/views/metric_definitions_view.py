@@ -622,6 +622,24 @@ class MetricDefinitionsView(View):
                     elif statistic_slug == "rolling_average":
                         # rolling averages are computed over existing statistics (e.g. sum, ratio)
                         aggregations = statistic_conf.get("aggregations", ["sum"])
+
+                        # Build a dynamic PARTITION BY clause for the window function.
+                        # For each base field dimension (non-metric, non-client_id), emit a
+                        # liquid conditional so the field is only included in the partition
+                        # when it's actually in the query. The trailing constant `1` ensures
+                        # the PARTITION BY clause is never empty (when no grouping dimension
+                        # is selected `PARTITION BY 1` is equivalent to a global window).
+                        partition_by_conditions = "".join(
+                            f"{{% if {self.name}.{dim['name']}._is_selected %}}{dim['sql']},"
+                            f"{{% endif %}}"
+                            for dim in dimensions
+                            if dim.get("group_label") == "Base Fields"
+                            and dim["name"] != "client_id"
+                        )
+                        partition_by_clause = (
+                            f"PARTITION BY {partition_by_conditions} 1"
+                        )
+
                         for aggregation in aggregations:
                             # find measures that match the current dimension and aggregation type
                             matching_measures = [
@@ -647,6 +665,7 @@ class MetricDefinitionsView(View):
                                                         {self.name}.submission_quarter._is_selected or
                                                         {self.name}.submission_year._is_selected %}}
                                                     AVG(${{{matching_measure['name']}}}) OVER (
+                                                        {partition_by_clause}
                                                         {{% if date_groupby_position._parameter_value != "" %}}
                                                         ORDER BY {{% parameter date_groupby_position %}}
                                                         {{% elsif {self.name}.submission_date._is_selected %}}
