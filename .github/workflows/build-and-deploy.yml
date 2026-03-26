@@ -291,8 +291,8 @@ jobs:
         with:
           project_id: moz-fx-data-artifacts-prod
           image_tags: |-
-		    us-docker.pkg.dev/moz-fx-data-artifacts-prod/lookml-generator/lookml-generator:latest
-		    us-docker.pkg.dev/moz-fx-data-artifacts-prod/lookml-generator/lookml-generator:${{ github.sha }}
+            us-docker.pkg.dev/moz-fx-data-artifacts-prod/lookml-generator/lookml-generator:latest
+            us-docker.pkg.dev/moz-fx-data-artifacts-prod/lookml-generator/lookml-generator:${{ github.sha }}
           workload_identity_pool_project_number: ${{ vars.GCPV2_WORKLOAD_IDENTITY_POOL_PROJECT_NUMBER }}
           service_account_name: lookml-generator
 
