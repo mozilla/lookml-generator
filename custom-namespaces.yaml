@@ -2520,6 +2520,10 @@ ai_usage:
     - phlee@mozilla.com
   pretty_name: AI Usage
   views:
+    ai_costs_combined:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.ai_usage_derived.ai_costs_combined_v1
     claude_api_keys:
       type: table_view
       tables:
