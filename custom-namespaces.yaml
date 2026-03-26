@@ -882,6 +882,7 @@ ads:
         total_impression_derived_actual_revenue_sum:
           type: sum
           sql: ${total_impression_derived_actual_revenue}
+          value_format: "$0.00"
         total_click_derived_actual_revenue_sum:
           type: sum
           sql: ${total_click_derived_actual_revenue}
@@ -900,6 +901,16 @@ ads:
         budgeted_clicks_sum:
           type: sum
           sql: ${budgeted_clicks}
+        delivered_revenue_sum:
+          type: sum
+          sql: ${delivered_revenue}
+          value_format: "$0.00"
+        max_impressions_during_campaign_sum:
+          type: sum
+          sql: ${max_impressions_during_campaign}
+        max_clicks_during_campaign_sum:
+          type: sum
+          sql: ${max_clicks_during_campaign}
     campaigns_monthly:
       type: table_view
       tables:
@@ -908,9 +919,11 @@ ads:
         booked_budget:
           type: sum
           sql: ${budget}
+          value_format: "$0.00"
         total_delivered_revenue:
           type: sum
           sql: ${delivered_revenue}
+          value_format: "$0.00"
         booked_impressions:
           type: sum
           sql: ${budgeted_impressions}
@@ -923,12 +936,15 @@ ads:
         cpc:
           type: number
           sql: SAFE_DIVIDE(${booked_budget}, ${booked_clicks})
+          value_format: "$0.00"
         cpm:
           type: number
           sql: SAFE_DIVIDE(${booked_budget}, ${booked_impressions}) * 1000
+          value_format: "$0.00"
         booked_rate:
           type: number
           sql: SAFE_DIVIDE(${booked_budget}, ${total_sold_quantity})
+          value_format: "$0.00"
     provider_request_stats_daily:
       type: table_view
       tables:
