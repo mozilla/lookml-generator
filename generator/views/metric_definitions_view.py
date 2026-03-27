@@ -779,7 +779,14 @@ class MetricDefinitionsView(View):
 
                                 # rolling averages need special handling to adjust window sizes
                                 # based on the selected time granularity
-                                if statistic_slug == "rolling_average":
+                                if (
+                                    statistic_slug == "rolling_average"
+                                    and "_custom_window" in matching_measure["name"]
+                                ):
+                                    sql = self._create_custom_window_period_sql(
+                                        original_sql, period
+                                    )
+                                elif statistic_slug == "rolling_average":
                                     sql = self._create_rolling_average_period_sql(
                                         original_sql, period
                                     )
@@ -851,6 +858,59 @@ class MetricDefinitionsView(View):
                 f"ROWS BETWEEN {adjusted_window} PRECEDING AND "
                 + f"{adjusted_window - original_window_size} PRECEDING",
                 original_sql,
+            )
+            time_conditions.append(f"{condition}\n{modified_sql}")
+
+        return (
+            "\n".join(time_conditions)
+            + f"\n{{% else %}}\n{original_sql}\n{{% endif %}}"
+        )
+
+    def _create_custom_window_period_sql(self, original_sql: str, period: int) -> str:
+        """
+        Create period-over-period SQL for custom rolling average measures.
+
+        Because the window size is a runtime Looker parameter, Python arithmetic
+        cannot be used. Instead, Liquid {% assign %} tags compute the shifted
+        window boundaries at query time.
+
+        For date granularity (divisor=1):
+            preceding  = window_size - 1
+            start      = preceding + period
+            end        = period
+            → ROWS BETWEEN {{ preceding | plus: period }} PRECEDING AND period PRECEDING
+
+        For coarser granularities (divisor D):
+            adjusted     = (preceding + period) / D   (integer division)
+            adjusted_end = adjusted - preceding
+            → ROWS BETWEEN {{ adjusted }} PRECEDING AND {{ adjusted_end }} PRECEDING
+        """
+        rows_pattern = r"ROWS BETWEEN\s*\{\{[^}]+\}\}\s*PRECEDING AND CURRENT ROW"
+        if not re.search(rows_pattern, original_sql, re.DOTALL):
+            return original_sql
+
+        time_conditions = []
+        for unit, divisor in self.TIME_UNITS:
+            condition = (
+                f"{{% {'if' if unit == 'date' else 'elsif'} "
+                + f"{self.name}.submission_{unit}._is_selected %}}"
+            )
+
+            if unit == "date":
+                rows_replacement = (
+                    f"{{% assign preceding = rolling_average_window_size._parameter_value | minus: 1 %}}\n"
+                    f"ROWS BETWEEN {{{{ preceding | plus: {period} }}}} PRECEDING AND {period} PRECEDING"
+                )
+            else:
+                rows_replacement = (
+                    f"{{% assign preceding = rolling_average_window_size._parameter_value | minus: 1 %}}\n"
+                    f"{{% assign adjusted = preceding | plus: {period} | divided_by: {divisor} %}}\n"
+                    f"{{% assign adjusted_end = adjusted | minus: preceding %}}\n"
+                    f"ROWS BETWEEN {{{{ adjusted }}}} PRECEDING AND {{{{ adjusted_end }}}} PRECEDING"
+                )
+
+            modified_sql = re.sub(
+                rows_pattern, rows_replacement, original_sql, flags=re.DOTALL
             )
             time_conditions.append(f"{condition}\n{modified_sql}")
 
