@@ -328,7 +328,22 @@ class MetricDefinitionsView(View):
             view_defn["dimensions"],
         )
         view_defn["sets"] = self._get_sets()
-        view_defn["parameters"] = self._get_parameters(view_defn["dimensions"])
+        rolling_average_window_sizes = sorted(
+            {
+                window_size
+                for metric in namespace_definitions.metrics.definitions.values()
+                if metric.select_expression
+                and metric.data_source.name == data_source_name
+                and metric.type != "histogram"
+                and metric.statistics
+                for stat_slug, stat_conf in metric.statistics.items()
+                if stat_slug == "rolling_average"
+                for window_size in stat_conf.get("window_sizes", [])
+            }
+        )
+        view_defn["parameters"] = self._get_parameters(
+            view_defn["dimensions"], rolling_average_window_sizes
+        )
         view_defn["filters"] = self._get_filters()
 
         return {"views": [view_defn]}
@@ -411,7 +426,9 @@ class MetricDefinitionsView(View):
             }
         ]
 
-    def _get_parameters(self, dimensions: List[dict]):
+    def _get_parameters(
+        self, dimensions: List[dict], rolling_average_window_sizes: List[int] = []
+    ):
         hide_sampling = "yes"
 
         for dim in dimensions:
@@ -458,7 +475,23 @@ class MetricDefinitionsView(View):
                 + "is selected as BigQuery can't correctly resolve the GROUP BY otherwise",
                 "default_value": "",
             },
-        ]
+        ] + (
+            [
+                {
+                    "name": "rolling_average_window_size",
+                    "label": "Rolling Average Custom Window Size (days)",
+                    "type": "unquoted",
+                    "description": "Number of days for the custom rolling average window.",
+                    "default_value": str(rolling_average_window_sizes[0]),
+                    "allowed_values": [
+                        {"label": f"{w} days", "value": str(w)}
+                        for w in rolling_average_window_sizes
+                    ],
+                }
+            ]
+            if rolling_average_window_sizes
+            else []
+        )
 
     def _get_filters(self):
         return [
@@ -684,6 +717,46 @@ class MetricDefinitionsView(View):
                                                 "description": f"{window_size} day rolling average of {dimension_label}",
                                             }
                                         )
+
+                            # Parametric-window measure: uses the rolling_average_window_size
+                            # parameter so the user can set any window size at query time.
+                            # The parameter value must be n-1 (preceding rows count) because
+                            # SQL does not allow arithmetic in ROWS BETWEEN expressions.
+                            for matching_measure in matching_measures:
+                                measures.append(
+                                    {
+                                        "name": f"{dimension['name']}_{statistic_slug}_{aggregation}_custom_window",
+                                        "type": "number",
+                                        "label": f"{matching_measure['label']} Custom Window Rolling Average",
+                                        "sql": f"""
+                                            {{% if {self.name}.submission_date._is_selected or
+                                                {self.name}.submission_week._is_selected or
+                                                {self.name}.submission_month._is_selected or
+                                                {self.name}.submission_quarter._is_selected or
+                                                {self.name}.submission_year._is_selected %}}
+                                            AVG(${{{matching_measure['name']}}}) OVER (
+                                                {partition_by_clause}
+                                                {{% if date_groupby_position._parameter_value != "" %}}
+                                                ORDER BY {{% parameter date_groupby_position %}}
+                                                {{% elsif {self.name}.submission_date._is_selected %}}
+                                                ORDER BY ${{TABLE}}.analysis_basis
+                                                {{% else %}}
+                                                ERROR("date_groupby_position needs to be set when using submission_week,
+                                                submission_month, submission_quarter, or submission_year")
+                                                {{% endif %}}
+                                                ROWS BETWEEN
+                                                {{{{ rolling_average_window_size._parameter_value | minus: 1 }}}}
+                                                PRECEDING AND CURRENT ROW
+                                            )
+                                            {{% else %}}
+                                            ERROR('Please select a "submission_*" field to compute the rolling average')
+                                            {{% endif %}}
+                                        """,
+                                        "group_label": "Statistics",
+                                        "description": f"Rolling average of {dimension_label} using a window size "
+                                        + "controlled by the 'Rolling Average Custom Window Size' parameter.",
+                                    }
+                                )
 
                     # period-over-period measures compare current values with historical values
                     if "period_over_period" in statistic_conf:
