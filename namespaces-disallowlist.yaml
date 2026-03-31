@@ -43,6 +43,7 @@
 - klar_ios
 - focus_android
 - klar_android
+- subscription_platform_frontend
 - fenix:
     views:
       - bookmarks_sync
