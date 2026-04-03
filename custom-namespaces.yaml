@@ -974,12 +974,18 @@ ads:
         forecast_native_glean_inventory_sum:
           type: sum
           sql: "${forecast_native_glean_inventory}"
+        forecast_native_uapi_inventory_sum:
+          type: sum
+          sql: "${forecast_native_uapi_inventory}"
         forecast_native_glean_sponsored_impressions_sum:
           type: sum
           sql: "${forecast_sponsored_impressions}"
         forecast_uapi_impressions_excluding_house_ads_sum:
           type: sum
           sql: "${forecast_uapi_impressions_excluding_house_ads}"
+        forecast_fill_rate_avg:
+          type: number
+          sql: "SAFE_DIVIDE(${forecast_uapi_impressions_excluding_house_ads_sum},${forecast_native_uapi_inventory_sum})"
         forecast_revenue_sum:
           type: sum
           sql: "${forecast_revenue}"
@@ -989,15 +995,21 @@ ads:
         actual_native_glean_inventory_sum:
           type: sum
           sql: "${actual_native_glean_inventory}"
+        inferred_actual_native_uapi_inventory_sum:
+          type: sum
+          sql: "${inferred_actual_native_uapi_inventory}"
         actual_native_glean_sponsored_impressions_sum:
           type: sum
           sql: "${actual_native_glean_sponsored_content_impressions}"
         actual_uapi_impressions_excluding_house_ads_sum:
           type: sum
-          sql: "${actual_uapi_impressions_excluding_house}"
+          sql: "${actual_uapi_impressions_excluding_house_ads}"
         actual_revenue_sum:
           type: sum
           sql: "${actual_revenue}"
+        actual_fill_rate_avg:
+          type: number
+          sql: "SAFE_DIVIDE(${actual_uapi_impressions_excluding_house_ads_sum},${inferred_actual_native_uapi_inventory_sum})"
         actual_ecpm_avg:
           type: number
           sql: "SAFE_DIVIDE(${actual_revenue_sum},${actual_uapi_impressions_excluding_house_ads_sum})*1000"
@@ -1032,6 +1044,20 @@ ads:
           based_on_time: forecast_month_date
           period: month
           value_to_date: "no"
+        forecast_uapi_inventory_difference_from_previous_forecast:
+          type: period_over_period
+          kind: difference
+          based_on: forecast_native_uapi_inventory_sum
+          based_on_time: forecast_month_date
+          period: month
+          value_to_date: "no"
+        forecast_uapi_inventory_perc_difference_from_previous_forecast:
+          type: period_over_period
+          kind: relative_change
+          based_on: forecast_native_uapi_inventory_sum
+          based_on_time: forecast_month_date
+          period: month
+          value_to_date: "no"
         forecast_ecpm_difference_from_previous_forecast:
           type: period_over_period
           kind: difference
@@ -1043,6 +1069,20 @@ ads:
           type: period_over_period
           kind: relative_change
           based_on: forecast_ecpm_avg
+          based_on_time: forecast_month_date
+          period: month
+          value_to_date: "no"
+        forecast_fill_rate_difference_from_previous_forecast:
+          type: period_over_period
+          kind: difference
+          based_on: forecast_fill_rate_avg
+          based_on_time: forecast_month_date
+          period: month
+          value_to_date: "no"
+        forecast_fill_rate_perc_difference_from_previous_forecast:
+          type: period_over_period
+          kind: relative_change
+          based_on: forecast_fill_rate_avg
           based_on_time: forecast_month_date
           period: month
           value_to_date: "no"
@@ -1074,6 +1114,20 @@ ads:
           based_on_time: submission_month_date
           period: month
           value_to_date: "no"
+        inferred_actual_uapi_inventory_difference_from_last_month:
+          type: period_over_period
+          kind: difference
+          based_on: inferred_actual_native_uapi_inventory_sum
+          based_on_time: submission_month_date
+          period: month
+          value_to_date: "no"
+        inferred_actual_uapi_inventory_perc_difference_from_last_month:
+          type: period_over_period
+          kind: relative_change
+          based_on: inferred_actual_native_uapi_inventory_sum
+          based_on_time: submission_month_date
+          period: month
+          value_to_date: "no"
         actual_ecpm_difference_from_last_month:
           type: period_over_period
           kind: difference
@@ -1085,6 +1139,20 @@ ads:
           type: period_over_period
           kind: relative_change
           based_on: actual_ecpm_avg
+          based_on_time: submission_month_date
+          period: month
+          value_to_date: "no"
+        actual_fill_rate_difference_from_last_month:
+          type: period_over_period
+          kind: difference
+          based_on: actual_fill_rate_avg
+          based_on_time: submission_month_date
+          period: month
+          value_to_date: "no"
+        actual_fill_rate_perc_difference_from_last_month:
+          type: period_over_period
+          kind: relative_change
+          based_on: actual_fill_rate_avg
           based_on_time: submission_month_date
           period: month
           value_to_date: "no"
