@@ -6,6 +6,7 @@ from copy import deepcopy
 from typing import Any, Iterator, Optional
 
 from . import lookml_utils
+from .lookml_utils import DEFAULT_MAX_SUGGEST_PERSIST_FOR
 from .view import View, ViewDict
 
 
@@ -68,6 +69,8 @@ class EventsStreamView(View):
                 # `event_id` columns were added in https://github.com/mozilla/bigquery-etl/pull/8596.
                 dimension["sql"] = "COALESCE(${TABLE}.event_id, GENERATE_UUID())"
                 dimension["primary_key"] = "yes"
+            elif dimension["name"] == "experiments":
+                dimension["sql"] = "JSON_KEYS(${TABLE}.experiments, 1)"
 
         measures = self.get_measures(dimensions)
 
@@ -83,6 +86,35 @@ class EventsStreamView(View):
                         d for d in dimensions if lookml_utils._is_dimension_group(d)
                     ],
                     "measures": measures,
+                },
+                {
+                    "name": f"{self.name}__experiments",
+                    "dimensions": [
+                        {
+                            "name": "id",
+                            "type": "string",
+                            "sql": "${TABLE}",
+                            "suggest_persist_for": DEFAULT_MAX_SUGGEST_PERSIST_FOR,
+                        },
+                        {
+                            "name": "branch",
+                            "type": "string",
+                            "sql": "JSON_VALUE(events_stream.experiments[${TABLE}].branch)",
+                            "suggest_persist_for": DEFAULT_MAX_SUGGEST_PERSIST_FOR,
+                        },
+                        {
+                            "name": "enrollment_id",
+                            "type": "string",
+                            "sql": "JSON_VALUE(events_stream.experiments[${TABLE}].extra.enrollment_id)",
+                            "suggest_persist_for": DEFAULT_MAX_SUGGEST_PERSIST_FOR,
+                        },
+                        {
+                            "name": "type",
+                            "type": "string",
+                            "sql": "JSON_VALUE(events_stream.experiments[${TABLE}].extra.type)",
+                            "suggest_persist_for": DEFAULT_MAX_SUGGEST_PERSIST_FOR,
+                        },
+                    ],
                 },
             ],
         }
