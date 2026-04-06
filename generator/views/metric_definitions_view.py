@@ -138,8 +138,8 @@ class MetricDefinitionsView(View):
 
         if (
             data_source_definition.client_id_column == "NULL"
-            and not base_view_dimensions
-        ) or data_source_definition.columns_as_dimensions:
+            or data_source_definition.columns_as_dimensions
+        ):
             # if the metrics data source doesn't have any joins then use the dimensions
             # of the data source itself as base fields
             date_filter = None
@@ -522,7 +522,14 @@ class MetricDefinitionsView(View):
                 dimension["name"], self.namespace
             )
             if metric and metric.statistics:
-                for statistic_slug, statistic_conf in metric.statistics.items():
+                # Sort statistics so that rolling_average is processed last,
+                # since it depends on measures created by other statistics
+                # (e.g. sum, ratio) to already exist in the measures list.
+                sorted_statistics = sorted(
+                    metric.statistics.items(),
+                    key=lambda item: item[0] == "rolling_average",
+                )
+                for statistic_slug, statistic_conf in sorted_statistics:
                     dimension_label = dimension.get("label") or dimension.get("name")
                     if statistic_slug in [
                         "average",
