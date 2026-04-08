@@ -1363,6 +1363,11 @@ experimentation:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.telemetry.experiment_crash_rates_live
+    experiment_sample_ratio_mismatch:
+      type: table_view
+      tables:
+        - channel: release
+          table: moz-fx-data-experiments.monitoring.experiment_sample_ratio_mismatch_v1
   explores:
     experiment_crash_rates:
       type: table_explore
