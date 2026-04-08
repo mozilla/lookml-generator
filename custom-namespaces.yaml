@@ -1373,6 +1373,10 @@ experimentation:
       type: table_explore
       views:
         base_view: experiment_crash_rates
+    experiment_sample_ratio_mismatch:
+      type: table_explore
+      views:
+        base_view: experiment_sample_ratio_mismatch
 firefox_desktop:
   glean_app: true
   views:
