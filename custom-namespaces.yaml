@@ -1156,6 +1156,10 @@ ads:
           based_on_time: submission_month_date
           period: month
           value_to_date: "no"
+    ads_client_operations_and_errors_hourly:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.ads_derived.ads_client_operations_and_errors_hourly_v1
   explores:
     campaigns_monthly:
       type: table_explore
@@ -1185,6 +1189,10 @@ ads:
       type: table_explore
       views:
         base_view: equativ_monthly_with_line_item
+    ads_client_operations_and_errors_hourly:
+      type: table_explore
+      views:
+        base_view: ads_client_operations_and_errors_hourly
 ads_monitoring:
   glean_app: false
   connection: bigquery-oauth
