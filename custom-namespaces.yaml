@@ -1160,6 +1160,117 @@ ads:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.ads_derived.ads_client_operations_and_errors_hourly_v1
+      measures:
+        build_cache_error_builder_error_sum:
+          type: sum
+          sql: "${build_cache_error_builder_error}"
+        build_cache_error_database_error_sum:
+          type: sum
+          sql: "${build_cache_error_database_error}"
+        build_cache_error_empty_db_path_sum:
+          type: sum
+          sql: "${build_cache_error_empty_db_path}"
+        build_cache_error_invalid_max_size_sum:
+          type: sum
+          sql: "${build_cache_error_invalid_max_size}"
+        build_cache_error_invalid_ttl_sum:
+          type: sum
+          sql: "${build_cache_error_invalid_ttl}"
+        build_cache_error_rate:
+          type: number
+          value_format_name: percent_2
+          sql: "SAFE_DIVIDE(${build_cache_errors_total}, ${op_new_sum})"
+        build_cache_errors_total:
+          type: number
+          sql: >-
+            ${build_cache_error_builder_error_sum} +
+            ${build_cache_error_database_error_sum} +
+            ${build_cache_error_empty_db_path_sum} +
+            ${build_cache_error_invalid_max_size_sum} +
+            ${build_cache_error_invalid_ttl_sum}
+        client_error_record_click_sum:
+          type: sum
+          sql: "${client_error_record_click}"
+        client_error_record_impression_sum:
+          type: sum
+          sql: "${client_error_record_impression}"
+        client_error_report_ad_sum:
+          type: sum
+          sql: "${client_error_report_ad}"
+        client_error_request_ads_sum:
+          type: sum
+          sql: "${client_error_request_ads}"
+        deserialization_error_invalid_ad_item_sum:
+          type: sum
+          sql: "${deserialization_error_invalid_ad_item}"
+        deserialization_error_invalid_array_sum:
+          type: sum
+          sql: "${deserialization_error_invalid_array}"
+        deserialization_error_invalid_structure_sum:
+          type: sum
+          sql: "${deserialization_error_invalid_structure}"
+        deserialization_error_rate:
+          type: number
+          value_format_name: percent_2
+          sql: "SAFE_DIVIDE(${deserialization_errors_total}, ${op_request_ads_sum})"
+        deserialization_errors_total:
+          type: number
+          sql: >-
+            ${deserialization_error_invalid_ad_item_sum} +
+            ${deserialization_error_invalid_array_sum} +
+            ${deserialization_error_invalid_structure_sum}
+        http_cache_outcome_cleanup_failed_sum:
+          type: sum
+          sql: "${http_cache_outcome_cleanup_failed}"
+        http_cache_outcome_hit_sum:
+          type: sum
+          sql: "${http_cache_outcome_hit}"
+        http_cache_outcome_lookup_failed_sum:
+          type: sum
+          sql: "${http_cache_outcome_lookup_failed}"
+        http_cache_outcome_miss_not_cacheable_sum:
+          type: sum
+          sql: "${http_cache_outcome_miss_not_cacheable}"
+        http_cache_outcome_miss_stored_sum:
+          type: sum
+          sql: "${http_cache_outcome_miss_stored}"
+        http_cache_outcome_no_cache_sum:
+          type: sum
+          sql: "${http_cache_outcome_no_cache}"
+        http_cache_outcome_store_failed_sum:
+          type: sum
+          sql: "${http_cache_outcome_store_failed}"
+        op_new_sum:
+          type: sum
+          sql: "${op_new}"
+        op_record_click_sum:
+          type: sum
+          sql: "${op_record_click}"
+        op_record_impression_sum:
+          type: sum
+          sql: "${op_record_impression}"
+        op_report_ad_sum:
+          type: sum
+          sql: "${op_report_ad}"
+        op_request_ads_sum:
+          type: sum
+          sql: "${op_request_ads}"
+        record_click_error_rate:
+          type: number
+          value_format_name: percent_2
+          sql: "SAFE_DIVIDE(${client_error_record_click_sum}, ${op_record_click_sum})"
+        record_impression_error_rate:
+          type: number
+          value_format_name: percent_2
+          sql: "SAFE_DIVIDE(${client_error_record_impression_sum}, ${op_record_impression_sum})"
+        report_ad_error_rate:
+          type: number
+          value_format_name: percent_2
+          sql: "SAFE_DIVIDE(${client_error_report_ad_sum}, ${op_report_ad_sum})"
+        request_ads_error_rate:
+          type: number
+          value_format_name: percent_2
+          sql: "SAFE_DIVIDE(${client_error_request_ads_sum}, ${op_request_ads_sum})"
   explores:
     campaigns_monthly:
       type: table_explore
