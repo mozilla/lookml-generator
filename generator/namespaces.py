@@ -31,7 +31,7 @@ PROBE_INFO_BASE_URI = "https://probeinfo.telemetry.mozilla.org"
 DEFAULT_SPOKE = "looker-spoke-default"
 OPMON_DATASET = "operational_monitoring"
 PROD_PROJECT = "moz-fx-data-shared-prod"
-SKIP_DEPRECATED = ["mozilla_vpn"]
+SKIP_DEPRECATED = ["mozilla-vpn"]
 
 
 def _normalize_slug(name):
