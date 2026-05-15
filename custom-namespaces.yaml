@@ -1879,6 +1879,10 @@ monitoring:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.monitoring_derived.looker_user_reported_issues_v1
+    probe_scraper_applications:
+      type: table_view
+      tables:
+        - table: moz-fx-data-shared-prod.monitoring_derived.probe_scraper_applications_v1
   explores:
     payload_bytes_error_all:
       type: ping_explore
@@ -1940,6 +1944,10 @@ monitoring:
       type: table_explore
       views:
         base_view: looker_user_reported_issues
+    probe_scraper_applications:
+      type: table_explore
+      views:
+        base_view: probe_scraper_applications
 
 reference:
   glean_app: false
