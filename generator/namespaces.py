@@ -31,7 +31,6 @@ PROBE_INFO_BASE_URI = "https://probeinfo.telemetry.mozilla.org"
 DEFAULT_SPOKE = "looker-spoke-default"
 OPMON_DATASET = "operational_monitoring"
 PROD_PROJECT = "moz-fx-data-shared-prod"
-SKIP_DEPRECATED = ["mozilla-vpn"]
 
 
 def _normalize_slug(name):
@@ -233,23 +232,18 @@ def _get_glean_apps(
                 ),
             }
             for channel in variants
-            if not channel.get("deprecated")
-            or channel.get("app_name")
-            not in SKIP_DEPRECATED  # TODO handling for deprecated apps
         ]
 
-        # If all channels are deprecated, don't include this app
-        if channels:
-            apps.append(
-                {
-                    "name": app_name,
-                    "pretty_name": canonical_app_name,
-                    "channels": channels,
-                    "owners": emails,
-                    "glean_app": True,
-                    "v1_name": v1_name,
-                }
-            )
+        apps.append(
+            {
+                "name": app_name,
+                "pretty_name": canonical_app_name,
+                "channels": channels,
+                "owners": emails,
+                "glean_app": True,
+                "v1_name": v1_name,
+            }
+        )
 
     return apps
 
