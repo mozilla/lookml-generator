@@ -1004,13 +1004,13 @@ ads:
         actual_uapi_impressions_excluding_house_ads_sum:
           type: sum
           sql: "${actual_uapi_impressions_excluding_house_ads}"
-        actual_uapi_impressions:
+        actual_uapi_impressions_total:
           type: sum
           sql: "${actual_uapi_impressions}"
         actual_uapi_clicks_excluding_house_ads_sum:
           type: sum
           sql: "${actual_uapi_clicks_excluding_house_ads}"
-        actual_uapi_clicks:
+        actual_uapi_clicks_total:
           type: sum
           sql: "${actual_uapi_clicks}"
         actual_revenue_sum:
