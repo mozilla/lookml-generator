@@ -287,7 +287,7 @@ jobs:
           docker build . -t us-docker.pkg.dev/moz-fx-data-artifacts-prod/lookml-generator/lookml-generator:latest -t us-docker.pkg.dev/moz-fx-data-artifacts-prod/lookml-generator/lookml-generator:${{ github.sha }}
         # yamllint enable
       - name: Push Docker image latest to GAR
-        uses: mozilla-it/deploy-actions/docker-push@b9d76236c1d1dd89daab4ea15651cbe76574267a
+        uses: mozilla/deploy-actions/docker-push@f7f886627a7914358ff56dda226419e1df90ca40  # v6.5.4
         with:
           project_id: moz-fx-data-artifacts-prod
           image_tags: |-
