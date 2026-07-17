@@ -1433,6 +1433,10 @@ ads:
       type: table_explore
       views:
         base_view: forecast_content_monthly
+    forecast_content_daily_aggregates:
+      type: table_explore
+      views:
+        base_view: forecast_content_daily_aggregates    
     equativ_monthly_with_line_item:
       type: table_explore
       views:
