@@ -46,6 +46,7 @@
 - klar_ios
 - focus_android
 - klar_android
+- relay
 - fenix:
     views:
       - bookmarks_sync
