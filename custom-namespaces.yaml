@@ -2139,10 +2139,6 @@ kpi:
     - loines@mozilla.com
   pretty_name: KPI
   views:
-    unified_metrics:
-      type: ping_view
-      tables:
-        - table: mozdata.telemetry.unified_metrics
     automated_kpi_forecasts:
       type: table_view
       tables:
@@ -2151,11 +2147,6 @@ kpi:
       type: table_view
       tables:
         - table: moz-fx-data-shared-prod.telemetry_derived.kpi_automated_forecast_confidences_v1
-  explores:
-    unified_metrics:
-      type: ping_explore
-      views:
-        base_view: unified_metrics
 shared:
   glean_app: false
   pretty_name: Shared
