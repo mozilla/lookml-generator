@@ -1170,6 +1170,24 @@ ads:
       tables:
         - table: mozdata.ads.forecast_content_daily_aggregates
       measures:
+        forecast_total_active_users_sum:
+          type: sum
+          sql: "${forecast_total_active_users}"
+        actual_total_active_users_sum:
+          type: sum
+          sql: "${actual_total_active_users}"
+        forecast_newtab_visits_to_dau_sum:
+          type: sum
+          sql: "${forecast_newtab_visits_to_dau}"
+        actual_newtab_visits_to_dau_sum:
+          type: sum
+          sql: "${actual_newtab_visits_to_dau}"
+        forecast_total_newtab_visits_sum:
+          type: sum
+          sql: "${forecast_total_newtab_visits}"
+        actual_total_newtab_visits_sum:
+          type: sum
+          sql: "${actual_total_newtab_visits}"
         forecast_native_inventory_sum:
           type: sum
           sql: "${forecast_native_inventory}"
