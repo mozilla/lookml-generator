@@ -1231,84 +1231,84 @@ ads:
           type: period_over_period
           kind: difference
           based_on: forecast_uapi_impressions_excluding_house_ads_sum
-          based_on_time: forecast_month_date
+          based_on_time: forecast_month
           period: month
           value_to_date: "no"
         forecast_sponsored_impressions_nonhouse_perc_difference_from_previous_forecast:
           type: period_over_period
           kind: relative_change
           based_on: forecast_uapi_impressions_excluding_house_ads_sum
-          based_on_time: forecast_month_date
+          based_on_time: forecast_month
           period: month
           value_to_date: "no"
         forecast_uapi_inventory_difference_from_previous_forecast:
           type: period_over_period
           kind: difference
           based_on: forecast_native_uapi_inventory_sum
-          based_on_time: forecast_month_date
+          based_on_time: forecast_month
           period: month
           value_to_date: "no"
         forecast_uapi_inventory_perc_difference_from_previous_forecast:
           type: period_over_period
           kind: relative_change
           based_on: forecast_native_uapi_inventory_sum
-          based_on_time: forecast_month_date
+          based_on_time: forecast_month
           period: month
           value_to_date: "no"
         forecast_fill_rate_difference_from_previous_forecast:
           type: period_over_period
           kind: difference
           based_on: forecast_fill_rate_avg
-          based_on_time: forecast_month_date
+          based_on_time: forecast_month
           period: month
           value_to_date: "no"
         forecast_fill_rate_perc_difference_from_previous_forecast:
           type: period_over_period
           kind: relative_change
           based_on: forecast_fill_rate_avg
-          based_on_time: forecast_month_date
+          based_on_time: forecast_month
           period: month
           value_to_date: "no"
         actual_sponsored_impressions_difference_from_last_month:
           type: period_over_period
           kind: difference
           based_on: actual_uapi_impressions_excluding_house_ads_sum
-          based_on_time: submission_month_date
+          based_on_time: submission_month
           period: month
           value_to_date: "no"
         actual_sponsored_impressions_perc_difference_from_last_month:
           type: period_over_period
           kind: relative_change
           based_on: actual_uapi_impressions_excluding_house_ads_sum
-          based_on_time: submission_month_date
+          based_on_time: submission_month
           period: month
           value_to_date: "no"
         inferred_actual_uapi_inventory_difference_from_last_month:
           type: period_over_period
           kind: difference
           based_on: inferred_actual_native_uapi_inventory_sum
-          based_on_time: submission_month_date
+          based_on_time: submission_month
           period: month
           value_to_date: "no"
         inferred_actual_uapi_inventory_perc_difference_from_last_month:
           type: period_over_period
           kind: relative_change
           based_on: inferred_actual_native_uapi_inventory_sum
-          based_on_time: submission_month_date
+          based_on_time: submission_month
           period: month
           value_to_date: "no"
         actual_fill_rate_difference_from_last_month:
           type: period_over_period
           kind: difference
           based_on: actual_fill_rate_avg
-          based_on_time: submission_month_date
+          based_on_time: submission_month
           period: month
           value_to_date: "no"
         actual_fill_rate_perc_difference_from_last_month:
           type: period_over_period
           kind: relative_change
           based_on: actual_fill_rate_avg
-          based_on_time: submission_month_date
+          based_on_time: submission_month
           period: month
           value_to_date: "no"
     ads_client_operations_and_errors_hourly:
