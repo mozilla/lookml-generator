@@ -838,12 +838,9 @@ ads:
         booked_rate_measure:
           type: number
           sql: SAFE_DIVIDE(${booked_budget}, ${total_sold_quantity})
-        total_impression_derived_actual_revenue_sum:
+        total_delivered_revenue_sum:
           type: sum
-          sql: ${total_impression_derived_actual_revenue}
-        total_click_derived_actual_revenue_sum:
-          type: sum
-          sql: ${total_click_derived_actual_revenue}
+          sql: ${total_delivered_revenue}
         total_impressions_after_contract_end:
           type: sum
           sql: ${impressions_after_contract_end}
@@ -879,13 +876,6 @@ ads:
         clicks_during_campaign_sum:
           type: sum
           sql: ${clicks_during_campaign}
-        total_impression_derived_actual_revenue_sum:
-          type: sum
-          sql: ${total_impression_derived_actual_revenue}
-          value_format: "$0.00"
-        total_click_derived_actual_revenue_sum:
-          type: sum
-          sql: ${total_click_derived_actual_revenue}
         max_impressions_sum:
           type: sum
           sql: ${max_impressions}
