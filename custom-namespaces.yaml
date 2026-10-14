@@ -2215,6 +2215,58 @@ marketing:
       type: table_view
       tables:
         - table: mozdata.analysis.marketing_firefox_for_families_forecasted_expectations
+    unified_attribution_clients_agg:
+      type: table_view
+      tables:
+        - table: mozdata.fenix.unified_attribution_clients_agg
+      measures:
+        total_new_profiles:
+          type: sum
+          sql: "${new_profiles}"
+        total_activated_profiles:
+          type: sum
+          sql: "${d4_6_retained}"
+        total_activated_eligible:
+          type: sum
+          sql: "${d4_6_eligible}"
+        total_w4_retained:
+          type: sum
+          sql: "${w4_retained}"
+        total_w4_eligible:
+          type: sum
+          sql: "${w4_eligible}"
+        activation_rate:
+          type: number
+          sql: SAFE_DIVIDE(${total_activated_profiles}, ${total_activated_eligible})
+        retention_rate:
+          type: number
+          sql: SAFE_DIVIDE(${total_w4_retained}, ${total_w4_eligible})
+    firefox_desktop_unified_attribution_clients_agg:
+      type: table_view
+      tables:
+        - table: mozdata.telemetry.firefox_desktop_unified_attribution_clients_agg
+      measures:
+        total_new_profiles:
+          type: sum
+          sql: "${new_profiles}"
+        total_activated_profiles:
+          type: sum
+          sql: "${d4_6_retained}"
+        total_activated_eligible:
+          type: sum
+          sql: "${d4_6_eligible}"
+        total_w4_retained:
+          type: sum
+          sql: "${w4_retained}"
+        total_w4_eligible:
+          type: sum
+          sql: "${w4_eligible}"
+        activation_rate:
+          type: number
+          sql: SAFE_DIVIDE(${total_activated_profiles}, ${total_activated_eligible})
+        retention_rate:
+          type: number
+          sql: SAFE_DIVIDE(${total_w4_retained}, ${total_w4_eligible})
 fivetran:
   glean_app: false
   owners:
