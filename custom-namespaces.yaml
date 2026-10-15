@@ -2215,67 +2215,6 @@ marketing:
       type: table_view
       tables:
         - table: mozdata.analysis.marketing_firefox_for_families_forecasted_expectations
-    unified_attribution_clients_agg:
-      type: table_view
-      tables:
-        - table: mozdata.fenix.unified_attribution_clients_agg
-      measures:
-        total_new_profiles:
-          type: sum
-          sql: "${new_profiles}"
-        total_activated_profiles:
-          type: sum
-          sql: "${d4_6_retained}"
-        total_activated_eligible:
-          type: sum
-          sql: "${d4_6_eligible}"
-        total_w4_retained:
-          type: sum
-          sql: "${w4_retained}"
-        total_w4_eligible:
-          type: sum
-          sql: "${w4_eligible}"
-        activation_rate:
-          type: number
-          sql: SAFE_DIVIDE(${total_activated_profiles}, ${total_activated_eligible})
-        retention_rate:
-          type: number
-          sql: SAFE_DIVIDE(${total_w4_retained}, ${total_w4_eligible})
-    firefox_desktop_unified_attribution_clients_agg:
-      type: table_view
-      tables:
-        - table: mozdata.telemetry.firefox_desktop_unified_attribution_clients_agg
-      measures:
-        total_new_profiles:
-          type: sum
-          sql: "${new_profiles}"
-        total_activated_profiles:
-          type: sum
-          sql: "${d4_6_retained}"
-        total_activated_eligible:
-          type: sum
-          sql: "${d4_6_eligible}"
-        total_w4_retained:
-          type: sum
-          sql: "${w4_retained}"
-        total_w4_eligible:
-          type: sum
-          sql: "${w4_eligible}"
-        activation_rate:
-          type: number
-          sql: SAFE_DIVIDE(${total_activated_profiles}, ${total_activated_eligible})
-        retention_rate:
-          type: number
-          sql: SAFE_DIVIDE(${total_w4_retained}, ${total_w4_eligible})
-  explores:
-    unified_attribution_clients_agg:
-      type: table_explore
-      views:
-        base_view: unified_attribution_clients_agg
-    firefox_desktop_unified_attribution_clients_agg:
-      type: table_explore
-      views:
-        base_view: firefox_desktop_unified_attribution_clients_agg
 marketing_private:
   glean_app: false
   connection: bigquery-oauth
@@ -2284,15 +2223,58 @@ marketing_private:
   pretty_name: Marketing Private
   spoke: looker-spoke-private
   views:
-    marketing_daily_campaign_stats:
+    unified_attribution_performance:
       type: table_view
       tables:
-        - table: mozdata.marketing_ads.daily_campaign_stats
+        - table: mozdata.marketing_ads.unified_attribution_performance
+      measures:
+        total_new_profiles:
+          type: sum
+          sql: "${new_profiles}"
+        total_activated_profiles:
+          type: sum
+          sql: "${d4_6_retained}"
+        total_activated_eligible:
+          type: sum
+          sql: "${d4_6_eligible}"
+        total_w4_retained:
+          type: sum
+          sql: "${w4_retained}"
+        total_w4_eligible:
+          type: sum
+          sql: "${w4_eligible}"
+        activation_rate:
+          type: number
+          sql: SAFE_DIVIDE(${total_activated_profiles}, ${total_activated_eligible})
+        retention_rate:
+          type: number
+          sql: SAFE_DIVIDE(${total_w4_retained}, ${total_w4_eligible})
+        total_clicks:
+          type: sum
+          sql: "${clicks}"
+        total_impressions:
+          type: sum
+          sql: "${impressions}"
+        total_spend:
+          type: sum
+          sql: "${spend}"
+        total_conversions:
+          type: sum
+          sql: "${conversions}"
+        cost_per_new_profile:
+          type: number
+          sql: SAFE_DIVIDE(${total_spend}, ${total_new_profiles})
+        cost_per_activated_profile:
+          type: number
+          sql: SAFE_DIVIDE(${total_spend}, ${total_activated_profiles})
+        cost_per_w4_retained_profile:
+          type: number
+          sql: SAFE_DIVIDE(${total_spend}, ${total_w4_retained})
   explores:
-    marketing_daily_campaign_stats:
+    unified_attribution_performance:
       type: table_explore
       views:
-        base_view: marketing_daily_campaign_stats
+        base_view: unified_attribution_performance
 fivetran:
   glean_app: false
   owners:
