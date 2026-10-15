@@ -2267,6 +2267,32 @@ marketing:
         retention_rate:
           type: number
           sql: SAFE_DIVIDE(${total_w4_retained}, ${total_w4_eligible})
+  explores:
+    unified_attribution_clients_agg:
+      type: table_explore
+      views:
+        base_view: unified_attribution_clients_agg
+    firefox_desktop_unified_attribution_clients_agg:
+      type: table_explore
+      views:
+        base_view: firefox_desktop_unified_attribution_clients_agg
+marketing_private:
+  glean_app: false
+  connection: bigquery-oauth
+  owners:
+    - data-marketing-wg@mozilla.com
+  pretty_name: Marketing Private
+  spoke: looker-spoke-private
+  views:
+    marketing_daily_campaign_stats:
+      type: table_view
+      tables:
+        - table: mozdata.marketing_ads.daily_campaign_stats
+  explores:
+    marketing_daily_campaign_stats:
+      type: table_explore
+      views:
+        base_view: marketing_daily_campaign_stats
 fivetran:
   glean_app: false
   owners:
