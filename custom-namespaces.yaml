@@ -2246,9 +2246,11 @@ marketing_private:
         activation_rate:
           type: number
           sql: SAFE_DIVIDE(${total_activated_profiles}, ${total_activated_eligible})
+          value_format_name: percent_2
         retention_rate:
           type: number
           sql: SAFE_DIVIDE(${total_w4_retained}, ${total_w4_eligible})
+          value_format_name: percent_2
         total_clicks:
           type: sum
           sql: "${clicks}"
@@ -2258,18 +2260,22 @@ marketing_private:
         total_spend:
           type: sum
           sql: "${spend}"
+          value_format: "$0.00"
         total_conversions:
           type: sum
           sql: "${conversions}"
         cost_per_new_profile:
           type: number
           sql: SAFE_DIVIDE(${total_spend}, ${total_new_profiles})
+          value_format: "$0.00"
         cost_per_activated_profile:
           type: number
           sql: SAFE_DIVIDE(${total_spend}, ${total_activated_profiles})
+          value_format: "$0.00"
         cost_per_w4_retained_profile:
           type: number
           sql: SAFE_DIVIDE(${total_spend}, ${total_w4_retained})
+          value_format: "$0.00"
   explores:
     unified_attribution_performance:
       type: table_explore
