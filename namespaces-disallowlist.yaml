@@ -118,6 +118,36 @@
       - user_characteristics
 - firefox_ios:
     views:
+      - bookmarks_sync
+      - bookmarks_sync_table
+      - broken_site_report
+      - broken_site_report_table
+      - creditcards_sync
+      - creditcards_sync_table
+      - events_first_seen
+      - events_first_seen_table
+      - events_stream_table
+      - first_session
+      - first_session_table
+      - fx_accounts
+      - fx_accounts_table
+      - fx_suggest
+      - fx_suggest_table
+      - growth_accounting
+      - history_sync
+      - history_sync_table
+      - installation
+      - installation_table
+      - nimbus_targeting_context
+      - nimbus_targeting_context_table
+      - onboarding
+      - onboarding_opt_out
+      - onboarding_opt_out_table
+      - onboarding_table
+      - rust_component_errors
+      - rust_component_errors_table
+      - sync
+      - sync_table
       - temp_bookmarks_sync
       - temp_bookmarks_sync_table
       - temp_clients_sync
@@ -137,6 +167,24 @@
       - topsites_impression
       - topsites_impression_table
     explores:
+      - bookmarks_sync
+      - broken_site_report
+      - creditcards_sync
+      - events_first_seen
+      - events_stream_table
+      - feature_usage_events
+      - feature_usage_metrics
+      - first_session
+      - fx_accounts
+      - fx_suggest
+      - growth_accounting
+      - history_sync
+      - installation
+      - nimbus_targeting_context
+      - onboarding
+      - onboarding_opt_out
+      - rust_component_errors
+      - sync
       - temp_bookmarks_sync
       - temp_clients_sync
       - temp_credit_cards_sync
